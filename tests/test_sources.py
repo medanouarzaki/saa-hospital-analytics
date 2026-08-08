@@ -13,7 +13,9 @@ ce test rouge sur un registre par ailleurs correct, et il finirait par être
 désactivé — ce que ce test existe précisément pour éviter.
 """
 
+import importlib.util
 import subprocess
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -21,6 +23,8 @@ import yaml
 
 RACINE = Path(__file__).resolve().parent.parent
 SOURCES = RACINE / "docs" / "sources" / "sources.yml"
+CONVERTISSEUR = RACINE / "docs" / "sources" / "to_bibtex.py"
+BIBLIOGRAPHIE = RACINE / "report" / "biblio.bib"
 
 FIABILITE_AUTORISEES = {"officielle", "academique", "presse", "secondaire"}
 VERIFICATION_AUTORISEES = {
@@ -183,6 +187,33 @@ def test_urls_vivantes() -> None:
     print(f"entrées ignorées (url=sans_url) : {len(ignorees_sans_url)}")
 
     assert not echecs, "État déclaré non conforme à l'état mesuré : " + " | ".join(echecs)
+
+
+def test_biblio_synchronisee() -> None:
+    """report/biblio.bib est un fichier produit et committé : rien ne garantit
+    qu'il reste synchrone avec sources.yml après une modification manuelle de
+    l'un sans régénération de l'autre. Ce test régénère la bibliographie dans
+    un répertoire temporaire hors du dépôt (jamais dans report/), et compare
+    octet à octet au fichier committé. Il ne réécrit jamais report/biblio.bib :
+    un test qui corrige ce qu'il contrôle ne contrôle rien.
+    """
+    spec = importlib.util.spec_from_file_location("to_bibtex", CONVERTISSEUR)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    with tempfile.TemporaryDirectory() as tmp:
+        destination_temporaire = Path(tmp) / "biblio_regenere.bib"
+        module.SOURCE = SOURCES
+        module.DESTINATION = destination_temporaire
+        module.main()
+        contenu_regenere = destination_temporaire.read_bytes()
+
+    contenu_committe = BIBLIOGRAPHIE.read_bytes()
+
+    assert contenu_regenere == contenu_committe, (
+        "report/biblio.bib n'est plus synchrone avec docs/sources/sources.yml : "
+        "régénérer avec `uv run python3 docs/sources/to_bibtex.py`"
+    )
 
 
 if __name__ == "__main__":
