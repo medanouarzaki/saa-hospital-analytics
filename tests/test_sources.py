@@ -166,9 +166,8 @@ def test_urls_vivantes() -> None:
     for source in a_controler:
         code = code_http(source["url"])
         morte_attendue = source["verification"] == "introuvable"
-        print(
-            f"{source['id']} : {code} : attendu={'mort' if morte_attendue else 'vivant'} : {source['url']}"
-        )
+        attendu = "mort" if morte_attendue else "vivant"
+        print(f"{source['id']} : {code} : attendu={attendu} : {source['url']}")
 
         if code in NI_PREUVE_NI_CONTRE_PREUVE:
             continue
