@@ -55,13 +55,12 @@ def construire_entree(source: dict) -> str:
     # données @misc de biblatex exige un champ date/year valide (un entier),
     # et aucune valeur de repli honnête (ni vide, ni "n.d.") ne satisfait
     # cette contrainte sans fabriquer une date. L'omission est le choix le
-    # moins inexact ; le résidu d'avertissement biber en est la conséquence
-    # mesurée et documentée à l'étape 5 du rapport, pas une négligence.
+    # moins inexact.
     #
-    # Mesuré au lot 1.E : ce résidu (4 avertissements sur les entrées
-    # non_datee) n'apparaît qu'avec l'option --validate-datamodel de biber,
-    # optionnelle. `biber --tool` en usage normal, sans cette stricture,
-    # ne signale ni avertissement ni erreur sur le fichier produit.
+    # Ce résidu (avertissement sur les entrées non_datee) n'apparaît qu'avec
+    # l'option --validate-datamodel de biber, optionnelle. `biber --tool` en
+    # usage normal, sans cette stricture, ne signale ni avertissement ni
+    # erreur sur le fichier produit.
 
     lignes = [f"@misc{{{cle},"]
     for nom_champ, valeur in champs.items():
