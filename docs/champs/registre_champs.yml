@@ -1,0 +1,618 @@
+# Registre des champs — colonnes de la couche source
+#
+# Règle de preuve. Un champ `OBS` porte un identifiant de ligne du relevé de
+# champs (`docs/observation/releve_champs.yml`). Un champ `DOC` porte un
+# identifiant du registre des sources (`docs/sources/sources.yml`). Un champ
+# `HYP` porte une justification écrite et l'effet qu'aurait une hypothèse
+# fausse.
+#
+# `type` vaut `text` sur toute colonne du schéma `source`, sans exception.
+# Ce n'est pas un défaut de typage : la couche source reproduit une
+# extraction avec ses défauts, et une ligne mal formée doit se charger pour
+# partir ensuite en quarantaine. Le typage strict et la standardisation des
+# dates appartiennent à la couche intermédiaire. Si PostgreSQL rejetait la
+# ligne au chargement, le dispositif de quarantaine n'aurait plus d'objet.
+#
+# Lignes du relevé qui n'entrent pas au modèle, et pourquoi :
+#   - REL-PAT.D07 Âge — dérivable de la date de naissance, ne se stocke pas ;
+#   - REL-PAT.D08 et REL-RDV.I08 Num — libellé relevé, nature de la donnée
+#     non observée ; une colonne dont le contenu est inconnu ne se modélise
+#     pas ;
+#   - REL-RDV.I02 à REL-RDV.I07, REL-RDV.I09, REL-RDV.I10 — le bloc
+#     d'identification de l'écran de rendez-vous rappelle des données du
+#     dossier patient ; elles sont affichées, non saisies, et appartiennent
+#     à source.patients.
+
+- table: source.patients
+  colonne: n_ipp
+  type: text
+  type_metier: code
+  libelle_hosix: "N° IPP"
+  provenance: OBS
+  preuve: REL-PAT.D01
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: nom
+  type: text
+  type_metier: texte
+  libelle_hosix: "Nom"
+  provenance: OBS
+  preuve: REL-PAT.D02
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: nom_famille_1
+  type: text
+  type_metier: texte
+  libelle_hosix: "Nom de famille 1"
+  provenance: OBS
+  preuve: REL-PAT.D03
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: nom_famille_2
+  type: text
+  type_metier: texte
+  libelle_hosix: "Nom de famille 2"
+  provenance: OBS
+  preuve: REL-PAT.D04
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: sexe
+  type: text
+  type_metier: code
+  libelle_hosix: "Sexe"
+  provenance: OBS
+  preuve: REL-PAT.D05
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: date_naissance
+  type: text
+  type_metier: date
+  libelle_hosix: "D. Nai"
+  provenance: OBS
+  preuve: REL-PAT.D06
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: type_piece_identite
+  type: text
+  type_metier: code
+  libelle_hosix: "Type pièce d'identité"
+  provenance: OBS
+  preuve: REL-PAT.D09
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: n_piece_identite
+  type: text
+  type_metier: texte
+  libelle_hosix: "N° pièce d'identité"
+  provenance: OBS
+  preuve: REL-PAT.D10
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: etat_civil
+  type: text
+  type_metier: code
+  libelle_hosix: "E. Civil"
+  provenance: OBS
+  preuve: REL-PAT.D11
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: type_patient
+  type: text
+  type_metier: code
+  libelle_hosix: "Type patient"
+  provenance: OBS
+  preuve: REL-PAT.D12
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: date_photo
+  type: text
+  type_metier: date
+  libelle_hosix: "Date photo"
+  provenance: OBS
+  preuve: REL-PAT.D13
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: modifie_par
+  type: text
+  type_metier: texte
+  libelle_hosix: "Modifié par"
+  provenance: OBS
+  preuve: REL-PAT.D14
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: cree_par
+  type: text
+  type_metier: texte
+  libelle_hosix: "Créé par"
+  provenance: OBS
+  preuve: REL-PAT.D15
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: date_attribution
+  type: text
+  type_metier: date
+  libelle_hosix: "Date d'attribution"
+  provenance: OBS
+  preuve: REL-PAT.D16
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: compagnie_assurance
+  type: text
+  type_metier: code
+  libelle_hosix: "Compagnie d'assur."
+  provenance: OBS
+  preuve: REL-PAT.A01
+  note: "Relevé de champs, fiche patient, bloc Compagnie d'assurance."
+- table: source.patients
+  colonne: police
+  type: text
+  type_metier: texte
+  libelle_hosix: "Police"
+  provenance: OBS
+  preuve: REL-PAT.A02
+  note: "Relevé de champs, fiche patient, bloc Compagnie d'assurance."
+- table: source.patients
+  colonne: n_assure
+  type: text
+  type_metier: texte
+  libelle_hosix: "N° Assu"
+  provenance: OBS
+  preuve: REL-PAT.A03
+  note: "Relevé de champs, fiche patient, bloc Compagnie d'assurance."
+- table: source.patients
+  colonne: profession
+  type: text
+  type_metier: texte
+  libelle_hosix: "Profession"
+  provenance: OBS
+  preuve: REL-PAT.A04
+  note: "Relevé de champs, fiche patient, bloc Compagnie d'assurance."
+- table: source.patients
+  colonne: num_inscription
+  type: text
+  type_metier: texte
+  libelle_hosix: "Num. inscription"
+  provenance: OBS
+  preuve: REL-PAT.A05
+  note: "Relevé de champs, fiche patient, bloc Compagnie d'assurance."
+- table: source.patients
+  colonne: date_inscription
+  type: text
+  type_metier: date
+  libelle_hosix: "Date inscription"
+  provenance: OBS
+  preuve: REL-PAT.A06
+  note: "Relevé de champs, fiche patient, bloc Compagnie d'assurance."
+- table: source.patients
+  colonne: type_domicile
+  type: text
+  type_metier: code
+  libelle_hosix: "Type"
+  provenance: OBS
+  preuve: REL-PAT.H01
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: adresse
+  type: text
+  type_metier: texte
+  libelle_hosix: "Adresse"
+  provenance: OBS
+  preuve: REL-PAT.H02
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: code_postal
+  type: text
+  type_metier: texte
+  libelle_hosix: "Code postal"
+  provenance: OBS
+  preuve: REL-PAT.H03
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: etat
+  type: text
+  type_metier: code
+  libelle_hosix: "État"
+  provenance: OBS
+  preuve: REL-PAT.H04
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: ville
+  type: text
+  type_metier: code
+  libelle_hosix: "Ville"
+  provenance: OBS
+  preuve: REL-PAT.H05
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: quartier
+  type: text
+  type_metier: texte
+  libelle_hosix: "Quartier"
+  provenance: OBS
+  preuve: REL-PAT.H06
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: nationalite
+  type: text
+  type_metier: code
+  libelle_hosix: "Nationalité"
+  provenance: OBS
+  preuve: REL-PAT.H07
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: telephone_1
+  type: text
+  type_metier: texte
+  libelle_hosix: "Téléphone 1"
+  provenance: OBS
+  preuve: REL-PAT.H08
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: telephone_2
+  type: text
+  type_metier: texte
+  libelle_hosix: "Téléphone 2"
+  provenance: OBS
+  preuve: REL-PAT.H09
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: telephone_3
+  type: text
+  type_metier: texte
+  libelle_hosix: "Téléphone 3"
+  provenance: OBS
+  preuve: REL-PAT.H10
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: telephone_4
+  type: text
+  type_metier: texte
+  libelle_hosix: "Téléphone 4"
+  provenance: OBS
+  preuve: REL-PAT.H11
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: avertissements_sms
+  type: text
+  type_metier: booleen
+  libelle_hosix: "Avertissements SMS"
+  provenance: OBS
+  preuve: REL-PAT.H12
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: email
+  type: text
+  type_metier: texte
+  libelle_hosix: "E-mail"
+  provenance: OBS
+  preuve: REL-PAT.H13
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: avertissements_email
+  type: text
+  type_metier: booleen
+  libelle_hosix: "Avertissements e-mail"
+  provenance: OBS
+  preuve: REL-PAT.H14
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: environnement
+  type: text
+  type_metier: code
+  libelle_hosix: "Environnement"
+  provenance: OBS
+  preuve: REL-PAT.H15
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: nom_pere
+  type: text
+  type_metier: texte
+  libelle_hosix: "Nom. Père"
+  provenance: OBS
+  preuve: REL-PAT.N01
+  note: "Relevé de champs, fiche patient, bloc Né."
+- table: source.patients
+  colonne: nom_mere
+  type: text
+  type_metier: texte
+  libelle_hosix: "Nom. Mère"
+  provenance: OBS
+  preuve: REL-PAT.N02
+  note: "Relevé de champs, fiche patient, bloc Né."
+- table: source.patients
+  colonne: etat_naissance
+  type: text
+  type_metier: code
+  libelle_hosix: "Lieu de naissance - État"
+  provenance: OBS
+  preuve: REL-PAT.N03
+  note: "Relevé de champs, fiche patient, bloc Né."
+- table: source.patients
+  colonne: ville_naissance
+  type: text
+  type_metier: code
+  libelle_hosix: "Ville"
+  provenance: OBS
+  preuve: REL-PAT.N04
+  note: "Relevé de champs, fiche patient, bloc Né."
+- table: source.patients
+  colonne: pays_naissance
+  type: text
+  type_metier: code
+  libelle_hosix: "Pays"
+  provenance: OBS
+  preuve: REL-PAT.N05
+  note: "Relevé de champs, fiche patient, bloc Né."
+- table: source.patients
+  colonne: quartier_naissance
+  type: text
+  type_metier: texte
+  libelle_hosix: "Quartier"
+  provenance: OBS
+  preuve: REL-PAT.N06
+  note: "Relevé de champs, fiche patient, bloc Né."
+- table: source.patients
+  colonne: commentaire
+  type: text
+  type_metier: texte
+  libelle_hosix: "Commentaire"
+  provenance: OBS
+  preuve: REL-PAT.K01
+  note: "Relevé de champs, fiche patient, bloc Commentaire."
+- table: source.patients
+  colonne: province
+  type: text
+  type_metier: code
+  libelle_hosix: "Province"
+  provenance: OBS
+  preuve: REL-IPP.R09
+  note: "Relevé de champs, recherche d'IPP, colonne de résultat. La colonne n'apparaît pas au bloc Domicile de la fiche patient, où figurent État, Ville et Quartier ; elle est établie par la liste de résultats de la recherche, qui la restitue."
+- table: source.patients
+  colonne: exitus
+  type: text
+  type_metier: booleen
+  libelle_hosix: "Exitus"
+  provenance: OBS
+  preuve: REL-IPP.F04
+  note: "Relevé de champs, recherche d'IPP, filtre de population. L'existence d'un filtre sur les patients décédés établit qu'un indicateur de décès est stocké sur la fiche, bien qu'aucun champ de ce nom n'ait été relevé sur l'écran de la fiche patient."
+- table: source.patients
+  colonne: date_modification
+  type: text
+  type_metier: horodatage
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "L'écran de la fiche patient porte un champ Modifié par sans horodatage adjacent, là où l'écran de rendez-vous appareille chaque agent à sa date. La colonne est posée parce que l'historisation de la dimension patient en type 2 exige un instant de changement. Si l'extraction réelle ne la fournissait pas, l'historisation se rabattrait sur la date d'extraction de la partition, à la granularité du jour au lieu de la seconde, et les changements survenus le même jour seraient confondus."
+- table: source.patients
+  colonne: date_extraction
+  type: text
+  type_metier: date
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "Colonne technique de la zone d'atterrissage, absente du système observé. Elle porte la date de l'extraction dont la ligne provient et rend le rechargement d'une partition idempotent. Si une extraction réelle ne la fournissait pas, elle serait dérivée du nom du fichier partitionné, sans perte d'information."
+
+- table: source.rendez_vous
+  colonne: n_rdv
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "Aucun identifiant de rendez-vous n'apparaît à l'écran Donner rendez-vous, dont la barre d'actions comporte pourtant Enregistrer, Supprimer et Chercher, trois opérations qui supposent une clé. La colonne est posée parce que la table des passages porte une référence de rendez-vous nullable, qui n'aurait pas de cible sans elle. Si le système en place clé le rendez-vous par un couple agenda et horodatage plutôt que par un numéro, la structure logique du modèle est inchangée et seule la forme de la clé diffère."
+- table: source.rendez_vous
+  colonne: n_ipp
+  type: text
+  type_metier: code
+  libelle_hosix: "N° IPP"
+  provenance: OBS
+  preuve: REL-RDV.I01
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Identification du patient."
+- table: source.rendez_vous
+  colonne: agenda
+  type: text
+  type_metier: code
+  libelle_hosix: "Agenda"
+  provenance: OBS
+  preuve: REL-RDV.R01
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: activite
+  type: text
+  type_metier: code
+  libelle_hosix: "Activité"
+  provenance: OBS
+  preuve: REL-RDV.R02
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: origine
+  type: text
+  type_metier: code
+  libelle_hosix: "Origine"
+  provenance: OBS
+  preuve: REL-RDV.R03
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: hopital_cs
+  type: text
+  type_metier: code
+  libelle_hosix: "Hôpital/C.S."
+  provenance: OBS
+  preuve: REL-RDV.R04
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: medecin_ext
+  type: text
+  type_metier: texte
+  libelle_hosix: "Médecin ext."
+  provenance: OBS
+  preuve: REL-RDV.R05
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: service_ext
+  type: text
+  type_metier: texte
+  libelle_hosix: "Service ext."
+  provenance: OBS
+  preuve: REL-RDV.R06
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: observations
+  type: text
+  type_metier: texte
+  libelle_hosix: "Observations"
+  provenance: OBS
+  preuve: REL-RDV.R07
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: date_rendez_vous
+  type: text
+  type_metier: horodatage
+  libelle_hosix: "Date rendez-vous"
+  provenance: OBS
+  preuve: REL-RDV.R08
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: rdv_supplementaire
+  type: text
+  type_metier: booleen
+  libelle_hosix: "Rendez-vous supplémentaire"
+  provenance: OBS
+  preuve: REL-RDV.R09
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: type_attention
+  type: text
+  type_metier: code
+  libelle_hosix: "Type d'attention"
+  provenance: OBS
+  preuve: REL-RDV.R10
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: etat
+  type: text
+  type_metier: code
+  libelle_hosix: "État"
+  provenance: OBS
+  preuve: REL-RDV.R11
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: duree
+  type: text
+  type_metier: entier
+  libelle_hosix: "Durée"
+  provenance: OBS
+  preuve: REL-RDV.R12
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous. Durée exprimée en minutes, valeur nulle sur le rendez-vous observé."
+- table: source.rendez_vous
+  colonne: date_reception
+  type: text
+  type_metier: horodatage
+  libelle_hosix: "Date réception"
+  provenance: OBS
+  preuve: REL-RDV.R13
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: imprimer_donnees
+  type: text
+  type_metier: booleen
+  libelle_hosix: "Imprimer données"
+  provenance: OBS
+  preuve: REL-RDV.R14
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: cree_par
+  type: text
+  type_metier: texte
+  libelle_hosix: "Créé par"
+  provenance: OBS
+  preuve: REL-RDV.C01
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications."
+- table: source.rendez_vous
+  colonne: date_creation
+  type: text
+  type_metier: horodatage
+  libelle_hosix: "Date création"
+  provenance: OBS
+  preuve: REL-RDV.C02
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications. L'écart entre cette colonne et la date du rendez-vous est le délai d'obtention, grandeur centrale de l'analyse. Sur le rendez-vous observé, il valait une seconde."
+- table: source.rendez_vous
+  colonne: modifie_par
+  type: text
+  type_metier: texte
+  libelle_hosix: "Modifié par"
+  provenance: OBS
+  preuve: REL-RDV.C03
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications."
+- table: source.rendez_vous
+  colonne: date_mod
+  type: text
+  type_metier: horodatage
+  libelle_hosix: "Date mod."
+  provenance: OBS
+  preuve: REL-RDV.C04
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications."
+- table: source.rendez_vous
+  colonne: confirme_par
+  type: text
+  type_metier: texte
+  libelle_hosix: "Confirmé par"
+  provenance: OBS
+  preuve: REL-RDV.C05
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications. Avec la colonne d'annulation, ce couple sépare une annulation déclarée d'une absence non prévenue ; sans lui, les deux se confondent."
+- table: source.rendez_vous
+  colonne: date_conf
+  type: text
+  type_metier: horodatage
+  libelle_hosix: "Date conf."
+  provenance: OBS
+  preuve: REL-RDV.C06
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications."
+- table: source.rendez_vous
+  colonne: annule_par
+  type: text
+  type_metier: texte
+  libelle_hosix: "Annulé par"
+  provenance: OBS
+  preuve: REL-RDV.C07
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications."
+- table: source.rendez_vous
+  colonne: date_annul
+  type: text
+  type_metier: horodatage
+  libelle_hosix: "Date annul."
+  provenance: OBS
+  preuve: REL-RDV.C08
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications."
+- table: source.rendez_vous
+  colonne: liste_attente_service
+  type: text
+  type_metier: code
+  libelle_hosix: "Service"
+  provenance: OBS
+  preuve: REL-RDV.L01
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Liste d'attente des consultations."
+- table: source.rendez_vous
+  colonne: liste_attente_agenda
+  type: text
+  type_metier: code
+  libelle_hosix: "Agenda"
+  provenance: OBS
+  preuve: REL-RDV.L02
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Liste d'attente des consultations."
+- table: source.rendez_vous
+  colonne: liste_attente_activite
+  type: text
+  type_metier: code
+  libelle_hosix: "Activité"
+  provenance: OBS
+  preuve: REL-RDV.L03
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Liste d'attente des consultations."
+- table: source.rendez_vous
+  colonne: date_extraction
+  type: text
+  type_metier: date
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "Colonne technique de la zone d'atterrissage, absente du système observé. Elle porte la date de l'extraction dont la ligne provient et rend le rechargement d'une partition idempotent. Si une extraction réelle ne la fournissait pas, elle serait dérivée du nom du fichier partitionné, sans perte d'information."
