@@ -21,3 +21,5 @@ jobs:
       - run: uv run pytest tests/test_aucune_image.py -v
 
       - run: uv run pytest tests/test_sources.py -v -s
+
+      - run: uv run pytest tests/test_relations.py -v
