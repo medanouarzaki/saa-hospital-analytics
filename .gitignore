@@ -21,8 +21,9 @@ dbt/dbt_packages/
 # Fichiers de travail hors dépôt
 *.bak
 rapport*.md
-handoff-*.md
-prompt-bloc-*.md
+# Local working files, never tracked
+/local/
+*.local.md
 
 # Système
 .DS_Store
