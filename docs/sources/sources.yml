@@ -1,0 +1,401 @@
+# Registre des sources — bloc 1
+#
+# Deux vérifications distinctes coexistent dans ce fichier et ne doivent pas
+# être confondues :
+#   - le champ `verification` porte sur le CONTENU, établi par lecture ;
+#   - le contrôle HTTP de tests/test_sources.py porte sur la VIE DE L'URL.
+# Une source peut satisfaire l'une sans l'autre. Le Bulletin Officiel n° 5926
+# en est l'illustration : URL vivante, contenu inaccessible car scanné.
+#
+# Règle de numérotation : un document, un identifiant. Une source primaire
+# officielle et la reprise de presse qui l'a corroborée portent deux
+# identifiants distincts.
+#
+# Les dix champs id, titre, auteur, type, url, date_publication,
+# date_consultation, fiabilite, verification, utilise_pour sont présents
+# dans chaque entrée et aucune valeur n'est vide. Deux champs admettent une
+# valeur littérale déclarant une absence légitime plutôt qu'un oubli :
+#   - date_publication peut valoir non_datee ;
+#   - url peut valoir sans_url, uniquement si verification vaut introuvable.
+# Champs facultatifs, dont la clé peut être absente : note, doublon_de,
+# remplace_par.
+
+- id: S-01
+  titre: "L'hôpital Sidi Saïd de Meknès accueille une partie des Marocains de Wuhan"
+  auteur: "Le Desk, reprise d'une dépêche MAP"
+  type: article de presse
+  url: https://ledesk.ma/encontinu/lhopital-sidi-said-de-meknes-accueille-une-partie-des-marocains-de-wuhan/
+  date_publication: "2020-02-02"
+  date_consultation: "2026-08-08"
+  fiabilite: presse
+  verification: non_verifiable_par_outil
+  doublon_de: S-29
+  utilise_pour: "Conservée pour tracer l'effondrement d'un double sourçage apparent. Le contenu est celui de S-29."
+  note: "Le site oppose une détection de robot. Reprise mot pour mot de la dépêche MAP S-29, comme S-02."
+
+- id: S-02
+  titre: "Vidéo. L'hôpital Sidi Saïd de Meknès aménagé pour accueillir les Marocains de Wuhan"
+  auteur: "H24info, reprise d'une dépêche MAP"
+  type: article de presse
+  url: https://www.h24info.ma/video-lhopital-sidi-said-de-meknes-amenage-pour-accueillir-les-marocains-de-wuhan/
+  date_publication: "2020-02-02"
+  date_consultation: "2026-08-08"
+  fiabilite: presse
+  verification: introuvable
+  doublon_de: S-29
+  utilise_pour: "Aucun usage. Entrée conservée pour mémoire."
+  note: "URL en erreur 404. Le cadrage initial comptait S-01 et S-02 comme deux sources concordantes ; ce sont deux reprises de la même dépêche MAP."
+
+- id: S-03
+  titre: "Arrêté du ministre de la santé n° 456-11 du 2 rajeb 1431 (6 juillet 2010) portant règlement intérieur des hôpitaux"
+  auteur: "Ministère de la Santé, Royaume du Maroc"
+  type: texte réglementaire
+  url: https://www.sgg.gov.ma/BO/bo_fr/2011/bo_5926_fr.pdf
+  date_publication: "2011-03-17"
+  date_consultation: "2026-08-08"
+  fiabilite: officielle
+  verification: accessible_non_extractible
+  utilise_pour: "Articles 2, 9, 13, 15, 27, 33, 35, 36, 39, 40, 42, 43, 44, 45, 46, 47, 57, 67, 79, 80. Missions du SAA, organisation par tranche de capacité, formalités d'admission et de sortie, régime des urgences."
+  note: "Le PDF officiel est un scan sans couche de texte : l'URL répond, le contenu n'est pas extractible. Le texte a été lu sur le support consolidé S-27."
+
+- id: S-04
+  titre: "Règlement intérieur des hôpitaux de 1993, article 72"
+  auteur: "Ministère de la Santé, Royaume du Maroc"
+  type: texte réglementaire
+  url: sans_url
+  date_publication: "1993"
+  date_consultation: "2026-08-08"
+  fiabilite: secondaire
+  verification: introuvable
+  remplace_par: S-27
+  utilise_pour: "Aucun usage. Entrée conservée pour documenter la recherche infructueuse."
+  note: "Le seul support citant cet article est un polycopié de cours hébergé sur une plateforme d'étudiants, exclu par la règle du projet. Remplacé par l'article 35 du texte de 2010, en vigueur et plus complet."
+
+- id: S-05
+  titre: "Population légale de la région Fès-Meknès, RGPH 2024"
+  auteur: "Haut-Commissariat au Plan, Direction régionale de Fès-Meknès"
+  type: publication statistique officielle
+  url: https://www.hcp.ma/region-fes/Population-legale-de-la-region-Fes-Meknes-RGPH-2024_a17.html
+  date_publication: "2024"
+  date_consultation: "2026-08-08"
+  fiabilite: officielle
+  verification: contenu_lu
+  utilise_pour: "Population régionale 4 467 911 dont 2 855 366 urbains et 1 612 545 ruraux. Pyramide des âges de la préfecture de Meknès."
+  note: "La page comporte du contenu publicitaire injecté par un tiers, sans rapport avec les données. Le détail par préfecture figure dans le PDF joint, pas sur la page."
+
+- id: S-06
+  titre: "HOSIX.NET"
+  auteur: "SIVSA Soluciones Informáticas"
+  type: documentation éditeur
+  url: https://www.sivsa.com/site/hosix/hosix-net/
+  date_publication: "2018-10-15"
+  date_consultation: "2026-08-08"
+  fiabilite: secondaire
+  verification: contenu_lu
+  utilise_pour: "Trois paquets contractables. Décompte réel de 26 modules : 12 au Core, 6 au Clinic, 8 aux Extension Packs."
+
+- id: S-07
+  titre: "Hosix introduce mejoras en sus funcionalidades y optimiza su rendimiento y eficacia"
+  auteur: "SIVSA Soluciones Informáticas"
+  type: documentation éditeur
+  url: https://www.sivsa.com/site/nuevas-funcionalidades-hosix-2020/
+  date_publication: "2021-06-11"
+  date_consultation: "2026-08-08"
+  fiabilite: secondaire
+  verification: contenu_lu
+  utilise_pour: "Conception dans les années 1980, plus de 30 hôpitaux dans 6 pays, migration WebForms vers MVC achevée sur les modules de prescription, admission, facturation et approvisionnements."
+  note: "Établit que le module admisión est migré, ce qui explique le chemin MvcWindowCompatibility.aspx relevé au poste."
+
+- id: S-08
+  titre: "CONSULTAS — Hosix .NET Core"
+  auteur: "SIVSA Soluciones Informáticas"
+  type: documentation éditeur
+  url: https://www.sivsa.com/site/hosix/hosix-net/core/consultas/
+  date_publication: "2018-10-15"
+  date_consultation: "2026-08-08"
+  fiabilite: secondaire
+  verification: contenu_lu
+  utilise_pour: "Génération d'agendas, citations manuelles ou automatiques, modifications, annulations, intégration à la liste d'attente, production de notifications, listings et statistiques."
+
+- id: S-09
+  titre: "FACTURACIÓN — Hosix Core"
+  auteur: "SIVSA Soluciones Informáticas"
+  type: documentation éditeur
+  url: https://www.sivsa.com/site/hosix/hosix-core/facturacion/
+  date_publication: "2018-10-22"
+  date_consultation: "2026-08-08"
+  fiabilite: secondaire
+  verification: contenu_lu
+  utilise_pour: "Captation manuelle ou automatique des mouvements, contrôle de l'état facturé ou en attente, paramétrage par groupes, types de contrats et de prestations, facturation aux entités publiques, privées et mutuelles."
+
+- id: S-10
+  titre: "Santé en chiffres 2023"
+  auteur: "Ministère de la Santé et de la Protection Sociale, Service des Études et de l'Information Sanitaire"
+  type: publication statistique officielle
+  url: https://www.sante.gov.ma/Documents/2025/03/Sante%20en%20chiffre%202023%20VF.pdf
+  date_publication: "2025"
+  date_consultation: "2026-08-08"
+  fiabilite: officielle
+  verification: non_verifiable_par_outil
+  utilise_pour: "Nomenclature des indicateurs remontés par le profil RAPPORTS ET STATISTIQUES."
+  note: "Le domaine sante.gov.ma refuse tout accès automatisé. L'édition 2024 a été obtenue par téléchargement direct, voir S-30."
+
+- id: S-11
+  titre: "Médecins, capacité litière, maladies, accouchements… A la loupe, le système de santé en chiffres"
+  auteur: "Laila Zerrour, Aujourd'hui le Maroc"
+  type: article de presse
+  url: https://aujourdhui.ma/societe/medecins-capacite-litiere-maladies-accouchements-a-la-loupe-le-systeme-de-sante-en-chiffres
+  date_publication: "2026-06-19"
+  date_consultation: "2026-08-08"
+  fiabilite: presse
+  verification: contenu_lu
+  doublon_de: S-30
+  utilise_pour: "Corroboration secondaire des indicateurs nationaux. Aucun chiffre du modèle ne s'appuie sur cette entrée."
+  note: "Quatre chiffres diffèrent de la source primaire S-30 : capacité fonctionnelle 22 874 contre 22 873, admissions 1 282 403 contre 1 282 301, interventions 277 520 contre 277 279, consultations par médecin 438 contre 439. La source primaire fait foi."
+
+- id: S-12
+  titre: "Améliorer la prise en charge des urgences médicales pour préserver et sauver des vies et contribuer à assurer des soins de qualité pour tous"
+  auteur: "Conseil Économique, Social et Environnemental"
+  type: avis d'institution publique
+  url: https://www.cese.ma/wp-content/uploads/2023/10/ebook-Avis-urgences-medicales-au-Maroc-vf.pdf
+  date_publication: "2023-03-30"
+  date_consultation: "2026-08-08"
+  fiabilite: officielle
+  verification: contenu_lu
+  utilise_pour: "6 482 185 consultations et soins d'urgence par an dans le public. 25 % des hospitalisations et 47 % des cas opérés en 2021 issus des urgences. Urgences vitales 10 %, consultations non urgentes 64 %. Hospitalisation dans 13 % des cas aux polycliniques CNSS. 148 services d'urgence dont 94 de base."
+  note: "Le cadrage initial portait une autre adresse, sous /media/2023/06/. Elle répond, mais son contenu n'a pas été lu. L'adresse retenue ici est celle dont le contenu a été effectivement vérifié."
+
+- id: S-13
+  titre: "Les consultations non appropriées aux services des urgences : étude dans un hôpital provincial au Maroc"
+  auteur: "Berraho M., Boly A., Tachfouti N. et al."
+  type: article académique
+  url: https://doi.org/10.3917/pos.433.0197
+  date_publication: "2012-09-24"
+  date_consultation: "2026-08-08"
+  fiabilite: academique
+  verification: contenu_lu
+  utilise_pour: "30,7 % de consultations non appropriées sur 410 patients au CHP de Nador, 2010. Répartition des motifs de recours par chapitre CIM-10."
+  note: "Le corps de l'article et son résumé donnent en sens inverse la relation entre couverture sociale et caractère approprié du recours. Cette contradiction interne est signalée et aucun champ ne s'y adosse. Étude antérieure à la généralisation de l'AMO."
+
+- id: S-14
+  titre: "Triage des patients à l'accueil d'une structure d'urgences. Présentation de l'échelle FRench Emergency Nurses Classification in Hospital (FRENCH)"
+  auteur: "Taboulet P., Maillard-Acker C., Ranchon G. et al., Société française de médecine d'urgence"
+  type: article académique
+  url: https://stm.cairn.info/article/FMU_091_0051
+  date_publication: "2019"
+  date_consultation: "2026-08-08"
+  fiabilite: academique
+  verification: contenu_lu
+  utilise_pour: "Six niveaux de tri, le niveau 3 étant scindé en 3A et 3B selon la comorbidité ou l'adressage par un médecin. Délais maximaux avant prise en charge médicale : 1, 20, 60, 90, 120 et 240 minutes. Taux d'hospitalisation par niveau : 80,9 %, 59,6 %, 25,5 %, 4,0 % et 1,7 %."
+  note: "Échelle française. Sa transposition au contexte marocain est une hypothèse, distincte de la validité des valeurs publiées."
+
+- id: S-15
+  titre: "Généralisation de l'AMO : plus de 32 millions de bénéficiaires en 2025"
+  auteur: "Ministère de l'Économie et des Finances, note de présentation du projet de loi de finances 2026, relayée par Maroc.ma"
+  type: publication officielle
+  url: https://www.maroc.ma/fr/actualites/generalisation-de-lamo-plus-de-32-millions-de-beneficiaires-en-2025
+  date_publication: "2025-10-21"
+  date_consultation: "2026-08-08"
+  fiabilite: officielle
+  verification: contenu_lu
+  utilise_pour: "32 millions de bénéficiaires soit 88 % de la population contre 42 % avant la généralisation. AMO-Tadamon près de 11 millions, AMO-TNS environ 4 millions, AMO-Achamil 313 000. Prise en charge du ticket modérateur par l'État pour les prestations en structure publique."
+
+- id: S-16
+  titre: "Tadamon, travailleurs salariés et non salariés : radioscopie des bénéficiaires de l'assurance maladie obligatoire"
+  auteur: "Aujourd'hui le Maroc, d'après données CNSS"
+  type: article de presse
+  url: https://aujourdhui.ma/societe/tadamon-travailleurs-salaries-et-non-salaries-radioscopie-des-beneficiaires-de-lassurance-maladie-obligatoire
+  date_publication: "2025"
+  date_consultation: "2026-08-08"
+  fiabilite: presse
+  verification: non_verifiable_par_outil
+  utilise_pour: "Répartition des droits ouverts par régime. Corroborée par S-15, qui fait foi."
+  note: "Contenu non vérifié par lecture. Si le contrôle HTTP échoue, aucun champ ne s'y adosse : S-15 couvre les mêmes grandeurs."
+
+- id: S-17
+  titre: "Tarification nationale de référence"
+  auteur: "Agence Nationale de l'Assurance Maladie"
+  type: barème officiel
+  url: https://anam.ma/anam/regulation/tarification-nationale-de-reference/
+  date_publication: "2007"
+  date_consultation: "2026-08-08"
+  fiabilite: officielle
+  verification: contenu_lu
+  utilise_pour: "Convention du secteur public : deux grilles seulement, lettres clés et forfaits d'actes de chirurgie. Grille 1 : C 50,00 ; Cs 75,00 ; CNPSY 100,00 ; Cp 120,00 ; B 0,90 ; P 0,90 ; Z 9,00 ; KE 10,00 ; K 13,00 ; D 10,00 ; AMM 40,00 dirhams."
+  note: "L'établissement ne pratiquant aucune chirurgie, seule la grille des lettres clés s'applique. Le générateur ne produit aucun forfait."
+
+- id: S-18
+  titre: "Bénéficier du tiers payant"
+  auteur: "Caisse Nationale des Organismes de Prévoyance Sociale"
+  type: documentation d'organisme public
+  url: https://wtemps.cnops.org.ma/beneficiertiersp?r=261
+  date_publication: non_datee
+  date_consultation: "2026-08-08"
+  fiabilite: officielle
+  verification: contenu_lu
+  utilise_pour: "Prise en charge totale des frais en hospitalisation et hôpital de jour dans le public sur la base de la TNR. Ticket modérateur de 20 % de la TNR en ambulatoire public au-delà de 200 dirhams. Seuil de 200 dirhams en deçà duquel aucun tiers payant ne s'applique."
+
+- id: S-19
+  titre: "Prestations"
+  auteur: "Caisse Nationale des Organismes de Prévoyance Sociale"
+  type: documentation d'organisme public
+  url: https://www.cnops.org.ma/prestations?r=82
+  date_publication: non_datee
+  date_consultation: "2026-08-08"
+  fiabilite: officielle
+  verification: contenu_lu
+  utilise_pour: "Dans le secteur public, aucune demande de prise en charge préalable n'est exigée. Radiologie et explorations à 80 % de la TNR en ambulatoire, 100 % en hospitalisation publique. Dialyse à 700 dirhams la séance dans le public."
+
+- id: S-20
+  titre: "Le centre hospitalier préfectoral de Meknès"
+  auteur: "Cour des comptes du Royaume du Maroc, en partenariat avec la Cour régionale des comptes de Fès-Meknès"
+  type: rapport de juridiction financière
+  url: https://www.courdescomptes.ma/wp-content/uploads/2023/01/20.-Hopital-prefectoral-Meknes.pdf
+  date_publication: "2023-01"
+  date_consultation: "2026-08-08"
+  fiabilite: officielle
+  verification: contenu_lu
+  utilise_pour: "Attribution de plusieurs identifiants au même patient et recommandation d'enregistrement de la CIN. Absence d'état comparatif entre rendez-vous demandés et consultations réalisées. Délais moyens de rendez-vous par spécialité. Créances non recouvrées de 50 876 365 dirhams au 31/12/2016, 57 % des dossiers non facturés en 2015, 3 477 consultations payées sur 160 659 aux urgences en 2016. Absence d'activité chirurgicale et de garde de nuit à Sidi Saïd. État antérieur du système d'information : DIM, Mawiidi web, fiches papier."
+
+- id: S-21
+  titre: "L'hôpital Mohamed V à Tanger"
+  auteur: "Cour des comptes du Royaume du Maroc"
+  type: rapport de juridiction financière
+  url: https://www.courdescomptes.ma/wp-content/uploads/2023/01/17.-Hopital-regional-Tanger.pdf
+  date_publication: "2023-01"
+  date_consultation: "2026-08-08"
+  fiabilite: officielle
+  verification: non_verifiable_par_outil
+  doublon_de: S-20
+  utilise_pour: "Aucun usage. La recommandation de mise à niveau des SAA figure mot pour mot dans S-20."
+  note: "Contenu non vérifié par lecture. Entrée conservée pour documenter l'écartement pour doublon."
+
+- id: S-22
+  titre: "Splink — documentation"
+  auteur: "Ministry of Justice Analytical Services, Royaume-Uni"
+  type: documentation technique
+  url: https://moj-analytical-services.github.io/splink/
+  date_publication: non_datee
+  date_consultation: "2026-08-08"
+  fiabilite: secondaire
+  verification: non_verifiable_par_outil
+  utilise_pour: "Modèle de Fellegi-Sunter, estimation des paramètres par espérance-maximisation, moteur DuckDB."
+
+- id: S-23
+  titre: "Probabilistic record linkage"
+  auteur: "Robin Linacre"
+  type: documentation technique
+  url: https://www.robinlinacre.com/probabilistic_linkage/
+  date_publication: non_datee
+  date_consultation: "2026-08-08"
+  fiabilite: secondaire
+  verification: non_verifiable_par_outil
+  utilise_pour: "Exposé du modèle probabiliste sous-jacent à Splink."
+
+- id: S-24
+  titre: "Patient no-show statistics"
+  auteur: "Dialog Health"
+  type: compilation statistique secondaire
+  url: https://www.dialoghealth.com/post/patient-no-show-statistics
+  date_publication: "2025-08-26"
+  date_consultation: "2026-08-08"
+  fiabilite: secondaire
+  verification: contenu_lu
+  utilise_pour: "Moyenne mondiale de 23,5 %, fourchette ambulatoire de 23 à 33 %. Taux par spécialité : soins primaires 19 %, pédiatrie 30 %, gynéco-obstétrique 18 %, dentaire 15 %."
+  note: "Valeurs américaines sur des catégories de spécialités américaines. La valeur est DOC, sa transposition à un hôpital de district marocain est HYP. Pneumologie et explorations fonctionnelles n'ont aucune correspondance."
+
+- id: S-25
+  titre: "Loi n° 65-00 portant code de la couverture médicale de base ; loi-cadre n° 09-21 relative à la protection sociale ; loi n° 54-23"
+  auteur: "Royaume du Maroc"
+  type: texte législatif
+  url: sans_url
+  date_publication: non_datee
+  date_consultation: "2026-08-08"
+  fiabilite: officielle
+  verification: introuvable
+  remplace_par: S-31
+  utilise_pour: "Aucun usage direct. Le contenu de la loi 54-23 est établi par S-31."
+  note: "Le texte officiel des trois lois n'a pas été ouvert. Le numéro de Bulletin Officiel 7478 mentionné par le cadrage initial n'a été confirmé par aucune source ouverte et n'entre pas au registre."
+
+- id: S-26
+  titre: "Jours fériés Maroc 2026 — liste officielle"
+  auteur: "Agenda Maroc"
+  type: compilation secondaire
+  url: https://www.agendamaroc.com/jours-feries/2026
+  date_publication: "2026"
+  date_consultation: "2026-08-08"
+  fiabilite: secondaire
+  verification: contenu_lu
+  utilise_pour: "Fériés fixes. Aïd Al Wahda le 31 octobre, institué par décret royal de novembre 2025. Yennayer le 14 janvier. Ramadan 2026 à partir du 19 février, Aïd al-Fitr le 20 mars, Aïd al-Adha le 27 mai."
+  note: "Les deux Aïd donnent deux jours fériés dans le secteur public. Les dates des fêtes religieuses sont confirmées après observation du croissant lunaire par le ministère des Habous."
+
+- id: S-27
+  titre: "Règlement intérieur des hôpitaux 2010 — texte intégral"
+  auteur: "Ministère de la Santé, Royaume du Maroc ; reproduction intégrale hébergée par un portail professionnel pharmaceutique"
+  type: texte réglementaire reproduit
+  url: https://pharmacie.ma/uploads/pdfs/reglement_int_des_hop.pdf
+  date_publication: "2010-07-06"
+  date_consultation: "2026-08-08"
+  fiabilite: secondaire
+  verification: contenu_lu
+  utilise_pour: "Support de lecture effective de l'arrêté S-03. Reproduit l'intégralité des 100 articles."
+  note: "Reproduction fidèle et vérifiable, mais non officielle. La source de droit est S-03 ; c'est ce support qui a permis d'en lire le texte."
+
+- id: S-28
+  titre: "Bulletin Officiel n° 5926 du 12 rabii II 1432 (17 mars 2011), édition de traduction officielle"
+  auteur: "Secrétariat Général du Gouvernement, Royaume du Maroc"
+  type: journal officiel
+  url: https://www.sgg.gov.ma/BO/bo_fr/2011/bo_5926_fr.pdf
+  date_publication: "2011-03-17"
+  date_consultation: "2026-08-08"
+  fiabilite: officielle
+  verification: accessible_non_extractible
+  utilise_pour: "Support officiel de publication de l'arrêté S-03 et du décret n° 2-06-656 relatif à l'organisation hospitalière."
+  note: "Scan sans couche de texte. L'URL répond, le contenu n'est pas extractible par un outil."
+
+- id: S-29
+  titre: "Meknès : l'hôpital Sidi Saïd aménagé pour l'accueil des Marocains rapatriés de Wuhan"
+  auteur: "Maghreb Arabe Presse"
+  type: dépêche d'agence
+  url: https://www.mapnews.ma/fr/actualites/r%C3%A9gional/mekn%C3%A8s-gr%C3%A2ce%E2%80%99%E2%80%99-au-covid19-lh%C3%B4pital-sidi-said-s%C3%A9rige-en-structure-de-r%C3%A9f%C3%A9rence
+  date_publication: "2020-02"
+  date_consultation: "2026-08-08"
+  fiabilite: presse
+  verification: contenu_lu
+  utilise_pour: "Mise en fonction en 1916, superficie de 4,5 hectares, capacité litière annoncée de 140 lits, rénovation de 2019 et pôle Mère-Enfant, rattachement au CHP Mohammed V, départements de médecine et mère-enfant, consultations externes et services médico-techniques dont le centre de consultations externes."
+  note: "Source primaire de S-01 et S-02, reprise à l'identique par au moins huit titres. Les 140 lits sont une capacité annoncée, à ne pas confondre avec la capacité fonctionnelle mesurée par S-30."
+
+- id: S-30
+  titre: "Santé en chiffres 2024"
+  auteur: "Ministère de la Santé et de la Protection Sociale, Service des Études et de l'Information Sanitaire"
+  type: publication statistique officielle
+  url: https://www.sante.gov.ma/Documents/2026/06/Sante%20en%20chiffre%202024%20VF.pdf
+  date_publication: "2026-06-26"
+  date_consultation: "2026-08-08"
+  fiabilite: officielle
+  verification: contenu_lu
+  utilise_pour: "Volumétrie relevée par établissement. Tableau 76 page 102, tableau 77 page 105, tableau 78 page 109, tableau 79 page 113. Inventaire exhaustif des 84 tableaux du document, dont quatre seulement descendent à l'établissement."
+  note: "Empreinte SHA-256 du fichier consulté : f9cebbb62fe1b3cfff3f8e1dd0890f827e786e9cc91809b5b464b9c46addfa05. Le domaine refuse l'accès automatisé ; le fichier a été téléchargé directement."
+
+- id: S-31
+  titre: "Transfert de la CNOPS à la CNSS : publiée au BO, les principales dispositions de la loi 54.23"
+  auteur: "Médias24"
+  type: article de presse économique
+  url: https://medias24.com/2026/02/03/transfert-de-la-cnops-a-la-cnss-publiee-au-bo-voici-les-principales-dispositions-de-la-loi-54-23-1621903/
+  date_publication: "2026-02-03"
+  date_consultation: "2026-08-08"
+  fiabilite: presse
+  verification: contenu_lu
+  utilise_pour: "Publication de la loi 54-23 au Bulletin Officiel du 29 janvier 2026. Entrée en vigueur douze mois après le premier jour du mois suivant la publication, soit février 2027. Justifie le maintien de la CNOPS comme organisme distinct sur toute la période générée."
+
+- id: S-32
+  titre: "Arrêté du ministre des affaires sociales n° 221-98 du 28 janvier 1998 fixant les tarifs des actes et prestations rendus par les centres hospitaliers"
+  auteur: "Ministère des Affaires Sociales, Royaume du Maroc"
+  type: texte réglementaire
+  url: sans_url
+  date_publication: "1998-01-28"
+  date_consultation: "2026-08-08"
+  fiabilite: officielle
+  verification: introuvable
+  utilise_pour: "Aucun usage. Le texte fixe ce que l'hôpital facture, là où la TNR fixe ce que l'organisme rembourse."
+  note: "Cité par la Cour des comptes S-20, qui l'oppose à la gratuité de fait constatée aux urgences. Le texte n'a pas été retrouvé. Le générateur assimile le montant facturé au tarif TNR, et cette assimilation est déclarée HYP."
