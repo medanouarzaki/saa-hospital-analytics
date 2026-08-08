@@ -62,13 +62,10 @@ def test_completude_relations() -> None:
         for champ in CHAMPS_OBLIGATOIRES:
             assert champ in relation, f"{ident} : champ obligatoire manquant '{champ}'"
             valeur = relation[champ]
-            assert isinstance(valeur, str) and valeur.strip(), (
-                f"{ident} : champ '{champ}' vide"
-            )
+            assert isinstance(valeur, str) and valeur.strip(), f"{ident} : champ '{champ}' vide"
 
         assert relation["statut"] in STATUT_AUTORISES, (
-            f"{ident} : statut '{relation['statut']}' hors ensemble autorisé "
-            f"{STATUT_AUTORISES}"
+            f"{ident} : statut '{relation['statut']}' hors ensemble autorisé {STATUT_AUTORISES}"
         )
 
         source = relation.get("source", "")
