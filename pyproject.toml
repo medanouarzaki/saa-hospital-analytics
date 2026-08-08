@@ -1,0 +1,36 @@
+[project]
+name = "saa-hospital-analytics"
+version = "0.1.0"
+requires-python = "==3.12.*"
+dependencies = [
+    "pyyaml",
+    "pandas",
+    "pyarrow",
+    "faker",
+    "psycopg[binary]",
+    "sqlalchemy",
+    "openpyxl",
+    "streamlit",
+    "splink",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "ruff",
+    "sqlfluff",
+]
+dbt = [
+    "dbt-core",
+    "dbt-postgres",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.uv]
+package = false
