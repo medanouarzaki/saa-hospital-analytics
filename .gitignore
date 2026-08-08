@@ -1,0 +1,48 @@
+# Environnements et caches Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# Sorties du générateur
+generator/output/*
+!generator/output/.gitkeep
+
+# Configuration locale
+.env
+
+# Journaux et artefacts d'exécution
+logs/
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/
+
+# Fichiers de travail hors dépôt
+*.bak
+rapport*.md
+handoff-*.md
+prompt-bloc-*.md
+
+# Système
+.DS_Store
+
+# Auxiliaires LaTeX
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.bcf
+*.run.xml
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# Images
+*.heic
+*.HEIC
+*.jpg
+*.jpeg
+*.png
