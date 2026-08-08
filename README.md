@@ -17,9 +17,9 @@ Le jeu de données est entièrement synthétique. Aucune donnée réelle de pati
 
 ## Démarrage
 
-1. Copier `.env.example` vers `.env`.
-2. Lancer `docker compose -f docker/docker-compose.yml up -d`.
-3. Ouvrir le tableau de bord sur le port déclaré dans `.env`.
+1. Copier `.env.example` vers `.env`, puis renseigner les valeurs locales (ports, mot de passe PostgreSQL, clés Airflow).
+2. Lancer `docker compose -f docker/docker-compose.yml --env-file .env up --wait`.
+3. Ouvrir le tableau de bord sur le port déclaré par `STREAMLIT_PORT` dans `.env`.
 
 ## Structure du dépôt
 
