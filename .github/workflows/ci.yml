@@ -19,3 +19,5 @@ jobs:
       - run: uv run sqlfluff lint --dialect postgres .
 
       - run: uv run pytest tests/test_aucune_image.py -v
+
+      - run: uv run pytest tests/test_sources.py -v -s
