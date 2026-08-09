@@ -1,0 +1,235 @@
+parametres:
+- nom: colonnes_identifiants
+  valeur:
+  - table: source.creances
+    colonne: n_creance
+  - table: source.creances
+    colonne: n_facture
+  - table: source.encaissements
+    colonne: n_encaissement
+  - table: source.encaissements
+    colonne: n_facture
+  - table: source.factures
+    colonne: n_episode
+  - table: source.factures
+    colonne: n_facture
+  - table: source.factures
+    colonne: n_ipp
+  - table: source.lignes_facture
+    colonne: n_facture
+  - table: source.mouvements
+    colonne: n_ipp
+  - table: source.mouvements
+    colonne: n_mutation
+  - table: source.mouvements
+    colonne: n_sejour
+  - table: source.passages
+    colonne: n_ipp
+  - table: source.passages
+    colonne: n_passage
+  - table: source.passages
+    colonne: n_rdv
+  - table: source.passages_urgences
+    colonne: n_ipp
+  - table: source.passages_urgences
+    colonne: n_passage
+  - table: source.patients
+    colonne: n_ipp
+  - table: source.prises_en_charge
+    colonne: n_episode
+  - table: source.prises_en_charge
+    colonne: n_ipp
+  - table: source.prises_en_charge
+    colonne: n_prise_en_charge
+  - table: source.relances
+    colonne: n_creance
+  - table: source.relances
+    colonne: n_relance
+  - table: source.rendez_vous
+    colonne: n_ipp
+  - table: source.rendez_vous
+    colonne: n_rdv
+  unite: liste de colonnes
+  provenance: OBS
+  preuve: docs/champs/registre_champs.yml
+  note: 'Colonnes de type_metier code dont le nom commence par n_ (numéro) : clé propre à une ligne ou
+    clé étrangère vers une autre table, sans domaine énumérable. Classement fondé sur le nom, le libellé
+    et la note de chaque colonne au registre.'
+- nom: colonnes_differees
+  valeur:
+  - table: source.lignes_facture
+    colonne: code_acte
+  - table: source.lignes_facture
+    colonne: lettre_cle
+  unite: liste de colonnes
+  provenance: OBS
+  preuve: docs/champs/registre_champs.yml
+  note: 'Colonnes de type_metier code, référentielles par nature d''après leur propre note au registre,
+    dont la nomenclature n''est pas encore établie : le code de l''acte et la lettre clé, dont la nomenclature
+    relève d''un travail distinct sur la facturation. Cette liste doit être vidée quand cette nomenclature
+    sera écrite ; une colonne qui reçoit sa nomenclature doit en sortir. Un test dédié vérifie qu''aucune
+    colonne de cette liste n''apparaît aussi dans la correspondance.'
+- nom: correspondance_colonnes_nomenclatures
+  valeur:
+  - table: source.patients
+    colonne: sexe
+    nomenclature: nomenclature_sexe
+  - table: source.patients
+    colonne: type_piece_identite
+    nomenclature: nomenclature_type_piece_identite
+  - table: source.patients
+    colonne: etat_civil
+    nomenclature: nomenclature_etat_civil
+  - table: source.patients
+    colonne: type_patient
+    nomenclature: nomenclature_type_patient
+  - table: source.patients
+    colonne: compagnie_assurance
+    nomenclature: nomenclature_compagnie_assurance
+  - table: source.patients
+    colonne: type_domicile
+    nomenclature: nomenclature_type_domicile
+  - table: source.patients
+    colonne: etat
+    nomenclature: nomenclature_region
+  - table: source.patients
+    colonne: ville
+    nomenclature: nomenclature_ville
+  - table: source.patients
+    colonne: nationalite
+    nomenclature: nomenclature_pays
+  - table: source.patients
+    colonne: environnement
+    nomenclature: nomenclature_environnement
+  - table: source.patients
+    colonne: etat_naissance
+    nomenclature: nomenclature_region
+  - table: source.patients
+    colonne: ville_naissance
+    nomenclature: nomenclature_ville
+  - table: source.patients
+    colonne: pays_naissance
+    nomenclature: nomenclature_pays
+  - table: source.patients
+    colonne: province
+    nomenclature: nomenclature_province
+  - table: source.rendez_vous
+    colonne: agenda
+    nomenclature: nomenclature_agenda
+  - table: source.rendez_vous
+    colonne: activite
+    nomenclature: nomenclature_activite
+  - table: source.rendez_vous
+    colonne: origine
+    nomenclature: nomenclature_origine
+  - table: source.rendez_vous
+    colonne: hopital_cs
+    nomenclature: nomenclature_etablissements_partenaires
+  - table: source.rendez_vous
+    colonne: type_attention
+    nomenclature: nomenclature_type_attention
+  - table: source.rendez_vous
+    colonne: etat
+    nomenclature: nomenclature_etat_rendez_vous
+  - table: source.rendez_vous
+    colonne: liste_attente_service
+    nomenclature: nomenclature_service
+  - table: source.rendez_vous
+    colonne: liste_attente_agenda
+    nomenclature: nomenclature_agenda
+  - table: source.rendez_vous
+    colonne: liste_attente_activite
+    nomenclature: nomenclature_activite
+  - table: source.passages
+    colonne: type_passage
+    nomenclature: nomenclature_type_passage
+  - table: source.passages
+    colonne: service
+    nomenclature: nomenclature_service
+  - table: source.passages
+    colonne: activite
+    nomenclature: nomenclature_activite
+  - table: source.passages
+    colonne: mode_prise_en_charge
+    nomenclature: nomenclature_mode_prise_en_charge
+  - table: source.mouvements
+    colonne: mode_admission
+    nomenclature: nomenclature_mode_admission
+  - table: source.mouvements
+    colonne: service_accueil
+    nomenclature: nomenclature_service
+  - table: source.mouvements
+    colonne: service_origine
+    nomenclature: nomenclature_service
+  - table: source.mouvements
+    colonne: service_destination
+    nomenclature: nomenclature_service
+  - table: source.mouvements
+    colonne: mode_sortie
+    nomenclature: nomenclature_mode_sortie
+  - table: source.prises_en_charge
+    colonne: type_episode
+    nomenclature: nomenclature_type_episode
+  - table: source.prises_en_charge
+    colonne: organisme
+    nomenclature: nomenclature_organisme_regime
+  - table: source.prises_en_charge
+    colonne: etat
+    nomenclature: nomenclature_etat_prise_en_charge
+  - table: source.factures
+    colonne: type_episode
+    nomenclature: nomenclature_type_episode
+  - table: source.factures
+    colonne: code_diagnostic_cim10
+    nomenclature: nomenclature_diagnostic
+  - table: source.factures
+    colonne: type_facture
+    nomenclature: nomenclature_type_facture
+  - table: source.factures
+    colonne: service_emetteur
+    nomenclature: nomenclature_service
+  - table: source.factures
+    colonne: etat
+    nomenclature: nomenclature_etat_facture
+  - table: source.lignes_facture
+    colonne: service_executant
+    nomenclature: nomenclature_service
+  - table: source.passages_urgences
+    colonne: mode_arrivee
+    nomenclature: nomenclature_mode_arrivee
+  - table: source.passages_urgences
+    colonne: motif_recours
+    nomenclature: nomenclature_motif_recours
+  - table: source.passages_urgences
+    colonne: niveau_tri
+    nomenclature: nomenclature_niveau_tri
+  - table: source.passages_urgences
+    colonne: orientation_sortie
+    nomenclature: nomenclature_orientation_sortie
+  - table: source.passages_urgences
+    colonne: service_orientation
+    nomenclature: nomenclature_service
+  - table: source.passages_urgences
+    colonne: motif_transfert
+    nomenclature: nomenclature_motif_transfert
+  - table: source.encaissements
+    colonne: mode_reglement
+    nomenclature: nomenclature_mode_reglement
+  - table: source.creances
+    colonne: type_debiteur
+    nomenclature: nomenclature_type_debiteur
+  - table: source.creances
+    colonne: motif_non_recouvrement
+    nomenclature: nomenclature_motif_non_recouvrement
+  - table: source.relances
+    colonne: canal
+    nomenclature: nomenclature_canal_relance
+  - table: source.relances
+    colonne: resultat
+    nomenclature: nomenclature_resultat_relance
+  unite: liste de correspondances
+  provenance: OBS
+  preuve: docs/champs/registre_champs.yml
+  note: Correspondance entre chaque colonne de type_metier code non identifiante et non différée, et le
+    nom de la nomenclature qui en porte le domaine de valeurs. Plusieurs colonnes de tables distinctes
+    peuvent partager la même nomenclature (par exemple service, réutilisée par sept colonnes).
