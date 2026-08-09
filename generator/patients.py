@@ -6,11 +6,13 @@ nombre en dehors du générateur reçu en argument ; aucun générateur global, 
 itération sur un ensemble non ordonné.
 """
 
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 import numpy as np
 
-from generator import config, ecriture, nomenclatures
+from generator import config, ecriture, nomenclatures, temporel
+
+FLUX_MODIFICATION = "programme"
 
 TABLE = "source.patients"
 AGE_MAJORITE_ANNEES = 18
@@ -95,6 +97,25 @@ def _tranche_depuis_age_jours(age_jours: int, tranches: list[str]) -> str:
         elif borne_min <= age_jours <= borne_max:
             return tranche
     return tranches[-1]
+
+
+def _tirer_horodatage_modification(
+    jour: date,
+    cache_profil: dict[date, list[float]],
+    entrees: dict[str, dict],
+    generateur: np.random.Generator,
+) -> datetime:
+    # generator/calendrier.py ne reçoit pas les entrées déjà chargées et recharge la
+    # configuration à chaque appel (est_ferie, est_ramadan) : un cache par jour évite de
+    # relire la configuration à chaque ligne modifiée, sans réimplémenter aucune règle de
+    # calendrier (temporel.profil_horaire_applicable reste l'unique source du profil).
+    if jour not in cache_profil:
+        cache_profil[jour] = temporel.profil_horaire_applicable(jour, FLUX_MODIFICATION, entrees)
+    profil = cache_profil[jour]
+    heure = int(generateur.choice(24, p=profil))
+    minute = int(generateur.integers(0, 60))
+    seconde = int(generateur.integers(0, 60))
+    return datetime(jour.year, jour.month, jour.day, heure, minute, seconde)
 
 
 def _appliquer_contraintes_egalite(ligne: dict, entrees: dict[str, dict]) -> None:
@@ -303,6 +324,7 @@ def generer_lignes(
     foyers: dict[int, tuple[str, str]] = {}
 
     premiers = _premier_episode_par_patient(episodes)
+    cache_profil_horaire: dict[date, list[float]] = {}
 
     lignes: list[dict] = []
     for patient in sorted(population, key=lambda p: p["patient_id"]):
@@ -323,14 +345,16 @@ def generer_lignes(
             date_ancrage = premier["date"] if premier else date_extraction_creation
             date_ancrage = max(date_ancrage, date_extraction_creation)
             delai = int(generateur.exponential(echelle_modification)) + 1
-            date_modification = date_ancrage + timedelta(days=delai)
-            if date_modification <= date_fin:
+            jour_modification = date_ancrage + timedelta(days=delai)
+            if jour_modification <= date_fin:
                 ligne_modification = dict(ligne_base)
-                ligne_modification["date_modification"] = date_modification
+                ligne_modification["date_modification"] = _tirer_horodatage_modification(
+                    jour_modification, cache_profil_horaire, entrees, generateur
+                )
                 ligne_modification["modifie_par"] = _tirage_uniforme_liste(
                     comptes_systeme, generateur
                 )
-                ligne_modification["date_extraction"] = date_modification
+                ligne_modification["date_extraction"] = jour_modification
                 lignes.append(ligne_modification)
 
     return lignes

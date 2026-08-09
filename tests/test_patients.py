@@ -155,7 +155,7 @@ def test_ordre_des_dates_sur_toutes_les_lignes(generation: dict) -> None:
     for ligne in lignes:
         assert ligne["date_naissance"] < ligne["date_attribution"], ligne
         if ligne["date_modification"] is not None:
-            assert ligne["date_modification"] > ligne["date_attribution"], ligne
+            assert ligne["date_modification"].date() > ligne["date_attribution"], ligne
 
 
 def test_structure_age_ponderee_par_categorie(generation: dict) -> None:
