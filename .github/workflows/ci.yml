@@ -40,6 +40,8 @@ jobs:
 
       - run: uv run pytest tests/test_nomenclatures.py -v
 
+      - run: uv run pytest tests/test_volumes.py -v
+
   provenance:
     runs-on: ubuntu-latest
     # Le service n'exige aucun mot de passe : le conteneur est éphémère,
