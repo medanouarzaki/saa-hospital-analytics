@@ -4,7 +4,7 @@ Dette explicite, non traitée ici : la correspondance bidirectionnelle
 complète — vérifier que tout paramètre du générateur créant une relation
 figure dans ce registre, et qu'aucune conclusion des sources LaTeX ne repose
 sur une relation listée sans être marquée comme circulaire — exige que le
-générateur (bloc 3) et les sources LaTeX (bloc 10) existent. Ces deux
+générateur et les sources LaTeX existent. Ces deux
 contrôles sont des dettes explicites de ces blocs, nommées ici et non écrites
 avant qu'ils existent.
 """

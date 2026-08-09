@@ -6,7 +6,7 @@ from pathlib import Path, PurePosixPath
 RACINE = Path(__file__).resolve().parent.parent
 EXTENSIONS_INTERDITES = {".heic", ".jpg", ".jpeg", ".png"}
 
-# Bloc 9 : les captures du tableau de bord produit par le projet seront tolérées
+# Les captures du tableau de bord produit par le projet seront tolérées
 # sous ce préfixe et nulle part ailleurs. Vide jusque-là.
 PREFIXES_TOLERES: tuple[str, ...] = ()
 

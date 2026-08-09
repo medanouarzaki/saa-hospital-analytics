@@ -12,7 +12,7 @@ Chaque profil est traité en trois temps.
 
 **Ce que la réglementation marocaine impose.** L'arrêté n° 456-11 du 6 juillet 2010 portant règlement intérieur des hôpitaux prescrit les missions du service d'accueil et d'admission et les formalités qui s'y attachent. C'est la source la plus contraignante du dossier : elle dit ce que le service *doit* faire, indépendamment du logiciel qui le lui permet.
 
-**Les champs qui en découlent.** Une fonction prescrite par la réglementation et documentée par l'éditeur implique des champs. Ceux-ci sont proposés ici avec leur source, et repris tels quels dans `docs/champs/registre_champs.yml` au bloc 2.
+**Les champs qui en découlent.** Une fonction prescrite par la réglementation et documentée par l'éditeur implique des champs. Ceux-ci sont proposés ici avec leur source, et repris tels quels dans `docs/champs/registre_champs.yml`.
 
 ## Deux avertissements sur la nature des preuves
 
