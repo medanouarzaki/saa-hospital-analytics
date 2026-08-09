@@ -1,0 +1,1448 @@
+# Registre des champs — colonnes de la couche source
+#
+# Règle de preuve. Un champ `OBS` porte un identifiant de ligne du relevé de
+# champs (`docs/observation/releve_champs.yml`). Un champ `DOC` porte un
+# identifiant du registre des sources (`docs/sources/sources.yml`). Un champ
+# `HYP` porte une justification écrite et l'effet qu'aurait une hypothèse
+# fausse.
+#
+# `type` vaut `text` sur toute colonne du schéma `source`, sans exception.
+# Ce n'est pas un défaut de typage : la couche source reproduit une
+# extraction avec ses défauts, et une ligne mal formée doit se charger pour
+# partir ensuite en quarantaine. Le typage strict et la standardisation des
+# dates appartiennent à la couche intermédiaire. Si PostgreSQL rejetait la
+# ligne au chargement, le dispositif de quarantaine n'aurait plus d'objet.
+#
+# Lignes du relevé qui n'entrent pas au modèle, et pourquoi :
+#   - REL-PAT.D07 Âge — dérivable de la date de naissance, ne se stocke pas ;
+#   - REL-PAT.D08 et REL-RDV.I08 Num — libellé relevé, nature de la donnée
+#     non observée ; une colonne dont le contenu est inconnu ne se modélise
+#     pas ;
+#   - REL-RDV.I02 à REL-RDV.I07, REL-RDV.I09, REL-RDV.I10 — le bloc
+#     d'identification de l'écran de rendez-vous rappelle des données du
+#     dossier patient ; elles sont affichées, non saisies, et appartiennent
+#     à source.patients.
+#
+# Deux exclusions supplémentaires, portant sur les neuf tables reconstruites
+# par voie documentaire :
+#   - creances.anciennete_jours, proposé par docs/modules_non_observes.md —
+#     une durée comptée depuis la date de lecture n'est pas un fait stocké
+#     mais un calcul de restitution. Elle est produite dans la couche marts,
+#     au même titre que l'âge du patient, écarté pour le même motif.
+#   - aucune colonne dont la valeur dépendrait de la date à laquelle on la
+#     lit n'entre dans la couche source. creances.montant_restant est en
+#     revanche conservé bien qu'il se déduise des deux colonnes voisines :
+#     sa redondance est interne à la ligne, elle ne dépend pas de la date de
+#     lecture, et l'écart éventuel entre les trois montants est un contrôle
+#     de cohérence exploitable.
+
+- table: source.patients
+  colonne: n_ipp
+  type: text
+  type_metier: code
+  libelle_hosix: "N° IPP"
+  provenance: OBS
+  preuve: REL-PAT.D01
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: nom
+  type: text
+  type_metier: texte
+  libelle_hosix: "Nom"
+  provenance: OBS
+  preuve: REL-PAT.D02
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: nom_famille_1
+  type: text
+  type_metier: texte
+  libelle_hosix: "Nom de famille 1"
+  provenance: OBS
+  preuve: REL-PAT.D03
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: nom_famille_2
+  type: text
+  type_metier: texte
+  libelle_hosix: "Nom de famille 2"
+  provenance: OBS
+  preuve: REL-PAT.D04
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: sexe
+  type: text
+  type_metier: code
+  libelle_hosix: "Sexe"
+  provenance: OBS
+  preuve: REL-PAT.D05
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: date_naissance
+  type: text
+  type_metier: date
+  libelle_hosix: "D. Nai"
+  provenance: OBS
+  preuve: REL-PAT.D06
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: type_piece_identite
+  type: text
+  type_metier: code
+  libelle_hosix: "Type pièce d'identité"
+  provenance: OBS
+  preuve: REL-PAT.D09
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: n_piece_identite
+  type: text
+  type_metier: texte
+  libelle_hosix: "N° pièce d'identité"
+  provenance: OBS
+  preuve: REL-PAT.D10
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: etat_civil
+  type: text
+  type_metier: code
+  libelle_hosix: "E. Civil"
+  provenance: OBS
+  preuve: REL-PAT.D11
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: type_patient
+  type: text
+  type_metier: code
+  libelle_hosix: "Type patient"
+  provenance: OBS
+  preuve: REL-PAT.D12
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: date_photo
+  type: text
+  type_metier: date
+  libelle_hosix: "Date photo"
+  provenance: OBS
+  preuve: REL-PAT.D13
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: modifie_par
+  type: text
+  type_metier: texte
+  libelle_hosix: "Modifié par"
+  provenance: OBS
+  preuve: REL-PAT.D14
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: cree_par
+  type: text
+  type_metier: texte
+  libelle_hosix: "Créé par"
+  provenance: OBS
+  preuve: REL-PAT.D15
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: date_attribution
+  type: text
+  type_metier: date
+  libelle_hosix: "Date d'attribution"
+  provenance: OBS
+  preuve: REL-PAT.D16
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.patients
+  colonne: compagnie_assurance
+  type: text
+  type_metier: code
+  libelle_hosix: "Compagnie d'assur."
+  provenance: OBS
+  preuve: REL-PAT.A01
+  note: "Relevé de champs, fiche patient, bloc Compagnie d'assurance."
+- table: source.patients
+  colonne: police
+  type: text
+  type_metier: texte
+  libelle_hosix: "Police"
+  provenance: OBS
+  preuve: REL-PAT.A02
+  note: "Relevé de champs, fiche patient, bloc Compagnie d'assurance."
+- table: source.patients
+  colonne: n_assure
+  type: text
+  type_metier: texte
+  libelle_hosix: "N° Assu"
+  provenance: OBS
+  preuve: REL-PAT.A03
+  note: "Relevé de champs, fiche patient, bloc Compagnie d'assurance."
+- table: source.patients
+  colonne: profession
+  type: text
+  type_metier: texte
+  libelle_hosix: "Profession"
+  provenance: OBS
+  preuve: REL-PAT.A04
+  note: "Relevé de champs, fiche patient, bloc Compagnie d'assurance."
+- table: source.patients
+  colonne: num_inscription
+  type: text
+  type_metier: texte
+  libelle_hosix: "Num. inscription"
+  provenance: OBS
+  preuve: REL-PAT.A05
+  note: "Relevé de champs, fiche patient, bloc Compagnie d'assurance."
+- table: source.patients
+  colonne: date_inscription
+  type: text
+  type_metier: date
+  libelle_hosix: "Date inscription"
+  provenance: OBS
+  preuve: REL-PAT.A06
+  note: "Relevé de champs, fiche patient, bloc Compagnie d'assurance."
+- table: source.patients
+  colonne: type_domicile
+  type: text
+  type_metier: code
+  libelle_hosix: "Type"
+  provenance: OBS
+  preuve: REL-PAT.H01
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: adresse
+  type: text
+  type_metier: texte
+  libelle_hosix: "Adresse"
+  provenance: OBS
+  preuve: REL-PAT.H02
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: code_postal
+  type: text
+  type_metier: texte
+  libelle_hosix: "Code postal"
+  provenance: OBS
+  preuve: REL-PAT.H03
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: etat
+  type: text
+  type_metier: code
+  libelle_hosix: "État"
+  provenance: OBS
+  preuve: REL-PAT.H04
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: ville
+  type: text
+  type_metier: code
+  libelle_hosix: "Ville"
+  provenance: OBS
+  preuve: REL-PAT.H05
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: quartier
+  type: text
+  type_metier: texte
+  libelle_hosix: "Quartier"
+  provenance: OBS
+  preuve: REL-PAT.H06
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: nationalite
+  type: text
+  type_metier: code
+  libelle_hosix: "Nationalité"
+  provenance: OBS
+  preuve: REL-PAT.H07
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: telephone_1
+  type: text
+  type_metier: texte
+  libelle_hosix: "Téléphone 1"
+  provenance: OBS
+  preuve: REL-PAT.H08
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: telephone_2
+  type: text
+  type_metier: texte
+  libelle_hosix: "Téléphone 2"
+  provenance: OBS
+  preuve: REL-PAT.H09
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: telephone_3
+  type: text
+  type_metier: texte
+  libelle_hosix: "Téléphone 3"
+  provenance: OBS
+  preuve: REL-PAT.H10
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: telephone_4
+  type: text
+  type_metier: texte
+  libelle_hosix: "Téléphone 4"
+  provenance: OBS
+  preuve: REL-PAT.H11
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: avertissements_sms
+  type: text
+  type_metier: booleen
+  libelle_hosix: "Avertissements SMS"
+  provenance: OBS
+  preuve: REL-PAT.H12
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: email
+  type: text
+  type_metier: texte
+  libelle_hosix: "E-mail"
+  provenance: OBS
+  preuve: REL-PAT.H13
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: avertissements_email
+  type: text
+  type_metier: booleen
+  libelle_hosix: "Avertissements e-mail"
+  provenance: OBS
+  preuve: REL-PAT.H14
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: environnement
+  type: text
+  type_metier: code
+  libelle_hosix: "Environnement"
+  provenance: OBS
+  preuve: REL-PAT.H15
+  note: "Relevé de champs, fiche patient, bloc Domicile."
+- table: source.patients
+  colonne: nom_pere
+  type: text
+  type_metier: texte
+  libelle_hosix: "Nom. Père"
+  provenance: OBS
+  preuve: REL-PAT.N01
+  note: "Relevé de champs, fiche patient, bloc Né."
+- table: source.patients
+  colonne: nom_mere
+  type: text
+  type_metier: texte
+  libelle_hosix: "Nom. Mère"
+  provenance: OBS
+  preuve: REL-PAT.N02
+  note: "Relevé de champs, fiche patient, bloc Né."
+- table: source.patients
+  colonne: etat_naissance
+  type: text
+  type_metier: code
+  libelle_hosix: "Lieu de naissance - État"
+  provenance: OBS
+  preuve: REL-PAT.N03
+  note: "Relevé de champs, fiche patient, bloc Né."
+- table: source.patients
+  colonne: ville_naissance
+  type: text
+  type_metier: code
+  libelle_hosix: "Ville"
+  provenance: OBS
+  preuve: REL-PAT.N04
+  note: "Relevé de champs, fiche patient, bloc Né."
+- table: source.patients
+  colonne: pays_naissance
+  type: text
+  type_metier: code
+  libelle_hosix: "Pays"
+  provenance: OBS
+  preuve: REL-PAT.N05
+  note: "Relevé de champs, fiche patient, bloc Né."
+- table: source.patients
+  colonne: quartier_naissance
+  type: text
+  type_metier: texte
+  libelle_hosix: "Quartier"
+  provenance: OBS
+  preuve: REL-PAT.N06
+  note: "Relevé de champs, fiche patient, bloc Né."
+- table: source.patients
+  colonne: commentaire
+  type: text
+  type_metier: texte
+  libelle_hosix: "Commentaire"
+  provenance: OBS
+  preuve: REL-PAT.K01
+  note: "Relevé de champs, fiche patient, bloc Commentaire."
+- table: source.patients
+  colonne: province
+  type: text
+  type_metier: code
+  libelle_hosix: "Province"
+  provenance: OBS
+  preuve: REL-IPP.R09
+  note: "Relevé de champs, recherche d'IPP, colonne de résultat. La colonne n'apparaît pas au bloc Domicile de la fiche patient, où figurent État, Ville et Quartier ; elle est établie par la liste de résultats de la recherche, qui la restitue."
+- table: source.patients
+  colonne: exitus
+  type: text
+  type_metier: booleen
+  libelle_hosix: "Exitus"
+  provenance: OBS
+  preuve: REL-IPP.F04
+  note: "Relevé de champs, recherche d'IPP, filtre de population. L'existence d'un filtre sur les patients décédés établit qu'un indicateur de décès est stocké sur la fiche, bien qu'aucun champ de ce nom n'ait été relevé sur l'écran de la fiche patient."
+- table: source.patients
+  colonne: date_modification
+  type: text
+  type_metier: horodatage
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "L'écran de la fiche patient porte un champ Modifié par sans horodatage adjacent, là où l'écran de rendez-vous appareille chaque agent à sa date. La colonne est posée parce que l'historisation de la dimension patient en type 2 exige un instant de changement. Si l'extraction réelle ne la fournissait pas, l'historisation se rabattrait sur la date d'extraction de la partition, à la granularité du jour au lieu de la seconde, et les changements survenus le même jour seraient confondus."
+- table: source.patients
+  colonne: date_extraction
+  type: text
+  type_metier: date
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "Colonne technique de la zone d'atterrissage, absente du système observé. Elle porte la date de l'extraction dont la ligne provient et rend le rechargement d'une partition idempotent. Si une extraction réelle ne la fournissait pas, elle serait dérivée du nom du fichier partitionné, sans perte d'information."
+
+- table: source.rendez_vous
+  colonne: n_rdv
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "Aucun identifiant de rendez-vous n'apparaît à l'écran Donner rendez-vous, dont la barre d'actions comporte pourtant Enregistrer, Supprimer et Chercher, trois opérations qui supposent une clé. La colonne est posée parce que la table des passages porte une référence de rendez-vous nullable, qui n'aurait pas de cible sans elle. Si le système en place clé le rendez-vous par un couple agenda et horodatage plutôt que par un numéro, la structure logique du modèle est inchangée et seule la forme de la clé diffère."
+- table: source.rendez_vous
+  colonne: n_ipp
+  type: text
+  type_metier: code
+  libelle_hosix: "N° IPP"
+  provenance: OBS
+  preuve: REL-RDV.I01
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Identification du patient."
+- table: source.rendez_vous
+  colonne: agenda
+  type: text
+  type_metier: code
+  libelle_hosix: "Agenda"
+  provenance: OBS
+  preuve: REL-RDV.R01
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: activite
+  type: text
+  type_metier: code
+  libelle_hosix: "Activité"
+  provenance: OBS
+  preuve: REL-RDV.R02
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: origine
+  type: text
+  type_metier: code
+  libelle_hosix: "Origine"
+  provenance: OBS
+  preuve: REL-RDV.R03
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: hopital_cs
+  type: text
+  type_metier: code
+  libelle_hosix: "Hôpital/C.S."
+  provenance: OBS
+  preuve: REL-RDV.R04
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: medecin_ext
+  type: text
+  type_metier: texte
+  libelle_hosix: "Médecin ext."
+  provenance: OBS
+  preuve: REL-RDV.R05
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: service_ext
+  type: text
+  type_metier: texte
+  libelle_hosix: "Service ext."
+  provenance: OBS
+  preuve: REL-RDV.R06
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: observations
+  type: text
+  type_metier: texte
+  libelle_hosix: "Observations"
+  provenance: OBS
+  preuve: REL-RDV.R07
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: date_rendez_vous
+  type: text
+  type_metier: horodatage
+  libelle_hosix: "Date rendez-vous"
+  provenance: OBS
+  preuve: REL-RDV.R08
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: rdv_supplementaire
+  type: text
+  type_metier: booleen
+  libelle_hosix: "Rendez-vous supplémentaire"
+  provenance: OBS
+  preuve: REL-RDV.R09
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: type_attention
+  type: text
+  type_metier: code
+  libelle_hosix: "Type d'attention"
+  provenance: OBS
+  preuve: REL-RDV.R10
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: etat
+  type: text
+  type_metier: code
+  libelle_hosix: "État"
+  provenance: OBS
+  preuve: REL-RDV.R11
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: duree
+  type: text
+  type_metier: entier
+  libelle_hosix: "Durée"
+  provenance: OBS
+  preuve: REL-RDV.R12
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous. Durée exprimée en minutes, valeur nulle sur le rendez-vous observé."
+- table: source.rendez_vous
+  colonne: date_reception
+  type: text
+  type_metier: horodatage
+  libelle_hosix: "Date réception"
+  provenance: OBS
+  preuve: REL-RDV.R13
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: imprimer_donnees
+  type: text
+  type_metier: booleen
+  libelle_hosix: "Imprimer données"
+  provenance: OBS
+  preuve: REL-RDV.R14
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous."
+- table: source.rendez_vous
+  colonne: cree_par
+  type: text
+  type_metier: texte
+  libelle_hosix: "Créé par"
+  provenance: OBS
+  preuve: REL-RDV.C01
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications."
+- table: source.rendez_vous
+  colonne: date_creation
+  type: text
+  type_metier: horodatage
+  libelle_hosix: "Date création"
+  provenance: OBS
+  preuve: REL-RDV.C02
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications. L'écart entre cette colonne et la date du rendez-vous est le délai d'obtention, grandeur centrale de l'analyse. Sur le rendez-vous observé, il valait une seconde."
+- table: source.rendez_vous
+  colonne: modifie_par
+  type: text
+  type_metier: texte
+  libelle_hosix: "Modifié par"
+  provenance: OBS
+  preuve: REL-RDV.C03
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications."
+- table: source.rendez_vous
+  colonne: date_mod
+  type: text
+  type_metier: horodatage
+  libelle_hosix: "Date mod."
+  provenance: OBS
+  preuve: REL-RDV.C04
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications."
+- table: source.rendez_vous
+  colonne: confirme_par
+  type: text
+  type_metier: texte
+  libelle_hosix: "Confirmé par"
+  provenance: OBS
+  preuve: REL-RDV.C05
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications. Avec la colonne d'annulation, ce couple sépare une annulation déclarée d'une absence non prévenue ; sans lui, les deux se confondent."
+- table: source.rendez_vous
+  colonne: date_conf
+  type: text
+  type_metier: horodatage
+  libelle_hosix: "Date conf."
+  provenance: OBS
+  preuve: REL-RDV.C06
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications."
+- table: source.rendez_vous
+  colonne: annule_par
+  type: text
+  type_metier: texte
+  libelle_hosix: "Annulé par"
+  provenance: OBS
+  preuve: REL-RDV.C07
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications."
+- table: source.rendez_vous
+  colonne: date_annul
+  type: text
+  type_metier: horodatage
+  libelle_hosix: "Date annul."
+  provenance: OBS
+  preuve: REL-RDV.C08
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications."
+- table: source.rendez_vous
+  colonne: liste_attente_service
+  type: text
+  type_metier: code
+  libelle_hosix: "Service"
+  provenance: OBS
+  preuve: REL-RDV.L01
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Liste d'attente des consultations."
+- table: source.rendez_vous
+  colonne: liste_attente_agenda
+  type: text
+  type_metier: code
+  libelle_hosix: "Agenda"
+  provenance: OBS
+  preuve: REL-RDV.L02
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Liste d'attente des consultations."
+- table: source.rendez_vous
+  colonne: liste_attente_activite
+  type: text
+  type_metier: code
+  libelle_hosix: "Activité"
+  provenance: OBS
+  preuve: REL-RDV.L03
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Liste d'attente des consultations."
+- table: source.rendez_vous
+  colonne: date_extraction
+  type: text
+  type_metier: date
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "Colonne technique de la zone d'atterrissage, absente du système observé. Elle porte la date de l'extraction dont la ligne provient et rend le rechargement d'une partition idempotent. Si une extraction réelle ne la fournissait pas, elle serait dérivée du nom du fichier partitionné, sans perte d'information."
+
+- table: source.passages
+  colonne: n_passage
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-08
+  note: "Le module Consultas de l'éditeur documente la gestion des consultations et la production de leurs listings, ce qui suppose un identifiant de passage."
+- table: source.passages
+  colonne: n_ipp
+  type: text
+  type_metier: code
+  libelle_hosix: "N° IPP"
+  provenance: OBS
+  preuve: REL-PAT.D01
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.passages
+  colonne: type_passage
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-06
+  note: "La liste de travail du module Médicos regroupe les patients par type d'épisode : hospitalisés, consultation, urgences. Le système type donc ses épisodes."
+- table: source.passages
+  colonne: service
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "Article 27 du règlement intérieur : l'hôpital s'organise en services, et l'activité s'y rattache."
+- table: source.passages
+  colonne: activite
+  type: text
+  type_metier: code
+  libelle_hosix: "Activité"
+  provenance: OBS
+  preuve: REL-RDV.R02
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous. Le même référentiel d'activités qualifie le rendez-vous et le passage qui l'honore."
+- table: source.passages
+  colonne: n_rdv
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "La colonne rattache le passage au rendez-vous qui l'a programmé, et hérite du caractère hypothétique de l'identifiant de rendez-vous lui-même, qui n'apparaît sur aucun écran. Elle est nullable : un passage peut survenir sans rendez-vous préalable. Si le système en place ne conservait pas ce rattachement, le délai d'obtention resterait mesurable sur la table des rendez-vous, mais le taux d'honoration des rendez-vous ne le serait plus."
+- table: source.passages
+  colonne: mode_prise_en_charge
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-18
+  note: "Le tiers payant distingue les modes de prise en charge selon le régime et le caractère ambulatoire ou hospitalier de la prestation."
+- table: source.passages
+  colonne: date_heure_entree
+  type: text
+  type_metier: horodatage
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-08
+  note: "Le module Consultas gère la programmation et le déroulement de la consultation, dont l'heure d'entrée."
+- table: source.passages
+  colonne: date_heure_sortie
+  type: text
+  type_metier: horodatage
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-08
+  note: "Idem, borne de fin du passage."
+- table: source.passages
+  colonne: medecin
+  type: text
+  type_metier: texte
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-06
+  note: "Le module Médicos rattache l'épisode au praticien qui le prend en charge."
+- table: source.passages
+  colonne: cree_par
+  type: text
+  type_metier: texte
+  libelle_hosix: "Créé par"
+  provenance: OBS
+  preuve: REL-RDV.C01
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications. Le même bloc d'audit est reproduit d'un écran à l'autre."
+- table: source.passages
+  colonne: date_creation
+  type: text
+  type_metier: horodatage
+  libelle_hosix: "Date création"
+  provenance: OBS
+  preuve: REL-RDV.C02
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications. Le même bloc d'audit est reproduit d'un écran à l'autre."
+- table: source.passages
+  colonne: date_extraction
+  type: text
+  type_metier: date
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "Colonne technique de la zone d'atterrissage, absente du système observé. Elle porte la date de l'extraction dont la ligne provient et rend le rechargement d'une partition idempotent. Si une extraction réelle ne la fournissait pas, elle serait dérivée du nom du fichier partitionné, sans perte d'information."
+
+- table: source.mouvements
+  colonne: n_sejour
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "Article 40 : les formalités d'admission ouvrent un dossier de séjour identifié."
+- table: source.mouvements
+  colonne: n_ipp
+  type: text
+  type_metier: code
+  libelle_hosix: "N° IPP"
+  provenance: OBS
+  preuve: REL-PAT.D01
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.mouvements
+  colonne: date_heure_admission
+  type: text
+  type_metier: horodatage
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "Article 40, formalités d'admission ordinaire."
+- table: source.mouvements
+  colonne: mode_admission
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "Articles 40, 42 et 45 : l'admission est ordinaire ou en urgence, et les formalités diffèrent."
+- table: source.mouvements
+  colonne: service_accueil
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "Article 44 : l'hospitalisation est ordonnée vers un service."
+- table: source.mouvements
+  colonne: lit
+  type: text
+  type_metier: texte
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "Aucune source ne documente l'identification du lit occupé, alors que la capacité litière fonctionnelle est publiée par établissement et que l'article 42 impose l'admission même en cas d'indisponibilité de lits, ce qui suppose un suivi de l'occupation. La colonne est posée parce que le taux d'occupation du tableau de bord se recalcule depuis les journées d'hospitalisation, non depuis les lits ; si elle était fausse ou absente, aucun indicateur du chapitre sur l'activité ne changerait."
+- table: source.mouvements
+  colonne: n_mutation
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "Article 35 : le service gère les effectifs des patients et leurs mouvements à l'intérieur de l'hôpital."
+- table: source.mouvements
+  colonne: service_origine
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "Article 35, mouvements internes."
+- table: source.mouvements
+  colonne: service_destination
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "Article 35, mouvements internes."
+- table: source.mouvements
+  colonne: date_heure_mutation
+  type: text
+  type_metier: horodatage
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "Article 35, mouvements internes."
+- table: source.mouvements
+  colonne: date_heure_sortie
+  type: text
+  type_metier: horodatage
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "Article 79 : les formalités de sortie closent le séjour."
+- table: source.mouvements
+  colonne: mode_sortie
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "Articles 79 et 80 : sortie régulière avec billet, sortie à l'insu du personnel, décès."
+- table: source.mouvements
+  colonne: date_extraction
+  type: text
+  type_metier: date
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "Colonne technique de la zone d'atterrissage, absente du système observé. Elle porte la date de l'extraction dont la ligne provient et rend le rechargement d'une partition idempotent. Si une extraction réelle ne la fournissait pas, elle serait dérivée du nom du fichier partitionné, sans perte d'information."
+
+- table: source.prises_en_charge
+  colonne: n_prise_en_charge
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "Article 79 : les formalités de sortie comportent la signature des documents de prise en charge, document identifié."
+- table: source.prises_en_charge
+  colonne: n_ipp
+  type: text
+  type_metier: code
+  libelle_hosix: "N° IPP"
+  provenance: OBS
+  preuve: REL-PAT.D01
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.prises_en_charge
+  colonne: n_episode
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "Article 79 : la prise en charge se rattache à l'épisode qu'elle couvre."
+- table: source.prises_en_charge
+  colonne: type_episode
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "Article 36 : taxonomie réglementaire des modes d'utilisation de l'hôpital."
+- table: source.prises_en_charge
+  colonne: organisme
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-15
+  note: "Les régimes de l'assurance maladie obligatoire sont distincts et l'organisme gestionnaire diffère de l'un à l'autre."
+- table: source.prises_en_charge
+  colonne: n_assure
+  type: text
+  type_metier: texte
+  libelle_hosix: "N° Assu"
+  provenance: OBS
+  preuve: REL-PAT.A03
+  note: "Relevé de champs, fiche patient, bloc Compagnie d'assurance."
+- table: source.prises_en_charge
+  colonne: date_verification
+  type: text
+  type_metier: horodatage
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "Article 40 : le patient présente les documents exigés selon son statut de couverture, ce qui date la vérification."
+- table: source.prises_en_charge
+  colonne: etat
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-19
+  note: "Aucune demande de prise en charge préalable n'est exigée dans le secteur public : l'état constate l'ouverture des droits, il n'enregistre pas un accord. Valeurs retenues : droits ouverts, droits fermés, non vérifié."
+- table: source.prises_en_charge
+  colonne: taux_prise_en_charge
+  type: text
+  type_metier: decimal
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-18
+  note: "Cent pour cent de la tarification nationale de référence en hospitalisation et en hôpital de jour, quatre-vingts pour cent en ambulatoire au-delà de deux cents dirhams."
+- table: source.prises_en_charge
+  colonne: date_extraction
+  type: text
+  type_metier: date
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "Colonne technique de la zone d'atterrissage, absente du système observé. Elle porte la date de l'extraction dont la ligne provient et rend le rechargement d'une partition idempotent. Si une extraction réelle ne la fournissait pas, elle serait dérivée du nom du fichier partitionné, sans perte d'information."
+
+- table: source.factures
+  colonne: n_facture
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-09
+  note: "Le module Facturación de Hosix Core documente l'émission de factures et de listings personnalisés, ce qui suppose un identifiant de facture."
+- table: source.factures
+  colonne: n_ipp
+  type: text
+  type_metier: code
+  libelle_hosix: "N° IPP"
+  provenance: OBS
+  preuve: REL-PAT.D01
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.factures
+  colonne: n_episode
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-09
+  note: "Le module Facturación récupère dans chacun des autres modules l'information nécessaire à la facturation en captant les mouvements générés, ce qui suppose un identifiant d'épisode rattaché."
+- table: source.factures
+  colonne: type_episode
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "L'article 36 du règlement intérieur des hôpitaux établit une taxonomie réglementaire des modes d'utilisation de l'hôpital, que la facture doit porter."
+- table: source.factures
+  colonne: code_diagnostic_cim10
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "L'article 35 du règlement intérieur impose d'établir la facturation sur la base de la classification des maladies, soit la CIM-10."
+- table: source.factures
+  colonne: date_facture
+  type: text
+  type_metier: date
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-09
+  note: "Le module Facturación de l'éditeur documente l'émission de factures, ce qui suppose une date d'émission."
+- table: source.factures
+  colonne: type_facture
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-09
+  note: "Le module Facturación admet la facturation aux entités publiques, aux entités privées et particuliers, et aux mutuelles d'accidents."
+- table: source.factures
+  colonne: service_emetteur
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "L'article 35 du règlement intérieur charge le service d'accueil et d'admission d'établir la facturation, ce qui rattache chaque facture à un service émetteur."
+- table: source.factures
+  colonne: etat
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-09
+  note: "Le module Facturación contrôle explicitement l'état des activités réalisées : facturées, en attente de facturation, et autres états."
+- table: source.factures
+  colonne: montant_total
+  type: text
+  type_metier: decimal
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-17
+  note: "Le montant se calcule sur la grille des lettres clés de la tarification nationale de référence du secteur public."
+- table: source.factures
+  colonne: part_organisme
+  type: text
+  type_metier: decimal
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-18
+  note: "Les taux de prise en charge de la tarification nationale de référence fixent la part organisme à 100 % en hospitalisation et hôpital de jour, et à 80 % en ambulatoire au-delà de 200 dirhams."
+- table: source.factures
+  colonne: part_patient
+  type: text
+  type_metier: decimal
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-18
+  note: "La part patient est le complément de la part organisme, sauf pour les bénéficiaires du régime AMO-Tadamon en structure publique où l'État prend en charge le ticket modérateur et où la part patient devient nulle, comme l'établit une seconde source (S-15)."
+- table: source.factures
+  colonne: cree_par
+  type: text
+  type_metier: texte
+  libelle_hosix: "Créé par"
+  provenance: OBS
+  preuve: REL-RDV.C01
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications. Le même bloc d'audit est reproduit d'un écran à l'autre."
+- table: source.factures
+  colonne: date_creation
+  type: text
+  type_metier: horodatage
+  libelle_hosix: "Date création"
+  provenance: OBS
+  preuve: REL-RDV.C02
+  note: "Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications. Le même bloc d'audit est reproduit d'un écran à l'autre."
+- table: source.factures
+  colonne: date_extraction
+  type: text
+  type_metier: date
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "Colonne technique de la zone d'atterrissage, absente du système observé. Elle porte la date de l'extraction dont la ligne provient et rend le rechargement d'une partition idempotent. Si une extraction réelle ne la fournissait pas, elle serait dérivée du nom du fichier partitionné, sans perte d'information."
+
+- table: source.lignes_facture
+  colonne: n_facture
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-09
+  note: "Le module Facturación de l'éditeur documente l'émission de factures composées de lignes."
+- table: source.lignes_facture
+  colonne: n_ligne
+  type: text
+  type_metier: entier
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-09
+  note: "Le module Facturación produit une documentation et des listings personnalisés composés de lignes détaillées."
+- table: source.lignes_facture
+  colonne: code_acte
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "L'article 35 du règlement intérieur impose une facturation sur la base des nomenclatures des actes, et la grille des lettres clés du secteur public rattache un code à chaque acte."
+- table: source.lignes_facture
+  colonne: libelle_acte
+  type: text
+  type_metier: texte
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-17
+  note: "La grille des lettres clés de la tarification nationale de référence du secteur public porte un libellé pour chaque acte, en complément de la nomenclature imposée par l'article 35 du règlement intérieur."
+- table: source.lignes_facture
+  colonne: lettre_cle
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-17
+  note: "La tarification nationale de référence rémunère l'acte par une lettre clé et un coefficient."
+- table: source.lignes_facture
+  colonne: coefficient
+  type: text
+  type_metier: decimal
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-17
+  note: "La tarification nationale de référence rémunère l'acte par une lettre clé et un coefficient."
+- table: source.lignes_facture
+  colonne: quantite
+  type: text
+  type_metier: entier
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "La structure d'une ligne de facturation hospitalière comporte usuellement une quantité distincte du coefficient de la lettre clé, mais aucune des sources ouvertes ne la documente pour le secteur public marocain. La colonne est posée parce que sans elle un acte répété le même jour se confondrait avec un acte unique. Si elle était absente du système réel, les montants resteraient exacts et seul le dénombrement des actes par ligne serait affecté."
+- table: source.lignes_facture
+  colonne: tarif_unitaire
+  type: text
+  type_metier: decimal
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-17
+  note: "Le tarif unitaire se lit sur la grille des lettres clés de la tarification nationale de référence."
+- table: source.lignes_facture
+  colonne: montant
+  type: text
+  type_metier: decimal
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-17
+  note: "Le montant de la ligne se calcule sur la grille des lettres clés de la tarification nationale de référence."
+- table: source.lignes_facture
+  colonne: service_executant
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-09
+  note: "Le module Facturación rattache chaque activité facturable au service qui l'a exécutée."
+- table: source.lignes_facture
+  colonne: date_acte
+  type: text
+  type_metier: date
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "L'article 42 du règlement intérieur dispose qu'aux urgences la facturation n'est entamée qu'après l'engagement de la prise en charge médicale, ce qui date l'acte facturé."
+- table: source.lignes_facture
+  colonne: date_extraction
+  type: text
+  type_metier: date
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "Colonne technique de la zone d'atterrissage, absente du système observé. Elle porte la date de l'extraction dont la ligne provient et rend le rechargement d'une partition idempotent. Si une extraction réelle ne la fournissait pas, elle serait dérivée du nom du fichier partitionné, sans perte d'information."
+
+- table: source.passages_urgences
+  colonne: n_passage
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "L'article 45 du règlement intérieur prescrit que les formalités d'admission en urgence sont enregistrées, ce qui identifie chaque passage."
+- table: source.passages_urgences
+  colonne: n_ipp
+  type: text
+  type_metier: code
+  libelle_hosix: "N° IPP"
+  provenance: OBS
+  preuve: REL-PAT.D01
+  note: "Relevé de champs, fiche patient, bloc Données principales."
+- table: source.passages_urgences
+  colonne: date_heure_arrivee
+  type: text
+  type_metier: horodatage
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "L'article 42 du règlement intérieur fait de l'accueil aux urgences l'acte fondateur du passage."
+- table: source.passages_urgences
+  colonne: mode_arrivee
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-12
+  note: "Le mode d'arrivée aux urgences est documenté par la protection civile, l'ambulance SMUR, les moyens propres et le transport privé."
+- table: source.passages_urgences
+  colonne: motif_recours
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-13
+  note: "L'étude sur le recours non approprié aux urgences classe les motifs de consultation par chapitre de la CIM-10."
+- table: source.passages_urgences
+  colonne: niveau_tri
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-12
+  note: "Les chiffres du ministère répartissent les passages entre urgences vitales, environ 10 %, et consultations médicales non urgentes, 64 %, le solde de 26 % correspondant aux urgences réelles non vitales. Réserve : cette source ne distingue que trois groupes de gravité, tandis que le modèle retient cinq niveaux ; la colonne existe, c'est son échelle qui reste ouverte."
+- table: source.passages_urgences
+  colonne: date_heure_pec_medicale
+  type: text
+  type_metier: horodatage
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "L'article 42 du règlement intérieur dispose que la procédure de facturation n'est entamée qu'après l'engagement de la prise en charge médicale, ce qui date cet engagement."
+- table: source.passages_urgences
+  colonne: date_heure_sortie
+  type: text
+  type_metier: horodatage
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "L'article 43 du règlement intérieur impose au patient admis aux urgences de s'acquitter des frais avant sa sortie, ce que le règlement précède."
+- table: source.passages_urgences
+  colonne: orientation_sortie
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "Les articles 42, 44, 46 et 47 du règlement intérieur distinguent le retour à domicile, l'hospitalisation, le transfert, la sortie contre avis médical et le décès comme issues du passage."
+- table: source.passages_urgences
+  colonne: service_orientation
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "L'article 44 du règlement intérieur dispose que l'hospitalisation d'urgence est ordonnée vers un service."
+- table: source.passages_urgences
+  colonne: motif_transfert
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "L'article 47 du règlement intérieur prévoit le transfert lorsque les soins requis relèvent d'une discipline ou d'une technique n'existant pas à l'hôpital."
+- table: source.passages_urgences
+  colonne: consentement_transfert
+  type: text
+  type_metier: booleen
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "L'article 47 du règlement intérieur exige le consentement écrit du patient pour un transfert, sauf extrême urgence."
+- table: source.passages_urgences
+  colonne: famille_informee
+  type: text
+  type_metier: booleen
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "Les articles 47 et 67 du règlement intérieur imposent d'informer la famille, lors d'un transfert comme pour un patient mineur, incapable ou inconscient."
+- table: source.passages_urgences
+  colonne: inventaire_effets
+  type: text
+  type_metier: booleen
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "L'article 45 du règlement intérieur impose un inventaire contradictoire des effets personnels lorsque le patient est inconscient."
+- table: source.passages_urgences
+  colonne: date_extraction
+  type: text
+  type_metier: date
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "Colonne technique de la zone d'atterrissage, absente du système observé. Elle porte la date de l'extraction dont la ligne provient et rend le rechargement d'une partition idempotent. Si une extraction réelle ne la fournissait pas, elle serait dérivée du nom du fichier partitionné, sans perte d'information."
+
+- table: source.encaissements
+  colonne: n_encaissement
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "L'article 79 du règlement intérieur range le règlement des frais parmi les formalités de sortie, ce qui identifie chaque encaissement."
+- table: source.encaissements
+  colonne: n_facture
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "L'article 79 du règlement intérieur rattache le règlement des frais à la facture émise."
+- table: source.encaissements
+  colonne: date_encaissement
+  type: text
+  type_metier: horodatage
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "L'article 79 du règlement intérieur date le règlement des frais parmi les formalités de sortie."
+- table: source.encaissements
+  colonne: mode_reglement
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "Aucune source ouverte ne documente les moyens de paiement acceptés au guichet d'un hôpital public marocain ; la Cour des comptes décrit seulement un versement direct chez le régisseur. La colonne est posée parce que la page de recouvrement du tableau de bord distingue les canaux d'encaissement. Si la répartition retenue était fausse, aucun taux de recouvrement ni aucune ancienneté de créance n'en serait affecté, ces grandeurs ne dépendant que du montant et de la date."
+- table: source.encaissements
+  colonne: montant
+  type: text
+  type_metier: decimal
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-18
+  note: "Le montant encaissé suit les taux de prise en charge de la tarification nationale de référence."
+- table: source.encaissements
+  colonne: regisseur
+  type: text
+  type_metier: texte
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-20
+  note: "Le rapport de la Cour des comptes décrit un paiement direct chez le régisseur."
+- table: source.encaissements
+  colonne: billet_sortie_delivre
+  type: text
+  type_metier: booleen
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "L'article 79 du règlement intérieur conditionne la délivrance du billet de sortie au règlement des frais ou à la signature des documents de prise en charge."
+- table: source.encaissements
+  colonne: date_extraction
+  type: text
+  type_metier: date
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "Colonne technique de la zone d'atterrissage, absente du système observé. Elle porte la date de l'extraction dont la ligne provient et rend le rechargement d'une partition idempotent. Si une extraction réelle ne la fournissait pas, elle serait dérivée du nom du fichier partitionné, sans perte d'information."
+
+- table: source.creances
+  colonne: n_creance
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "L'article 9, paragraphe b, du règlement intérieur charge le pôle des affaires administratives du recouvrement des créances de l'établissement, ce qui identifie chaque créance."
+- table: source.creances
+  colonne: n_facture
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "L'article 9, paragraphe b, du règlement intérieur rattache la créance recouvrée à la facture qui l'a fait naître."
+- table: source.creances
+  colonne: date_naissance_creance
+  type: text
+  type_metier: date
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-27
+  note: "L'article 79 du règlement intérieur fait naître la créance aux formalités de sortie, lorsque la facturation n'est pas soldée."
+- table: source.creances
+  colonne: montant_du
+  type: text
+  type_metier: decimal
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-20
+  note: "Le rapport de la Cour des comptes établit l'existence d'un état des prestations non recouvrées, dont le montant dû."
+- table: source.creances
+  colonne: montant_recouvre
+  type: text
+  type_metier: decimal
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-20
+  note: "Le rapport de la Cour des comptes établit l'existence d'un état des prestations non recouvrées, dont le montant recouvré."
+- table: source.creances
+  colonne: montant_restant
+  type: text
+  type_metier: decimal
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-20
+  note: "Le rapport de la Cour des comptes établit l'existence d'un état des prestations non recouvrées, dont le montant restant dû. Cette colonne est conservée bien qu'elle se déduise des deux colonnes voisines : sa redondance interne à la ligne ne dépend pas de la date de lecture, et l'écart éventuel entre les trois montants est un contrôle de cohérence exploitable."
+- table: source.creances
+  colonne: type_debiteur
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-09
+  note: "Le module Facturación distingue les débiteurs publics, privés, mutualistes et particuliers."
+- table: source.creances
+  colonne: motif_non_recouvrement
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: DOC
+  preuve: S-20
+  note: "Le rapport de la Cour des comptes relève des sorties sans règlement, des patients non identifiés et des évasions comme motifs de non-recouvrement."
+- table: source.creances
+  colonne: date_extraction
+  type: text
+  type_metier: date
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "Colonne technique de la zone d'atterrissage, absente du système observé. Elle porte la date de l'extraction dont la ligne provient et rend le rechargement d'une partition idempotent. Si une extraction réelle ne la fournissait pas, elle serait dérivée du nom du fichier partitionné, sans perte d'information."
+
+- table: source.relances
+  colonne: n_relance
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "Aucune source ouverte ne documente une procédure de relance formalisée dans cet établissement ; le rapport de la Cour des comptes constate au contraire l'absence de diligences de recouvrement. La colonne identifie chaque relance parce que la page de recouvrement du tableau de bord la mobilise ; ce que la chaîne démontre ici est la calculabilité de l'indicateur, non une mesure."
+- table: source.relances
+  colonne: n_creance
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "Aucune source ouverte ne documente une procédure de relance formalisée ; la seule source disponible sur le recouvrement décrit au contraire son absence. La colonne rattache la relance à la créance parce que le tableau de bord en a besoin pour sa page recouvrement ; elle démontre une calculabilité, non une pratique observée."
+- table: source.relances
+  colonne: date_relance
+  type: text
+  type_metier: date
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "Aucune source ouverte ne documente de procédure de relance formalisée dans cet établissement, et le rapport de la Cour des comptes constate précisément l'absence de diligences de recouvrement. La date de relance est posée parce que la page de recouvrement du tableau de bord en a besoin ; elle atteste une calculabilité, non un fait mesuré."
+- table: source.relances
+  colonne: canal
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "Aucune source ouverte ne documente les canaux de relance employés dans cet établissement ; la source disponible sur le recouvrement décrit au contraire une carence de diligences. La colonne existe parce que le tableau de bord distingue les canaux à sa page recouvrement ; elle démontre une capacité de calcul, pas une observation."
+- table: source.relances
+  colonne: resultat
+  type: text
+  type_metier: code
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "Aucune source ouverte ne documente le résultat d'une procédure de relance dans cet établissement, dont la seule source disponible sur le recouvrement décrit l'absence de diligences. La colonne est posée parce que la page de recouvrement du tableau de bord en a besoin ; ce qu'elle démontre est une calculabilité, non une mesure."
+- table: source.relances
+  colonne: date_extraction
+  type: text
+  type_metier: date
+  libelle_hosix: non_releve
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: "Colonne technique de la zone d'atterrissage, absente du système observé. Elle porte la date de l'extraction dont la ligne provient et rend le rechargement d'une partition idempotent. Si une extraction réelle ne la fournissait pas, elle serait dérivée du nom du fichier partitionné, sans perte d'information."

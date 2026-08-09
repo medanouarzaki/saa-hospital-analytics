@@ -68,9 +68,7 @@ def test_completude_sources() -> None:
         for champ in CHAMPS_OBLIGATOIRES:
             assert champ in source, f"{ident} : champ obligatoire manquant '{champ}'"
             valeur = source[champ]
-            assert isinstance(valeur, str) and valeur.strip(), (
-                f"{ident} : champ '{champ}' vide"
-            )
+            assert isinstance(valeur, str) and valeur.strip(), f"{ident} : champ '{champ}' vide"
 
         assert source["fiabilite"] in FIABILITE_AUTORISEES, (
             f"{ident} : fiabilite '{source['fiabilite']}' hors ensemble autorisé"
@@ -95,8 +93,7 @@ def test_completude_sources() -> None:
             if champ_reference in source:
                 cible = source[champ_reference]
                 assert cible in identifiants_valides, (
-                    f"{ident} : {champ_reference}='{cible}' ne désigne aucun "
-                    f"identifiant existant"
+                    f"{ident} : {champ_reference}='{cible}' ne désigne aucun identifiant existant"
                 )
 
 
@@ -174,13 +171,9 @@ def test_urls_vivantes() -> None:
 
         est_morte = code in ("404", "410")
         if morte_attendue and not est_morte:
-            echecs.append(
-                f"{source['id']} : déclarée morte (introuvable) mais répond {code}"
-            )
+            echecs.append(f"{source['id']} : déclarée morte (introuvable) mais répond {code}")
         elif not morte_attendue and est_morte:
-            echecs.append(
-                f"{source['id']} : déclarée vivante mais répond {code}"
-            )
+            echecs.append(f"{source['id']} : déclarée vivante mais répond {code}")
 
     print(f"URL interrogées : {len(a_controler)} sur {len(sources)} entrées")
     print(f"entrées ignorées (url=sans_url) : {len(ignorees_sans_url)}")

@@ -20,7 +20,7 @@ et, pour l'ambulatoire :
 
 Trois des quatre entrées de la première formule et les deux entrées de la seconde étaient des grandeurs nationales ou des hypothèses. L'effectif de 60 médecins n'avait aucune source et était identifié au cadrage comme l'hypothèse la plus fragile du modèle.
 
-Deux constats ont été établis pendant le bloc 1.
+Deux constats ont été établis lors de la recherche documentaire.
 
 Le premier est que *Santé en chiffres 2024* [`S-30`] publie les indicateurs hospitaliers **par établissement nommé**, au tableau 76 page 102. HP Sidi Said y figure, ainsi que dans les tableaux 78 (consultations spécialisées externes) et 79 (activités des laboratoires). Un inventaire exhaustif des quatre-vingt-quatre tableaux du document a établi que quatre d'entre eux, et seulement quatre, descendent à l'établissement : les tableaux 76, 77, 78 et 79. Les quatre ont été extraits.
 
@@ -118,7 +118,7 @@ La part d'accouchements est en outre bornée par une contrainte interne vérifia
 
 ## Conséquences
 
-**L'analyse de sensibilité à l'effectif médical disparaît.** On ne conduit pas une analyse de sensibilité sur une grandeur mesurée. Les trois exécutions à 40, 60 et 80 médecins prévues au bloc 3 sont supprimées, et la section correspondante du rapport est remplacée par l'analyse de sensibilité aux passages aux urgences.
+**L'analyse de sensibilité à l'effectif médical disparaît.** On ne conduit pas une analyse de sensibilité sur une grandeur mesurée. Les trois exécutions à 40, 60 et 80 médecins prévues pour la génération du jeu de données sont supprimées, et la section correspondante du rapport est remplacée par l'analyse de sensibilité aux passages aux urgences.
 
 **L'effectif médical sort du chemin critique.** Il n'est plus un paramètre du générateur. Il subsiste comme contrôle de cohérence : le tableau 78 donne 8 médecins assurant des consultations spécialisées externes à Sidi Saïd, pour 4 142 consultations, soit 518 par médecin.
 

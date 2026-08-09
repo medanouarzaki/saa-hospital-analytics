@@ -1,23 +1,31 @@
-"""Interdit toute trace de vocabulaire d'outil génératif dans les fichiers suivis.
+"""Interdit toute trace de vocabulaire d'outil génératif et toute numérotation
+interne d'étape dans les fichiers suivis.
 
-Motif volontairement limité à trois catégories de vocabulaire GÉNÉRIQUE et
-PUBLIC : noms de fournisseurs d'outils génératifs, formules de co-signature
-automatique, formules d'attribution de génération. Aucun terme propre à la
-nomenclature interne de ce projet (noms d'artefacts, de blocs, de lots, de
-documents de transmission) n'y figure : un test qui énumérerait ce vocabulaire
-interne serait lui-même la fuite qu'il prétend empêcher. La détection de ce
-vocabulaire interne reste une revue manuelle, plus large, exécutée avant
-chaque publication — ce test-ci est un filet permanent, pas un remplacement.
+Deux contrôles. Le premier porte sur un motif volontairement limité à trois
+catégories de vocabulaire GÉNÉRIQUE et PUBLIC : noms de fournisseurs d'outils
+génératifs, formules de co-signature automatique, formules d'attribution de
+génération. Le second porte sur la numérotation interne d'étape de ce projet :
+le mot désignant une étape de travail suivi d'un nombre, et un identifiant de
+sous-étape combinant un chiffre et une lettre. Aucun de ces deux motifs
+n'énumère un terme de la nomenclature interne autre que sa forme : un test qui
+énumérerait ce vocabulaire interne serait lui-même la fuite qu'il prétend
+empêcher. La détection de ce vocabulaire interne reste une revue manuelle,
+plus large, exécutée avant chaque publication — ce test-ci est un filet
+permanent, pas un remplacement.
 
 Ce fichier est nécessairement exclu de son propre parcours : il contient les
 motifs recherchés en tant que données, pas en tant que trace.
 """
 
+import re
 import subprocess
 from pathlib import Path
 
 RACINE = Path(__file__).resolve().parent.parent
 CE_FICHIER = Path(__file__).resolve().relative_to(RACINE).as_posix()
+
+MOTIF_ETAPE = re.compile(r"\b(bloc|lot)\W{0,3}[0-9]", re.IGNORECASE)
+MOTIF_SOUS_ETAPE = re.compile(r"\b[0-9]+\.[A-Za-z]\b")
 
 MOTIFS_INTERDITS = [
     # Noms de fournisseurs d'outils génératifs
@@ -73,3 +81,23 @@ def test_aucune_trace_processus_generatif() -> None:
                 fautifs.append(f"{chemin} : motif '{motif}'")
 
     assert not fautifs, "Trace de vocabulaire d'outil génératif : " + " | ".join(fautifs)
+
+
+def test_aucune_numerotation_interne() -> None:
+    fautifs = []
+    for chemin in fichiers_suivis():
+        if chemin == CE_FICHIER:
+            continue
+        chemin_absolu = RACINE / chemin
+        if not chemin_absolu.is_file():
+            continue
+        try:
+            contenu = chemin_absolu.read_text(encoding="utf-8")
+        except (UnicodeDecodeError, OSError):
+            continue
+        for numero_ligne, ligne in enumerate(contenu.splitlines(), start=1):
+            correspondance = MOTIF_ETAPE.search(ligne) or MOTIF_SOUS_ETAPE.search(ligne)
+            if correspondance:
+                fautifs.append(f"{chemin}:{numero_ligne} : '{correspondance.group(0)}'")
+
+    assert not fautifs, "Numérotation interne d'étape : " + " | ".join(fautifs)

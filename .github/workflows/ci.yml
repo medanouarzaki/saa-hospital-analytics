@@ -16,6 +16,8 @@ jobs:
 
       - run: uv run ruff check .
 
+      - run: uv run ruff format --check .
+
       - run: uv run sqlfluff lint --dialect postgres .
 
       - run: uv run pytest tests/test_aucune_image.py -v
@@ -25,3 +27,39 @@ jobs:
       - run: uv run pytest tests/test_relations.py -v
 
       - run: uv run pytest tests/test_aucune_trace_processus.py -v
+
+  provenance:
+    runs-on: ubuntu-latest
+    # Le service n'exige aucun mot de passe : le conteneur est éphémère,
+    # joignable depuis le seul job qui l'a démarré, et aucun identifiant
+    # n'existe donc qui pourrait fuir.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ""
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+
+      - run: uv sync --frozen
+
+      - run: uv run python ingestion/appliquer_ddl.py
+
+      - run: uv run pytest tests/test_provenance.py -v

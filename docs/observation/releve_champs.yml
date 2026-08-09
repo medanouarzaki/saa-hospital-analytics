@@ -1,0 +1,952 @@
+# Relevé de champs — observation au poste de travail, profil MSM - GESTION DE RDV
+#
+# Deux conventions de lecture :
+#
+# 1. Le caractère obligatoire ou facultatif d'un champ n'a été relevé sur aucun
+#    écran. Il n'est donc affirmé nulle part : tous les champs de saisie
+#    portent `non_determine`. Une valeur binaire imposée ici produirait cent
+#    quarante-trois affirmations non observées.
+#
+# 2. `sans_objet` désigne un élément qui n'est pas un champ de saisie de
+#    dossier : bouton d'action, onglet, entrée de menu, libellé de profil,
+#    colonne de résultat, filtre de recherche.
+
+profil_observe: "MSM - GESTION DE RDV"
+date_observation: "2026-07-28"
+
+ecrans:
+  - code: DEM
+    libelle: "Écran de démarrage"
+    blocs:
+      - code: I
+        libelle: "Identification du site"
+      - code: P
+        libelle: "Profils applicatifs"
+      - code: M
+        libelle: "Menus principaux"
+    champs:
+      - id: REL-DEM.I01
+        bloc: I
+        libelle: "Identification du site"
+        type_apparent: texte
+        saisie: sans_objet
+        valeurs_observees: ["005 Fès-Meknès; Sidi Said"]
+        note: "La graphie exacte du séparateur entre le code de région et le nom de l'établissement est celle relevée à l'écran."
+      - id: REL-DEM.I02
+        bloc: I
+        libelle: "Ministère de tutelle"
+        type_apparent: texte
+        saisie: sans_objet
+        valeurs_observees: ["Ministère de la Santé"]
+      - id: REL-DEM.P01
+        bloc: P
+        libelle: "MSM - FACTURATION SAA"
+        type_apparent: liste
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-DEM.P02
+        bloc: P
+        libelle: "MSM - GESTION DE RDV"
+        type_apparent: liste
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+        note: "Seul profil dont les habilitations ont été accordées au poste. Les quatre autres sont relevés à l'écran de démarrage sans avoir été ouverts."
+      - id: REL-DEM.P03
+        bloc: P
+        libelle: "MSM - RECOUVREMENT"
+        type_apparent: liste
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-DEM.P04
+        bloc: P
+        libelle: "MSM - URGENCE"
+        type_apparent: liste
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-DEM.P05
+        bloc: P
+        libelle: "MSM RAPPORTS ET STATISTIQUES"
+        type_apparent: liste
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+        note: "Libellé dépourvu du tiret séparateur que portent les quatre autres profils. Reproduit tel qu'affiché."
+      - id: REL-DEM.M01
+        bloc: M
+        libelle: "Hosix.NET"
+        type_apparent: menu
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-DEM.M02
+        bloc: M
+        libelle: "Données Patient"
+        type_apparent: menu
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-DEM.M03
+        bloc: M
+        libelle: "Centre de Consultation"
+        type_apparent: menu
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-DEM.M04
+        bloc: M
+        libelle: "Factures"
+        type_apparent: menu
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+
+  - code: IPP
+    libelle: "Recherche d'IPP"
+    blocs:
+      - code: O
+        libelle: "Onglets"
+      - code: C
+        libelle: "Critères de recherche"
+      - code: F
+        libelle: "Filtres de population"
+      - code: R
+        libelle: "Colonnes de résultat"
+    champs:
+      - id: REL-IPP.O01
+        bloc: O
+        libelle: "Chercher"
+        type_apparent: onglet
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.O02
+        bloc: O
+        libelle: "Chercher MPI"
+        type_apparent: onglet
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.O03
+        bloc: O
+        libelle: "Chercher MPI Pondéré"
+        type_apparent: onglet
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+        note: "Onglet de recherche pondérée sur l'index maître des patients. Avec la colonne de résultat Probabilité, il atteste que le rapprochement probabiliste d'identités est une fonction du système en place."
+      - id: REL-IPP.O04
+        bloc: O
+        libelle: "Nouvel IPP"
+        type_apparent: onglet
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.C01
+        bloc: C
+        libelle: "N° document"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: ["C.I.N"]
+      - id: REL-IPP.C02
+        bloc: C
+        libelle: "Nom"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+        note: "Le relevé de l'observation porte un critère unique formulé « nom et prénom ». Il est restitué en deux lignes, l'écran présentant deux zones distinctes ; la scission reste à confirmer."
+      - id: REL-IPP.C03
+        bloc: C
+        libelle: "Prénom"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+        note: "Le relevé de l'observation porte un critère unique formulé « nom et prénom ». Il est restitué en deux lignes, l'écran présentant deux zones distinctes ; la scission reste à confirmer."
+      - id: REL-IPP.C04
+        bloc: C
+        libelle: "Date de naissance"
+        type_apparent: date
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.C05
+        bloc: C
+        libelle: "Mois"
+        type_apparent: entier
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.C06
+        bloc: C
+        libelle: "Année"
+        type_apparent: entier
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.C07
+        bloc: C
+        libelle: "Approximation en années"
+        type_apparent: entier
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.C08
+        bloc: C
+        libelle: "Âge"
+        type_apparent: entier
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.C09
+        bloc: C
+        libelle: "Téléphone"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.C10
+        bloc: C
+        libelle: "N° document de contact"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.C11
+        bloc: C
+        libelle: "Sexe"
+        type_apparent: liste
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.C12
+        bloc: C
+        libelle: "État civil"
+        type_apparent: liste
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.C13
+        bloc: C
+        libelle: "N° assuré"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.F01
+        bloc: F
+        libelle: "Patients Hospitalisés"
+        type_apparent: option
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.F02
+        bloc: F
+        libelle: "Patients aux Urgences"
+        type_apparent: option
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.F03
+        bloc: F
+        libelle: "Tous les patients"
+        type_apparent: option
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.F04
+        bloc: F
+        libelle: "Exitus"
+        type_apparent: case_a_cocher
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+        note: "Filtre sur les patients décédés. Terme latin employé tel quel par l'interface."
+      - id: REL-IPP.R01
+        bloc: R
+        libelle: "IPP"
+        type_apparent: colonne
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.R02
+        bloc: R
+        libelle: "Nom"
+        type_apparent: colonne
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.R03
+        bloc: R
+        libelle: "D. Naissance"
+        type_apparent: colonne
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.R04
+        bloc: R
+        libelle: "N° pièce d'identité"
+        type_apparent: colonne
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.R05
+        bloc: R
+        libelle: "N° Assu"
+        type_apparent: colonne
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.R06
+        bloc: R
+        libelle: "E. Civil"
+        type_apparent: colonne
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.R07
+        bloc: R
+        libelle: "Tél"
+        type_apparent: colonne
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.R08
+        bloc: R
+        libelle: "Sexe"
+        type_apparent: colonne
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.R09
+        bloc: R
+        libelle: "Province"
+        type_apparent: colonne
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.R10
+        bloc: R
+        libelle: "Ville"
+        type_apparent: colonne
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.R11
+        bloc: R
+        libelle: "Code postal"
+        type_apparent: colonne
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-IPP.R12
+        bloc: R
+        libelle: "Probabilité"
+        type_apparent: colonne
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+        note: "Colonne de score de rapprochement. Aucune échelle ni aucun seuil n'est affiché à l'écran."
+
+  - code: PAT
+    libelle: "Fiche patient"
+    blocs:
+      - code: B
+        libelle: "Barre d'actions"
+      - code: T
+        libelle: "Onglets"
+      - code: D
+        libelle: "Données principales"
+      - code: A
+        libelle: "Compagnie d'assurance"
+      - code: H
+        libelle: "Domicile"
+      - code: N
+        libelle: "Né"
+      - code: K
+        libelle: "Commentaire"
+    champs:
+      - id: REL-PAT.B01
+        bloc: B
+        libelle: "Nouveau"
+        type_apparent: bouton
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.B02
+        bloc: B
+        libelle: "Enregistrer"
+        type_apparent: bouton
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.B03
+        bloc: B
+        libelle: "Supprimer"
+        type_apparent: bouton
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.B04
+        bloc: B
+        libelle: "Chercher"
+        type_apparent: bouton
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.B05
+        bloc: B
+        libelle: "Imprimer"
+        type_apparent: bouton
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.B06
+        bloc: B
+        libelle: "Caractéristiques"
+        type_apparent: bouton
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.B07
+        bloc: B
+        libelle: "Identificateurs"
+        type_apparent: bouton
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.B08
+        bloc: B
+        libelle: "Remplacer l'historique"
+        type_apparent: bouton
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.B09
+        bloc: B
+        libelle: "Données de l'assuré"
+        type_apparent: bouton
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.B10
+        bloc: B
+        libelle: "Données de la CNSS"
+        type_apparent: bouton
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+        note: "Bouton d'accès aux données de l'organisme d'assurance maladie du secteur privé."
+      - id: REL-PAT.T01
+        bloc: T
+        libelle: "Général"
+        type_apparent: onglet
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.T02
+        bloc: T
+        libelle: "Contacts"
+        type_apparent: onglet
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.T03
+        bloc: T
+        libelle: "Quota soins primaires"
+        type_apparent: onglet
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.D01
+        bloc: D
+        libelle: "N° IPP"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.D02
+        bloc: D
+        libelle: "Nom"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.D03
+        bloc: D
+        libelle: "Nom de famille 1"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.D04
+        bloc: D
+        libelle: "Nom de famille 2"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.D05
+        bloc: D
+        libelle: "Sexe"
+        type_apparent: liste
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.D06
+        bloc: D
+        libelle: "D. Nai"
+        type_apparent: date
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.D07
+        bloc: D
+        libelle: "Âge"
+        type_apparent: entier
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.D08
+        bloc: D
+        libelle: "Num"
+        type_apparent: non_determine
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+        note: "Libellé relevé tel qu'affiché. La nature de la donnée qu'il porte n'a pas été observée. Le même libellé apparaît au bloc d'identification de l'écran de rendez-vous."
+      - id: REL-PAT.D09
+        bloc: D
+        libelle: "Type pièce d'identité"
+        type_apparent: liste
+        saisie: non_determine
+        valeurs_observees: ["C", "C.I.N"]
+        note: "Liste à code et libellé. Le code et le libellé sont affichés côte à côte."
+      - id: REL-PAT.D10
+        bloc: D
+        libelle: "N° pièce d'identité"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.D11
+        bloc: D
+        libelle: "E. Civil"
+        type_apparent: liste
+        saisie: non_determine
+        valeurs_observees: ["C", "CÉLIBATAIRE"]
+        note: "Liste à code et libellé. Le code et le libellé sont affichés côte à côte."
+      - id: REL-PAT.D12
+        bloc: D
+        libelle: "Type patient"
+        type_apparent: liste
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.D13
+        bloc: D
+        libelle: "Date photo"
+        type_apparent: date
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.D14
+        bloc: D
+        libelle: "Modifié par"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.D15
+        bloc: D
+        libelle: "Créé par"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.D16
+        bloc: D
+        libelle: "Date d'attribution"
+        type_apparent: date
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.A01
+        bloc: A
+        libelle: "Compagnie d'assur."
+        type_apparent: liste
+        saisie: non_determine
+        valeurs_observees: ["00116", "CNSS PIPC"]
+      - id: REL-PAT.A02
+        bloc: A
+        libelle: "Police"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.A03
+        bloc: A
+        libelle: "N° Assu"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.A04
+        bloc: A
+        libelle: "Profession"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.A05
+        bloc: A
+        libelle: "Num. inscription"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.A06
+        bloc: A
+        libelle: "Date inscription"
+        type_apparent: date
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.H01
+        bloc: H
+        libelle: "Type"
+        type_apparent: liste
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.H02
+        bloc: H
+        libelle: "Adresse"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.H03
+        bloc: H
+        libelle: "Code postal"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.H04
+        bloc: H
+        libelle: "État"
+        type_apparent: liste
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.H05
+        bloc: H
+        libelle: "Ville"
+        type_apparent: liste
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.H06
+        bloc: H
+        libelle: "Quartier"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.H07
+        bloc: H
+        libelle: "Nationalité"
+        type_apparent: liste
+        saisie: non_determine
+        valeurs_observees: ["504", "MAROC"]
+      - id: REL-PAT.H08
+        bloc: H
+        libelle: "Téléphone 1"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.H09
+        bloc: H
+        libelle: "Téléphone 2"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.H10
+        bloc: H
+        libelle: "Téléphone 3"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.H11
+        bloc: H
+        libelle: "Téléphone 4"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.H12
+        bloc: H
+        libelle: "Avertissements SMS"
+        type_apparent: case_a_cocher
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+        note: "Case d'envoi d'avertissements par message court. Le champ existe et n'est pas exploité par le service."
+      - id: REL-PAT.H13
+        bloc: H
+        libelle: "E-mail"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.H14
+        bloc: H
+        libelle: "Avertissements e-mail"
+        type_apparent: case_a_cocher
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.H15
+        bloc: H
+        libelle: "Environnement"
+        type_apparent: liste
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.N01
+        bloc: N
+        libelle: "Nom. Père"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.N02
+        bloc: N
+        libelle: "Nom. Mère"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.N03
+        bloc: N
+        libelle: "Lieu de naissance - État"
+        type_apparent: liste
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.N04
+        bloc: N
+        libelle: "Ville"
+        type_apparent: liste
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.N05
+        bloc: N
+        libelle: "Pays"
+        type_apparent: liste
+        saisie: non_determine
+        valeurs_observees: ["504", "MAROC"]
+      - id: REL-PAT.N06
+        bloc: N
+        libelle: "Quartier"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-PAT.K01
+        bloc: K
+        libelle: "Commentaire"
+        type_apparent: zone_texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+
+  - code: RDV
+    libelle: "Donner rendez-vous"
+    blocs:
+      - code: B
+        libelle: "Barre d'actions"
+      - code: I
+        libelle: "Identification du patient"
+      - code: R
+        libelle: "Rendez-vous"
+      - code: C
+        libelle: "Contrôle de modifications"
+      - code: L
+        libelle: "Liste d'attente des consultations"
+    champs:
+      - id: REL-RDV.B01
+        bloc: B
+        libelle: "Nouveau"
+        type_apparent: bouton
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.B02
+        bloc: B
+        libelle: "Enregistrer"
+        type_apparent: bouton
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.B03
+        bloc: B
+        libelle: "Supprimer"
+        type_apparent: bouton
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.B04
+        bloc: B
+        libelle: "Chercher"
+        type_apparent: bouton
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.B05
+        bloc: B
+        libelle: "Imprimer"
+        type_apparent: bouton
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.B06
+        bloc: B
+        libelle: "Autres"
+        type_apparent: bouton
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.B07
+        bloc: B
+        libelle: "Couvertures"
+        type_apparent: bouton
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.I01
+        bloc: I
+        libelle: "N° IPP"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.I02
+        bloc: I
+        libelle: "Téléphone"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.I03
+        bloc: I
+        libelle: "Compagnie"
+        type_apparent: liste
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.I04
+        bloc: I
+        libelle: "N° Assu"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.I05
+        bloc: I
+        libelle: "Âge"
+        type_apparent: entier
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.I06
+        bloc: I
+        libelle: "Date naissance"
+        type_apparent: date
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.I07
+        bloc: I
+        libelle: "C.I.N"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.I08
+        bloc: I
+        libelle: "Num"
+        type_apparent: non_determine
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+        note: "Même libellé qu'au bloc de données principales de la fiche patient. Nature non observée."
+      - id: REL-RDV.I09
+        bloc: I
+        libelle: "Adresse"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.I10
+        bloc: I
+        libelle: "Ville"
+        type_apparent: liste
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.R01
+        bloc: R
+        libelle: "Agenda"
+        type_apparent: liste
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.R02
+        bloc: R
+        libelle: "Activité"
+        type_apparent: liste
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.R03
+        bloc: R
+        libelle: "Origine"
+        type_apparent: liste
+        saisie: non_determine
+        valeurs_observees: ["AU", "AUTRES HÔPITAUX"]
+      - id: REL-RDV.R04
+        bloc: R
+        libelle: "Hôpital/C.S."
+        type_apparent: liste
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.R05
+        bloc: R
+        libelle: "Médecin ext."
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.R06
+        bloc: R
+        libelle: "Service ext."
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.R07
+        bloc: R
+        libelle: "Observations"
+        type_apparent: zone_texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.R08
+        bloc: R
+        libelle: "Date rendez-vous"
+        type_apparent: horodatage
+        saisie: non_determine
+        valeurs_observees: ["07/28/2026 10:57:07 AM"]
+        note: "Format d'affichage mois/jour/année sur douze heures, dans une interface en français."
+      - id: REL-RDV.R09
+        bloc: R
+        libelle: "Rendez-vous supplémentaire"
+        type_apparent: case_a_cocher
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.R10
+        bloc: R
+        libelle: "Type d'attention"
+        type_apparent: liste
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.R11
+        bloc: R
+        libelle: "État"
+        type_apparent: liste
+        saisie: non_determine
+        valeurs_observees: ["En instance"]
+        note: "État du rendez-vous à la création."
+      - id: REL-RDV.R12
+        bloc: R
+        libelle: "Durée"
+        type_apparent: entier
+        saisie: non_determine
+        valeurs_observees: ["0"]
+        note: "Durée exprimée en minutes, valeur nulle à la création."
+      - id: REL-RDV.R13
+        bloc: R
+        libelle: "Date réception"
+        type_apparent: horodatage
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.R14
+        bloc: R
+        libelle: "Imprimer données"
+        type_apparent: case_a_cocher
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.C01
+        bloc: C
+        libelle: "Créé par"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.C02
+        bloc: C
+        libelle: "Date création"
+        type_apparent: horodatage
+        saisie: non_determine
+        valeurs_observees: ["07/28/2026 10:57:06 AM"]
+        note: "Sur le rendez-vous observé, une seconde sépare la création du rendez-vous lui-même. L'écart entre ces deux horodatages est le délai d'obtention d'un rendez-vous, grandeur centrale de l'analyse."
+      - id: REL-RDV.C03
+        bloc: C
+        libelle: "Modifié par"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.C04
+        bloc: C
+        libelle: "Date mod."
+        type_apparent: horodatage
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.C05
+        bloc: C
+        libelle: "Confirmé par"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+        note: "Le couple confirmé par / annulé par sépare une annulation déclarée d'une absence non prévenue. Sans ce couple, les deux se confondent dans un même état non honoré."
+      - id: REL-RDV.C06
+        bloc: C
+        libelle: "Date conf."
+        type_apparent: horodatage
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.C07
+        bloc: C
+        libelle: "Annulé par"
+        type_apparent: texte
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+        note: "Le couple confirmé par / annulé par sépare une annulation déclarée d'une absence non prévenue. Sans ce couple, les deux se confondent dans un même état non honoré."
+      - id: REL-RDV.C08
+        bloc: C
+        libelle: "Date annul."
+        type_apparent: horodatage
+        saisie: non_determine
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.L01
+        bloc: L
+        libelle: "Service"
+        type_apparent: colonne
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.L02
+        bloc: L
+        libelle: "Agenda"
+        type_apparent: colonne
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
+      - id: REL-RDV.L03
+        bloc: L
+        libelle: "Activité"
+        type_apparent: colonne
+        saisie: sans_objet
+        valeurs_observees: aucune_valeur_observee
