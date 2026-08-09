@@ -208,8 +208,8 @@ def test_delai_median_par_activite(generation: dict) -> None:
     # eligibles : le patient existait deja la veille du rendez-vous ou avant. Les
     # rendez-vous dont le patient est cree le jour meme (fiche ouverte a la premiere
     # visite) n'ont structurellement aucun delai possible et ne relevent pas de
-    # delai_rdv_par_specialite ; mesure du lot : 59,7 % des episodes de consultation
-    # tombent dans ce cas structurel.
+    # delai_rdv_par_specialite ; mesure : 59,7 % des episodes de consultation tombent
+    # dans ce cas structurel.
     def marge_disponible(ligne: dict) -> int:
         pid = patient_id_de(ligne["n_ipp"])
         return (ligne["date_rendez_vous"].date() - date_creation_par_patient[pid]).days
