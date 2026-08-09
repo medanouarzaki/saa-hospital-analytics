@@ -1,0 +1,151 @@
+parametres:
+- nom: correspondance_type_passage_service
+  valeur:
+    H: HM
+    C: CE
+    U: UR
+  unite: code de nomenclature_type_passage vers code de nomenclature_service
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Correspondance un-a-un posee entre le type de passage et le service qui l'accueille,
+    parmi les codes deja ecrits de nomenclature_service (HM Hospitalisation medecine, CE
+    Consultations externes, UR Urgences) - aucune valeur n'est ajoutee a cette nomenclature.
+    Si cette correspondance etait fausse, un passage porterait un service etranger a son
+    type, incoherence relevable par un controle croise, sans effet sur aucun total.
+- nom: correspondance_type_passage_mode_prise_en_charge
+  valeur:
+    H: HOS
+    C: AMB
+    U: AMB
+  unite: code de nomenclature_type_passage vers code de nomenclature_mode_prise_en_charge
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Seule l'hospitalisation est prise en charge en mode hospitalier (HOS) dans ce
+    modele ; une consultation ou un passage aux urgences reste ambulatoire (AMB) meme si
+    l'urgence peut en pratique deboucher sur une admission distincte, non modelisee par ce
+    generateur. Codes deja ecrits de nomenclature_mode_prise_en_charge, aucune valeur
+    ajoutee. Si cette correspondance etait fausse, la repartition ambulatoire/hospitalier
+    affichee serait faussee, sans effet sur le nombre de passages par type.
+- nom: duree_mediane_minutes_par_categorie
+  valeur:
+    C: 20
+    U: 180
+  unite: minutes, mediane d'une loi log-normale
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune source ne documente la duree d'une consultation ni d'un passage aux
+    urgences pour cet etablissement. Poses par convention - une consultation programmee
+    dure typiquement quelques dizaines de minutes, un passage aux urgences plusieurs
+    heures. La categorie H (hospitalisation) n'a pas d'entree ici - sa mediane reprend
+    directement dms_publie (S-30, generator/config/volumetrie.yml), deja documentee,
+    convertie en minutes plutot que dupliquee sous une nouvelle valeur non sourcee. Si ces
+    medianes etaient fausses, la duree affichee par categorie serait faussee, sans effet
+    sur le nombre de passages ni sur leur repartition par type.
+- nom: ecart_type_log_duree
+  valeur: 0.4
+  unite: ecart-type du logarithme de la duree, identique aux trois categories
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Meme construction que ecart_type_log_delai (generator/config/rendez_vous.yml) pour
+    le delai de rendez-vous - un ecart-type unique, pose sans source, produit une
+    dispersion moderee autour de la mediane propre a chaque categorie. Si cette valeur
+    etait fausse, l'etalement des durees serait plus ou moins large, sans effet sur la
+    mediane par categorie.
+- nom: ecart_type_minutes_avance_retard_rdv
+  valeur: 8
+  unite: minutes, ecart-type d'une loi normale centree sur l'heure du rendez-vous
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: L'heure d'entree d'un passage issu d'un rendez-vous honore s'articule avec l'heure
+    du rendez-vous par un ecart tire dans une loi normale centree sur zero, plutot que de
+    reprendre l'heure du rendez-vous telle quelle - un patient arrive rarement a la seconde
+    pres. Ecart-type pose sans source, plausible pour une arrivee a quelques minutes pres
+    d'un horaire programme. Si cette valeur etait fausse, la dispersion autour de l'heure
+    du rendez-vous serait plus ou moins large, sans effet sur aucun total.
+- nom: comptes_utilisateurs_passages
+  valeur:
+  - INF-BUR01
+  - INF-BUR02
+  - AGT-GUI01
+  - ADM-ACC01
+  - ADM-ACC02
+  unite: liste de comptes utilisateurs
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Meme ensemble de comptes que comptes_utilisateurs_rdv (generator/config/rendez_vous.yml)
+    et comptes_utilisateurs_systeme (generator/config/demographie.yml), pour cree_par.
+    Repete ici plutot que reference pour que ce fichier reste lisible independamment ; les
+    trois listes doivent rester synchronisees si l'une est modifiee.
+- nom: contraintes_coherence_passages
+  valeur:
+  - colonne_a: type_passage
+    colonne_b: n_rdv
+    nature: presence_conditionnee
+    valeur_a_declenchante: C
+    tolerance: 0.0
+    justification: Un passage issu d'une consultation programmee (type_passage C) porte
+      toujours l'identifiant du rendez-vous honore qui l'a programme ; un passage
+      d'hospitalisation ou d'urgence n'en porte jamais, ces deux categories n'etant
+      jamais precedees d'un rendez-vous.
+  - colonne_a: type_passage
+    colonne_b: activite
+    nature: presence_conditionnee
+    valeur_a_declenchante: C
+    tolerance: 0.0
+    justification: L'activite (specialite de consultation) n'est suivie que pour une
+      consultation programmee, reprise du rendez-vous honore correspondant ; une
+      hospitalisation ou un passage aux urgences ne relevent d'aucune specialite de
+      consultation dans ce modele.
+  unite: liste de contraintes d'accord intra-ligne pour source.passages
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Meme schema que contraintes_coherence (generator/config/coherence.yml) et
+    contraintes_coherence_rendez_vous (generator/config/rendez_vous.yml), repris ici sous
+    un nom distinct faute d'ecriture autorisee sur ces deux fichiers dans ce lot. Lu par
+    generator/passages.py (application) et par le test d'invariant generique de cohérence
+    intra-ligne (verification, via contraintes_coherence_par_table).
+- nom: contraintes_coherence_par_table
+  valeur:
+    source.patients: contraintes_coherence
+    source.rendez_vous: contraintes_coherence_rendez_vous
+    source.passages: contraintes_coherence_passages
+  unite: correspondance de nom de table vers nom du parametre portant ses contraintes de
+    cohérence intra-ligne
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Les trois lots ayant ecrit une table ont chacun du nommer differemment son
+    parametre de contraintes de cohérence, le fichier de configuration naturel
+    (coherence.yml) n'etant plus ouvert a l'ecriture des le second lot. Cet index rend le
+    test d'invariant generique capable de retrouver, pour n'importe quelle table du
+    registre des generateurs, le nom du parametre a lire, sans jamais citer de nom de
+    table ni de colonne dans le fichier de test lui-meme. Une table sans entree ici est
+    lue comme n'ayant aucune contrainte de cohérence declaree, pas comme une erreur.
+- nom: colonnes_degenerees_declarees
+  valeur:
+  - table: source.rendez_vous
+    colonne: observations
+    justification: Deja declaree sous colonnes_toujours_vides_rendez_vous
+      (generator/config/rendez_vous.yml) - champ libre jamais renseigne, aucune valeur
+      observee au poste, aucune source ne decrivant comment le systeme en place le
+      renseigne. Reprise ici pour que le test d'invariant generique de colonne degeneree
+      la reconnaisse sans citer de nom de colonne en dur.
+  - table: source.rendez_vous
+    colonne: duree
+    justification: Constante a zero sur toutes les lignes (parametre duree_minutes,
+      generator/config/rendez_vous.yml) - c'est la seule valeur observee au poste
+      (REL-RDV.R12), retenue telle quelle plutot qu'une variation inventee sans preuve.
+  - table: source.rendez_vous
+    colonne: imprimer_donnees
+    justification: Constante a faux sur toutes les lignes - case a cocher jamais observee
+      au poste (REL-RDV.R14, aucune_valeur_observee), posee par convention comme valeur
+      par defaut la plus plausible d'une case non cochee.
+  unite: liste de colonnes non identifiantes legitimement a valeur unique ou entierement
+    distincte sur toute la periode, par table
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Complete, pour les tables ecrites avant ce lot, les declarations deja faites sous
+    un autre nom de parametre specifique a leur propre fichier de configuration (non
+    ouvert a l'ecriture dans ce lot) ; toute colonne degeneree decouverte dans
+    source.passages par la mesure de ce lot est declaree ici directement, ce fichier etant
+    ouvert a l'ecriture. Lu par le test d'invariant generique de colonne degeneree, par
+    table, sans jamais citer de nom de colonne dans le fichier de test lui-meme.
