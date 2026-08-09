@@ -1,0 +1,273 @@
+parametres:
+- nom: structure_age
+  valeur:
+    tranches:
+    - 0-4
+    - 5-14
+    - 15-24
+    - 25-44
+    - 45-64
+    - 65+
+    parts:
+    - 0.08
+    - 0.17
+    - 0.16
+    - 0.3
+    - 0.2
+    - 0.09
+  unite: tranches et parts
+  provenance: HYP
+  preuve: S-05
+  note: 'S-05 mentionne l''existence d''une pyramide des âges de la préfecture de Meknès, mais son contenu
+    chiffré n''est pas extrait dans le dépôt (document source absent de ~/extraction-sc/) : seule l''existence
+    de la source est établie, pas ses valeurs. Les six tranches et leurs parts sont posées par convention,
+    plausibles pour une population marocaine jeune. Si cette structure était fausse, la pyramide des âges
+    affichée au tableau de bord serait invraisemblable, sans effet sur le nombre de fiches produites.'
+- nom: repartition_sexe
+  valeur:
+    M: 0.497
+    F: 0.503
+  unite: proportion
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Répartition posée à parité quasi stricte, conforme à l'ordre de grandeur national usuel, sans
+    source enregistrée spécifique à l'établissement. Si cette répartition était fausse, la parité affichée
+    serait légèrement faussée, sans effet sur le nombre de fiches produites.
+- nom: repartition_couverture
+  valeur:
+    '00116': 0.5
+    '00042': 0.15
+    00089: 0.15
+    SANS: 0.2
+  unite: proportion par code de nomenclature_compagnie_assurance
+  provenance: HYP
+  preuve: S-15
+  note: 'Nom imposé par la relation R-08 du registre des relations injectées. S-15 mesure les parts nationales
+    des régimes AMO (Tadamon, TNS, Achamil, autres), mais R-08 dit lui-même explicitement que « les effectifs
+    nationaux sont sourcés, la clé de recours hospitalier ne l''est pas » : la correspondance entre régimes
+    nationaux et compagnies de nomenclature_compagnie_assurance n''est pas établie, la répartition retenue
+    ici est posée, informée sans être dérivée. 00116 (CNSS PIPC) est majoritaire, seule compagnie concrètement
+    observée au relevé de champs (REL-PAT.A01). Si cette répartition était fausse, la composition par
+    régime affichée au tableau de bord serait imposée à tort, sans effet sur le nombre de fiches produites.'
+- nom: profil_recours_demographique
+  valeur:
+    H:
+      0-4: 1.6
+      5-14: 0.8
+      15-24: 0.8
+      25-44: 0.9
+      45-64: 1.1
+      65+: 1.6
+    U:
+      0-4: 1.5
+      5-14: 0.9
+      15-24: 0.9
+      25-44: 0.9
+      45-64: 1.0
+      65+: 1.5
+    C:
+      0-4: 0.7
+      5-14: 0.9
+      15-24: 1.1
+      25-44: 1.3
+      45-64: 1.1
+      65+: 0.9
+  unite: multiplicateurs par catégorie de premier épisode et par tranche d'âge
+  provenance: HYP
+  preuve: S-05
+  note: 'Nom imposé par la relation R-13 du registre des relations injectées. Multiplicateurs appliqués
+    à structure_age selon la catégorie du premier épisode du patient (H, C ou U), puis renormalisés. R-13
+    (S-05) dit que le recours surreprésente les moins de 5 ans, les femmes de 18 à 45 ans et les plus
+    de 60 ans, sans chiffrer l''ampleur : l''ampleur retenue ici (facteurs 1,5 à 1,6 pour les tranches
+    extrêmes en H et U, 1,1 à 1,3 pour les tranches médianes en C) est posée, pas mesurée. La variation
+    par sexe décrite par R-13 n''est pas reprise séparément, simplification explicite : seule la variation
+    par âge et par catégorie est modélisée. Si ces facteurs étaient faux, l''écart de structure d''âge
+    entre catégories serait plus ou moins marqué, potentiellement jusqu''à disparaître, sans effet sur
+    le nombre de fiches produites par catégorie.'
+- nom: prenoms_masculins
+  valeur:
+  - Mohammed
+  - Ahmed
+  - Youssef
+  - Hassan
+  - Omar
+  - Karim
+  - Rachid
+  - Said
+  - Abdelillah
+  - Mustapha
+  - Khalid
+  - Aziz
+  - Yassine
+  - Hamid
+  - Brahim
+  - Larbi
+  - Noureddine
+  - Abderrahim
+  - Fouad
+  - Samir
+  unite: liste de prénoms
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Liste de vingt prénoms masculins usuels au Maroc, posée sans source enregistrée. Sert aussi de
+    vivier pour nom_pere. Si cette liste était fausse ou trop courte, la vraisemblance des prénoms affichés
+    serait affectée, sans effet sur aucun total.
+- nom: prenoms_feminins
+  valeur:
+  - Fatima
+  - Khadija
+  - Aicha
+  - Malika
+  - Naima
+  - Latifa
+  - Zineb
+  - Amina
+  - Samira
+  - Nadia
+  - Rachida
+  - Karima
+  - Saida
+  - Hafida
+  - Souad
+  - Wafaa
+  - Ilham
+  - Meryem
+  - Zohra
+  - Loubna
+  unite: liste de prénoms
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Liste de vingt prénoms féminins usuels au Maroc, posée sans source enregistrée. Sert aussi de
+    vivier pour nom_mere. Si cette liste était fausse ou trop courte, la vraisemblance des prénoms affichés
+    serait affectée, sans effet sur aucun total.
+- nom: noms_famille
+  valeur:
+  - Alaoui
+  - Bennani
+  - Idrissi
+  - Tazi
+  - Fassi
+  - Chraibi
+  - Berrada
+  - Squalli
+  - Lahlou
+  - Amrani
+  - Sbai
+  - Kettani
+  - Benjelloun
+  - Cherkaoui
+  - Belghiti
+  - Moussaoui
+  - Ziani
+  - Ouazzani
+  - Sekkat
+  - Bakkali
+  unite: liste de noms de famille
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Liste de vingt noms de famille usuels au Maroc, posée sans source enregistrée. Sert à tirer indépendamment
+    nom_famille_1 et nom_famille_2. Si cette liste était fausse ou trop courte, la vraisemblance des noms
+    affichés serait affectée, sans effet sur aucun total.
+- nom: repartition_residence
+  valeur:
+    region:
+      FM: 0.95
+      TT: 0.02
+      CS: 0.02
+      RS: 0.01
+    province:
+      MEK: 0.7
+      FES: 0.1
+      ELH: 0.08
+      IFR: 0.07
+      KHE: 0.03
+      SEF: 0.02
+    ville:
+      MEK: 0.7
+      FES: 0.1
+      ELH: 0.08
+      IFR: 0.07
+      KHE: 0.05
+    environnement:
+      U: 0.639
+      R: 0.361
+  unite: proportion par code de nomenclature, par colonne géographique
+  provenance: HYP
+  preuve: S-05
+  note: 'Répartition géographique de résidence, cohérente avec l''implantation de l''établissement à Meknès
+    : la préfecture de Meknès domine (70 %) province et ville, la région Fès-Meknès domine (95 %) la région.
+    Le partage urbain/rural (63,9 % / 36,1 %) reprend la mesure régionale de S-05 (2 855 366 urbains,
+    1 612 545 ruraux sur 4 467 911), seule part de cette entrée directement mesurée ; les poids par ville,
+    province et région sont posés sans source. Si cette répartition était fausse, la carte de provenance
+    des patients serait faussée, sans effet sur le nombre de fiches produites.'
+- nom: repartition_pays
+  valeur:
+    '504': 0.95
+    '250': 0.01
+    '012': 0.01
+    '788': 0.01
+    '724': 0.01
+    '478': 0.01
+  unite: proportion par code de nomenclature_pays
+  provenance: HYP
+  preuve: REL-PAT.H07
+  note: >-
+    Répartition retenue pour nationalite et pays_naissance, partagée entre les deux
+    colonnes. Le code 504 (MAROC) est dominant à 95 %, conforme à ce que le relevé de
+    champs observe comme la nationalité et le pays de naissance de la très grande
+    majorité des patients d'un hôpital provincial (REL-PAT.H07, REL-PAT.N05). Les cinq
+    autres codes se partagent le reste à parts égales, posé sans source distincte. Si
+    cette répartition était fausse, la part de patients étrangers affichée serait
+    faussée, sans effet sur aucun total.
+- nom: gabarit_identifiant_patient
+  valeur: IPP-{rang:06d}
+  unite: gabarit de formatage
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Gabarit interprété par le générateur à partir du rang d''apparition rendu par le fil des épisodes,
+    jamais écrit en dur ailleurs. Choix technique, non observé : le relevé de champs ne montre aucune
+    valeur de n_ipp. Si ce gabarit était faux, seule la forme visuelle de l''identifiant en serait affectée,
+    sans effet sur son rang ni sur sa croissance.'
+- nom: taux_avertissements_sms
+  valeur: 0.6
+  unite: proportion
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Part des patients ayant activé les avertissements SMS, posée sans source. Si ce taux était faux,
+    seule la proportion affichée serait affectée, sans effet sur aucun total.
+- nom: taux_avertissements_email
+  valeur: 0.3
+  unite: proportion
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Part des patients ayant activé les avertissements courriel, posée sans source. Si ce taux était
+    faux, seule la proportion affichée serait affectée, sans effet sur aucun total.
+- nom: taux_exitus
+  valeur: 0.02
+  unite: proportion
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Part des fiches patient marquées décédées, posée sans source faute de statistique de mortalité
+    hospitalière disponible pour l'établissement. Si ce taux était faux, seule la proportion affichée
+    serait affectée, sans effet sur aucun total.
+- nom: taux_modification_fiche
+  valeur: 0.15
+  unite: proportion
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Part des fiches patient modifiées au moins une fois après leur création, posée sans source. Ce
+    paramètre n''est pas décoratif : sans lui, aucune fiche ne reparaît dans une partition ultérieure,
+    et la couche d''historisation des blocs suivants n''aurait rien à historiser. Si ce taux était faux,
+    le volume de fiches réapparaissant serait faussé dans le même sens, sans effet sur le nombre de fiches
+    distinctes produites.'
+- nom: loi_delai_modification
+  valeur:
+    forme: exponentielle
+    echelle_jours: 90
+  unite: loi de décroissance et échelle
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Délai entre la création d'une fiche et sa modification, tiré d'une loi exponentielle d'échelle
+    90 jours, posée sans source. Si cette échelle était fausse, la répartition des modifications dans
+    le temps serait plus ou moins concentrée près de la création, sans effet sur le nombre de fiches modifiées,
+    fixé par taux_modification_fiche.
