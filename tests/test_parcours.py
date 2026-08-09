@@ -2,6 +2,7 @@
 
 import subprocess
 import sys
+from collections import Counter
 from datetime import date
 from pathlib import Path
 
@@ -71,11 +72,14 @@ def test_file_preexistante() -> None:
     anciennete_max = entrees["anciennete_maximale_file_preexistante_jours"]["valeur"]
     date_debut = date.fromisoformat(entrees["date_debut"]["valeur"])
 
-    prealables = [p for p in population if p["date_creation"] < date_debut]
-    assert len(prealables) == effectif_configure, (
-        f"{len(prealables)} patients antérieurs au début de la période, "
-        f"{effectif_configure} attendus"
-    )
+    # la file préexistante est structurellement les tout premiers identifiants
+    # (ajoutés avant le fil des épisodes) ; des patients nouveaux dont la fiche est
+    # créée à la prise d'un rendez-vous peuvent aussi porter une date de création
+    # antérieure au début de la période (cas limite explicite), sans appartenir à la
+    # file préexistante — les deux ne se distinguent plus par la seule date.
+    prealables = sorted(population, key=lambda p: p["patient_id"])[:effectif_configure]
+    assert all(p["activite_creation"] is None for p in prealables)
+    assert len(prealables) == effectif_configure
 
     for patient in prealables:
         assert patient["date_creation"] < date_debut
@@ -86,10 +90,15 @@ def test_file_preexistante() -> None:
 def test_part_patients_connus() -> None:
     entrees = entrees_config()
     part_configuree = entrees["part_patients_connus"]["valeur"]
-    episodes, population = construire(1, entrees)
+    episodes, _ = construire(1, entrees)
 
-    date_creation = {p["patient_id"]: p["date_creation"] for p in population}
-    connus = sum(1 for e in episodes if date_creation[e["patient_id"]] != e["date"])
+    # un épisode est « connu » s'il n'est pas le tout premier épisode de son patient :
+    # la date de création de la fiche ne distingue plus connu de nouveau depuis que la
+    # fiche d'un nouveau patient de consultation peut être créée avant l'épisode lui-même.
+    premiers: dict[int, dict] = {}
+    for episode in episodes:
+        premiers.setdefault(episode["patient_id"], episode)
+    connus = sum(1 for e in episodes if premiers[e["patient_id"]] is not e)
     part_mesuree = connus / len(episodes)
 
     # Tolérance mesurée sur cinq graines (rapport.md) : écart maximal observé 0,0017.
@@ -102,13 +111,18 @@ def test_croissance_identifiants() -> None:
     entrees = entrees_config()
     _, population = construire(1, entrees)
 
+    # les identifiants sont attribués dans l'ordre d'attribution du fil des épisodes,
+    # de façon strictement croissante et sans doublon. La date de création n'est plus
+    # nécessairement croissante avec l'identifiant depuis que la fiche d'un nouveau
+    # patient de consultation peut être créée avant l'épisode qui l'a fait naître
+    # (parfois avant celle d'un patient d'identifiant inférieur) : ce n'est plus
+    # l'invariant vérifié ici.
     tries_par_id = sorted(population, key=lambda p: p["patient_id"])
-    dates = [p["date_creation"] for p in tries_par_id]
     ids = [p["patient_id"] for p in tries_par_id]
 
     assert ids == sorted(ids)
     assert len(ids) == len(set(ids))
-    assert dates == sorted(dates)
+    assert ids == list(range(len(ids)))
 
 
 def test_determinisme() -> None:
@@ -142,6 +156,25 @@ def _hash_parcours_sous_processus(graine: int) -> str:
         [sys.executable, "-c", script], capture_output=True, text=True, check=True
     )
     return resultat.stdout.strip()
+
+
+def test_invariance_fil_episodes_par_categorie_et_patients() -> None:
+    # ce lot deplace des dates de creation de fiche, il ne refait pas le fil : le nombre
+    # d'episodes par categorie et le nombre de patients distincts doivent rester ceux que
+    # produit le module de volumes, independamment de la deuxieme passe qui deplace les
+    # dates de creation des fiches ouvertes a la prise d'un rendez-vous.
+    entrees = entrees_config()
+    comptes = comptes_par_categorie(entrees)
+    episodes, population = construire(1, entrees)
+
+    attendu_par_categorie = {cat: sum(c.values()) for cat, c in comptes.items()}
+    mesure_par_categorie = Counter(e["categorie"] for e in episodes)
+
+    for categorie, attendu in attendu_par_categorie.items():
+        assert mesure_par_categorie[categorie] == attendu, categorie
+
+    identifiants = {p["patient_id"] for p in population}
+    assert len(identifiants) == len(population)
 
 
 def test_independance_ordre_iteration() -> None:
