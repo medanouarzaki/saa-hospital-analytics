@@ -1,26 +1,17 @@
 """Contrôles bloquants sur la configuration du générateur (generator/config/)."""
 
-import importlib.util
 from datetime import date
 from pathlib import Path
 
 import yaml
+
+from generator import config
 
 RACINE = Path(__file__).resolve().parent.parent
 SOURCES = RACINE / "docs" / "sources" / "sources.yml"
 RELATIONS = RACINE / "docs" / "relations_injectees.yml"
 
 PROVENANCES_AUTORISEES = {"OBS", "DOC", "HYP"}
-
-
-def charger_module(chemin: Path):
-    spec = importlib.util.spec_from_file_location(chemin.stem, chemin)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
-config = charger_module(RACINE / "generator" / "config.py")
 
 
 def charger_sources() -> dict[str, dict]:
