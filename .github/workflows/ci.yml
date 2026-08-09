@@ -36,6 +36,8 @@ jobs:
 
       - run: uv run pytest tests/test_performance_configuration.py -v
 
+      - run: uv run pytest tests/test_ecriture.py -v
+
   provenance:
     runs-on: ubuntu-latest
     # Le service n'exige aucun mot de passe : le conteneur est éphémère,
