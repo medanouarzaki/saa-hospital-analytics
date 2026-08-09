@@ -11,6 +11,7 @@ valeur est correcte.
 import csv
 import hashlib
 from collections import defaultdict
+from datetime import date as date_cls
 from pathlib import Path
 
 import pandas as pd
@@ -68,6 +69,17 @@ def _valider_colonnes(table: str, ligne: dict, colonnes: list[str]) -> None:
         raise ValueError(f"{table} : colonnes en trop dans la ligne : {sorted(en_trop)}")
 
 
+def _valider_bornage_periode(
+    table: str, ligne: dict, date_debut: date_cls, date_fin: date_cls
+) -> None:
+    valeur_date = ligne["date_extraction"]
+    if valeur_date < date_debut or valeur_date > date_fin:
+        raise ValueError(
+            f"{table} : date_extraction {valeur_date.isoformat()} hors de la période "
+            f"[{date_debut.isoformat()}, {date_fin.isoformat()}] pour la ligne {ligne!r}"
+        )
+
+
 def _empreinte(chemin: Path) -> str:
     return hashlib.sha256(chemin.read_bytes()).hexdigest()
 
@@ -103,9 +115,13 @@ class Execution:
         fin_de_ligne = format_config["fin_de_ligne"]["valeur"]
         types_colonnes = {colonne: registre.type_metier(table, colonne) for colonne in colonnes}
 
+        date_debut_periode = date_cls.fromisoformat(self.date_debut)
+        date_fin_periode = date_cls.fromisoformat(self.date_fin)
+
         par_date: dict[str, list[dict]] = defaultdict(list)
         for ligne in lignes:
             _valider_colonnes(table, ligne, colonnes)
+            _valider_bornage_periode(table, ligne, date_debut_periode, date_fin_periode)
             valeur_date = ligne["date_extraction"]
             cle_date = valeur_date.isoformat()
             par_date[cle_date].append(ligne)

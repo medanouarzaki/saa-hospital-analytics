@@ -25,7 +25,7 @@ def ligne_valide(date_extraction: date) -> dict:
 
 
 def nouvelle_execution(racine: Path) -> ecriture.Execution:
-    return ecriture.Execution(racine, "scenario_30", 1, "2024-01-01", "2024-01-02")
+    return ecriture.Execution(racine, "scenario_30", 1, "2024-01-01", "2024-01-31")
 
 
 def seul_csv(racine: Path) -> Path:
@@ -159,6 +159,26 @@ def test_manifeste_recense_partitions_et_empreintes(tmp_path: Path) -> None:
     for relatif, empreinte in manifeste["empreintes"].items():
         empreinte_recalculee = hashlib.sha256((tmp_path / relatif).read_bytes()).hexdigest()
         assert empreinte == empreinte_recalculee
+
+
+def test_date_extraction_hors_periode_rejetee(tmp_path: Path) -> None:
+    execution = nouvelle_execution(tmp_path)
+
+    ligne_avant = ligne_valide(date(2023, 12, 31))
+    try:
+        execution.ecrire_table(TABLE, [ligne_avant])
+        raise AssertionError("une date_extraction avant le debut de periode aurait du etre rejetee")
+    except ValueError as erreur:
+        assert "hors de la période" in str(erreur)
+        assert "2023-12-31" in str(erreur)
+
+    ligne_apres = ligne_valide(date(2024, 2, 1))
+    try:
+        execution.ecrire_table(TABLE, [ligne_apres])
+        raise AssertionError("une date_extraction apres la fin de periode aurait du etre rejetee")
+    except ValueError as erreur:
+        assert "hors de la période" in str(erreur)
+        assert "2024-02-01" in str(erreur)
 
 
 def test_reproductibilite_empreintes(tmp_path: Path) -> None:
