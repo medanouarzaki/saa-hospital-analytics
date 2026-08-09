@@ -113,14 +113,23 @@ parametres:
     libelle: Khénifra
   - code: SEF
     libelle: Séfrou
+  - code: CAS
+    libelle: Casablanca
+  - code: RAB
+    libelle: Rabat
+  - code: TNG
+    libelle: Tanger-Asilah
   unite: couples code-libellé
   provenance: HYP
   preuve: S-05
   note: S-05 établit l'existence de la préfecture de Meknès, siège de l'établissement, mais ne fournit
-    pas la liste complète des préfectures et provinces de la région. Les autres codes sont posés par convention
-    parmi les préfectures et provinces de la région Fès-Meknès. Si cette liste était fausse ou incomplète,
-    des patients d'une province non listée seraient rejetés au chargement, sans effet sur aucun total
-    mesuré ailleurs.
+    pas la liste complète des préfectures et provinces de la région. Les six premiers codes sont posés
+    par convention parmi les préfectures et provinces de la région Fès-Meknès. CAS, RAB et TNG s'y
+    ajoutent comme chef-lieu de rattachement pour les patients dont la région de résidence
+    (nomenclature_region) est Casablanca-Settat, Rabat-Salé-Kénitra ou Tanger-Tétouan-Al Hoceïma ; sans
+    eux, aucune province ne pouvait s'accorder avec une région extérieure à Fès-Meknès. Si ces trois
+    codes étaient faux, la province affichée pour les patients hors région d'implantation serait
+    imprécise (un seul chef-lieu représentant toute la région), sans effet sur aucun total.
 - nom: nomenclature_ville
   valeur:
   - code: MEK
@@ -133,12 +142,21 @@ parametres:
     libelle: Ifrane
   - code: KHE
     libelle: Khénifra
+  - code: CAS
+    libelle: Casablanca
+  - code: RAB
+    libelle: Rabat
+  - code: TNG
+    libelle: Tanger
   unite: couples code-libellé
   provenance: HYP
   preuve: sans_preuve_externe
-  note: Aucune source enregistrée ne fournit de liste de villes. Codes posés par convention, villes plausibles
-    de la région d'implantation de l'établissement. Si cette liste était fausse ou incomplète, des patients
-    d'une ville non listée seraient rejetés au chargement, sans effet sur aucun total mesuré ailleurs.
+  note: Aucune source enregistrée ne fournit de liste de villes. Les cinq premiers codes sont posés par
+    convention, villes plausibles de la région d'implantation de l'établissement. CAS, RAB et TNG s'y
+    ajoutent, même justification que pour nomenclature_province, pour donner une ville cohérente aux
+    patients des régions Casablanca-Settat, Rabat-Salé-Kénitra et Tanger-Tétouan-Al Hoceïma. Si cette
+    liste était fausse ou incomplète, des patients d'une ville non listée seraient rejetés au chargement,
+    sans effet sur aucun total mesuré ailleurs.
 - nom: nomenclature_pays
   valeur:
   - code: '504'
