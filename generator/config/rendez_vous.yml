@@ -179,3 +179,102 @@ parametres:
   note: Meme ensemble de comptes que comptes_utilisateurs_systeme (demographie.yml), pour cree_par, modifie_par,
     confirme_par et annule_par. Repete ici plutot que reference pour que ce fichier reste lisible independamment
     ; les deux listes doivent rester synchronisees si l'une est modifiee.
+- nom: code_etat_absence
+  valeur: CO
+  unite: code de nomenclature_etat_rendez_vous
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Un rendez-vous non honore reste a l'etat confirme (CO), la nomenclature ne porte
+    aucun code dedie a l'absence. L'absence se deduit, en aval, de l'absence de passage
+    associe a un rendez-vous confirme dont la date est passee, plutot que d'un etat propre
+    a cette table. C'est fidele au fonctionnement d'un carnet de rendez-vous reel observe
+    (bloc Controle de modifications, confirme_par et date_conf distincts d'annule_par et
+    date_annul) ; la reconstitution du taux d'absence a partir de ce rapprochement
+    appartient a la couche intermediaire, pas a ce generateur. Si ce code etait faux, la
+    colonne etat afficherait un code absent de la nomenclature, rejete au chargement, sans
+    effet sur le nombre de rendez-vous par categorie (honore, annule, en instance), fixes
+    independamment de ce code.
+- nom: taux_medecin_adresse
+  valeur: 0.6
+  unite: proportion des rendez-vous d'origine externe
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Part des rendez-vous d'origine externe (AU) qui nomment en outre le medecin
+    adressant (medecin_ext), colonne facultative meme pour un adressage. Pose sans source.
+    Si ce taux etait faux, la part de rendez-vous adresses nommant un medecin serait
+    faussee, sans effet sur le nombre de rendez-vous adresses lui-meme, fixe par
+    part_patients_adresses.
+- nom: taux_service_adresse
+  valeur: 0.4
+  unite: proportion des rendez-vous d'origine externe
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Part des rendez-vous d'origine externe (AU) qui nomment en outre le service
+    d'origine (service_ext), colonne facultative meme pour un adressage. Pose sans source.
+    Si ce taux etait faux, la part de rendez-vous adresses nommant un service serait
+    faussee, sans effet sur le nombre de rendez-vous adresses lui-meme.
+- nom: liste_services_adressants
+  valeur:
+  - Medecine generale
+  - Consultations externes
+  - Urgences
+  - Medecine interne
+  - Pediatrie
+  unite: liste de noms de service libres
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: service_ext est un champ texte libre (aucune nomenclature ne le couvre), tire
+    uniformement dans cette liste posee sans source quand renseigne. Si cette liste etait
+    fausse ou trop courte, la vraisemblance du service affiche serait affectee, sans effet
+    sur aucun total.
+- nom: taux_renseignement_rdv
+  valeur:
+    modifie_par: 0.05
+  unite: proportion de rendez-vous ou la colonne est renseignee
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: modifie_par et date_mod sont facultatifs, comme les colonnes correspondantes de
+    la table des patients (taux_renseignement, demographie.yml). Une valeur absente ici
+    parce que la colonne est facultative et n'a pas ete saisie est une absence
+    structurelle, qui fait partie du jeu de donnees normal, ce n'est pas un defaut
+    injecte. Le decompte de la verite terrain, dans un lot ulterieur, ne doit compter que
+    les defauts reellement injectes, pas ces absences structurelles. Si ce taux etait
+    faux, la part de rendez-vous modifies affichee serait faussee, sans effet sur aucun
+    total.
+- nom: contraintes_coherence_rendez_vous
+  valeur:
+  - colonne_a: origine
+    colonne_b: hopital_cs
+    nature: presence_conditionnee
+    valeur_a_declenchante: AU
+    tolerance: 0.0
+    justification: Une ligne dont l'origine est un adressage externe (AU) nomme toujours
+      un etablissement d'origine (hopital_cs) ; une ligne d'origine spontanee (SP) n'en
+      nomme jamais. Meme mecanisme de configuration que contraintes_coherence
+      (coherence.yml, lot de la table des patients), repris ici sous un nom distinct
+      faute d'ecriture autorisee sur ce fichier dans ce lot ; verifie par un test
+      generique qui lit cette liste sans citer les colonnes en dur.
+  unite: liste de contraintes d'accord intra-ligne pour source.rendez_vous
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Meme schema que contraintes_coherence (generator/config/coherence.yml), nature
+    presence_conditionnee signifie que colonne_b est renseignee si et seulement si
+    colonne_a vaut valeur_a_declenchante. Lu par generator/rendez_vous.py (application) et
+    par tests/test_rendez_vous.py (verification generique).
+- nom: colonnes_toujours_vides_rendez_vous
+  valeur:
+  - colonne: observations
+    justification: Champ libre du bloc Donner rendez-vous (registre des champs,
+      REL-RDV.R07) ; aucune valeur n'est relevee au poste pour cette colonne, et
+      aucune source documentaire ne decrit comment le systeme en place la
+      renseigne. generator/rendez_vous.py ne l'ecrit donc jamais (valeur vide sur
+      toutes les lignes), meme choix que duree_minutes pour les colonnes sans
+      preuve d'une variation reelle. Une colonne entierement vide est sinon un
+      signal d'anomalie de generation ; celle-ci est declaree ici pour que le test
+      qui verifie l'absence de colonne vide non justifiee la distingue d'un defaut.
+  unite: liste de colonnes de source.rendez_vous legitimement vides sur toute la periode
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Lu par tests/test_rendez_vous.py (verification generique de vacuite des
+    colonnes) pour exclure cette liste du controle plutot que de le desactiver
+    globalement.

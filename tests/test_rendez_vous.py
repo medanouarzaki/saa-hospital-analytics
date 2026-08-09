@@ -198,33 +198,21 @@ def test_pente_absenteisme_reelle(generation: dict) -> None:
 def test_delai_median_par_activite(generation: dict) -> None:
     entrees = generation["entrees"]
     lignes = generation["lignes"]
-    population = generation["population"]
 
     delais_medians_attendus = entrees["delai_rdv_par_specialite"]["valeur"]
-    date_creation_par_patient = {p["patient_id"]: p["date_creation"] for p in population}
-
     honores = [ligne for ligne in lignes if ligne["etat"] == "HO"]
 
-    # eligibles : le patient existait deja la veille du rendez-vous ou avant. Les
-    # rendez-vous dont le patient est cree le jour meme (fiche ouverte a la premiere
-    # visite) n'ont structurellement aucun delai possible et ne relevent pas de
-    # delai_rdv_par_specialite ; mesure : 59,7 % des episodes de consultation tombent
-    # dans ce cas structurel.
-    def marge_disponible(ligne: dict) -> int:
-        pid = patient_id_de(ligne["n_ipp"])
-        return (ligne["date_rendez_vous"].date() - date_creation_par_patient[pid]).days
-
-    eligibles = [ligne for ligne in honores if marge_disponible(ligne) > 0]
-
-    # tolerance mesuree sur 3 graines independantes : ecart maximal observe 10 jours
-    # (ophtalmologie, mediane 45 j), du a l'ecretage du delai tire a la marge de jours
-    # reellement disponible avant le rendez-vous (voir generator/rendez_vous.py) ; plus
-    # marque pour les medianes les plus hautes.
-    TOLERANCE_JOURS = 12
+    # objet du lot : depuis que la fiche d'une premiere consultation programmee est creee
+    # a la prise du rendez-vous (et non plus le jour de l'episode), le delai est observable
+    # sur la quasi-totalite des rendez-vous honores, plus seulement sur un sous-ensemble
+    # "eligible" -- mesure sur la totalite des lignes honorees, sans filtre.
+    # tolerance mesuree sur 3 graines independantes (graines 1, 2, 3) : ecart maximal
+    # observe 5,0 jours (graine 3) entre mediane mesuree et mediane configuree.
+    TOLERANCE_JOURS = 8
     for activite, mediane_attendue in delais_medians_attendus.items():
         delais = [
             (ligne["date_rendez_vous"].date() - ligne["date_creation"].date()).days
-            for ligne in eligibles
+            for ligne in honores
             if ligne["activite"] == activite
         ]
         assert len(delais) > 0
@@ -415,3 +403,92 @@ def test_reproductibilite_deux_graines_deux_formats(generation: dict) -> None:
     empreintes_b_csv = {k: v for k, v in execution_b.empreintes.items() if k.endswith(".csv")}
     # controle positif : une graine differente doit produire des empreintes differentes
     assert empreintes_a1_csv != empreintes_b_csv
+
+
+def test_bornage_partitions_par_table(generation: dict) -> None:
+    entrees = generation["entrees"]
+    date_debut = date.fromisoformat(entrees["date_debut"]["valeur"])
+    date_fin = date.fromisoformat(entrees["date_fin"]["valeur"])
+    n_jours_periode = (date_fin - date_debut).days + 1
+
+    tables_lignes = {
+        "source.patients": generation_patients()["lignes"],
+        TABLE: generation["lignes"],
+    }
+
+    for table, lignes in tables_lignes.items():
+        dates_extraction = {ligne["date_extraction"] for ligne in lignes}
+        assert dates_extraction, table
+        hors_periode = {d for d in dates_extraction if d < date_debut or d > date_fin}
+        assert not hors_periode, (table, sorted(hors_periode))
+        assert len(dates_extraction) <= n_jours_periode, (table, len(dates_extraction))
+
+
+def test_anteriorite_complete_naissance_fiche_prise_rdv(generation: dict) -> None:
+    lignes_patients = generation_patients()["lignes"]
+    lignes_rdv = generation["lignes"]
+
+    naissance_par_patient: dict[int, date] = {}
+    fiche_par_patient: dict[int, date] = {}
+    for ligne in lignes_patients:
+        pid = patient_id_de(ligne["n_ipp"])
+        naissance = ligne["date_naissance"]
+        fiche = ligne["date_attribution"]
+        if pid not in naissance_par_patient:
+            naissance_par_patient[pid] = naissance
+            fiche_par_patient[pid] = fiche
+        else:
+            # deux lignes (creation puis modification) pour le meme patient portent
+            # les memes date_naissance et date_attribution : verifie l'invariant plutot
+            # que de le supposer.
+            assert naissance_par_patient[pid] == naissance
+            assert fiche_par_patient[pid] == fiche
+
+    assert lignes_rdv, "aucune ligne de rendez-vous"
+    for ligne in lignes_rdv:
+        pid = patient_id_de(ligne["n_ipp"])
+        naissance = naissance_par_patient[pid]
+        fiche = fiche_par_patient[pid]
+        prise = ligne["date_creation"].date()
+        rendez_vous_jour = ligne["date_rendez_vous"].date()
+        assert naissance < fiche, (pid, naissance, fiche)
+        assert fiche <= prise, (pid, fiche, prise)
+        assert prise <= rendez_vous_jour, (pid, prise, rendez_vous_jour)
+
+
+def test_adressage_coherent_contraintes_configurees(generation: dict) -> None:
+    entrees = generation["entrees"]
+    lignes = generation["lignes"]
+
+    contraintes = entrees["contraintes_coherence_rendez_vous"]["valeur"]
+    assert contraintes, "aucune contrainte configuree"
+
+    for contrainte in contraintes:
+        assert contrainte["nature"] == "presence_conditionnee"
+        colonne_a = contrainte["colonne_a"]
+        colonne_b = contrainte["colonne_b"]
+        valeur_declenchante = contrainte["valeur_a_declenchante"]
+
+        violations = [
+            ligne
+            for ligne in lignes
+            if (ligne[colonne_a] == valeur_declenchante) != (ligne[colonne_b] is not None)
+        ]
+        assert not violations, (colonne_a, colonne_b, len(violations))
+
+
+def test_aucune_colonne_entierement_vide_sauf_declaree(generation: dict) -> None:
+    entrees = generation["entrees"]
+    lignes = generation["lignes"]
+
+    colonnes_declarees_vides = {
+        e["colonne"] for e in entrees["colonnes_toujours_vides_rendez_vous"]["valeur"]
+    }
+    colonnes = registre.colonnes_table(TABLE)
+
+    for colonne in colonnes:
+        if colonne in colonnes_declarees_vides:
+            continue
+        valeurs = [ligne[colonne] for ligne in lignes]
+        toutes_vides = all(v is None or v == "" for v in valeurs)
+        assert not toutes_vides, colonne

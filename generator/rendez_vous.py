@@ -14,7 +14,7 @@ from datetime import date, datetime, timedelta
 
 import numpy as np
 
-from generator import config, ecriture, temporel
+from generator import config, ecriture, nomenclatures, temporel
 
 TABLE = "source.rendez_vous"
 FLUX = "programme"
@@ -37,6 +37,10 @@ def _tirage_pondere_dict(poids_par_code: dict[str, float], generateur: np.random
 
 def _tirage_uniforme_liste(valeurs: list, generateur: np.random.Generator):
     return valeurs[int(generateur.integers(0, len(valeurs)))]
+
+
+def _renseigne(taux: float, generateur: np.random.Generator) -> bool:
+    return bool(generateur.random() < taux)
 
 
 class _CachesTemporelles:
@@ -67,13 +71,6 @@ class _CachesTemporelles:
 
 def _jour_ouvert(jour: date, caches: _CachesTemporelles) -> bool:
     return caches.poids_jour(jour) > 0
-
-
-def _jour_ouvert_le_plus_proche_avant(jour: date, caches: _CachesTemporelles) -> date:
-    candidat = jour
-    while not _jour_ouvert(candidat, caches):
-        candidat -= timedelta(days=1)
-    return candidat
 
 
 def _jour_ouvert_le_plus_proche_apres(jour: date, caches: _CachesTemporelles) -> date:
@@ -162,6 +159,33 @@ def _patient_existant_a(
     return population_triee[indice]
 
 
+def _construire_adressage(
+    origine: str, entrees: dict[str, dict], generateur: np.random.Generator
+) -> tuple[str | None, str | None, str | None]:
+    contrainte = next(
+        c
+        for c in entrees["contraintes_coherence_rendez_vous"]["valeur"]
+        if c["colonne_b"] == "hopital_cs"
+    )
+    if origine != contrainte["valeur_a_declenchante"]:
+        return None, None, None
+
+    hopital_cs = _tirage_uniforme_liste(
+        nomenclatures.codes_nomenclature("nomenclature_etablissements_partenaires", entrees),
+        generateur,
+    )
+    medecin_ext = None
+    if _renseigne(entrees["taux_medecin_adresse"]["valeur"], generateur):
+        noms_famille = entrees["noms_famille"]["valeur"]
+        medecin_ext = f"Dr. {_tirage_uniforme_liste(noms_famille, generateur)}"
+    service_ext = None
+    if _renseigne(entrees["taux_service_adresse"]["valeur"], generateur):
+        service_ext = _tirage_uniforme_liste(
+            entrees["liste_services_adressants"]["valeur"], generateur
+        )
+    return hopital_cs, medecin_ext, service_ext
+
+
 def _construire_ligne_base(
     n_ipp: str,
     activite: str,
@@ -228,6 +252,8 @@ def generer_lignes(
     comptes = entrees["comptes_utilisateurs_rdv"]["valeur"]
     gabarit_ipp = entrees["gabarit_identifiant_patient"]["valeur"]
     code_origine_adresse = "AU"
+    code_etat_absence = entrees["code_etat_absence"]["valeur"]
+    taux_renseignement_modif = entrees["taux_renseignement_rdv"]["valeur"]["modifie_par"]
 
     for activite in repartition_activites:
         if activite not in delais_medians:
@@ -241,13 +267,27 @@ def generer_lignes(
 
     population_triee = sorted(population, key=lambda p: p["date_creation"])
     dates_creation = [p["date_creation"] for p in population_triee]
-    date_creation_par_patient = {p["patient_id"]: p["date_creation"] for p in population}
+    population_par_id = {p["patient_id"]: p for p in population}
 
     episodes_consultation = [e for e in episodes if e["categorie"] == "C"]
 
+    premiers_par_patient: dict[int, dict] = {}
+    for episode in episodes:
+        pid = episode["patient_id"]
+        if pid not in premiers_par_patient:
+            premiers_par_patient[pid] = episode
+
     episodes_par_activite: dict[str, list[dict]] = {a: [] for a in repartition_activites}
     for episode in episodes_consultation:
-        activite = _tirage_pondere_dict(repartition_activites, generateur)
+        patient = population_par_id[episode["patient_id"]]
+        active_precomputee = (
+            premiers_par_patient.get(episode["patient_id"]) is episode
+            and patient.get("activite_creation") is not None
+        )
+        if active_precomputee:
+            activite = patient["activite_creation"]
+        else:
+            activite = _tirage_pondere_dict(repartition_activites, generateur)
         episodes_par_activite[activite].append(episode)
 
     lignes: list[dict] = []
@@ -268,6 +308,13 @@ def generer_lignes(
         prise = rendez_vous_date - timedelta(days=delai)
         return _jour_ouvert_borne_inferieurement(prise, date_min, caches)
 
+    def construire_modification(jour_reference: date) -> tuple[str | None, datetime | None]:
+        if not _renseigne(taux_renseignement_modif, generateur):
+            return None, None
+        modifie_par = _tirage_uniforme_liste(comptes, generateur)
+        date_mod = _tirer_horodatage(jour_reference, caches, generateur)
+        return modifie_par, date_mod
+
     for activite, episodes_activite in episodes_par_activite.items():
         agenda = correspondance_activite_agenda[activite]
         mediane = delais_medians[activite]
@@ -278,21 +325,23 @@ def generer_lignes(
             jour_rdv = episode["date"]
             patient_id = episode["patient_id"]
             n_ipp = n_ipp_pour(patient_id)
-            date_creation_patient = date_creation_par_patient[patient_id]
+            patient = population_par_id[patient_id]
+            date_creation_patient = patient["date_creation"]
 
-            marge_disponible = (jour_rdv - date_creation_patient).days
-            if marge_disponible <= 0:
-                # la fiche du patient est créée le jour même de cet épisode (patient
-                # nouveau) : aucun délai n'est possible, la prise ne peut précéder
-                # l'existence de la fiche. Structurel, distinct du choix délibéré de
-                # part_rdv_jour_meme, qui ne s'applique qu'aux patients déjà connus.
-                delai = 0
-            elif generateur.random() < part_jour_meme:
-                delai = 0
+            est_premier = premiers_par_patient.get(patient_id) is episode
+            if est_premier and patient.get("activite_creation") == activite:
+                # la date de prise a deja ete fixee par generator/parcours.py au moment
+                # ou la fiche a ete ouverte : ne pas la retirer independamment ici, sous
+                # peine de contredire cette decision deja prise et deja coherente.
+                jour_prise = date_creation_patient
             else:
-                delai = _delai_lognormal(mediane, ecart_type_log, generateur)
-                delai = min(delai, marge_disponible)
-            jour_prise = tirer_prise(jour_rdv, delai, date_creation_patient)
+                marge_disponible = (jour_rdv - date_creation_patient).days
+                if marge_disponible <= 0 or generateur.random() < part_jour_meme:
+                    delai = 0
+                else:
+                    delai = _delai_lognormal(mediane, ecart_type_log, generateur)
+                    delai = min(delai, marge_disponible)
+                jour_prise = tirer_prise(jour_rdv, delai, date_creation_patient)
 
             ligne = _construire_ligne_base(
                 n_ipp, activite, agenda, choisir_type_attention(), comptes, entrees, generateur
@@ -305,11 +354,12 @@ def generer_lignes(
             ligne["date_reception"] = ligne["date_creation"]
             ligne["confirme_par"] = _tirage_uniforme_liste(comptes, generateur)
             ligne["date_conf"] = _tirer_horodatage(jour_prise, caches, generateur)
-            if generateur.random() < part_adresses:
-                ligne["origine"] = code_origine_adresse
-            else:
-                ligne["origine"] = "SP"
-            ligne["date_extraction"] = jour_prise
+            ligne["origine"] = code_origine_adresse if generateur.random() < part_adresses else "SP"
+            ligne["hopital_cs"], ligne["medecin_ext"], ligne["service_ext"] = _construire_adressage(
+                ligne["origine"], entrees, generateur
+            )
+            ligne["modifie_par"], ligne["date_mod"] = construire_modification(jour_rdv)
+            ligne["date_extraction"] = max(jour_prise, date_debut)
             lignes.append(ligne)
 
         # --- volume total deduit des taux, absences et annulations en lignes supplementaires ---
@@ -343,7 +393,7 @@ def generer_lignes(
                 n_ipp, activite, agenda, choisir_type_attention(), comptes, entrees, generateur
             )
             ligne["n_rdv"] = prochain_n_rdv()
-            ligne["etat"] = "CO"
+            ligne["etat"] = code_etat_absence
             ligne["rdv_supplementaire"] = True
             ligne["date_rendez_vous"] = _tirer_horodatage(jour_rdv, caches, generateur)
             ligne["date_creation"] = _tirer_horodatage(jour_prise, caches, generateur)
@@ -351,7 +401,11 @@ def generer_lignes(
             ligne["confirme_par"] = _tirage_uniforme_liste(comptes, generateur)
             ligne["date_conf"] = _tirer_horodatage(jour_prise, caches, generateur)
             ligne["origine"] = code_origine_adresse if generateur.random() < part_adresses else "SP"
-            ligne["date_extraction"] = jour_prise
+            ligne["hopital_cs"], ligne["medecin_ext"], ligne["service_ext"] = _construire_adressage(
+                ligne["origine"], entrees, generateur
+            )
+            ligne["modifie_par"], ligne["date_mod"] = construire_modification(jour_prise)
+            ligne["date_extraction"] = max(jour_prise, date_debut)
             lignes.append(ligne)
 
         for _ in range(n_annulations):
@@ -379,7 +433,11 @@ def generer_lignes(
             jour_annulation = _jour_ouvert_borne_inferieurement(jour_rdv, jour_prise, caches)
             ligne["date_annul"] = _tirer_horodatage(jour_annulation, caches, generateur)
             ligne["origine"] = code_origine_adresse if generateur.random() < part_adresses else "SP"
-            ligne["date_extraction"] = jour_prise
+            ligne["hopital_cs"], ligne["medecin_ext"], ligne["service_ext"] = _construire_adressage(
+                ligne["origine"], entrees, generateur
+            )
+            ligne["modifie_par"], ligne["date_mod"] = construire_modification(jour_prise)
+            ligne["date_extraction"] = max(jour_prise, date_debut)
             lignes.append(ligne)
 
         # --- debordement de periode : prises recentes dont le rendez-vous depasse la fin ---
@@ -418,7 +476,11 @@ def generer_lignes(
                 ligne["liste_attente_agenda"] = agenda
                 ligne["liste_attente_activite"] = activite
             ligne["origine"] = code_origine_adresse if generateur.random() < part_adresses else "SP"
-            ligne["date_extraction"] = jour_prise
+            ligne["hopital_cs"], ligne["medecin_ext"], ligne["service_ext"] = _construire_adressage(
+                ligne["origine"], entrees, generateur
+            )
+            ligne["modifie_par"], ligne["date_mod"] = construire_modification(jour_prise)
+            ligne["date_extraction"] = max(jour_prise, date_debut)
             lignes.append(ligne)
 
     return lignes
