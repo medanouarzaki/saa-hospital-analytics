@@ -1,0 +1,162 @@
+parametres:
+- nom: nomenclature_diagnostic
+  valeur:
+  - code: A09
+    libelle: Diarrhée et gastro-entérite d'origine présumée infectieuse
+  - code: A90
+    libelle: Dengue
+  - code: B34
+    libelle: Infection virale, siège non précisé
+  - code: E11
+    libelle: Diabète sucré de type 2
+  - code: E86
+    libelle: Déplétion volémique
+  - code: I10
+    libelle: Hypertension essentielle
+  - code: I21
+    libelle: Infarctus aigu du myocarde
+  - code: I50
+    libelle: Insuffisance cardiaque
+  - code: J06
+    libelle: Infection aiguë des voies respiratoires supérieures
+  - code: J18
+    libelle: Pneumopathie, organisme non précisé
+  - code: J45
+    libelle: Asthme
+  - code: K29
+    libelle: Gastrite et duodénite
+  - code: K35
+    libelle: Appendicite aiguë
+  - code: K52
+    libelle: Autres gastro-entérites et colites non infectieuses
+  - code: K59
+    libelle: Autres troubles fonctionnels de l'intestin
+  - code: N10
+    libelle: Néphrite tubulo-interstitielle aiguë
+  - code: N39
+    libelle: Autres affections des voies urinaires
+  - code: O80
+    libelle: Accouchement unique spontané
+  - code: O99
+    libelle: Autres affections maternelles au cours de la grossesse
+  - code: P07
+    libelle: Prématurité et faible poids de naissance
+  - code: R10
+    libelle: Douleurs abdominales et pelviennes
+  - code: R50
+    libelle: Fièvre non précisée
+  - code: R51
+    libelle: Céphalée
+  - code: R55
+    libelle: Syncope et collapsus
+  - code: S00
+    libelle: Traumatisme superficiel de la tête
+  - code: S52
+    libelle: Fracture de l'avant-bras
+  - code: S82
+    libelle: Fracture de la jambe, y compris la cheville
+  - code: T78
+    libelle: Effets indésirables non classés ailleurs
+  - code: Z34
+    libelle: Surveillance d'une grossesse normale
+  - code: Z38
+    libelle: Nouveau-nés selon le lieu de naissance
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Restriction délibérée à une trentaine de codes CIM-10 plausibles pour l''activité mesurée de
+    l''établissement (médecine générale, pédiatrie, gynécologie-obstétrique, cardiologie, dermatologie,
+    ORL, ophtalmologie), à l''exclusion de toute cause nécessitant un acte chirurgical. Une classification
+    complète de la CIM-10 compte plusieurs milliers de codes et n''aurait pas de sens pour un établissement
+    dont la source mesure l''activité chirurgicale à zéro sur deux exercices : la quasi-totalité des codes
+    ne seraient jamais utilisés. Si cette restriction excluait un diagnostic réellement traité, une ligne
+    de facture le portant serait rejetée au chargement plutôt que silencieusement acceptée.'
+- nom: nomenclature_mode_arrivee
+  valeur:
+  - code: PC
+    libelle: Protection civile
+  - code: SMUR
+    libelle: Ambulance SMUR
+  - code: MP
+    libelle: Moyens propres
+  - code: TP
+    libelle: Transport privé
+  unite: couples code-libellé
+  provenance: DOC
+  preuve: S-12
+  note: Le mode d'arrivée aux urgences est documenté par la protection civile, l'ambulance SMUR, les moyens
+    propres et le transport privé (S-12, déjà cité par le registre pour cette colonne).
+- nom: nomenclature_motif_recours
+  valeur:
+  - code: RESP
+    libelle: Motif respiratoire
+  - code: DIG
+    libelle: Motif digestif
+  - code: TRAUM
+    libelle: Traumatisme
+  - code: CARDIO
+    libelle: Motif cardiovasculaire
+  - code: FIEVRE
+    libelle: Fièvre, syndrome infectieux
+  - code: AUTRE
+    libelle: Autre motif
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: S-13
+  note: S-13 classe les motifs de consultation aux urgences par chapitre de la CIM-10, sans énumérer de
+    liste précise. Les six motifs posés ici reprennent des regroupements usuels de chapitres, pas la CIM-10
+    elle-même. Si cette liste était fausse, la répartition des passages par motif serait invraisemblable,
+    sans effet sur aucun total.
+- nom: nomenclature_niveau_tri
+  valeur:
+  - code: '1'
+    libelle: Niveau 1 - Réanimation immédiate
+  - code: '2'
+    libelle: Niveau 2 - Urgence vitale
+  - code: '3'
+    libelle: Niveau 3 - Urgence relative
+  - code: '4'
+    libelle: Niveau 4 - Consultation urgente
+  - code: '5'
+    libelle: Niveau 5 - Consultation non urgente
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: S-12
+  note: S-12 ne distingue que trois groupes de gravité (urgences vitales environ 10 %, consultations non
+    urgentes 64 %, solde de 26 % en urgences réelles non vitales), déjà noté au registre pour cette colonne
+    comme une réserve explicite sur son échelle. Le nombre de niveaux retenu ici, cinq, est une décision
+    posée, non démontrée par une source. Si l'échelle réelle comptait un nombre de niveaux différent,
+    la correspondance entre les cinq niveaux et les trois groupes mesurés par S-12 resterait à établir,
+    sans effet sur aucun total.
+- nom: nomenclature_orientation_sortie
+  valeur:
+  - code: RD
+    libelle: Retour à domicile
+  - code: HO
+    libelle: Hospitalisation
+  - code: TR
+    libelle: Transfert
+  - code: SC
+    libelle: Sortie contre avis médical
+  - code: DC
+    libelle: Décès
+  unite: couples code-libellé
+  provenance: DOC
+  preuve: S-27
+  note: Les articles 42, 44, 46 et 47 du règlement intérieur distinguent le retour à domicile, l'hospitalisation,
+    le transfert, la sortie contre avis médical et le décès comme issues du passage (S-27, déjà cité par
+    le registre pour cette colonne).
+- nom: nomenclature_motif_transfert
+  valeur:
+  - code: DISC
+    libelle: Discipline non disponible
+  - code: TECH
+    libelle: Technique non disponible
+  - code: PLAT
+    libelle: Plateau technique insuffisant
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: S-27
+  note: L'article 47 du règlement intérieur prévoit le transfert lorsque les soins requis relèvent d'une
+    discipline ou d'une technique n'existant pas à l'hôpital, sans énumérer les disciplines concernées.
+    Les trois motifs posés ici reprennent la formulation même de l'article, sans la détailler par discipline.

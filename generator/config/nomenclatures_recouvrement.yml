@@ -1,0 +1,105 @@
+parametres:
+- nom: nomenclature_type_facture
+  valeur:
+  - code: PUB
+    libelle: Entités publiques
+  - code: PRIV
+    libelle: Entités privées et particuliers
+  - code: MUT
+    libelle: Mutuelles d'accidents
+  unite: couples code-libellé
+  provenance: DOC
+  preuve: S-09
+  note: Le module Facturación admet la facturation aux entités publiques, aux entités privées et particuliers,
+    et aux mutuelles d'accidents (S-09, déjà cité par le registre pour cette colonne).
+- nom: nomenclature_etat_facture
+  valeur:
+  - code: FAC
+    libelle: Facturée
+  - code: EA
+    libelle: En attente de facturation
+  - code: AU
+    libelle: Autre état
+  unite: couples code-libellé
+  provenance: DOC
+  preuve: S-09
+  note: 'Le module Facturación contrôle explicitement l''état des activités réalisées : facturées, en
+    attente de facturation, et autres états (S-09, déjà cité par le registre pour cette colonne).'
+- nom: nomenclature_mode_reglement
+  valeur:
+  - code: ESP
+    libelle: Espèces
+  - code: CHQ
+    libelle: Chèque
+  - code: VIR
+    libelle: Virement
+  - code: CB
+    libelle: Carte bancaire
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune source ouverte ne documente les moyens de paiement acceptés au guichet d'un hôpital public
+    marocain ; la Cour des comptes décrit seulement un versement direct chez le régisseur (déjà noté au
+    registre pour cette colonne). Les quatre modes posés ici sont des moyens de paiement usuels. Si la
+    répartition retenue était fausse, aucun taux de recouvrement ni aucune ancienneté de créance n'en
+    serait affecté, ces grandeurs ne dépendant que du montant et de la date.
+- nom: nomenclature_type_debiteur
+  valeur:
+  - code: PUB
+    libelle: Public
+  - code: PRIV
+    libelle: Privé
+  - code: MUT
+    libelle: Mutualiste
+  - code: PART
+    libelle: Particulier
+  unite: couples code-libellé
+  provenance: DOC
+  preuve: S-09
+  note: Le module Facturación distingue les débiteurs publics, privés, mutualistes et particuliers (S-09,
+    déjà cité par le registre pour cette colonne).
+- nom: nomenclature_motif_non_recouvrement
+  valeur:
+  - code: SR
+    libelle: Sortie sans règlement
+  - code: PNI
+    libelle: Patient non identifié
+  - code: EV
+    libelle: Évasion
+  unite: couples code-libellé
+  provenance: DOC
+  preuve: S-20
+  note: Le rapport de la Cour des comptes relève des sorties sans règlement, des patients non identifiés
+    et des évasions comme motifs de non-recouvrement (S-20, déjà cité par le registre pour cette colonne).
+- nom: nomenclature_canal_relance
+  valeur:
+  - code: TEL
+    libelle: Téléphone
+  - code: COUR
+    libelle: Courrier
+  - code: SMS
+    libelle: SMS
+  - code: EMAIL
+    libelle: Courriel
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune source ouverte ne documente les canaux de relance employés dans cet établissement ; la
+    source disponible sur le recouvrement décrit au contraire une carence de diligences (déjà noté au
+    registre pour cette colonne). Canaux posés par convention.
+- nom: nomenclature_resultat_relance
+  valeur:
+  - code: PAYE
+    libelle: Payé
+  - code: PART
+    libelle: Paiement partiel
+  - code: SANS
+    libelle: Sans effet
+  - code: REFUS
+    libelle: Refus
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune source ouverte ne documente le résultat d'une procédure de relance dans cet établissement,
+    dont la seule source disponible sur le recouvrement décrit l'absence de diligences (déjà noté au registre
+    pour cette colonne). Résultats posés par convention.
