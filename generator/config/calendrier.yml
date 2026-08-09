@@ -1,0 +1,235 @@
+parametres:
+  - nom: ferie_fixe_nouvel_an
+    valeur: "01-01"
+    unite: jour-mois récurrent
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Férié fixe repris du document de cadrage, non individuellement corroboré
+      par une entrée du registre des sources : S-26 mentionne des « fériés
+      fixes » sans les énumérer un à un, sauf Yennayer et Aïd Al Wahda.
+
+  - nom: ferie_fixe_manifeste_independance
+    valeur: "01-11"
+    unite: jour-mois récurrent
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Férié fixe repris du document de cadrage, non individuellement
+      corroboré par une entrée du registre des sources.
+
+  - nom: ferie_fixe_nouvel_an_amazigh
+    valeur: "01-14"
+    unite: jour-mois récurrent
+    provenance: DOC
+    preuve: S-26
+    note: >-
+      « Yennayer le 14 janvier ».
+
+  - nom: ferie_fixe_fete_travail
+    valeur: "05-01"
+    unite: jour-mois récurrent
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Férié fixe repris du document de cadrage, non individuellement
+      corroboré par une entrée du registre des sources.
+
+  - nom: ferie_fixe_fete_trone
+    valeur: "07-30"
+    unite: jour-mois récurrent
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Férié fixe repris du document de cadrage, non individuellement
+      corroboré par une entrée du registre des sources.
+
+  - nom: ferie_fixe_oued_eddahab
+    valeur: "08-14"
+    unite: jour-mois récurrent
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Férié fixe repris du document de cadrage, non individuellement
+      corroboré par une entrée du registre des sources.
+
+  - nom: ferie_fixe_revolution_roi_peuple
+    valeur: "08-20"
+    unite: jour-mois récurrent
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Férié fixe repris du document de cadrage, non individuellement
+      corroboré par une entrée du registre des sources.
+
+  - nom: ferie_fixe_fete_jeunesse
+    valeur: "08-21"
+    unite: jour-mois récurrent
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Férié fixe repris du document de cadrage, non individuellement
+      corroboré par une entrée du registre des sources.
+
+  - nom: ferie_fixe_marche_verte
+    valeur: "11-06"
+    unite: jour-mois récurrent
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Férié fixe repris du document de cadrage, non individuellement
+      corroboré par une entrée du registre des sources.
+
+  - nom: ferie_fixe_fete_independance
+    valeur: "11-18"
+    unite: jour-mois récurrent
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Férié fixe repris du document de cadrage, non individuellement
+      corroboré par une entrée du registre des sources.
+
+  - nom: ferie_fixe_aid_al_wahda
+    valeur: "10-31"
+    unite: jour-mois récurrent
+    provenance: DOC
+    preuve: S-26
+    note: >-
+      « Aïd Al Wahda le 31 octobre ». Ne s'applique pas avant
+      aid_al_wahda_premiere_annee.
+
+  - nom: aid_al_wahda_date_acte
+    valeur: "2025-11"
+    unite: mois
+    provenance: DOC
+    preuve: S-26
+    note: >-
+      « institué par décret royal de novembre 2025 ». Le jour exact du décret
+      n'est pas donné par la source, seuls le mois et l'année le sont.
+
+  - nom: aid_al_wahda_premiere_annee
+    valeur: 2026
+    unite: année
+    provenance: DOC
+    preuve: S-26
+    note: >-
+      Dérivé par nécessité logique depuis aid_al_wahda_date_acte : un décret
+      de novembre 2025 est postérieur au 31 octobre 2025, donc ce jour-là ne
+      peut pas avoir été férié. Le premier 31 octobre qui suit l'acte est
+      celui de 2026. Si cette dérivation était fausse, un jour férié serait
+      appliqué une année où le décret qui le fonde n'existait pas encore.
+
+  - nom: ramadan_debut_2024
+    valeur: "2024-03-11"
+    unite: date
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Reprise du document de cadrage, non corroborée par le registre des
+      sources qui ne documente que l'exercice 2026. Si cette date était
+      fausse, les grandeurs dérivées pour 2024 en seraient faussées.
+
+  - nom: ramadan_fin_2024
+    valeur: "2024-04-09"
+    unite: date
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Reprise du document de cadrage, non corroborée par le registre des
+      sources.
+
+  - nom: aid_al_fitr_2024
+    valeur: "2024-04-10"
+    unite: date
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Reprise du document de cadrage, non corroborée par le registre des
+      sources.
+
+  - nom: aid_al_adha_2024
+    valeur: "2024-06-17"
+    unite: date
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Reprise du document de cadrage, non corroborée par le registre des
+      sources.
+
+  - nom: ramadan_debut_2025
+    valeur: "2025-03-01"
+    unite: date
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Reprise du document de cadrage, non corroborée par le registre des
+      sources.
+
+  - nom: ramadan_fin_2025
+    valeur: "2025-03-30"
+    unite: date
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Reprise du document de cadrage, non corroborée par le registre des
+      sources.
+
+  - nom: aid_al_fitr_2025
+    valeur: "2025-03-31"
+    unite: date
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Reprise du document de cadrage, non corroborée par le registre des
+      sources.
+
+  - nom: aid_al_adha_2025
+    valeur: "2025-06-07"
+    unite: date
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Reprise du document de cadrage, non corroborée par le registre des
+      sources.
+
+  - nom: ramadan_debut_2026
+    valeur: "2026-02-19"
+    unite: date
+    provenance: DOC
+    preuve: S-26
+    note: >-
+      « Ramadan 2026 à partir du 19 février ».
+
+  - nom: ramadan_fin_2026
+    valeur: "2026-03-19"
+    unite: date
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Reprise du document de cadrage. S-26 donne le début du Ramadan 2026
+      mais pas sa fin ; cette date n'est donc pas corroborée par le registre
+      des sources.
+
+  - nom: aid_al_fitr_2026
+    valeur: "2026-03-20"
+    unite: date
+    provenance: DOC
+    preuve: S-26
+    note: >-
+      « Aïd al-Fitr le 20 mars ».
+
+  - nom: aid_al_adha_2026
+    valeur: "2026-05-27"
+    unite: date
+    provenance: DOC
+    preuve: S-26
+    note: >-
+      « Aïd al-Adha le 27 mai ».
+
+  - nom: duree_aid_jours
+    valeur: 2
+    unite: jours
+    provenance: DOC
+    preuve: S-26
+    note: >-
+      « Les deux Aïd donnent deux jours fériés dans le secteur public ».
