@@ -352,3 +352,188 @@ def test_reproductibilite_deux_graines_deux_formats(generation: dict) -> None:
     # contrôle positif : une graine différente doit produire des empreintes différentes,
     # sans quoi le test ne prouverait rien sur la sensibilité réelle à la graine
     assert empreintes_a1_csv != empreintes_b_csv
+
+
+def test_aucune_colonne_degeneree(generation: dict) -> None:
+    entrees = generation["entrees"]
+    lignes = generation["lignes"]
+
+    identifiants = {
+        c["colonne"] for c in entrees["colonnes_identifiants"]["valeur"] if c["table"] == TABLE
+    }
+
+    par_patient = {}
+    for ligne in lignes:
+        par_patient.setdefault(ligne["n_ipp"], ligne)
+    n_fiches = len(par_patient)
+
+    for colonne in registre.colonnes_table(TABLE):
+        valeurs_lignes = {ligne[colonne] for ligne in lignes}
+        assert len(valeurs_lignes) > 1, f"{colonne} : une seule valeur distincte sur la table"
+
+        if colonne in identifiants:
+            continue
+        valeurs_fiches = {ligne[colonne] for ligne in par_patient.values()}
+        assert len(valeurs_fiches) < n_fiches, (
+            f"{colonne} : autant de valeurs distinctes que de fiches ({n_fiches})"
+        )
+
+
+def test_coherence_intra_ligne(generation: dict) -> None:
+    entrees = generation["entrees"]
+    lignes = generation["lignes"]
+    total = len(lignes)
+
+    for contrainte in entrees["contraintes_coherence"]["valeur"]:
+        tolerance = contrainte["tolerance"]
+        nature = contrainte["nature"]
+
+        if nature == "egalite":
+            n_violations = sum(
+                1
+                for ligne in lignes
+                if ligne[contrainte["colonne_a"]] != ligne[contrainte["colonne_b"]]
+            )
+        elif nature == "appartenance":
+            n_violations = sum(
+                1
+                for ligne in lignes
+                if ligne[contrainte["colonne_a"]] == contrainte["valeur_a_declenchante"]
+                and ligne[contrainte["colonne_b"]] in contrainte["valeurs_b_interdites"]
+            )
+        elif nature == "derivation":
+            table = entrees[contrainte["table_derivation"]]["valeur"]
+            n_violations = sum(
+                1
+                for ligne in lignes
+                if ligne[contrainte["colonne_b"]] != table.get(ligne[contrainte["colonne_a"]])
+            )
+        else:
+            raise ValueError(f"nature de contrainte inconnue : {nature!r}")
+
+        part_violations = n_violations / total
+        assert part_violations <= tolerance, (
+            contrainte["colonne_a"],
+            contrainte["colonne_b"],
+            nature,
+            part_violations,
+        )
+
+
+def test_ordres_vraisemblance(generation: dict) -> None:
+    entrees = generation["entrees"]
+    lignes = generation["lignes"]
+
+    # 1. la piece d'identite dominante chez les nationaux l'est effectivement dans la sortie
+    distribution_piece = entrees["distribution_piece_identite"]["valeur"]["national"]
+    code_piece_dominant = max(distribution_piece, key=distribution_piece.get)
+    compte_piece = Counter(
+        ligne["type_piece_identite"] for ligne in lignes if ligne["nationalite"] == "504"
+    )
+    assert compte_piece.most_common(1)[0][0] == code_piece_dominant
+
+    # 2. aucune fiche mineure n'est veuve : trouve le code veuf par son libellé (controle positif
+    # implicite, une KeyError ferait echouer le test si aucun libelle ne contient VEUF)
+    code_veuf = next(
+        couple["code"]
+        for couple in entrees["nomenclature_etat_civil"]["valeur"]
+        if "VEUF" in couple["libelle"].upper()
+    )
+    n_mineurs_veufs = 0
+    for ligne in lignes:
+        age_annees = (ligne["date_attribution"] - ligne["date_naissance"]).days / 365
+        if age_annees < patients.AGE_MAJORITE_ANNEES and ligne["etat_civil"] == code_veuf:
+            n_mineurs_veufs += 1
+    assert n_mineurs_veufs == 0
+
+    # 3. aucune fiche sans compagnie d'assurance n'est de type assure (regle deja generique au
+    # test de coherence intra-ligne ; reaffirmee ici comme ordre explicite de l'etape 3)
+    contrainte_assurance = next(
+        c
+        for c in entrees["contraintes_coherence"]["valeur"]
+        if c["colonne_a"] == "compagnie_assurance"
+    )
+    n_violations = sum(
+        1
+        for ligne in lignes
+        if ligne["compagnie_assurance"] == contrainte_assurance["valeur_a_declenchante"]
+        and ligne["type_patient"] in contrainte_assurance["valeurs_b_interdites"]
+    )
+    assert n_violations == 0
+
+    # 4. la part de deces croit avec l'age : verifie l'ordre sur chaque paire de tranches
+    # consecutives, sur les fiches distinctes (l'exitus est une propriete de la fiche, pas de
+    # la ligne : une fiche modifiee ne doit pas etre comptee deux fois)
+    tranches = entrees["structure_age"]["valeur"]["tranches"]
+    par_patient = {}
+    for ligne in lignes:
+        par_patient.setdefault(ligne["n_ipp"], ligne)
+
+    parts_par_tranche = []
+    for tranche in tranches:
+        n_exitus = 0
+        n_total = 0
+        for ligne in par_patient.values():
+            age_jours = (ligne["date_attribution"] - ligne["date_naissance"]).days
+            if tranche_de_age_jours(age_jours, tranches) != tranche:
+                continue
+            n_total += 1
+            if ligne["exitus"]:
+                n_exitus += 1
+        assert n_total > 0
+        parts_par_tranche.append(n_exitus / n_total)
+
+    for avant, apres in zip(parts_par_tranche, parts_par_tranche[1:], strict=False):
+        assert apres > avant, (tranches, parts_par_tranche)
+
+
+def test_matiere_du_rapprochement(generation: dict) -> None:
+    lignes = generation["lignes"]
+
+    par_patient = {}
+    for ligne in lignes:
+        par_patient.setdefault(ligne["n_ipp"], ligne)
+    fiches = list(par_patient.values())
+    n_fiches = len(fiches)
+
+    groupes = {}
+    for ligne in fiches:
+        cle = (ligne["nom_famille_1"], ligne["date_naissance"])
+        groupes.setdefault(cle, []).append(ligne["n_ipp"])
+    couples_nom_naissance = sum(
+        len(ipps) * (len(ipps) - 1) // 2 for ipps in groupes.values() if len(ipps) > 1
+    )
+    # mesure sur graine 1 : 549 couples ; seuil pose a 50, tres en-deca de la mesure, pour ne
+    # pas rendre le test fragile a une variation de graine tout en restant strictement positif
+    assert couples_nom_naissance > 50
+
+    colonnes_identite = ["nom", "nom_famille_1", "date_naissance"]
+    identites = Counter(tuple(ligne[c] for c in colonnes_identite) for ligne in fiches)
+    n_uniques = sum(1 for v in identites.values() if v == 1)
+    assert n_uniques < n_fiches
+
+
+def test_taux_renseignement(generation: dict) -> None:
+    entrees = generation["entrees"]
+    lignes = generation["lignes"]
+    total = len(lignes)
+
+    taux_attendu = entrees["taux_renseignement"]["valeur"]
+    # tolerance mesuree sur 5 graines independantes : ecart maximal observe 0,0056
+    TOLERANCE = 0.02
+    for colonne, taux in taux_attendu.items():
+        n_renseigne = sum(1 for ligne in lignes if ligne[colonne] is not None)
+        part = n_renseigne / total
+        assert abs(part - taux) < TOLERANCE, (colonne, taux, part)
+
+
+def test_tracabilite_repartie(generation: dict) -> None:
+    lignes = generation["lignes"]
+
+    valeurs_cree_par = {ligne["cree_par"] for ligne in lignes}
+    assert len(valeurs_cree_par) > 1
+
+    valeurs_modifie_par = {
+        ligne["modifie_par"] for ligne in lignes if ligne["modifie_par"] is not None
+    }
+    assert len(valeurs_modifie_par) > 1
