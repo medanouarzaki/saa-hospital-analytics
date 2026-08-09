@@ -1,0 +1,238 @@
+parametres:
+  - nom: capacite_litiere_fonctionnelle
+    valeur: 40
+    unite: lits
+    provenance: DOC
+    preuve: S-30
+    note: >-
+      Tableau des indicateurs hospitaliers, ligne HP sidi said, page 102,
+      colonne « Capacité litière fonctionnelle ».
+
+  - nom: journees_hospitalisation
+    valeur: 7851
+    unite: journées par an
+    provenance: DOC
+    preuve: S-30
+    note: >-
+      Tableau des indicateurs hospitaliers, ligne HP sidi said, page 102,
+      colonne « Journées d'hospitalisation ».
+
+  - nom: admissions_annuelles
+    valeur: 1197
+    unite: admissions par an
+    provenance: DOC
+    preuve: S-30
+    note: >-
+      Tableau des indicateurs hospitaliers, ligne HP sidi said, page 102,
+      colonne « Admissions ».
+
+  - nom: tom_publie
+    valeur: 53.8
+    unite: pourcentage
+    provenance: DOC
+    preuve: S-30
+    note: >-
+      Tableau des indicateurs hospitaliers, ligne HP sidi said, page 102,
+      colonne « TOM » (taux d'occupation moyen). Reconstitué à moins de 0,05
+      depuis la capacité, les journées et 365 jours dans l'année de
+      référence — la variante à 366 jours ne reproduit pas cette valeur à la
+      même précision.
+
+  - nom: dms_publie
+    valeur: 6.6
+    unite: jours
+    provenance: DOC
+    preuve: S-30
+    note: >-
+      Tableau des indicateurs hospitaliers, ligne HP sidi said, page 102,
+      colonne « DMS » (durée moyenne de séjour).
+
+  - nom: irot_publie
+    valeur: 5.6
+    unite: jours
+    provenance: DOC
+    preuve: S-30
+    note: >-
+      Tableau des indicateurs hospitaliers, ligne HP sidi said, page 102,
+      colonne « IROT » (intervalle de rotation).
+
+  - nom: trot_publie
+    valeur: 29.9
+    unite: rotations par an
+    provenance: DOC
+    preuve: S-30
+    note: >-
+      Tableau des indicateurs hospitaliers, ligne HP sidi said, page 102,
+      colonne « TROT » (taux de rotation).
+
+  - nom: consultations_specialisees_externes
+    valeur: 4142
+    unite: consultations par an
+    provenance: DOC
+    preuve: S-30
+    note: >-
+      Tableau des consultations médicales spécialisées externes, ligne HP
+      Sidi Said, page 109, colonne « Nombre total de consultations
+      spécialisées externes ».
+
+  - nom: medecins_consultations_specialisees
+    valeur: 8
+    unite: médecins
+    provenance: DOC
+    preuve: S-30
+    note: >-
+      Tableau des consultations médicales spécialisées externes, ligne HP
+      Sidi Said, page 109, colonne « Nombre total des médecins ». Ce
+      décompte est propre à ce tableau et ne compte pas l'effectif médical
+      de l'établissement, qui n'est pas établi par ailleurs.
+
+  - nom: consultations_par_medecin_publie
+    valeur: 518
+    unite: consultations par médecin et par an
+    provenance: DOC
+    preuve: S-30
+    note: >-
+      Tableau des consultations médicales spécialisées externes, ligne HP
+      Sidi Said, page 109, colonne « Consultations spécialisées externe par
+      médecin ». Reconstitué exactement par arrondi du quotient des deux
+      grandeurs précédentes.
+
+  - nom: prelevements_laboratoire
+    valeur: 9625
+    unite: prélèvements par an
+    provenance: DOC
+    preuve: S-30
+    note: >-
+      Tableau des activités des laboratoires, ligne HP Sidi Said, page 113,
+      colonne « Nombre Total de prélèvements ».
+
+  - nom: examens_laboratoire_total
+    valeur: 49597
+    unite: examens par an
+    provenance: DOC
+    preuve: S-30
+    note: >-
+      Tableau des activités des laboratoires, ligne HP Sidi Said, page 113,
+      colonne « Total ». Égale exactement la somme des six colonnes de
+      catégorie de la même ligne.
+
+  - nom: examens_bacteriologie
+    valeur: 0
+    unite: examens par an
+    provenance: DOC
+    preuve: S-30
+    note: >-
+      Tableau des activités des laboratoires, ligne HP Sidi Said, page 113,
+      colonne « Bactériologie ». Zéro imprimé dans la source, distinct d'une
+      absence de ligne : la ligne existe et porte cette valeur.
+
+  - nom: examens_parasitologie
+    valeur: 0
+    unite: examens par an
+    provenance: DOC
+    preuve: S-30
+    note: >-
+      Tableau des activités des laboratoires, ligne HP Sidi Said, page 113,
+      colonne « Parasitologie ». Zéro imprimé dans la source, distinct d'une
+      absence de ligne.
+
+  - nom: examens_hygiene_alimentaire
+    valeur: 0
+    unite: examens par an
+    provenance: DOC
+    preuve: S-30
+    note: >-
+      Tableau des activités des laboratoires, ligne HP Sidi Said, page 113,
+      colonne « Hygiène alimentaire ». Zéro imprimé dans la source. C'est le
+      troisième zéro de la ligne, non nommé par le document de cadrage
+      antérieur, identifié ici par lecture directe de l'en-tête du tableau.
+
+  - nom: examens_immuno_serologie
+    valeur: 6866
+    unite: examens par an
+    provenance: DOC
+    preuve: S-30
+    note: >-
+      Tableau des activités des laboratoires, ligne HP Sidi Said, page 113,
+      colonne « Immuno-sérologie ».
+
+  - nom: examens_hematologie_transfusion
+    valeur: 13206
+    unite: examens par an
+    provenance: DOC
+    preuve: S-30
+    note: >-
+      Tableau des activités des laboratoires, ligne HP Sidi Said, page 113,
+      colonne « Hématologie et transfusion ».
+
+  - nom: examens_chimie_biologie
+    valeur: 29525
+    unite: examens par an
+    provenance: DOC
+    preuve: S-30
+    note: >-
+      Tableau des activités des laboratoires, ligne HP Sidi Said, page 113,
+      colonne « Chimie biologie (Biochimie) ».
+
+  - nom: interventions_chirurgicales
+    valeur: 0
+    unite: interventions par an
+    provenance: DOC
+    preuve: S-30
+    note: >-
+      Absence de ligne HP Sidi Said au tableau des interventions
+      chirurgicales, page 105, sur les deux exercices publiés — ce n'est pas
+      un zéro imprimé mais une absence, établie par quatre contrôles
+      indépendants dans docs/decisions/0003-volumetrie.md (recherche
+      exhaustive de dénomination, contrôle de somme provinciale, cohérence
+      de structure du document, corroboration par un rapport de la Cour des
+      comptes). Cette grandeur n'est pas dans les trois lignes extraites par
+      ce lot ; elle est reprise de cette décision déjà mesurée, pas de
+      mémoire.
+
+  - nom: ratio_examens_par_prelevement
+    valeur: 5.15
+    unite: examens par prélèvement
+    provenance: DOC
+    preuve: S-30
+    note: >-
+      Quotient examens_laboratoire_total / prelevements_laboratoire =
+      49597 / 9625, arrondi au centième. Relation R-19 du registre des
+      relations injectées : ce nom de paramètre est celui qu'y porte cette
+      relation.
+
+  - nom: passages_urgences_par_jour
+    valeur: 30
+    unite: passages par jour
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Scénario retenu de l'analyse de sensibilité, entre les bornes 14 et
+      54. La borne haute (54) transpose un ratio passages par lit observé à
+      l'hôpital Mohamed V, hôpital de recours, à la capacité litière de
+      Sidi Said ; cette transposition est contredite par la seule
+      description disponible du service, qui n'assurait pas la garde faute
+      de généralistes affectés. La borne basse (14) dérive de deux ratios
+      non sourcés (part des séjours issus des urgences, taux
+      d'hospitalisation aux urgences). La valeur retenue, 30, est
+      délibérément placée sous le milieu de la fourchette (34) parce que la
+      borne haute repose sur une transposition contredite par la source,
+      tandis que la borne basse ne souffre que d'un défaut de sourçage de
+      ses ratios : l'asymétrie de la fourchette reflète l'asymétrie de la
+      confiance accordée à ses bornes. Si cette hypothèse était fausse,
+      c'est tout le dimensionnement de la table des passages aux urgences
+      qui serait à l'échelle d'un service différent de celui décrit par les
+      sources disponibles.
+
+  - nom: scenarios_passages_urgences
+    valeur: [14, 30, 54]
+    unite: passages par jour
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Les trois valeurs de l'analyse de sensibilité aux passages aux
+      urgences : la borne basse, le scénario retenu et la borne haute,
+      décrits au paramètre passages_urgences_par_jour. Si l'une de ces
+      bornes était fausse, l'amplitude de l'analyse de sensibilité présentée
+      au rapport serait faussée sans que le scénario retenu change
+      nécessairement.

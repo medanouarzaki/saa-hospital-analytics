@@ -1,0 +1,56 @@
+parametres:
+  - nom: date_debut
+    valeur: "2024-01-01"
+    unite: date
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Borne de début retenue par décision de cadrage, non issue d'une source
+      externe. Si elle était fausse, la fenêtre entière de génération se
+      décalerait et le facteur d'échelle appliqué aux grandeurs annuelles de
+      l'exercice de référence en serait faussé.
+
+  - nom: date_fin
+    valeur: "2026-06-30"
+    unite: date
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Borne de fin retenue par décision de cadrage, non issue d'une source
+      externe. Si elle était fausse, le nombre de jours de la période et le
+      facteur d'échelle en seraient faussés dans les mêmes proportions.
+
+  - nom: nombre_jours_periode
+    valeur: 912
+    unite: jours
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Calculé comme (date_fin - date_debut).days + 1 sur les deux dates de
+      cadrage ci-dessus. Le test recalcule cette valeur de façon indépendante
+      depuis les deux dates : si l'une des deux est mal recopiée, le calcul
+      diverge de cette valeur et le test rougit.
+
+  - nom: annee_reference
+    valeur: 2024
+    unite: année
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Exercice retenu comme année de référence pour la mise à l'échelle des
+      grandeurs annuelles, par décision de cadrage : c'est le dernier
+      exercice complet publié par la source des indicateurs hospitaliers au
+      moment de l'extraction.
+
+  - nom: jours_annee_reference
+    valeur: 365
+    unite: jours
+    provenance: DOC
+    preuve: S-30
+    note: >-
+      Mesuré, non présumé : les quatre indicateurs de séjour publiés pour
+      l'établissement (tableau des indicateurs hospitaliers, ligne HP sidi
+      said, page 102) ne se reconstituent depuis la capacité litière
+      fonctionnelle, les journées d'hospitalisation et les admissions qu'en
+      posant 365 jours dans l'année de référence — la variante à 366 jours
+      échoue sur deux des quatre indicateurs, à plus de 0,05 en écart absolu.
