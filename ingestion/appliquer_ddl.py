@@ -18,12 +18,11 @@ RACINE = Path(__file__).resolve().parent.parent
 DOSSIER_DDL = RACINE / "ingestion" / "ddl"
 FICHIER_ENV = RACINE / ".env"
 
-CLES_CONNEXION = [
+CLES_OBLIGATOIRES = [
     "POSTGRES_HOST",
     "POSTGRES_PORT",
     "POSTGRES_DB",
     "POSTGRES_USER",
-    "POSTGRES_PASSWORD",
 ]
 
 
@@ -87,17 +86,19 @@ def est_vide(instruction: str) -> bool:
 
 def main() -> None:
     variables = charger_environnement()
-    manquantes = [cle for cle in CLES_CONNEXION if not variables.get(cle)]
+    manquantes = [cle for cle in CLES_OBLIGATOIRES if not variables.get(cle)]
     if manquantes:
         print(f"variables de connexion manquantes : {', '.join(manquantes)}", file=sys.stderr)
         raise SystemExit(1)
 
+    # Un mot de passe vide n'est pas un mot de passe manquant : un serveur en
+    # authentification trust n'en exige aucun, et cette valeur n'est donc pas validée.
     conninfo = {
         "host": variables["POSTGRES_HOST"],
         "port": variables["POSTGRES_PORT"],
         "dbname": variables["POSTGRES_DB"],
         "user": variables["POSTGRES_USER"],
-        "password": variables["POSTGRES_PASSWORD"],
+        "password": variables.get("POSTGRES_PASSWORD", ""),
     }
 
     fichiers = sorted(DOSSIER_DDL.glob("*.sql"))
