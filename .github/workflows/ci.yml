@@ -28,6 +28,8 @@ jobs:
 
       - run: uv run pytest tests/test_aucune_trace_processus.py -v
 
+      - run: uv run pytest tests/test_config_generateur.py -v
+
   provenance:
     runs-on: ubuntu-latest
     # Le service n'exige aucun mot de passe : le conteneur est éphémère,
