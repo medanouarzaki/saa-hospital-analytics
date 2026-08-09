@@ -6,7 +6,6 @@ import yaml
 
 RACINE = Path(__file__).resolve().parent.parent.parent
 REGISTRE = RACINE / "docs" / "champs" / "registre_champs.yml"
-DOSSIER_DDL = RACINE / "ingestion" / "ddl"
 
 ENTETE_SCHEMA = """\
 -- Fichier produit mécaniquement depuis le registre des champs : ne pas
@@ -72,16 +71,17 @@ def nom_fichier_table(rang: int, table: str) -> str:
     return f"{rang:02d}_{slug}.sql"
 
 
-def main() -> None:
+def generer(racine: Path = RACINE) -> None:
     with REGISTRE.open(encoding="utf-8") as f:
         entrees = yaml.safe_load(f)
 
     tables = grouper_par_table(entrees)
 
-    DOSSIER_DDL.mkdir(parents=True, exist_ok=True)
+    dossier_ddl = racine / "ingestion" / "ddl"
+    dossier_ddl.mkdir(parents=True, exist_ok=True)
 
     lignes_schema = [ENTETE_SCHEMA.rstrip("\n"), "", "create schema if not exists source;"]
-    (DOSSIER_DDL / "00_schema_source.sql").write_text(
+    (dossier_ddl / "00_schema_source.sql").write_text(
         "\n".join(lignes_schema).rstrip("\n") + "\n", encoding="utf-8"
     )
 
@@ -90,9 +90,9 @@ def main() -> None:
         lignes.extend(rendre_creation(table, colonnes))
         lignes.append("")
         lignes.extend(rendre_commentaires(table, colonnes))
-        chemin = DOSSIER_DDL / nom_fichier_table(rang, table)
+        chemin = dossier_ddl / nom_fichier_table(rang, table)
         chemin.write_text("\n".join(lignes).rstrip("\n") + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":
-    main()
+    generer()

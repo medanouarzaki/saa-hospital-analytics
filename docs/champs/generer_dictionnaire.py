@@ -6,8 +6,6 @@ import yaml
 
 RACINE = Path(__file__).resolve().parent.parent.parent
 REGISTRE = RACINE / "docs" / "champs" / "registre_champs.yml"
-CIBLE_MD = RACINE / "docs" / "champs" / "dictionnaire_donnees.md"
-CIBLE_TEX = RACINE / "report" / "dictionnaire_donnees.tex"
 
 ENTETES = ["colonne", "type_metier", "libelle_hosix", "provenance", "preuve", "note"]
 
@@ -74,18 +72,20 @@ def rendre_tex(tables: dict[str, list[dict]]) -> str:
     return "\n".join(lignes).rstrip("\n") + "\n"
 
 
-def main() -> None:
+def generer(racine: Path = RACINE) -> None:
     with REGISTRE.open(encoding="utf-8") as f:
         entrees = yaml.safe_load(f)
 
     tables = grouper_par_table(entrees)
 
-    CIBLE_MD.parent.mkdir(parents=True, exist_ok=True)
-    CIBLE_MD.write_text(rendre_markdown(tables), encoding="utf-8")
+    cible_md = racine / "docs" / "champs" / "dictionnaire_donnees.md"
+    cible_md.parent.mkdir(parents=True, exist_ok=True)
+    cible_md.write_text(rendre_markdown(tables), encoding="utf-8")
 
-    CIBLE_TEX.parent.mkdir(parents=True, exist_ok=True)
-    CIBLE_TEX.write_text(rendre_tex(tables), encoding="utf-8")
+    cible_tex = racine / "report" / "dictionnaire_donnees.tex"
+    cible_tex.parent.mkdir(parents=True, exist_ok=True)
+    cible_tex.write_text(rendre_tex(tables), encoding="utf-8")
 
 
 if __name__ == "__main__":
-    main()
+    generer()

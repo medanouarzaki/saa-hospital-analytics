@@ -6,7 +6,6 @@ import yaml
 
 RACINE = Path(__file__).resolve().parent.parent.parent
 REGISTRE = RACINE / "docs" / "champs" / "registre_champs.yml"
-CIBLE = RACINE / "dbt" / "models" / "sources" / "source.yml"
 
 
 def grouper_par_table(entrees: list[dict]) -> dict[str, list[dict]]:
@@ -28,7 +27,7 @@ def rendre_colonne(colonne: dict) -> dict:
     }
 
 
-def main() -> None:
+def generer(racine: Path = RACINE) -> None:
     with REGISTRE.open(encoding="utf-8") as f:
         entrees = yaml.safe_load(f)
 
@@ -50,12 +49,13 @@ def main() -> None:
         ],
     }
 
-    CIBLE.parent.mkdir(parents=True, exist_ok=True)
-    with CIBLE.open("w", encoding="utf-8") as f:
+    cible = racine / "dbt" / "models" / "sources" / "source.yml"
+    cible.parent.mkdir(parents=True, exist_ok=True)
+    with cible.open("w", encoding="utf-8") as f:
         f.write("# Fichier produit mécaniquement depuis le registre des champs : ne pas\n")
         f.write("# modifier à la main.\n")
         yaml.safe_dump(schema, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
 
 
 if __name__ == "__main__":
-    main()
+    generer()
