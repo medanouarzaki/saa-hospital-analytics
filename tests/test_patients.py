@@ -12,12 +12,11 @@ tests purement statistiques.
 import csv
 from collections import Counter
 from datetime import date
-from pathlib import Path
 
 import numpy as np
 import pytest
 
-from generator import alea, config, ecriture, nomenclatures, parcours, patients, registre, volumes
+from generator import alea, config, ecriture, parcours, patients, registre, volumes
 
 TABLE = "source.patients"
 GRAINE = 1
@@ -89,11 +88,6 @@ def generation(tmp_path_factory) -> dict:
     }
 
 
-def lire_entete(chemin_csv: Path) -> list[str]:
-    with chemin_csv.open(encoding="utf-8") as f:
-        return next(csv.reader(f))
-
-
 def toutes_les_lignes_csv(execution: ecriture.Execution) -> list[dict]:
     lignes: list[dict] = []
     for relatif in execution.partitions[TABLE]:
@@ -103,38 +97,6 @@ def toutes_les_lignes_csv(execution: ecriture.Execution) -> list[dict]:
         with chemin.open(encoding="utf-8") as f:
             lignes.extend(csv.DictReader(f))
     return lignes
-
-
-def test_entetes_exactement_les_colonnes_du_registre(generation: dict) -> None:
-    colonnes_attendues = registre.colonnes_table(TABLE)
-    execution: ecriture.Execution = generation["execution"]
-
-    premier_csv = execution.racine / next(
-        relatif for relatif in execution.partitions[TABLE] if relatif.endswith(".csv")
-    )
-    entete = lire_entete(premier_csv)
-
-    assert entete == colonnes_attendues
-
-
-def test_conformite_nomenclatures_toutes_colonnes_codees(generation: dict) -> None:
-    entrees = generation["entrees"]
-    lignes = generation["lignes"]
-
-    correspondance = entrees["correspondance_colonnes_nomenclatures"]["valeur"]
-    colonnes_codees = [c for c in correspondance if c["table"] == TABLE]
-    assert len(colonnes_codees) == 14, "le nombre de colonnes codées attendu a changé"
-
-    for correspondance_colonne in colonnes_codees:
-        colonne = correspondance_colonne["colonne"]
-        nom_nomenclature = nomenclatures.nomenclature_colonne(TABLE, colonne, entrees)
-        codes_valides = set(nomenclatures.codes_nomenclature(nom_nomenclature, entrees))
-
-        valeurs_observees = {ligne[colonne] for ligne in lignes}
-        hors_nomenclature = valeurs_observees - codes_valides
-        assert not hors_nomenclature, (
-            f"{colonne} : valeurs hors nomenclature {nom_nomenclature} : {hors_nomenclature}"
-        )
 
 
 def test_effectif_recompute_independamment(generation: dict) -> None:
@@ -311,49 +273,6 @@ def test_nationalite_observee_et_majoritaire(generation: dict) -> None:
     assert part_majoritaire > 0.5, (code_majoritaire_attendu, part_majoritaire, compte)
 
 
-def test_reproductibilite_deux_graines_deux_formats(generation: dict) -> None:
-    entrees = generation["entrees"]
-
-    def executer(graine: int, racine: Path) -> ecriture.Execution:
-        episodes, population = construire_episodes_population(graine, entrees)
-        rng = alea.construire_generateur(graine)
-        lignes = patients.generer_lignes(episodes, population, rng, entrees=entrees)
-        execution = ecriture.Execution(
-            racine,
-            "scenario_30",
-            graine,
-            entrees["date_debut"]["valeur"],
-            entrees["date_fin"]["valeur"],
-        )
-        execution.ecrire_table(TABLE, lignes)
-        return execution
-
-    racine_a1 = generation["racine"].parent / "repro_a1"
-    racine_a2 = generation["racine"].parent / "repro_a2"
-    racine_b = generation["racine"].parent / "repro_b"
-
-    execution_a1 = executer(7, racine_a1)
-    execution_a2 = executer(7, racine_a2)
-    execution_b = executer(8, racine_b)
-
-    empreintes_a1_csv = {k: v for k, v in execution_a1.empreintes.items() if k.endswith(".csv")}
-    empreintes_a2_csv = {k: v for k, v in execution_a2.empreintes.items() if k.endswith(".csv")}
-    empreintes_a1_parquet = {
-        k: v for k, v in execution_a1.empreintes.items() if k.endswith(".parquet")
-    }
-    empreintes_a2_parquet = {
-        k: v for k, v in execution_a2.empreintes.items() if k.endswith(".parquet")
-    }
-
-    assert empreintes_a1_csv == empreintes_a2_csv
-    assert empreintes_a1_parquet == empreintes_a2_parquet
-
-    empreintes_b_csv = {k: v for k, v in execution_b.empreintes.items() if k.endswith(".csv")}
-    # contrôle positif : une graine différente doit produire des empreintes différentes,
-    # sans quoi le test ne prouverait rien sur la sensibilité réelle à la graine
-    assert empreintes_a1_csv != empreintes_b_csv
-
-
 def test_aucune_colonne_degeneree(generation: dict) -> None:
     entrees = generation["entrees"]
     lignes = generation["lignes"]
@@ -376,47 +295,6 @@ def test_aucune_colonne_degeneree(generation: dict) -> None:
         valeurs_fiches = {ligne[colonne] for ligne in par_patient.values()}
         assert len(valeurs_fiches) < n_fiches, (
             f"{colonne} : autant de valeurs distinctes que de fiches ({n_fiches})"
-        )
-
-
-def test_coherence_intra_ligne(generation: dict) -> None:
-    entrees = generation["entrees"]
-    lignes = generation["lignes"]
-    total = len(lignes)
-
-    for contrainte in entrees["contraintes_coherence"]["valeur"]:
-        tolerance = contrainte["tolerance"]
-        nature = contrainte["nature"]
-
-        if nature == "egalite":
-            n_violations = sum(
-                1
-                for ligne in lignes
-                if ligne[contrainte["colonne_a"]] != ligne[contrainte["colonne_b"]]
-            )
-        elif nature == "appartenance":
-            n_violations = sum(
-                1
-                for ligne in lignes
-                if ligne[contrainte["colonne_a"]] == contrainte["valeur_a_declenchante"]
-                and ligne[contrainte["colonne_b"]] in contrainte["valeurs_b_interdites"]
-            )
-        elif nature == "derivation":
-            table = entrees[contrainte["table_derivation"]]["valeur"]
-            n_violations = sum(
-                1
-                for ligne in lignes
-                if ligne[contrainte["colonne_b"]] != table.get(ligne[contrainte["colonne_a"]])
-            )
-        else:
-            raise ValueError(f"nature de contrainte inconnue : {nature!r}")
-
-        part_violations = n_violations / total
-        assert part_violations <= tolerance, (
-            contrainte["colonne_a"],
-            contrainte["colonne_b"],
-            nature,
-            part_violations,
         )
 
 

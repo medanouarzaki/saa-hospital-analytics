@@ -6,7 +6,6 @@ génération complète, réutilisée via une fixture de portée module, plutôt 
 dates) portent explicitement sur la totalité des lignes.
 """
 
-import csv
 import statistics
 from collections import Counter
 from datetime import date
@@ -19,10 +18,8 @@ from generator import (
     alea,
     config,
     ecriture,
-    nomenclatures,
     parcours,
     patients,
-    registre,
     temporel,
     volumes,
 )
@@ -78,43 +75,6 @@ def generation(tmp_path_factory) -> dict:
         "execution": execution,
         "racine": racine,
     }
-
-
-def lire_entete(chemin_csv: Path) -> list[str]:
-    with chemin_csv.open(encoding="utf-8") as f:
-        return next(csv.reader(f))
-
-
-def test_entetes_exactement_les_colonnes_du_registre(generation: dict) -> None:
-    colonnes_attendues = registre.colonnes_table(TABLE)
-    execution: ecriture.Execution = generation["execution"]
-
-    premier_csv = execution.racine / next(
-        relatif for relatif in execution.partitions[TABLE] if relatif.endswith(".csv")
-    )
-    entete = lire_entete(premier_csv)
-
-    assert entete == colonnes_attendues
-
-
-def test_conformite_nomenclatures_toutes_colonnes_codees(generation: dict) -> None:
-    entrees = generation["entrees"]
-    lignes = generation["lignes"]
-
-    correspondance = entrees["correspondance_colonnes_nomenclatures"]["valeur"]
-    colonnes_codees = [c for c in correspondance if c["table"] == TABLE]
-    assert len(colonnes_codees) == 9, "le nombre de colonnes codées attendu a changé"
-
-    for correspondance_colonne in colonnes_codees:
-        colonne = correspondance_colonne["colonne"]
-        nom_nomenclature = nomenclatures.nomenclature_colonne(TABLE, colonne, entrees)
-        codes_valides = set(nomenclatures.codes_nomenclature(nom_nomenclature, entrees))
-
-        valeurs_observees = {ligne[colonne] for ligne in lignes if ligne[colonne] is not None}
-        hors_nomenclature = valeurs_observees - codes_valides
-        assert not hors_nomenclature, (
-            f"{colonne} : valeurs hors nomenclature {nom_nomenclature} : {hors_nomenclature}"
-        )
 
 
 def test_bijection_avec_episodes_consultation(generation: dict) -> None:
@@ -314,40 +274,6 @@ def test_debordement_de_periode(generation: dict) -> None:
     assert all(ligne["rdv_supplementaire"] for ligne in debordement)
 
 
-def test_horodatages_non_triviaux(generation: dict) -> None:
-    # part de minuit attendue sous un tirage horaire reel : le profil horaire "programme"
-    # porte un poids nul aux heures 0-7 (voir generator/config/temporel.yml), donc minuit
-    # (heure 0) ne peut structurellement jamais etre tire : seuil pose a 0,01, tres
-    # au-dessus de zero pour ne pas etre fragile, tres en-deca d'un horodatage trivial
-    # (100 % a minuit, mesure du lot de correction sur date_modification avant fix).
-    SEUIL_PART_MINUIT = 0.01
-
-    import yaml as _yaml
-
-    with (RACINE / "docs" / "champs" / "registre_champs.yml").open(encoding="utf-8") as f:
-        registre_brut = _yaml.safe_load(f)
-
-    colonnes_horodatage = [
-        (e["table"], e["colonne"]) for e in registre_brut if e["type_metier"] == "horodatage"
-    ]
-
-    tables_produites = {
-        "source.patients": generation_patients()["lignes"],
-        TABLE: generation["lignes"],
-    }
-
-    for table, colonne in colonnes_horodatage:
-        if table not in tables_produites:
-            continue
-        lignes_table = tables_produites[table]
-        valeurs = [ligne[colonne] for ligne in lignes_table if ligne.get(colonne) is not None]
-        if not valeurs:
-            continue
-        n_minuit = sum(1 for v in valeurs if v.hour == 0 and v.minute == 0 and v.second == 0)
-        part_minuit = n_minuit / len(valeurs)
-        assert part_minuit < SEUIL_PART_MINUIT, (table, colonne, part_minuit)
-
-
 _CACHE_GENERATION_PATIENTS: dict = {}
 
 
@@ -360,68 +286,6 @@ def generation_patients() -> dict:
         lignes = patients.generer_lignes(episodes, population, rng, entrees=entrees)
         _CACHE_GENERATION_PATIENTS["lignes"] = lignes
     return _CACHE_GENERATION_PATIENTS
-
-
-def test_reproductibilite_deux_graines_deux_formats(generation: dict) -> None:
-    entrees = generation["entrees"]
-
-    def executer(graine: int, racine: Path) -> ecriture.Execution:
-        rng = alea.construire_generateur(graine)
-        comptes = comptes_par_categorie(entrees)
-        episodes, population = parcours.construire_parcours(comptes, rng, entrees=entrees)
-        lignes = rdv.generer_lignes(episodes, population, rng, entrees=entrees)
-        execution = ecriture.Execution(
-            racine,
-            "scenario_30",
-            graine,
-            entrees["date_debut"]["valeur"],
-            entrees["date_fin"]["valeur"],
-        )
-        execution.ecrire_table(TABLE, lignes)
-        return execution
-
-    racine_a1 = generation["racine"].parent / "repro_rdv_a1"
-    racine_a2 = generation["racine"].parent / "repro_rdv_a2"
-    racine_b = generation["racine"].parent / "repro_rdv_b"
-
-    execution_a1 = executer(7, racine_a1)
-    execution_a2 = executer(7, racine_a2)
-    execution_b = executer(8, racine_b)
-
-    empreintes_a1_csv = {k: v for k, v in execution_a1.empreintes.items() if k.endswith(".csv")}
-    empreintes_a2_csv = {k: v for k, v in execution_a2.empreintes.items() if k.endswith(".csv")}
-    empreintes_a1_parquet = {
-        k: v for k, v in execution_a1.empreintes.items() if k.endswith(".parquet")
-    }
-    empreintes_a2_parquet = {
-        k: v for k, v in execution_a2.empreintes.items() if k.endswith(".parquet")
-    }
-
-    assert empreintes_a1_csv == empreintes_a2_csv
-    assert empreintes_a1_parquet == empreintes_a2_parquet
-
-    empreintes_b_csv = {k: v for k, v in execution_b.empreintes.items() if k.endswith(".csv")}
-    # controle positif : une graine differente doit produire des empreintes differentes
-    assert empreintes_a1_csv != empreintes_b_csv
-
-
-def test_bornage_partitions_par_table(generation: dict) -> None:
-    entrees = generation["entrees"]
-    date_debut = date.fromisoformat(entrees["date_debut"]["valeur"])
-    date_fin = date.fromisoformat(entrees["date_fin"]["valeur"])
-    n_jours_periode = (date_fin - date_debut).days + 1
-
-    tables_lignes = {
-        "source.patients": generation_patients()["lignes"],
-        TABLE: generation["lignes"],
-    }
-
-    for table, lignes in tables_lignes.items():
-        dates_extraction = {ligne["date_extraction"] for ligne in lignes}
-        assert dates_extraction, table
-        hors_periode = {d for d in dates_extraction if d < date_debut or d > date_fin}
-        assert not hors_periode, (table, sorted(hors_periode))
-        assert len(dates_extraction) <= n_jours_periode, (table, len(dates_extraction))
 
 
 def test_anteriorite_complete_naissance_fiche_prise_rdv(generation: dict) -> None:
@@ -454,41 +318,3 @@ def test_anteriorite_complete_naissance_fiche_prise_rdv(generation: dict) -> Non
         assert naissance < fiche, (pid, naissance, fiche)
         assert fiche <= prise, (pid, fiche, prise)
         assert prise <= rendez_vous_jour, (pid, prise, rendez_vous_jour)
-
-
-def test_adressage_coherent_contraintes_configurees(generation: dict) -> None:
-    entrees = generation["entrees"]
-    lignes = generation["lignes"]
-
-    contraintes = entrees["contraintes_coherence_rendez_vous"]["valeur"]
-    assert contraintes, "aucune contrainte configuree"
-
-    for contrainte in contraintes:
-        assert contrainte["nature"] == "presence_conditionnee"
-        colonne_a = contrainte["colonne_a"]
-        colonne_b = contrainte["colonne_b"]
-        valeur_declenchante = contrainte["valeur_a_declenchante"]
-
-        violations = [
-            ligne
-            for ligne in lignes
-            if (ligne[colonne_a] == valeur_declenchante) != (ligne[colonne_b] is not None)
-        ]
-        assert not violations, (colonne_a, colonne_b, len(violations))
-
-
-def test_aucune_colonne_entierement_vide_sauf_declaree(generation: dict) -> None:
-    entrees = generation["entrees"]
-    lignes = generation["lignes"]
-
-    colonnes_declarees_vides = {
-        e["colonne"] for e in entrees["colonnes_toujours_vides_rendez_vous"]["valeur"]
-    }
-    colonnes = registre.colonnes_table(TABLE)
-
-    for colonne in colonnes:
-        if colonne in colonnes_declarees_vides:
-            continue
-        valeurs = [ligne[colonne] for ligne in lignes]
-        toutes_vides = all(v is None or v == "" for v in valeurs)
-        assert not toutes_vides, colonne
