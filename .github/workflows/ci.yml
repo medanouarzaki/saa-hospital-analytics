@@ -46,6 +46,8 @@ jobs:
 
       - run: uv run pytest tests/test_patients.py -v
 
+      - run: uv run pytest tests/test_rendez_vous.py -v
+
   provenance:
     runs-on: ubuntu-latest
     # Le service n'exige aucun mot de passe : le conteneur est éphémère,
