@@ -1,0 +1,1285 @@
+# Fichier produit mécaniquement depuis le registre des champs : ne pas
+# modifier à la main.
+version: 2
+sources:
+- name: source
+  tables:
+  - name: patients
+    columns:
+    - name: n_ipp
+      description: Relevé de champs, fiche patient, bloc Données principales.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.D01
+        type_metier: code
+    - name: nom
+      description: Relevé de champs, fiche patient, bloc Données principales.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.D02
+        type_metier: texte
+    - name: nom_famille_1
+      description: Relevé de champs, fiche patient, bloc Données principales.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.D03
+        type_metier: texte
+    - name: nom_famille_2
+      description: Relevé de champs, fiche patient, bloc Données principales.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.D04
+        type_metier: texte
+    - name: sexe
+      description: Relevé de champs, fiche patient, bloc Données principales.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.D05
+        type_metier: code
+    - name: date_naissance
+      description: Relevé de champs, fiche patient, bloc Données principales.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.D06
+        type_metier: date
+    - name: type_piece_identite
+      description: Relevé de champs, fiche patient, bloc Données principales.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.D09
+        type_metier: code
+    - name: n_piece_identite
+      description: Relevé de champs, fiche patient, bloc Données principales.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.D10
+        type_metier: texte
+    - name: etat_civil
+      description: Relevé de champs, fiche patient, bloc Données principales.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.D11
+        type_metier: code
+    - name: type_patient
+      description: Relevé de champs, fiche patient, bloc Données principales.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.D12
+        type_metier: code
+    - name: date_photo
+      description: Relevé de champs, fiche patient, bloc Données principales.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.D13
+        type_metier: date
+    - name: modifie_par
+      description: Relevé de champs, fiche patient, bloc Données principales.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.D14
+        type_metier: texte
+    - name: cree_par
+      description: Relevé de champs, fiche patient, bloc Données principales.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.D15
+        type_metier: texte
+    - name: date_attribution
+      description: Relevé de champs, fiche patient, bloc Données principales.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.D16
+        type_metier: date
+    - name: compagnie_assurance
+      description: Relevé de champs, fiche patient, bloc Compagnie d'assurance.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.A01
+        type_metier: code
+    - name: police
+      description: Relevé de champs, fiche patient, bloc Compagnie d'assurance.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.A02
+        type_metier: texte
+    - name: n_assure
+      description: Relevé de champs, fiche patient, bloc Compagnie d'assurance.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.A03
+        type_metier: texte
+    - name: profession
+      description: Relevé de champs, fiche patient, bloc Compagnie d'assurance.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.A04
+        type_metier: texte
+    - name: num_inscription
+      description: Relevé de champs, fiche patient, bloc Compagnie d'assurance.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.A05
+        type_metier: texte
+    - name: date_inscription
+      description: Relevé de champs, fiche patient, bloc Compagnie d'assurance.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.A06
+        type_metier: date
+    - name: type_domicile
+      description: Relevé de champs, fiche patient, bloc Domicile.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.H01
+        type_metier: code
+    - name: adresse
+      description: Relevé de champs, fiche patient, bloc Domicile.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.H02
+        type_metier: texte
+    - name: code_postal
+      description: Relevé de champs, fiche patient, bloc Domicile.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.H03
+        type_metier: texte
+    - name: etat
+      description: Relevé de champs, fiche patient, bloc Domicile.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.H04
+        type_metier: code
+    - name: ville
+      description: Relevé de champs, fiche patient, bloc Domicile.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.H05
+        type_metier: code
+    - name: quartier
+      description: Relevé de champs, fiche patient, bloc Domicile.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.H06
+        type_metier: texte
+    - name: nationalite
+      description: Relevé de champs, fiche patient, bloc Domicile.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.H07
+        type_metier: code
+    - name: telephone_1
+      description: Relevé de champs, fiche patient, bloc Domicile.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.H08
+        type_metier: texte
+    - name: telephone_2
+      description: Relevé de champs, fiche patient, bloc Domicile.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.H09
+        type_metier: texte
+    - name: telephone_3
+      description: Relevé de champs, fiche patient, bloc Domicile.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.H10
+        type_metier: texte
+    - name: telephone_4
+      description: Relevé de champs, fiche patient, bloc Domicile.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.H11
+        type_metier: texte
+    - name: avertissements_sms
+      description: Relevé de champs, fiche patient, bloc Domicile.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.H12
+        type_metier: booleen
+    - name: email
+      description: Relevé de champs, fiche patient, bloc Domicile.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.H13
+        type_metier: texte
+    - name: avertissements_email
+      description: Relevé de champs, fiche patient, bloc Domicile.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.H14
+        type_metier: booleen
+    - name: environnement
+      description: Relevé de champs, fiche patient, bloc Domicile.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.H15
+        type_metier: code
+    - name: nom_pere
+      description: Relevé de champs, fiche patient, bloc Né.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.N01
+        type_metier: texte
+    - name: nom_mere
+      description: Relevé de champs, fiche patient, bloc Né.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.N02
+        type_metier: texte
+    - name: etat_naissance
+      description: Relevé de champs, fiche patient, bloc Né.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.N03
+        type_metier: code
+    - name: ville_naissance
+      description: Relevé de champs, fiche patient, bloc Né.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.N04
+        type_metier: code
+    - name: pays_naissance
+      description: Relevé de champs, fiche patient, bloc Né.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.N05
+        type_metier: code
+    - name: quartier_naissance
+      description: Relevé de champs, fiche patient, bloc Né.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.N06
+        type_metier: texte
+    - name: commentaire
+      description: Relevé de champs, fiche patient, bloc Commentaire.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.K01
+        type_metier: texte
+    - name: province
+      description: Relevé de champs, recherche d'IPP, colonne de résultat. La colonne
+        n'apparaît pas au bloc Domicile de la fiche patient, où figurent État, Ville
+        et Quartier ; elle est établie par la liste de résultats de la recherche,
+        qui la restitue.
+      meta:
+        provenance: OBS
+        preuve: REL-IPP.R09
+        type_metier: code
+    - name: exitus
+      description: Relevé de champs, recherche d'IPP, filtre de population. L'existence
+        d'un filtre sur les patients décédés établit qu'un indicateur de décès est
+        stocké sur la fiche, bien qu'aucun champ de ce nom n'ait été relevé sur l'écran
+        de la fiche patient.
+      meta:
+        provenance: OBS
+        preuve: REL-IPP.F04
+        type_metier: booleen
+    - name: date_modification
+      description: L'écran de la fiche patient porte un champ Modifié par sans horodatage
+        adjacent, là où l'écran de rendez-vous appareille chaque agent à sa date.
+        La colonne est posée parce que l'historisation de la dimension patient en
+        type 2 exige un instant de changement. Si l'extraction réelle ne la fournissait
+        pas, l'historisation se rabattrait sur la date d'extraction de la partition,
+        à la granularité du jour au lieu de la seconde, et les changements survenus
+        le même jour seraient confondus.
+      meta:
+        provenance: HYP
+        preuve: sans_preuve_externe
+        type_metier: horodatage
+    - name: date_extraction
+      description: Colonne technique de la zone d'atterrissage, absente du système
+        observé. Elle porte la date de l'extraction dont la ligne provient et rend
+        le rechargement d'une partition idempotent. Si une extraction réelle ne la
+        fournissait pas, elle serait dérivée du nom du fichier partitionné, sans perte
+        d'information.
+      meta:
+        provenance: HYP
+        preuve: sans_preuve_externe
+        type_metier: date
+  - name: rendez_vous
+    columns:
+    - name: n_rdv
+      description: Aucun identifiant de rendez-vous n'apparaît à l'écran Donner rendez-vous,
+        dont la barre d'actions comporte pourtant Enregistrer, Supprimer et Chercher,
+        trois opérations qui supposent une clé. La colonne est posée parce que la
+        table des passages porte une référence de rendez-vous nullable, qui n'aurait
+        pas de cible sans elle. Si le système en place clé le rendez-vous par un couple
+        agenda et horodatage plutôt que par un numéro, la structure logique du modèle
+        est inchangée et seule la forme de la clé diffère.
+      meta:
+        provenance: HYP
+        preuve: sans_preuve_externe
+        type_metier: code
+    - name: n_ipp
+      description: Relevé de champs, écran Donner rendez-vous, bloc Identification
+        du patient.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.I01
+        type_metier: code
+    - name: agenda
+      description: Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.R01
+        type_metier: code
+    - name: activite
+      description: Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.R02
+        type_metier: code
+    - name: origine
+      description: Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.R03
+        type_metier: code
+    - name: hopital_cs
+      description: Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.R04
+        type_metier: code
+    - name: medecin_ext
+      description: Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.R05
+        type_metier: texte
+    - name: service_ext
+      description: Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.R06
+        type_metier: texte
+    - name: observations
+      description: Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.R07
+        type_metier: texte
+    - name: date_rendez_vous
+      description: Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.R08
+        type_metier: horodatage
+    - name: rdv_supplementaire
+      description: Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.R09
+        type_metier: booleen
+    - name: type_attention
+      description: Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.R10
+        type_metier: code
+    - name: etat
+      description: Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.R11
+        type_metier: code
+    - name: duree
+      description: Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous. Durée
+        exprimée en minutes, valeur nulle sur le rendez-vous observé.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.R12
+        type_metier: entier
+    - name: date_reception
+      description: Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.R13
+        type_metier: horodatage
+    - name: imprimer_donnees
+      description: Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.R14
+        type_metier: booleen
+    - name: cree_par
+      description: Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.C01
+        type_metier: texte
+    - name: date_creation
+      description: Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications.
+        L'écart entre cette colonne et la date du rendez-vous est le délai d'obtention,
+        grandeur centrale de l'analyse. Sur le rendez-vous observé, il valait une
+        seconde.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.C02
+        type_metier: horodatage
+    - name: modifie_par
+      description: Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.C03
+        type_metier: texte
+    - name: date_mod
+      description: Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.C04
+        type_metier: horodatage
+    - name: confirme_par
+      description: Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications.
+        Avec la colonne d'annulation, ce couple sépare une annulation déclarée d'une
+        absence non prévenue ; sans lui, les deux se confondent.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.C05
+        type_metier: texte
+    - name: date_conf
+      description: Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.C06
+        type_metier: horodatage
+    - name: annule_par
+      description: Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.C07
+        type_metier: texte
+    - name: date_annul
+      description: Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.C08
+        type_metier: horodatage
+    - name: liste_attente_service
+      description: Relevé de champs, écran Donner rendez-vous, bloc Liste d'attente
+        des consultations.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.L01
+        type_metier: code
+    - name: liste_attente_agenda
+      description: Relevé de champs, écran Donner rendez-vous, bloc Liste d'attente
+        des consultations.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.L02
+        type_metier: code
+    - name: liste_attente_activite
+      description: Relevé de champs, écran Donner rendez-vous, bloc Liste d'attente
+        des consultations.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.L03
+        type_metier: code
+    - name: date_extraction
+      description: Colonne technique de la zone d'atterrissage, absente du système
+        observé. Elle porte la date de l'extraction dont la ligne provient et rend
+        le rechargement d'une partition idempotent. Si une extraction réelle ne la
+        fournissait pas, elle serait dérivée du nom du fichier partitionné, sans perte
+        d'information.
+      meta:
+        provenance: HYP
+        preuve: sans_preuve_externe
+        type_metier: date
+  - name: passages
+    columns:
+    - name: n_passage
+      description: Le module Consultas de l'éditeur documente la gestion des consultations
+        et la production de leurs listings, ce qui suppose un identifiant de passage.
+      meta:
+        provenance: DOC
+        preuve: S-08
+        type_metier: code
+    - name: n_ipp
+      description: Relevé de champs, fiche patient, bloc Données principales.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.D01
+        type_metier: code
+    - name: type_passage
+      description: 'La liste de travail du module Médicos regroupe les patients par
+        type d''épisode : hospitalisés, consultation, urgences. Le système type donc
+        ses épisodes.'
+      meta:
+        provenance: DOC
+        preuve: S-06
+        type_metier: code
+    - name: service
+      description: 'Article 27 du règlement intérieur : l''hôpital s''organise en
+        services, et l''activité s''y rattache.'
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: code
+    - name: activite
+      description: Relevé de champs, écran Donner rendez-vous, bloc Rendez-vous. Le
+        même référentiel d'activités qualifie le rendez-vous et le passage qui l'honore.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.R02
+        type_metier: code
+    - name: n_rdv
+      description: 'La colonne rattache le passage au rendez-vous qui l''a programmé,
+        et hérite du caractère hypothétique de l''identifiant de rendez-vous lui-même,
+        qui n''apparaît sur aucun écran. Elle est nullable : un passage peut survenir
+        sans rendez-vous préalable. Si le système en place ne conservait pas ce rattachement,
+        le délai d''obtention resterait mesurable sur la table des rendez-vous, mais
+        le taux d''honoration des rendez-vous ne le serait plus.'
+      meta:
+        provenance: HYP
+        preuve: sans_preuve_externe
+        type_metier: code
+    - name: mode_prise_en_charge
+      description: Le tiers payant distingue les modes de prise en charge selon le
+        régime et le caractère ambulatoire ou hospitalier de la prestation.
+      meta:
+        provenance: DOC
+        preuve: S-18
+        type_metier: code
+    - name: date_heure_entree
+      description: Le module Consultas gère la programmation et le déroulement de
+        la consultation, dont l'heure d'entrée.
+      meta:
+        provenance: DOC
+        preuve: S-08
+        type_metier: horodatage
+    - name: date_heure_sortie
+      description: Idem, borne de fin du passage.
+      meta:
+        provenance: DOC
+        preuve: S-08
+        type_metier: horodatage
+    - name: medecin
+      description: Le module Médicos rattache l'épisode au praticien qui le prend
+        en charge.
+      meta:
+        provenance: DOC
+        preuve: S-06
+        type_metier: texte
+    - name: cree_par
+      description: Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications.
+        Le même bloc d'audit est reproduit d'un écran à l'autre.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.C01
+        type_metier: texte
+    - name: date_creation
+      description: Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications.
+        Le même bloc d'audit est reproduit d'un écran à l'autre.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.C02
+        type_metier: horodatage
+    - name: date_extraction
+      description: Colonne technique de la zone d'atterrissage, absente du système
+        observé. Elle porte la date de l'extraction dont la ligne provient et rend
+        le rechargement d'une partition idempotent. Si une extraction réelle ne la
+        fournissait pas, elle serait dérivée du nom du fichier partitionné, sans perte
+        d'information.
+      meta:
+        provenance: HYP
+        preuve: sans_preuve_externe
+        type_metier: date
+  - name: mouvements
+    columns:
+    - name: n_sejour
+      description: 'Article 40 : les formalités d''admission ouvrent un dossier de
+        séjour identifié.'
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: code
+    - name: n_ipp
+      description: Relevé de champs, fiche patient, bloc Données principales.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.D01
+        type_metier: code
+    - name: date_heure_admission
+      description: Article 40, formalités d'admission ordinaire.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: horodatage
+    - name: mode_admission
+      description: 'Articles 40, 42 et 45 : l''admission est ordinaire ou en urgence,
+        et les formalités diffèrent.'
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: code
+    - name: service_accueil
+      description: 'Article 44 : l''hospitalisation est ordonnée vers un service.'
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: code
+    - name: lit
+      description: Aucune source ne documente l'identification du lit occupé, alors
+        que la capacité litière fonctionnelle est publiée par établissement et que
+        l'article 42 impose l'admission même en cas d'indisponibilité de lits, ce
+        qui suppose un suivi de l'occupation. La colonne est posée parce que le taux
+        d'occupation du tableau de bord se recalcule depuis les journées d'hospitalisation,
+        non depuis les lits ; si elle était fausse ou absente, aucun indicateur du
+        chapitre sur l'activité ne changerait.
+      meta:
+        provenance: HYP
+        preuve: sans_preuve_externe
+        type_metier: texte
+    - name: n_mutation
+      description: 'Article 35 : le service gère les effectifs des patients et leurs
+        mouvements à l''intérieur de l''hôpital.'
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: code
+    - name: service_origine
+      description: Article 35, mouvements internes.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: code
+    - name: service_destination
+      description: Article 35, mouvements internes.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: code
+    - name: date_heure_mutation
+      description: Article 35, mouvements internes.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: horodatage
+    - name: date_heure_sortie
+      description: 'Article 79 : les formalités de sortie closent le séjour.'
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: horodatage
+    - name: mode_sortie
+      description: 'Articles 79 et 80 : sortie régulière avec billet, sortie à l''insu
+        du personnel, décès.'
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: code
+    - name: date_extraction
+      description: Colonne technique de la zone d'atterrissage, absente du système
+        observé. Elle porte la date de l'extraction dont la ligne provient et rend
+        le rechargement d'une partition idempotent. Si une extraction réelle ne la
+        fournissait pas, elle serait dérivée du nom du fichier partitionné, sans perte
+        d'information.
+      meta:
+        provenance: HYP
+        preuve: sans_preuve_externe
+        type_metier: date
+  - name: prises_en_charge
+    columns:
+    - name: n_prise_en_charge
+      description: 'Article 79 : les formalités de sortie comportent la signature
+        des documents de prise en charge, document identifié.'
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: code
+    - name: n_ipp
+      description: Relevé de champs, fiche patient, bloc Données principales.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.D01
+        type_metier: code
+    - name: n_episode
+      description: 'Article 79 : la prise en charge se rattache à l''épisode qu''elle
+        couvre.'
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: code
+    - name: type_episode
+      description: 'Article 36 : taxonomie réglementaire des modes d''utilisation
+        de l''hôpital.'
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: code
+    - name: organisme
+      description: Les régimes de l'assurance maladie obligatoire sont distincts et
+        l'organisme gestionnaire diffère de l'un à l'autre.
+      meta:
+        provenance: DOC
+        preuve: S-15
+        type_metier: code
+    - name: n_assure
+      description: Relevé de champs, fiche patient, bloc Compagnie d'assurance.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.A03
+        type_metier: texte
+    - name: date_verification
+      description: 'Article 40 : le patient présente les documents exigés selon son
+        statut de couverture, ce qui date la vérification.'
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: horodatage
+    - name: etat
+      description: 'Aucune demande de prise en charge préalable n''est exigée dans
+        le secteur public : l''état constate l''ouverture des droits, il n''enregistre
+        pas un accord. Valeurs retenues : droits ouverts, droits fermés, non vérifié.'
+      meta:
+        provenance: DOC
+        preuve: S-19
+        type_metier: code
+    - name: taux_prise_en_charge
+      description: Cent pour cent de la tarification nationale de référence en hospitalisation
+        et en hôpital de jour, quatre-vingts pour cent en ambulatoire au-delà de deux
+        cents dirhams.
+      meta:
+        provenance: DOC
+        preuve: S-18
+        type_metier: decimal
+    - name: date_extraction
+      description: Colonne technique de la zone d'atterrissage, absente du système
+        observé. Elle porte la date de l'extraction dont la ligne provient et rend
+        le rechargement d'une partition idempotent. Si une extraction réelle ne la
+        fournissait pas, elle serait dérivée du nom du fichier partitionné, sans perte
+        d'information.
+      meta:
+        provenance: HYP
+        preuve: sans_preuve_externe
+        type_metier: date
+  - name: factures
+    columns:
+    - name: n_facture
+      description: Le module Facturación de Hosix Core documente l'émission de factures
+        et de listings personnalisés, ce qui suppose un identifiant de facture.
+      meta:
+        provenance: DOC
+        preuve: S-09
+        type_metier: code
+    - name: n_ipp
+      description: Relevé de champs, fiche patient, bloc Données principales.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.D01
+        type_metier: code
+    - name: n_episode
+      description: Le module Facturación récupère dans chacun des autres modules l'information
+        nécessaire à la facturation en captant les mouvements générés, ce qui suppose
+        un identifiant d'épisode rattaché.
+      meta:
+        provenance: DOC
+        preuve: S-09
+        type_metier: code
+    - name: type_episode
+      description: L'article 36 du règlement intérieur des hôpitaux établit une taxonomie
+        réglementaire des modes d'utilisation de l'hôpital, que la facture doit porter.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: code
+    - name: code_diagnostic_cim10
+      description: L'article 35 du règlement intérieur impose d'établir la facturation
+        sur la base de la classification des maladies, soit la CIM-10.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: code
+    - name: date_facture
+      description: Le module Facturación de l'éditeur documente l'émission de factures,
+        ce qui suppose une date d'émission.
+      meta:
+        provenance: DOC
+        preuve: S-09
+        type_metier: date
+    - name: type_facture
+      description: Le module Facturación admet la facturation aux entités publiques,
+        aux entités privées et particuliers, et aux mutuelles d'accidents.
+      meta:
+        provenance: DOC
+        preuve: S-09
+        type_metier: code
+    - name: service_emetteur
+      description: L'article 35 du règlement intérieur charge le service d'accueil
+        et d'admission d'établir la facturation, ce qui rattache chaque facture à
+        un service émetteur.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: code
+    - name: etat
+      description: 'Le module Facturación contrôle explicitement l''état des activités
+        réalisées : facturées, en attente de facturation, et autres états.'
+      meta:
+        provenance: DOC
+        preuve: S-09
+        type_metier: code
+    - name: montant_total
+      description: Le montant se calcule sur la grille des lettres clés de la tarification
+        nationale de référence du secteur public.
+      meta:
+        provenance: DOC
+        preuve: S-17
+        type_metier: decimal
+    - name: part_organisme
+      description: Les taux de prise en charge de la tarification nationale de référence
+        fixent la part organisme à 100 % en hospitalisation et hôpital de jour, et
+        à 80 % en ambulatoire au-delà de 200 dirhams.
+      meta:
+        provenance: DOC
+        preuve: S-18
+        type_metier: decimal
+    - name: part_patient
+      description: La part patient est le complément de la part organisme, sauf pour
+        les bénéficiaires du régime AMO-Tadamon en structure publique où l'État prend
+        en charge le ticket modérateur et où la part patient devient nulle, comme
+        l'établit une seconde source (S-15).
+      meta:
+        provenance: DOC
+        preuve: S-18
+        type_metier: decimal
+    - name: cree_par
+      description: Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications.
+        Le même bloc d'audit est reproduit d'un écran à l'autre.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.C01
+        type_metier: texte
+    - name: date_creation
+      description: Relevé de champs, écran Donner rendez-vous, bloc Contrôle de modifications.
+        Le même bloc d'audit est reproduit d'un écran à l'autre.
+      meta:
+        provenance: OBS
+        preuve: REL-RDV.C02
+        type_metier: horodatage
+    - name: date_extraction
+      description: Colonne technique de la zone d'atterrissage, absente du système
+        observé. Elle porte la date de l'extraction dont la ligne provient et rend
+        le rechargement d'une partition idempotent. Si une extraction réelle ne la
+        fournissait pas, elle serait dérivée du nom du fichier partitionné, sans perte
+        d'information.
+      meta:
+        provenance: HYP
+        preuve: sans_preuve_externe
+        type_metier: date
+  - name: lignes_facture
+    columns:
+    - name: n_facture
+      description: Le module Facturación de l'éditeur documente l'émission de factures
+        composées de lignes.
+      meta:
+        provenance: DOC
+        preuve: S-09
+        type_metier: code
+    - name: n_ligne
+      description: Le module Facturación produit une documentation et des listings
+        personnalisés composés de lignes détaillées.
+      meta:
+        provenance: DOC
+        preuve: S-09
+        type_metier: entier
+    - name: code_acte
+      description: L'article 35 du règlement intérieur impose une facturation sur
+        la base des nomenclatures des actes, et la grille des lettres clés du secteur
+        public rattache un code à chaque acte.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: code
+    - name: libelle_acte
+      description: La grille des lettres clés de la tarification nationale de référence
+        du secteur public porte un libellé pour chaque acte, en complément de la nomenclature
+        imposée par l'article 35 du règlement intérieur.
+      meta:
+        provenance: DOC
+        preuve: S-17
+        type_metier: texte
+    - name: lettre_cle
+      description: La tarification nationale de référence rémunère l'acte par une
+        lettre clé et un coefficient.
+      meta:
+        provenance: DOC
+        preuve: S-17
+        type_metier: code
+    - name: coefficient
+      description: La tarification nationale de référence rémunère l'acte par une
+        lettre clé et un coefficient.
+      meta:
+        provenance: DOC
+        preuve: S-17
+        type_metier: decimal
+    - name: quantite
+      description: La structure d'une ligne de facturation hospitalière comporte usuellement
+        une quantité distincte du coefficient de la lettre clé, mais aucune des sources
+        ouvertes ne la documente pour le secteur public marocain. La colonne est posée
+        parce que sans elle un acte répété le même jour se confondrait avec un acte
+        unique. Si elle était absente du système réel, les montants resteraient exacts
+        et seul le dénombrement des actes par ligne serait affecté.
+      meta:
+        provenance: HYP
+        preuve: sans_preuve_externe
+        type_metier: entier
+    - name: tarif_unitaire
+      description: Le tarif unitaire se lit sur la grille des lettres clés de la tarification
+        nationale de référence.
+      meta:
+        provenance: DOC
+        preuve: S-17
+        type_metier: decimal
+    - name: montant
+      description: Le montant de la ligne se calcule sur la grille des lettres clés
+        de la tarification nationale de référence.
+      meta:
+        provenance: DOC
+        preuve: S-17
+        type_metier: decimal
+    - name: service_executant
+      description: Le module Facturación rattache chaque activité facturable au service
+        qui l'a exécutée.
+      meta:
+        provenance: DOC
+        preuve: S-09
+        type_metier: code
+    - name: date_acte
+      description: L'article 42 du règlement intérieur dispose qu'aux urgences la
+        facturation n'est entamée qu'après l'engagement de la prise en charge médicale,
+        ce qui date l'acte facturé.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: date
+    - name: date_extraction
+      description: Colonne technique de la zone d'atterrissage, absente du système
+        observé. Elle porte la date de l'extraction dont la ligne provient et rend
+        le rechargement d'une partition idempotent. Si une extraction réelle ne la
+        fournissait pas, elle serait dérivée du nom du fichier partitionné, sans perte
+        d'information.
+      meta:
+        provenance: HYP
+        preuve: sans_preuve_externe
+        type_metier: date
+  - name: passages_urgences
+    columns:
+    - name: n_passage
+      description: L'article 45 du règlement intérieur prescrit que les formalités
+        d'admission en urgence sont enregistrées, ce qui identifie chaque passage.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: code
+    - name: n_ipp
+      description: Relevé de champs, fiche patient, bloc Données principales.
+      meta:
+        provenance: OBS
+        preuve: REL-PAT.D01
+        type_metier: code
+    - name: date_heure_arrivee
+      description: L'article 42 du règlement intérieur fait de l'accueil aux urgences
+        l'acte fondateur du passage.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: horodatage
+    - name: mode_arrivee
+      description: Le mode d'arrivée aux urgences est documenté par la protection
+        civile, l'ambulance SMUR, les moyens propres et le transport privé.
+      meta:
+        provenance: DOC
+        preuve: S-12
+        type_metier: code
+    - name: motif_recours
+      description: L'étude sur le recours non approprié aux urgences classe les motifs
+        de consultation par chapitre de la CIM-10.
+      meta:
+        provenance: DOC
+        preuve: S-13
+        type_metier: code
+    - name: niveau_tri
+      description: 'Les chiffres du ministère répartissent les passages entre urgences
+        vitales, environ 10 %, et consultations médicales non urgentes, 64 %, le solde
+        de 26 % correspondant aux urgences réelles non vitales. Réserve : cette source
+        ne distingue que trois groupes de gravité, tandis que le modèle retient cinq
+        niveaux ; la colonne existe, c''est son échelle qui reste ouverte.'
+      meta:
+        provenance: DOC
+        preuve: S-12
+        type_metier: code
+    - name: date_heure_pec_medicale
+      description: L'article 42 du règlement intérieur dispose que la procédure de
+        facturation n'est entamée qu'après l'engagement de la prise en charge médicale,
+        ce qui date cet engagement.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: horodatage
+    - name: date_heure_sortie
+      description: L'article 43 du règlement intérieur impose au patient admis aux
+        urgences de s'acquitter des frais avant sa sortie, ce que le règlement précède.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: horodatage
+    - name: orientation_sortie
+      description: Les articles 42, 44, 46 et 47 du règlement intérieur distinguent
+        le retour à domicile, l'hospitalisation, le transfert, la sortie contre avis
+        médical et le décès comme issues du passage.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: code
+    - name: service_orientation
+      description: L'article 44 du règlement intérieur dispose que l'hospitalisation
+        d'urgence est ordonnée vers un service.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: code
+    - name: motif_transfert
+      description: L'article 47 du règlement intérieur prévoit le transfert lorsque
+        les soins requis relèvent d'une discipline ou d'une technique n'existant pas
+        à l'hôpital.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: code
+    - name: consentement_transfert
+      description: L'article 47 du règlement intérieur exige le consentement écrit
+        du patient pour un transfert, sauf extrême urgence.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: booleen
+    - name: famille_informee
+      description: Les articles 47 et 67 du règlement intérieur imposent d'informer
+        la famille, lors d'un transfert comme pour un patient mineur, incapable ou
+        inconscient.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: booleen
+    - name: inventaire_effets
+      description: L'article 45 du règlement intérieur impose un inventaire contradictoire
+        des effets personnels lorsque le patient est inconscient.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: booleen
+    - name: date_extraction
+      description: Colonne technique de la zone d'atterrissage, absente du système
+        observé. Elle porte la date de l'extraction dont la ligne provient et rend
+        le rechargement d'une partition idempotent. Si une extraction réelle ne la
+        fournissait pas, elle serait dérivée du nom du fichier partitionné, sans perte
+        d'information.
+      meta:
+        provenance: HYP
+        preuve: sans_preuve_externe
+        type_metier: date
+  - name: encaissements
+    columns:
+    - name: n_encaissement
+      description: L'article 79 du règlement intérieur range le règlement des frais
+        parmi les formalités de sortie, ce qui identifie chaque encaissement.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: code
+    - name: n_facture
+      description: L'article 79 du règlement intérieur rattache le règlement des frais
+        à la facture émise.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: code
+    - name: date_encaissement
+      description: L'article 79 du règlement intérieur date le règlement des frais
+        parmi les formalités de sortie.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: horodatage
+    - name: mode_reglement
+      description: Aucune source ouverte ne documente les moyens de paiement acceptés
+        au guichet d'un hôpital public marocain ; la Cour des comptes décrit seulement
+        un versement direct chez le régisseur. La colonne est posée parce que la page
+        de recouvrement du tableau de bord distingue les canaux d'encaissement. Si
+        la répartition retenue était fausse, aucun taux de recouvrement ni aucune
+        ancienneté de créance n'en serait affecté, ces grandeurs ne dépendant que
+        du montant et de la date.
+      meta:
+        provenance: HYP
+        preuve: sans_preuve_externe
+        type_metier: code
+    - name: montant
+      description: Le montant encaissé suit les taux de prise en charge de la tarification
+        nationale de référence.
+      meta:
+        provenance: DOC
+        preuve: S-18
+        type_metier: decimal
+    - name: regisseur
+      description: Le rapport de la Cour des comptes décrit un paiement direct chez
+        le régisseur.
+      meta:
+        provenance: DOC
+        preuve: S-20
+        type_metier: texte
+    - name: billet_sortie_delivre
+      description: L'article 79 du règlement intérieur conditionne la délivrance du
+        billet de sortie au règlement des frais ou à la signature des documents de
+        prise en charge.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: booleen
+    - name: date_extraction
+      description: Colonne technique de la zone d'atterrissage, absente du système
+        observé. Elle porte la date de l'extraction dont la ligne provient et rend
+        le rechargement d'une partition idempotent. Si une extraction réelle ne la
+        fournissait pas, elle serait dérivée du nom du fichier partitionné, sans perte
+        d'information.
+      meta:
+        provenance: HYP
+        preuve: sans_preuve_externe
+        type_metier: date
+  - name: creances
+    columns:
+    - name: n_creance
+      description: L'article 9, paragraphe b, du règlement intérieur charge le pôle
+        des affaires administratives du recouvrement des créances de l'établissement,
+        ce qui identifie chaque créance.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: code
+    - name: n_facture
+      description: L'article 9, paragraphe b, du règlement intérieur rattache la créance
+        recouvrée à la facture qui l'a fait naître.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: code
+    - name: date_naissance_creance
+      description: L'article 79 du règlement intérieur fait naître la créance aux
+        formalités de sortie, lorsque la facturation n'est pas soldée.
+      meta:
+        provenance: DOC
+        preuve: S-27
+        type_metier: date
+    - name: montant_du
+      description: Le rapport de la Cour des comptes établit l'existence d'un état
+        des prestations non recouvrées, dont le montant dû.
+      meta:
+        provenance: DOC
+        preuve: S-20
+        type_metier: decimal
+    - name: montant_recouvre
+      description: Le rapport de la Cour des comptes établit l'existence d'un état
+        des prestations non recouvrées, dont le montant recouvré.
+      meta:
+        provenance: DOC
+        preuve: S-20
+        type_metier: decimal
+    - name: montant_restant
+      description: 'Le rapport de la Cour des comptes établit l''existence d''un état
+        des prestations non recouvrées, dont le montant restant dû. Cette colonne
+        est conservée bien qu''elle se déduise des deux colonnes voisines : sa redondance
+        interne à la ligne ne dépend pas de la date de lecture, et l''écart éventuel
+        entre les trois montants est un contrôle de cohérence exploitable.'
+      meta:
+        provenance: DOC
+        preuve: S-20
+        type_metier: decimal
+    - name: type_debiteur
+      description: Le module Facturación distingue les débiteurs publics, privés,
+        mutualistes et particuliers.
+      meta:
+        provenance: DOC
+        preuve: S-09
+        type_metier: code
+    - name: motif_non_recouvrement
+      description: Le rapport de la Cour des comptes relève des sorties sans règlement,
+        des patients non identifiés et des évasions comme motifs de non-recouvrement.
+      meta:
+        provenance: DOC
+        preuve: S-20
+        type_metier: code
+    - name: date_extraction
+      description: Colonne technique de la zone d'atterrissage, absente du système
+        observé. Elle porte la date de l'extraction dont la ligne provient et rend
+        le rechargement d'une partition idempotent. Si une extraction réelle ne la
+        fournissait pas, elle serait dérivée du nom du fichier partitionné, sans perte
+        d'information.
+      meta:
+        provenance: HYP
+        preuve: sans_preuve_externe
+        type_metier: date
+  - name: relances
+    columns:
+    - name: n_relance
+      description: Aucune source ouverte ne documente une procédure de relance formalisée
+        dans cet établissement ; le rapport de la Cour des comptes constate au contraire
+        l'absence de diligences de recouvrement. La colonne identifie chaque relance
+        parce que la page de recouvrement du tableau de bord la mobilise ; ce que
+        la chaîne démontre ici est la calculabilité de l'indicateur, non une mesure.
+      meta:
+        provenance: HYP
+        preuve: sans_preuve_externe
+        type_metier: code
+    - name: n_creance
+      description: Aucune source ouverte ne documente une procédure de relance formalisée
+        ; la seule source disponible sur le recouvrement décrit au contraire son absence.
+        La colonne rattache la relance à la créance parce que le tableau de bord en
+        a besoin pour sa page recouvrement ; elle démontre une calculabilité, non
+        une pratique observée.
+      meta:
+        provenance: HYP
+        preuve: sans_preuve_externe
+        type_metier: code
+    - name: date_relance
+      description: Aucune source ouverte ne documente de procédure de relance formalisée
+        dans cet établissement, et le rapport de la Cour des comptes constate précisément
+        l'absence de diligences de recouvrement. La date de relance est posée parce
+        que la page de recouvrement du tableau de bord en a besoin ; elle atteste
+        une calculabilité, non un fait mesuré.
+      meta:
+        provenance: HYP
+        preuve: sans_preuve_externe
+        type_metier: date
+    - name: canal
+      description: Aucune source ouverte ne documente les canaux de relance employés
+        dans cet établissement ; la source disponible sur le recouvrement décrit au
+        contraire une carence de diligences. La colonne existe parce que le tableau
+        de bord distingue les canaux à sa page recouvrement ; elle démontre une capacité
+        de calcul, pas une observation.
+      meta:
+        provenance: HYP
+        preuve: sans_preuve_externe
+        type_metier: code
+    - name: resultat
+      description: Aucune source ouverte ne documente le résultat d'une procédure
+        de relance dans cet établissement, dont la seule source disponible sur le
+        recouvrement décrit l'absence de diligences. La colonne est posée parce que
+        la page de recouvrement du tableau de bord en a besoin ; ce qu'elle démontre
+        est une calculabilité, non une mesure.
+      meta:
+        provenance: HYP
+        preuve: sans_preuve_externe
+        type_metier: code
+    - name: date_extraction
+      description: Colonne technique de la zone d'atterrissage, absente du système
+        observé. Elle porte la date de l'extraction dont la ligne provient et rend
+        le rechargement d'une partition idempotent. Si une extraction réelle ne la
+        fournissait pas, elle serait dérivée du nom du fichier partitionné, sans perte
+        d'information.
+      meta:
+        provenance: HYP
+        preuve: sans_preuve_externe
+        type_metier: date
