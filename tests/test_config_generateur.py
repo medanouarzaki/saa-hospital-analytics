@@ -89,6 +89,7 @@ def test_valeur_fausse_mais_legitime(tmp_path: Path) -> None:
         ),
         encoding="utf-8",
     )
+    config.vider_cache()
     try:
         config.charger_entrees(dossier)
         raise AssertionError("une entrée sans clé 'valeur' aurait dû être rejetée")
