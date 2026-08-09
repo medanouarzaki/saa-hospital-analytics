@@ -1,0 +1,66 @@
+parametres:
+- nom: contraintes_coherence
+  valeur:
+  - colonne_a: environnement
+    colonne_b: type_domicile
+    nature: egalite
+    tolerance: 0.0
+    justification: 'Les deux colonnes decrivent le meme caractere urbain/rural d''une fiche, avec des
+      codes identiques (U/R) dans deux nomenclatures distinctes. Mesure avant correction : 49,84 % des
+      lignes en desaccord (tirees independamment). Applique par le generateur via une boucle generique
+      sur les regles de nature egalite de ce fichier, qui recopie colonne_a vers colonne_b apres construction
+      de la ligne.'
+  - colonne_a: ville
+    colonne_b: province
+    nature: egalite
+    tolerance: 0.0
+    justification: 'Les codes de nomenclature_ville et de nomenclature_province designent le meme lieu
+      pour les huit villes/provinces retenues (MEK, FES, ELH, IFR, KHE, CAS, RAB, TNG). Mesure avant correction
+      : 48,93 % des lignes en desaccord (tirees independamment). Applique par le generateur via la meme
+      boucle generique.'
+  - colonne_a: etat
+    colonne_b: etat_naissance
+    nature: egalite
+    tolerance: 0.0
+    justification: 'Un patient qui reside dans une region est presume y etre ne, faute de source distinguant
+      lieu de naissance et lieu de residence. Mesure avant et apres correction : 0 % de desaccord, deja
+      coherent par construction (etat_naissance est une copie directe de etat). Declare ici pour que le
+      test generique le verifie sans le citer en dur, et pour qu''une regression future soit detectee.'
+  - colonne_a: ville
+    colonne_b: ville_naissance
+    nature: egalite
+    tolerance: 0.0
+    justification: 'Meme raisonnement que etat/etat_naissance, a l''echelle de la ville. Mesure avant
+      et apres correction : 0 % de desaccord, deja coherent par construction.'
+  - colonne_a: compagnie_assurance
+    colonne_b: type_patient
+    nature: appartenance
+    valeur_a_declenchante: SANS
+    valeurs_b_interdites:
+    - AS
+    tolerance: 0.0
+    justification: 'Une fiche sans compagnie d''assurance ne peut etre de type Assure (AS). Mesure avant
+      correction : 4,96 % des lignes en desaccord. Applique par le generateur via le parametre distribution_type_patient
+      (demographie.yml), qui exclut le code AS du tirage lorsque compagnie_assurance vaut SANS ; ce fichier
+      declare la contrainte pour que le test la verifie sans la recoder.'
+  - colonne_a: ville
+    colonne_b: code_postal
+    nature: derivation
+    table_derivation: codes_postaux_par_ville
+    tolerance: 0.0
+    justification: 'Chaque ville porte un code postal reel qui lui est propre. Mesure avant correction
+      : 29,80 % des lignes en desaccord (code_postal constant a 50000, celui de Meknes, quelle que soit
+      la ville). Applique par le generateur via le parametre codes_postaux_par_ville (demographie.yml)
+      ; ce fichier declare la contrainte pour que le test la verifie sans recoder la table de correspondance.'
+  unite: liste de contraintes d'accord intra-ligne
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Declare les couples de colonnes de source.patients qui doivent s''accorder au sein d''une meme
+    ligne, la nature de cet accord (egalite, appartenance, derivation), et la tolerance admise (0 partout
+    : chaque couple retenu ici est un couple ou l''accord est exigible a 100 %, pas une correlation statistique
+    approchee). Les couples retenus sont ceux que la mesure de cohérence intra-ligne du lot de correction
+    a etablis comme devant s''accorder ; pays_naissance/nationalite en a ete ecarte deliberement (9,45
+    % de desaccord mesure, sans que les deux colonnes doivent necessairement coincider : nationalite et
+    pays de naissance sont deux attributs distincts). Cette configuration est lue a la fois par generator/patients.py
+    (regles de nature egalite, appliquees generiquement apres construction de chaque ligne) et par tests/test_patients.py
+    (verification generique, sans aucun couple cite en dur dans le code du test).'
