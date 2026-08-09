@@ -1,0 +1,181 @@
+parametres:
+- nom: correspondance_activite_agenda
+  valeur:
+    '20': MG
+    '21': MI
+    '30': PED
+    '14': GYN
+    '4': CAR
+    '28': OPH
+    '29': ORL
+    '11': DER
+  unite: code de nomenclature_activite vers code de nomenclature_agenda
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Correspondance un-a-un deduite du rapprochement des libelles des deux nomenclatures deja ecrites
+    (Medecine generale/MG, Medecine interne/MI, Pediatrie/PED, Gynecologie-obstetrique/GYN, Cardiologie/CAR,
+    Ophtalmologie/OPH, Oto-rhino-laryngologie/ORL, Dermatologie/DER) : un agenda est le carnet de rendez-vous
+    d''une activite, les deux nomenclatures portent huit entrees chacune avec la meme correspondance implicite
+    de specialites. Aucune des deux nomenclatures ne restructuree, seule une table de correspondance est
+    ajoutee. Si cette correspondance etait fausse, un rendez-vous porterait un agenda d''une autre specialite
+    que son activite, incoherence relevable par un controle croise, sans effet sur aucun total.'
+- nom: repartition_activites_rdv
+  valeur:
+    '20': 0.3
+    '21': 0.1
+    '30': 0.15
+    '14': 0.12
+    '4': 0.1
+    '28': 0.1
+    '29': 0.08
+    '11': 0.05
+  unite: proportion par code de nomenclature_activite
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Repartition des rendez-vous honores entre les huit activites de consultation externe, posee sans
+    source. La medecine generale (30 %) et la pediatrie (15 %) dominent, plausibles pour un hopital provincial.
+    Si cette repartition etait fausse, la composition par specialite affichee au tableau de bord serait
+    invraisemblable, sans effet sur le nombre total de rendez-vous honores, fixe par le nombre d'episodes
+    de consultation.
+- nom: pente_absenteisme_delai
+  valeur: 0.012
+  unite: multiplicateur de probabilite par jour de delai
+  provenance: HYP
+  preuve: ''
+  note: 'Nom impose par la relation R-01 du registre des relations injectees : "L''absentéisme croît avec
+    le délai d''obtention, à l''intérieur d''une même spécialité." Forme retenue : probabilite_absence(delai)
+    = taux_absenteisme_par_specialite[activite] * (1 + pente_absenteisme_delai * delai_jours), plafonnee.
+    A 0,012 par jour, un delai de 30 jours multiplie la probabilite de base par 1,36 ; un delai de 90
+    jours la multiplie par 2,08. Cette forme lineaire est posee, pas mesuree : R-01 ne fixe pas de statut
+    de preuve (source vide dans le registre). Si cette pente etait fausse, le nuage delai/absenteisme
+    de la page Rendez-vous serait plus ou moins marque, potentiellement plat si la pente etait nulle,
+    sans effet sur le nombre total de rendez-vous honores ni sur le taux moyen d''absenteisme par specialite,
+    fixe independamment.'
+- nom: taux_absenteisme_par_specialite
+  valeur:
+    '20': 0.12
+    '21': 0.1
+    '30': 0.08
+    '14': 0.09
+    '4': 0.11
+    '28': 0.07
+    '29': 0.09
+    '11': 0.06
+  unite: proportion par code de nomenclature_activite
+  provenance: DOC
+  preuve: S-24
+  note: 'Nom impose par la relation R-02 du registre des relations injectees. S-24 documente que le niveau
+    d''absenteisme differe par specialite independamment du delai, sans fournir les taux exacts par specialite
+    de cet etablissement : le classement retenu ici (medecine generale et cardiologie les plus touchees,
+    dermatologie la moins touchee) est pose dans l''ordre de grandeur plausible, pas mesure. Si ces taux
+    etaient faux, le classement des specialites par absenteisme affiche au tableau de bord serait errone,
+    sans effet sur le nombre total de rendez-vous honores.'
+- nom: delai_rdv_par_specialite
+  valeur:
+    '20': 7
+    '21': 21
+    '30': 5
+    '14': 14
+    '4': 30
+    '28': 45
+    '29': 18
+    '11': 25
+  unite: delai median en jours par code de nomenclature_activite (loi log-normale)
+  provenance: DOC
+  preuve: S-20
+  note: 'Nom impose par la relation R-03 du registre des relations injectees. S-20 documente que le delai
+    d''obtention suit une loi log-normale de mediane propre a chaque specialite, sans fournir les medianes
+    exactes de cet etablissement : l''ophtalmologie (45 j) et la cardiologie (30 j) sont posees comme
+    les plus engorgees, la pediatrie (5 j) et la medecine generale (7 j) les plus rapides, ordre de grandeur
+    plausible, pas mesure. Une activite absente de cette table doit faire echouer le chargement plutot
+    que de recevoir une valeur par defaut : generator/rendez_vous.py leve une KeyError explicite, sans
+    valeur de repli. Si ces medianes etaient fausses, le classement des specialites par delai median affiche
+    au tableau de bord serait errone, et la conclusion sur la specialite la plus engorgee refleterait
+    la mediane fixee plutot qu''une mesure reelle -- consequence deja ecrite dans le registre des relations
+    injectees.'
+- nom: ecart_type_log_delai
+  valeur: 0.5
+  unite: ecart-type du logarithme du delai (loi log-normale, meme pour toutes les activites)
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Ecart-type du logarithme neperien du delai en jours, pose sans source, identique pour toutes les
+    specialites (seule la mediane varie par specialite, comme le prescrit R-03). Une valeur de 0,5 produit
+    une dispersion modérée autour de la mediane, plausible pour un delai de rendez-vous hospitalier. Si
+    cette valeur etait fausse, l'etalement de la distribution des delais serait plus ou moins large, sans
+    effet sur la mediane par specialite ni sur aucun total.
+- nom: taux_annulation
+  valeur: 0.06
+  unite: proportion
+  provenance: HYP
+  preuve: S-20
+  note: 'Nom impose par la relation R-16 du registre des relations injectees : "Une part fixee des rendez-vous
+    est annulee, distincte de l''absenteisme." S-20 est cite comme source de la relation elle-meme (l''existence
+    d''un phenomene d''annulation distinct de l''absence), pas de sa valeur chiffree pour cet etablissement,
+    restee HYP. Si ce taux etait faux, le volume de rendez-vous annules affiche serait faussee, sans effet
+    sur le nombre de rendez-vous honores.'
+- nom: part_rdv_jour_meme
+  valeur: 0.03
+  unite: proportion
+  provenance: HYP
+  preuve: REL-RDV.C02
+  note: Nom impose par la relation R-17 du registre des relations injectees. Le rendez-vous releve au
+    poste (REL-RDV.C02) atteste d'un ecart d'une seconde entre creation et rendez-vous, preuve que le
+    phenomene existe ; sa frequence dans les donnees (3 %) est posee, pas mesuree -- le registre le dit
+    lui-meme explicitement ("sa frequence dans les donnees est un parametre"). Si ce taux etait faux,
+    le mode a zero jour de la distribution des delais affichee serait plus ou moins marque, sans effet
+    sur aucun total.
+- nom: part_patients_adresses
+  valeur: 0.15
+  unite: proportion
+  provenance: HYP
+  preuve: REL-RDV.R03
+  note: 'Nom impose par la relation R-18 du registre des relations injectees. Le code d''origine correspondant
+    (AU, AUTRES HOPITAUX) est deja releve au poste (REL-RDV.R03, nomenclature_origine) : ce parametre
+    fixe seulement la part des rendez-vous qui le portent, pas le code lui-meme. Si ce taux etait faux,
+    la part de patients adresses affichee page Patients serait faussee, sans effet sur aucun total de
+    rendez-vous.'
+- nom: repartition_types_attention
+  valeur:
+    '1': 0.35
+    '2': 0.65
+  unite: proportion par code de nomenclature_type_attention
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'La consultation de suivi (code 2) domine la premiere consultation (code 1), plausible pour une
+    file active dominee par des patients deja connus (mesure du lot de la table des patients : profil_recours_demographique).
+    Pose sans source. Si cette repartition etait fausse, la part de premieres consultations affichee serait
+    faussee, sans effet sur aucun total.'
+- nom: part_liste_attente
+  valeur: 0.04
+  unite: proportion des rendez-vous en instance inscrits en liste d'attente
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Part des rendez-vous encore en instance (au-dela de la fin de periode, sans issue connue) qui
+    figurent en outre sur la liste d'attente des consultations du bloc REL-RDV.L01-L03, plutot que simplement
+    programmes. Pose sans source. Si ce taux etait faux, la taille de la liste d'attente affichee serait
+    faussee, sans effet sur le nombre de rendez-vous en instance lui-meme.
+- nom: duree_minutes
+  valeur: 0
+  unite: minutes
+  provenance: OBS
+  preuve: REL-RDV.R12
+  note: 'La seule valeur observee au poste (REL-RDV.R12) est zero. Ce n''est pas un accident de generation
+    a corriger comme les colonnes dagenerees du lot precedent : c''est l''unique donnee reelle disponible
+    sur cette colonne, et rien n''indique que le systeme en place la renseigne jamais autrement (aucune
+    autre valeur relevee, aucune source documentaire ne decrit une duree calculee). Retenue telle quelle
+    pour toutes les lignes : une valeur inventee non appuyee par la preuve serait moins fidele que la
+    reproduction de l''unique fait observe. Si cette valeur etait fausse, la duree affichee serait invraisemblable,
+    sans effet sur aucun total.'
+- nom: comptes_utilisateurs_rdv
+  valeur:
+  - ADM-ACC01
+  - ADM-ACC02
+  - INF-BUR01
+  - INF-BUR02
+  - AGT-GUI01
+  unite: liste de comptes utilisateurs
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Meme ensemble de comptes que comptes_utilisateurs_systeme (demographie.yml), pour cree_par, modifie_par,
+    confirme_par et annule_par. Repete ici plutot que reference pour que ce fichier reste lisible independamment
+    ; les deux listes doivent rester synchronisees si l'une est modifiee.
