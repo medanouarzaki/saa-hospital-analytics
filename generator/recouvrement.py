@@ -49,12 +49,27 @@ def _tirage_uniforme_liste(valeurs: list, generateur: np.random.Generator):
     return valeurs[int(generateur.integers(0, len(valeurs)))]
 
 
-def _decouper_montant(montant: float, n_parts: int, generateur: np.random.Generator) -> list[float]:
+def _decouper_montant(
+    montant: float, n_parts: int, generateur: np.random.Generator, montant_minimal: float
+) -> list[float]:
     if n_parts == 1:
         return [round(montant, 2)]
     poids = generateur.dirichlet(np.ones(n_parts))
     parts = [round(montant * p, 2) for p in poids[:-1]]
     parts.append(round(montant - sum(parts), 2))
+    # absorbe toute part sous le seuil minimal dans une part voisine plutot que de la
+    # produire telle quelle : la somme des parts reste inchangee, seule leur repartition
+    # en nombre de lignes change.
+    fusionne = True
+    while fusionne and len(parts) > 1:
+        fusionne = False
+        for i, part in enumerate(parts):
+            if part < montant_minimal:
+                voisin = i - 1 if i > 0 else i + 1
+                parts[voisin] = round(parts[voisin] + part, 2)
+                del parts[i]
+                fusionne = True
+                break
     return parts
 
 
@@ -86,6 +101,7 @@ def generer_lignes(
     gabarit_encaissement = entrees["gabarit_identifiant_encaissement"]["valeur"]
     gabarit_creance = entrees["gabarit_identifiant_creance"]["valeur"]
     gabarit_relance = entrees["gabarit_identifiant_relance"]["valeur"]
+    montant_minimal = entrees["montant_minimal_encaissement"]["valeur"]
 
     modes_patient = [m for m, d in correspondance_debiteur.items() if d == "PATIENT"]
     poids_modes_patient = {m: repartition_modes[m] for m in modes_patient}
@@ -125,11 +141,13 @@ def generer_lignes(
             n_parts = 1
             if generateur.random() < part_partiels:
                 n_parts = int(_tirage_pondere_dict(loi_n_versements, generateur))
-            montants = _decouper_montant(encaisse, n_parts, generateur)
+            montants = _decouper_montant(encaisse, n_parts, generateur, montant_minimal)
 
+            # le seuil minimal peut avoir fusionne des parts : autant de delais que de
+            # montants effectivement produits, jamais que de versements demandes au depart
             loi_delai = delai_patient if debiteur == "PATIENT" else delai_organisme
             delais = sorted(
-                int(_tirage_pondere_dict(loi_delai, generateur)) for _ in range(n_parts)
+                int(_tirage_pondere_dict(loi_delai, generateur)) for _ in range(len(montants))
             )
 
             for montant, delai in zip(montants, delais, strict=True):
@@ -184,12 +202,12 @@ def generer_lignes(
         motif = _tirage_pondere_dict(repartition_motifs, generateur)
         montant_recouvre_cumule = round(facture["montant_total"] - montant_restant, 2)
 
-        # simule la trajectoire complete de la creance (versements deja programmes
-        # apres la naissance, puis relances) avant de decider si elle doit apparaitre
-        # dans la table : une creance qui se solde entierement avant la fin de periode
-        # ne laisse aucune ligne (jamais un montant nul, jamais un residu perime qui
-        # laisserait croire une facture soldee encore ouverte - mesure avant d'etre
-        # ecartee, voir le rapport).
+        # une creance qui atteint zero est ecrite dans son etat final (motif RCV, montant
+        # restant nul), jamais retiree : la contraindre a ne jamais naitre a zero (verifie
+        # plus haut) est une chose, lui interdire d'atteindre zero en est une autre - la
+        # premiere version de ce lot confondait les deux, ce qui faisait disparaitre de la
+        # table toute relance ayant reellement solde sa creance (mesure avant d'ecrire,
+        # voir le rapport).
         instantanes: list[dict] = [
             {
                 "n_facture": n_facture,
@@ -210,8 +228,7 @@ def generer_lignes(
             (jour, debiteur, montant) for debiteur, montant, jour in versements if jour > naissance
         )
         for jour, debiteur, montant in versements_posterieurs:
-            if montant_restant <= 0:
-                soldee = True
+            if soldee:
                 break
             reduction = min(montant, restant[debiteur])
             if reduction <= 0:
@@ -221,16 +238,15 @@ def generer_lignes(
             montant_recouvre_cumule = round(montant_recouvre_cumule + reduction, 2)
             if montant_restant <= 0:
                 soldee = True
-                break
             instantanes.append(
                 {
                     "n_facture": n_facture,
                     "date_naissance_creance": naissance,
                     "montant_du": round(facture["montant_total"], 2),
                     "montant_recouvre": montant_recouvre_cumule,
-                    "montant_restant": montant_restant,
+                    "montant_restant": max(montant_restant, 0.0),
                     "type_debiteur": type_debiteur,
-                    "motif_non_recouvrement": motif,
+                    "motif_non_recouvrement": "RCV" if soldee else motif,
                     "date_extraction": max(jour, date_debut),
                 }
             )
@@ -289,28 +305,26 @@ def generer_lignes(
 
                 if montant_restant <= 0:
                     soldee = True
-                    break
                 instantanes.append(
                     {
                         "n_facture": n_facture,
                         "date_naissance_creance": naissance,
                         "montant_du": round(facture["montant_total"], 2),
                         "montant_recouvre": montant_recouvre_cumule,
-                        "montant_restant": montant_restant,
+                        "montant_restant": max(montant_restant, 0.0),
                         "type_debiteur": type_debiteur,
-                        "motif_non_recouvrement": motif,
+                        "motif_non_recouvrement": "RCV" if soldee else motif,
                         "date_extraction": max(jour_encaissement, date_debut),
                     }
                 )
+                if soldee:
+                    break
 
         for enc in encaissements_relances:
             enc["n_encaissement"] = gabarit_encaissement.format(rang=rang_enc)
             enc["regisseur"] = _tirage_uniforme_liste(comptes_regisseurs, generateur)
             lignes_enc.append(enc)
             rang_enc += 1
-
-        if soldee:
-            continue
 
         n_creance = gabarit_creance.format(rang=rang_cre)
         rang_cre += 1
