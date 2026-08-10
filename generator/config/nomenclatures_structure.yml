@@ -56,19 +56,18 @@ parametres:
     clé étrangère vers une autre table, sans domaine énumérable. Classement fondé sur le nom, le libellé
     et la note de chaque colonne au registre.'
 - nom: colonnes_differees
-  valeur:
-  - table: source.lignes_facture
-    colonne: code_acte
-  - table: source.lignes_facture
-    colonne: lettre_cle
+  valeur: []
   unite: liste de colonnes
   provenance: OBS
   preuve: docs/champs/registre_champs.yml
   note: 'Colonnes de type_metier code, référentielles par nature d''après leur propre note au registre,
-    dont la nomenclature n''est pas encore établie : le code de l''acte et la lettre clé, dont la nomenclature
-    relève d''un travail distinct sur la facturation. Cette liste doit être vidée quand cette nomenclature
-    sera écrite ; une colonne qui reçoit sa nomenclature doit en sortir. Un test dédié vérifie qu''aucune
-    colonne de cette liste n''apparaît aussi dans la correspondance.'
+    dont la nomenclature n''était pas encore établie. Les deux colonnes qu''elle portait, le code de
+    l''acte et la lettre clé, sont désormais dans la correspondance colonne vers nomenclature
+    (nomenclature_actes, nomenclature_lettres_cles) : la liste est vide. Elle garde son nom, sa note et
+    son mécanisme de contrôle (une colonne qui reçoit sa nomenclature doit en sortir, et le test dédié
+    vérifie qu''aucune colonne de cette liste n''apparaît aussi dans la correspondance) pour toute future
+    colonne référentielle dont la nomenclature ne serait pas encore établie ; une liste vide qui garde son
+    mécanisme reste utile, une liste supprimée ne l''est plus.'
 - nom: correspondance_colonnes_nomenclatures
   valeur:
   - table: source.patients
@@ -227,6 +226,12 @@ parametres:
   - table: source.relances
     colonne: resultat
     nomenclature: nomenclature_resultat_relance
+  - table: source.lignes_facture
+    colonne: code_acte
+    nomenclature: nomenclature_actes
+  - table: source.lignes_facture
+    colonne: lettre_cle
+    nomenclature: nomenclature_lettres_cles
   unite: liste de correspondances
   provenance: OBS
   preuve: docs/champs/registre_champs.yml

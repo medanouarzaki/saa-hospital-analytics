@@ -1,0 +1,212 @@
+parametres:
+- nom: nomenclature_actes
+  valeur:
+  - code: CONS-20
+    libelle: Consultation de médecine générale
+    lettre_cle: C
+    coefficient: 1
+    type_rattachement: activite
+    rattachement: '20'
+  - code: CONS-21
+    libelle: Consultation de médecine interne
+    lettre_cle: Cs
+    coefficient: 1
+    type_rattachement: activite
+    rattachement: '21'
+  - code: CONS-30
+    libelle: Consultation de pédiatrie
+    lettre_cle: Cp
+    coefficient: 1
+    type_rattachement: activite
+    rattachement: '30'
+  - code: CONS-14
+    libelle: Consultation de gynécologie-obstétrique
+    lettre_cle: Cs
+    coefficient: 1
+    type_rattachement: activite
+    rattachement: '14'
+  - code: CONS-04
+    libelle: Consultation de cardiologie
+    lettre_cle: Cs
+    coefficient: 1
+    type_rattachement: activite
+    rattachement: '4'
+  - code: CONS-28
+    libelle: Consultation d'ophtalmologie
+    lettre_cle: Cs
+    coefficient: 1
+    type_rattachement: activite
+    rattachement: '28'
+  - code: CONS-29
+    libelle: Consultation d'oto-rhino-laryngologie
+    lettre_cle: Cs
+    coefficient: 1
+    type_rattachement: activite
+    rattachement: '29'
+  - code: CONS-11
+    libelle: Consultation de dermatologie
+    lettre_cle: Cs
+    coefficient: 1
+    type_rattachement: activite
+    rattachement: '11'
+  - code: LAB-IS-01
+    libelle: Sérologie hépatite B
+    lettre_cle: B
+    coefficient: 15
+    type_rattachement: service
+    rattachement: LAB
+  - code: LAB-IS-02
+    libelle: Sérologie hépatite C
+    lettre_cle: B
+    coefficient: 15
+    type_rattachement: service
+    rattachement: LAB
+  - code: LAB-IS-03
+    libelle: Sérologie VIH
+    lettre_cle: B
+    coefficient: 20
+    type_rattachement: service
+    rattachement: LAB
+  - code: LAB-IS-04
+    libelle: Sérologie toxoplasmose
+    lettre_cle: B
+    coefficient: 20
+    type_rattachement: service
+    rattachement: LAB
+  - code: LAB-IS-05
+    libelle: Sérologie rubéole
+    lettre_cle: B
+    coefficient: 20
+    type_rattachement: service
+    rattachement: LAB
+  - code: LAB-IS-06
+    libelle: Dosage de la protéine C réactive
+    lettre_cle: B
+    coefficient: 10
+    type_rattachement: service
+    rattachement: LAB
+  - code: LAB-HT-01
+    libelle: Numération formule sanguine
+    lettre_cle: B
+    coefficient: 25
+    type_rattachement: service
+    rattachement: LAB
+  - code: LAB-HT-02
+    libelle: Groupage sanguin ABO Rhésus
+    lettre_cle: B
+    coefficient: 15
+    type_rattachement: service
+    rattachement: LAB
+  - code: LAB-HT-03
+    libelle: Taux de prothrombine
+    lettre_cle: B
+    coefficient: 15
+    type_rattachement: service
+    rattachement: LAB
+  - code: LAB-HT-04
+    libelle: Temps de céphaline activée
+    lettre_cle: B
+    coefficient: 15
+    type_rattachement: service
+    rattachement: LAB
+  - code: LAB-HT-05
+    libelle: Recherche d'agglutinines irrégulières
+    lettre_cle: B
+    coefficient: 20
+    type_rattachement: service
+    rattachement: LAB
+  - code: LAB-HT-06
+    libelle: Vitesse de sédimentation
+    lettre_cle: B
+    coefficient: 8
+    type_rattachement: service
+    rattachement: LAB
+  - code: LAB-CB-01
+    libelle: Glycémie
+    lettre_cle: B
+    coefficient: 6
+    type_rattachement: service
+    rattachement: LAB
+  - code: LAB-CB-02
+    libelle: Créatininémie
+    lettre_cle: B
+    coefficient: 8
+    type_rattachement: service
+    rattachement: LAB
+  - code: LAB-CB-03
+    libelle: Ionogramme sanguin
+    lettre_cle: B
+    coefficient: 15
+    type_rattachement: service
+    rattachement: LAB
+  - code: LAB-CB-04
+    libelle: Bilan hépatique
+    lettre_cle: B
+    coefficient: 12
+    type_rattachement: service
+    rattachement: LAB
+  - code: LAB-CB-05
+    libelle: Bilan lipidique
+    lettre_cle: B
+    coefficient: 12
+    type_rattachement: service
+    rattachement: LAB
+  - code: LAB-CB-06
+    libelle: Urée sanguine
+    lettre_cle: B
+    coefficient: 6
+    type_rattachement: service
+    rattachement: LAB
+  - code: IMG-Z-01
+    libelle: Radiographie du thorax
+    lettre_cle: Z
+    coefficient: 12
+    type_rattachement: service
+    rattachement: RAD
+  - code: IMG-Z-02
+    libelle: Radiographie de l'abdomen sans préparation
+    lettre_cle: Z
+    coefficient: 15
+    type_rattachement: service
+    rattachement: RAD
+  - code: IMG-Z-03
+    libelle: Radiographie osseuse standard
+    lettre_cle: Z
+    coefficient: 10
+    type_rattachement: service
+    rattachement: RAD
+  - code: IMG-Z-04
+    libelle: Radiographie du rachis
+    lettre_cle: Z
+    coefficient: 14
+    type_rattachement: service
+    rattachement: RAD
+  - code: IMG-KE-01
+    libelle: Échographie abdominale
+    lettre_cle: KE
+    coefficient: 20
+    type_rattachement: service
+    rattachement: RAD
+  - code: IMG-KE-02
+    libelle: Électrocardiogramme
+    lettre_cle: KE
+    coefficient: 8
+    type_rattachement: service
+    rattachement: RAD
+  unite: couples code-libellé, plus lettre clé, coefficient et rattachement
+  provenance: HYP
+  preuve: S-17
+  note: 'La structure — un acte identifié par un code, rémunéré par une lettre clé et un coefficient,
+    rattaché à l''activité ou au service qui le pratique — est celle du système national dont S-17 donne
+    la grille des lettres clés (contenu lu). Le détail acte par acte (quel examen, quel coefficient précis)
+    n''est corroboré par aucune source ouverte et reste posé : coefficients choisis dans l''ordre de
+    grandeur usuel de la nomenclature marocaine pour des actes de biologie et d''imagerie courants, sans
+    valeur individuelle vérifiée. Aucun acte chirurgical, aucun examen de bactériologie, de parasitologie
+    ni d''hygiène alimentaire : les trois catégories mesurées à zéro (examens_bacteriologie,
+    examens_parasitologie, examens_hygiene_alimentaire) et l''absence mesurée d''interventions
+    chirurgicales (interventions_chirurgicales) n''ont aucun acte correspondant. Le laboratoire porte six
+    actes par catégorie mesurée non nulle (immuno-sérologie, hématologie-transfusion, chimie biologie),
+    pour qu''une table des lignes de facture répartissant des dizaines de milliers d''examens sur ces
+    catégories ne les concentre pas sur une poignée de codes. Si un coefficient individuel était faux, le
+    montant absolu des lignes portant cet acte serait faussé, sans effet sur le nombre d''actes par
+    catégorie ni sur les totaux mesurés par ailleurs.'

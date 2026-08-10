@@ -37,6 +37,13 @@ COLONNES_ENUMEREES_AU_REGISTRE = [
 
 TERMES_INTERDITS = ["chirurg", "bactério", "bacterio", "parasito", "hygiène aliment"]
 
+# Mesure 1.4 du lot : catégories de laboratoire non nulles sur la période, et le préfixe de
+# code d'acte retenu pour chacune (§3). Les trois catégories mesurées à zéro (bactériologie,
+# parasitologie, hygiène alimentaire) ne portent aucun préfixe : aucun acte ne doit leur
+# correspondre.
+PREFIXES_LABORATOIRE_NON_NUL = {"LAB-IS-": 6, "LAB-HT-": 6, "LAB-CB-": 6}
+FRAGMENTS_LABORATOIRE_NUL = ["BACT", "PARA", "HYG"]
+
 
 def entrees_config() -> dict[str, dict]:
     return {e["nom"]: e for e in config.charger_entrees()}
@@ -193,8 +200,152 @@ def test_erreurs_nommees() -> None:
     except KeyError as erreur:
         assert "ZZ" in str(erreur)
 
+    entrees = entrees_config()
+    entrees_avec_colonne_differee = dict(entrees)
+    entrees_avec_colonne_differee["colonnes_differees"] = {
+        **entrees["colonnes_differees"],
+        "valeur": [*entrees["colonnes_differees"]["valeur"], {"table": "source.x", "colonne": "y"}],
+    }
     try:
-        nomenclatures.nomenclature_colonne("source.lignes_facture", "code_acte")
+        nomenclatures.nomenclature_colonne("source.x", "y", entrees_avec_colonne_differee)
         raise AssertionError("une colonne différée aurait dû lever une erreur")
     except KeyError as erreur:
-        assert "code_acte" in str(erreur)
+        assert "y" in str(erreur)
+
+    try:
+        nomenclatures.nomenclature_colonne("source.inconnue", "z", entrees)
+        raise AssertionError("une colonne sans nomenclature aurait dû lever une erreur")
+    except KeyError as erreur:
+        assert "z" in str(erreur)
+
+
+def test_lettre_cle_existante() -> None:
+    entrees = entrees_config()
+    lettres_valides = {c["code"] for c in entrees["nomenclature_lettres_cles"]["valeur"]}
+    actes = entrees["nomenclature_actes"]["valeur"]
+    assert actes
+    lettres_utilisees = {acte["lettre_cle"] for acte in actes}
+
+    for acte in actes:
+        assert acte["lettre_cle"] in lettres_valides, acte
+
+    orphelines = lettres_valides - lettres_utilisees
+    assert lettres_utilisees == lettres_valides, f"orphelines : {orphelines}"
+
+
+def test_rattachement_acte() -> None:
+    entrees = entrees_config()
+    codes_activite = set(nomenclatures.codes_nomenclature("nomenclature_activite", entrees))
+    codes_service = set(nomenclatures.codes_nomenclature("nomenclature_service", entrees))
+    actes = entrees["nomenclature_actes"]["valeur"]
+    assert actes
+
+    for acte in actes:
+        assert acte["type_rattachement"] in ("activite", "service"), acte
+        if acte["type_rattachement"] == "activite":
+            assert acte["rattachement"] in codes_activite, acte
+        else:
+            assert acte["rattachement"] in codes_service, acte
+
+
+def test_coefficients_et_valeurs_strictement_positifs() -> None:
+    entrees = entrees_config()
+    for lettre in entrees["nomenclature_lettres_cles"]["valeur"]:
+        assert lettre["valeur_unitaire"] > 0, lettre
+    for acte in entrees["nomenclature_actes"]["valeur"]:
+        assert acte["coefficient"] > 0, acte
+
+
+def _montant(valeur_lettre: float, coefficient: float, quantite: int) -> float:
+    return valeur_lettre * coefficient * quantite
+
+
+def test_montant_se_calcule() -> None:
+    entrees = entrees_config()
+    valeurs_lettres = {
+        c["code"]: c["valeur_unitaire"] for c in entrees["nomenclature_lettres_cles"]["valeur"]
+    }
+    actes_par_code = {a["code"]: a for a in entrees["nomenclature_actes"]["valeur"]}
+
+    cas = [
+        ("CONS-20", 1),
+        ("CONS-30", 2),
+        ("LAB-CB-01", 3),
+        ("IMG-Z-01", 1),
+    ]
+    for code_acte, quantite in cas:
+        acte = actes_par_code[code_acte]
+        valeur_lettre = valeurs_lettres[acte["lettre_cle"]]
+        attendu = valeur_lettre * acte["coefficient"] * quantite
+        obtenu = _montant(valeur_lettre, acte["coefficient"], quantite)
+        assert obtenu == attendu, (code_acte, quantite, obtenu, attendu)
+        # la quantité multiplie bien le montant, pas seulement le coefficient
+        assert _montant(valeur_lettre, acte["coefficient"], quantite * 2) == attendu * 2
+
+
+def test_dette_soldee_et_partition() -> None:
+    entrees = entrees_config()
+    assert entrees["colonnes_differees"]["valeur"] == []
+
+    correspondance = {
+        (c["table"], c["colonne"])
+        for c in entrees["correspondance_colonnes_nomenclatures"]["valeur"]
+    }
+    assert ("source.lignes_facture", "code_acte") in correspondance
+    assert ("source.lignes_facture", "lettre_cle") in correspondance
+
+    identifiants = {(c["table"], c["colonne"]) for c in entrees["colonnes_identifiants"]["valeur"]}
+    differees = {(c["table"], c["colonne"]) for c in entrees["colonnes_differees"]["valeur"]}
+    colonnes_registre = {(e["table"], e["colonne"]) for e in colonnes_code_registre()}
+
+    assert identifiants.isdisjoint(differees)
+    assert identifiants.isdisjoint(correspondance)
+    assert differees.isdisjoint(correspondance)
+    assert identifiants | differees | correspondance == colonnes_registre
+    assert len(identifiants) + len(differees) + len(correspondance) == len(colonnes_registre)
+
+
+def test_couverture_laboratoire() -> None:
+    entrees = entrees_config()
+    codes = [a["code"] for a in entrees["nomenclature_actes"]["valeur"]]
+
+    for prefixe, minimum in PREFIXES_LABORATOIRE_NON_NUL.items():
+        n = sum(1 for c in codes if c.startswith(prefixe))
+        assert n >= minimum, (prefixe, n, minimum)
+
+    for fragment in FRAGMENTS_LABORATOIRE_NUL:
+        assert not any(fragment in c for c in codes), fragment
+
+
+def test_interdits_couvrent_les_nouvelles_nomenclatures() -> None:
+    entrees = entrees_config()
+
+    fabrique = [
+        *entrees["nomenclature_actes"]["valeur"],
+        {
+            "code": "X",
+            "libelle": "Chirurgie générale",
+            "lettre_cle": "Cs",
+            "coefficient": 1,
+            "type_rattachement": "service",
+            "rattachement": "CE",
+        },
+    ]
+    entrees_positives = dict(entrees)
+    entrees_positives["nomenclature_actes"] = {**entrees["nomenclature_actes"], "valeur": fabrique}
+    trouve = any(
+        any(any(t in couple["libelle"].lower() for t in TERMES_INTERDITS) for couple in e["valeur"])
+        for nom, e in entrees_positives.items()
+        if nom.startswith("nomenclature_")
+    )
+    assert trouve, "le contrôle positif fabriqué (Chirurgie générale) n'a pas été détecté"
+
+    for couple in entrees["nomenclature_actes"]["valeur"]:
+        libelle_bas = couple["libelle"].lower()
+        for terme in TERMES_INTERDITS:
+            assert terme not in libelle_bas, (couple["code"], terme)
+
+    for couple in entrees["nomenclature_lettres_cles"]["valeur"]:
+        libelle_bas = couple["libelle"].lower()
+        for terme in TERMES_INTERDITS:
+            assert terme not in libelle_bas, (couple["code"], terme)
