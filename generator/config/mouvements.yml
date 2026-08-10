@@ -1,14 +1,38 @@
 parametres:
-- nom: taux_admission_urgence
-  valeur: 0.3
-  unite: proportion des sejours
+- nom: repartition_unites_hospitalisation
+  valeur:
+    HM: 0.55
+    HPED: 0.25
+    HGO: 0.2
+  unite: proportion par code de nomenclature_service (unites d'hospitalisation non chirurgicales)
   provenance: HYP
   preuve: sans_preuve_externe
-  note: Aucune source ne relie le mode d'admission (ordinaire ou urgence, nomenclature_mode_admission,
-    articles 40/42/45 du reglement interieur) a une proportion mesuree pour cet
-    etablissement. Pose sans source. Si ce taux etait faux, la part d'admissions en urgence
-    affichee serait faussee, sans effet sur le nombre total de sejours, fixe par le nombre
-    de passages d'hospitalisation.
+  note: Repartition des admissions entre les trois unites d'hospitalisation non
+    chirurgicales de nomenclature_service (HM, HPED, HGO - voir
+    generator/config/nomenclatures_organisation_activite.yml pour leur justification une a
+    une). HM domine, plausible pour une unite regroupant medecine generale, medecine
+    interne et cardiologie face a deux unites plus specialisees. Posee sans source. Lue
+    aussi par generator/urgences.py pour la colonne service_orientation des passages
+    orientes vers l'hospitalisation (HO), les deux modules dessinant independamment un
+    meme phenomene, comme deja pratique entre generator/passages.py et
+    generator/mouvements.py. Si cette repartition etait fausse, la charge relative
+    affichee par unite serait faussee, sans effet sur le nombre total de sejours ni sur la
+    capacite de chaque unite.
+- nom: capacite_par_unite
+  valeur:
+    HM: 22
+    HPED: 10
+    HGO: 8
+  unite: lits par unite d'hospitalisation
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Repartition de la capacite litiere fonctionnelle totale (40 lits, DOC, S-30,
+    generator/config/volumetrie.yml, lue, non modifiee) entre les trois unites, dans le
+    meme ordre de grandeur que repartition_unites_hospitalisation. Posee sans source ;
+    la somme (40) doit toujours egaler capacite_litiere_fonctionnelle, verifie par le
+    test generique et par tests/test_mouvements.py. Si cette repartition etait fausse,
+    l'occupation maximale affichee par unite serait faussee, sans effet sur l'occupation
+    totale de l'etablissement, qui reste bornee par la capacite totale.
 - nom: repartition_mode_sortie
   valeur:
     R: 0.85
@@ -59,10 +83,14 @@ parametres:
     reglement interieur, sans distinguer les mutations des autres mouvements). Choix
     technique, non observe.
 - nom: gabarit_identifiant_lit
-  valeur: LIT-{rang:03d}
+  valeur: "LIT-{unite}-{rang:03d}"
   unite: gabarit de formatage
   provenance: HYP
   preuve: sans_preuve_externe
-  note: Gabarit interprete par le generateur a partir du rang du lit dans le pool dont la
-    taille est capacite_litiere_fonctionnelle (generator/config/volumetrie.yml, lu, non
-    modifie). Choix technique, non observe.
+  note: Gabarit interprete par le generateur a partir du code de l'unite d'hospitalisation
+    et du rang du lit dans le pool propre a cette unite, dont la taille est
+    capacite_par_unite. Le code d'unite fait partie de l'identifiant depuis que la
+    capacite litiere totale (generator/config/volumetrie.yml, lue, non modifiee) est
+    repartie entre plusieurs unites - deux unites distinctes ne partagent aucun rang de
+    lit, chaque pool etant numerote independamment a partir de 1. Choix technique, non
+    observe.

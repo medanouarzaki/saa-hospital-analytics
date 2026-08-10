@@ -154,7 +154,10 @@ def test_capacite_jamais_depassee(generation: dict) -> None:
             evenements.append((debut, 1))
             evenements.append((fin, -1))
 
-    evenements.sort(key=lambda e: (e[0], -e[1]))
+    # une depart (-1) au meme instant qu'une arrivee (+1) libere le lit avant qu'il ne
+    # soit repris : traiter les departs en premier a timestamp egal, sinon un lit rendu et
+    # aussitot repris compte deux occupants simultanes qui n'existent jamais reellement.
+    evenements.sort(key=lambda e: (e[0], e[1]))
     occ = 0
     max_occ = 0
     for _, delta in evenements:
@@ -249,6 +252,57 @@ def test_sejours_en_cours(generation: dict) -> None:
 
     assert n_sejours_sans_sortie == n_passages_sans_sortie
     assert n_sejours_sans_sortie > 0
+
+
+def test_mutation_change_toujours_unite(generation: dict) -> None:
+    lignes_mvt = generation["lignes"][TABLE]
+
+    mutations = [ligne for ligne in lignes_mvt if ligne["date_heure_mutation"] is not None]
+    assert mutations, "aucune ligne de mutation à contrôler"
+    for ligne in mutations:
+        assert ligne["service_origine"] != ligne["service_destination"], ligne
+
+
+def test_somme_dotations_egale_capacite_totale(generation: dict) -> None:
+    entrees = generation["entrees"]
+    capacite_par_unite = entrees["capacite_par_unite"]["valeur"]
+    capacite_totale = entrees["capacite_litiere_fonctionnelle"]["valeur"]
+
+    assert sum(capacite_par_unite.values()) == capacite_totale
+
+
+def test_occupation_maximale_par_unite_sous_dotation(generation: dict) -> None:
+    entrees = generation["entrees"]
+    lignes_mvt = generation["lignes"][TABLE]
+    capacite_par_unite = entrees["capacite_par_unite"]["valeur"]
+    date_fin = date.fromisoformat(entrees["date_fin"]["valeur"])
+
+    groupes = _par_sejour(lignes_mvt)
+    evenements_par_unite: dict[str, list[tuple[datetime, int]]] = defaultdict(list)
+    for lignes_du_sejour in groupes.values():
+        lignes_triees = _lignes_avec_lit_triees(lignes_du_sejour)
+        for indice, ligne in enumerate(lignes_triees):
+            unite = ligne["service_accueil"] or ligne["service_destination"]
+            debut = ligne["date_heure_admission"] or ligne["date_heure_mutation"]
+            if indice + 1 < len(lignes_triees):
+                suivante = lignes_triees[indice + 1]
+                fin = suivante["date_heure_admission"] or suivante["date_heure_mutation"]
+            else:
+                fin = _fin_pour_calcul(lignes_du_sejour, date_fin)
+            evenements_par_unite[unite].append((debut, 1))
+            evenements_par_unite[unite].append((fin, -1))
+
+    assert evenements_par_unite, "aucune unité à contrôler"
+    for unite, evenements in evenements_par_unite.items():
+        # meme regle de priorite qu'en 4 : un depart au meme instant qu'une arrivee
+        # libere le lit avant qu'il ne soit repris.
+        evenements_tries = sorted(evenements, key=lambda e: (e[0], e[1]))
+        occ = 0
+        max_occ = 0
+        for _, delta in evenements_tries:
+            occ += delta
+            max_occ = max(max_occ, occ)
+        assert max_occ <= capacite_par_unite[unite], (unite, max_occ, capacite_par_unite[unite])
 
 
 def test_aucune_activite_chirurgicale(generation: dict) -> None:

@@ -7,11 +7,21 @@ séjour est tirée par ce module, indépendamment de celle déjà tirée par
 `generator/passages.py` pour le même passage (non modifiable ce lot) ; sa moyenne, pas sa
 médiane, est ajustée pour reproduire le rapport journées d'hospitalisation / admissions
 mesuré (voir le rapport), le seul degré de liberté qui reste une fois les admissions et
-leur date déjà fixées par le fil des épisodes. Un lit ne porte jamais deux séjours qui se
-chevauchent : l'attribution se fait par un balayage chronologique des occupations, avec un
-mécanisme explicite si la capacité venait à être dépassée (mesuré avant d'être écrit : ne
-survient jamais sur la génération de référence, voir le rapport). Ne tire aucun nombre en
-dehors du générateur reçu en argument.
+leur date déjà fixées par le fil des épisodes. Chaque séjour est admis dans l'une des trois
+unités d'hospitalisation non chirurgicales ; une mutation change toujours d'unité, jamais
+vers celle d'origine. Un lit ne porte jamais deux séjours qui se chevauchent au sein d'une
+même unité : l'attribution se fait par un balayage chronologique des occupations, séparé
+par unité (chacune sa propre dotation), avec un mécanisme explicite si sa capacité venait à
+être dépassée. La part d'admissions de mode urgence est dérivée de la part d'orientation
+vers l'hospitalisation des urgences (`orientation_urgences["HO"]`, voir
+`generator/config/urgences.yml`), pas tirée indépendamment : les deux décrivent le même
+flux et doivent s'accorder en décompte agrégé. `orientation_urgences["HO"]` est une part
+des passages aux urgences, une population bien plus large que les admissions
+d'hospitalisation elles-mêmes ; le taux appliqué au tirage ci-dessous est recalculé pour
+ramener le compte cible (cette part multipliée par le nombre de passages aux urgences) à
+une proportion des admissions effectivement fixées par le fil des épisodes, sans quoi les
+deux décomptes ne pourraient jamais s'accorder en agrégé. Ne tire aucun nombre en dehors du
+générateur reçu en argument.
 """
 
 import math
@@ -56,19 +66,27 @@ def _mu_lognormal_pour_moyenne(moyenne_cible: float, ecart_type_log: float) -> f
     return math.log(moyenne_cible) - (ecart_type_log**2) / 2
 
 
-def _attribuer_lits(segments: list[dict], capacite: int, gabarit_lit: str) -> int:
-    # balayage chronologique par debut de segment (interval scheduling) : un lit libere par
-    # un segment dont la fin precede ou egale le debut du segment courant est reutilise ;
-    # a defaut, un lit neuf est pris dans le pool. Si le pool est deja epuise (capacite
-    # atteinte), mecanisme explicite : le segment en cours dont la fin est la plus tardive
-    # est tronque a l'instant du nouveau segment, liberant son lit ; effet mesure et
-    # rapporte, jamais applique en silence.
+def _attribuer_lits_unite(segments: list[dict], capacite: int, gabarit_lit: str, unite: str) -> int:
+    # balayage chronologique par debut de segment (interval scheduling), au sein d'une
+    # seule unite : un lit libere par un segment dont la fin precede ou egale le debut du
+    # segment courant est reutilise ; a defaut, un lit neuf est pris dans le pool propre a
+    # l'unite. Si le pool est deja epuise, mecanisme explicite : le segment en cours dont
+    # la fin est la plus tardive est tronque a l'instant du nouveau segment, liberant son
+    # lit ; effet mesure et rapporte, jamais applique en silence. Un segment tronque qui
+    # porte une mutation planifiee voit cette mutation annulee en cascade (le sejour se
+    # termine au point de troncature, il ne peut pas changer d'unite apres coup) : sans
+    # cette cascade, le segment de mutation, deja construit avec son propre debut fixe,
+    # laisserait une occupation fantome apres la troncature de son predecesseur.
     segments_tries = sorted(segments, key=lambda s: s["debut"])
     lits_libres = list(range(1, capacite + 1))
     occupes: list[tuple[int, dict]] = []
+    annules: set[int] = set()
     n_depassements = 0
 
     for segment in segments_tries:
+        if id(segment) in annules:
+            continue
+
         encore_occupes = []
         for lit_id, occ in occupes:
             if occ["fin"] <= segment["debut"]:
@@ -79,16 +97,44 @@ def _attribuer_lits(segments: list[dict], capacite: int, gabarit_lit: str) -> in
 
         if not lits_libres:
             n_depassements += 1
-            lit_id, occ_le_plus_long = max(occupes, key=lambda t: t[1]["fin"])
+            # candidats a la troncature : jamais un sejour encore ouvert (sans sortie
+            # connue du passage correspondant) en priorite, sa fin de balayage tres
+            # eloignee (fin de periode) le designerait presque toujours sinon, ce qui
+            # forcerait une sortie que le passage ne porte pas ; repli sur l'ensemble des
+            # occupes seulement si aucun candidat clos n'est disponible.
+            candidats = [
+                (lid, o) for lid, o in occupes if o["sejour"]["sortie_visible"] is not None
+            ]
+            if not candidats:
+                candidats = occupes
+            lit_id, occ_le_plus_long = max(candidats, key=lambda t: t[1]["fin"])
             occ_le_plus_long["fin"] = segment["debut"]
             occ_le_plus_long["tronque"] = True
             occupes = [(lid, o) for lid, o in occupes if o is not occ_le_plus_long]
             lits_libres.append(lit_id)
 
+            sejour_tronque = occ_le_plus_long["sejour"]
+            segment_suivant = sejour_tronque.get("segment_mutation")
+            if segment_suivant is not None and segment_suivant is not occ_le_plus_long:
+                annules.add(id(segment_suivant))
+                sejour_tronque["mutation_ts"] = None
+                sejour_tronque["unite_destination"] = None
+                sejour_tronque["segment_mutation"] = None
+
         lit_id = lits_libres.pop(0)
-        segment["lit"] = gabarit_lit.format(rang=lit_id)
+        segment["lit"] = gabarit_lit.format(unite=unite, rang=lit_id)
         occupes.append((lit_id, segment))
 
+    return n_depassements
+
+
+def _attribuer_lits(
+    segments: list[dict], capacite_par_unite: dict[str, int], gabarit_lit: str
+) -> int:
+    n_depassements = 0
+    for unite, capacite in capacite_par_unite.items():
+        segments_unite = [s for s in segments if s["unite"] == unite]
+        n_depassements += _attribuer_lits_unite(segments_unite, capacite, gabarit_lit, unite)
     return n_depassements
 
 
@@ -101,12 +147,13 @@ def generer_lignes(
 
     date_debut = date.fromisoformat(entrees["date_debut"]["valeur"])
     date_fin = date.fromisoformat(entrees["date_fin"]["valeur"])
-    capacite = entrees["capacite_litiere_fonctionnelle"]["valeur"]
     gabarit_sejour = entrees["gabarit_identifiant_sejour"]["valeur"]
     gabarit_mouvement = entrees["gabarit_identifiant_mouvement"]["valeur"]
     gabarit_lit = entrees["gabarit_identifiant_lit"]["valeur"]
-    taux_urgence = entrees["taux_admission_urgence"]["valeur"]
+    part_orientation_ho = entrees["orientation_urgences"]["valeur"]["HO"]
     repartition_sortie = entrees["repartition_mode_sortie"]["valeur"]
+    repartition_unites = entrees["repartition_unites_hospitalisation"]["valeur"]
+    capacite_par_unite = entrees["capacite_par_unite"]["valeur"]
     part_mutation = entrees["part_sejours_avec_mutation"]["valeur"]
     ecart_type_log = entrees["ecart_type_log_duree_sejour"]["valeur"]
 
@@ -114,10 +161,21 @@ def generer_lignes(
     moyenne_cible_jours = _duree_moyenne_cible_jours(lignes_h, entrees)
     mu = _mu_lognormal_pour_moyenne(moyenne_cible_jours, ecart_type_log)
 
+    # orientation_urgences["HO"] est une part DES PASSAGES AUX URGENCES (population bien
+    # plus grande que les admissions d'hospitalisation), pas une part directement
+    # applicable aux admissions elles-memes : le nombre cible d'admissions de mode urgence
+    # est le nombre de passages aux urgences oriente vers l'hospitalisation, ramene aux
+    # admissions effectivement fixees par le fil des episodes -- c'est cette proportion-la,
+    # et non part_orientation_ho telle quelle, qui doit gouverner le tirage ci-dessous pour
+    # que les deux decomptes s'accordent en agrege.
+    n_urgences_total = sum(1 for ligne in lignes_passages if ligne["type_passage"] == "U")
+    n_ho_attendu = part_orientation_ho * n_urgences_total
+    taux_urgence = n_ho_attendu / len(lignes_h) if lignes_h else 0.0
+
     # premiere passe : construit chaque sejour (un ou deux segments d'occupation), sans
-    # attribuer de lit -- l'attribution se fait globalement, apres coup, sur l'ensemble des
-    # segments de tous les sejours, pour que la capacite soit respectee sur toute la
-    # periode et non sejour par sejour.
+    # attribuer de lit -- l'attribution se fait globalement par unite, apres coup, sur
+    # l'ensemble des segments de la periode, pour que la capacite de chaque unite soit
+    # respectee sur toute la periode et non sejour par sejour.
     sejours: list[dict] = []
     segments: list[dict] = []
 
@@ -125,6 +183,7 @@ def generer_lignes(
         n_sejour = gabarit_sejour.format(rang=rang)
         admission = passage["date_heure_entree"]
         ferme = passage["date_heure_sortie"] is not None
+        unite_admission = _tirage_pondere_dict(repartition_unites, generateur)
 
         if ferme:
             duree_jours = max(1 / 24, float(generateur.lognormal(mu, ecart_type_log)))
@@ -144,9 +203,14 @@ def generer_lignes(
             and generateur.random() < part_mutation
         )
         mutation_ts = None
+        unite_destination = None
         if avec_mutation:
             fraction = generateur.uniform(0.2, 0.8)
             mutation_ts = admission + (fin_balayage - admission) * fraction
+            # une mutation change toujours d'unite : tirage uniforme parmi les unites
+            # autres que celle d'origine, jamais celle-ci.
+            autres_unites = [u for u in repartition_unites if u != unite_admission]
+            unite_destination = autres_unites[int(generateur.integers(0, len(autres_unites)))]
 
         sejour = {
             "n_sejour": n_sejour,
@@ -154,6 +218,8 @@ def generer_lignes(
             "admission": admission,
             "sortie_visible": sortie,
             "mutation_ts": mutation_ts,
+            "unite_admission": unite_admission,
+            "unite_destination": unite_destination,
         }
         sejours.append(sejour)
 
@@ -163,12 +229,14 @@ def generer_lignes(
                 "fin": mutation_ts,
                 "sejour": sejour,
                 "role": "admission",
+                "unite": unite_admission,
             }
             segment_2 = {
                 "debut": mutation_ts,
                 "fin": fin_balayage,
                 "sejour": sejour,
                 "role": "mutation",
+                "unite": unite_destination,
             }
             segments.append(segment_1)
             segments.append(segment_2)
@@ -180,12 +248,13 @@ def generer_lignes(
                 "fin": fin_balayage,
                 "sejour": sejour,
                 "role": "admission",
+                "unite": unite_admission,
             }
             segments.append(segment_1)
             sejour["segment_admission"] = segment_1
             sejour["segment_mutation"] = None
 
-    n_depassements = _attribuer_lits(segments, capacite, gabarit_lit)
+    n_depassements = _attribuer_lits(segments, capacite_par_unite, gabarit_lit)
 
     lignes: list[dict] = []
     rang_mouvement = 0
@@ -205,7 +274,7 @@ def generer_lignes(
             "n_ipp": sejour["n_ipp"],
             "date_heure_admission": sejour["admission"],
             "mode_admission": mode_admission,
-            "service_accueil": "HM",
+            "service_accueil": sejour["unite_admission"],
             "lit": segment_admission["lit"],
             "n_mutation": prochain_n_mouvement(),
             "service_origine": None,
@@ -226,8 +295,8 @@ def generer_lignes(
                 "service_accueil": None,
                 "lit": segment_mutation["lit"],
                 "n_mutation": prochain_n_mouvement(),
-                "service_origine": "HM",
-                "service_destination": "HM",
+                "service_origine": sejour["unite_admission"],
+                "service_destination": sejour["unite_destination"],
                 "date_heure_mutation": sejour["mutation_ts"],
                 "date_heure_sortie": None,
                 "mode_sortie": None,
