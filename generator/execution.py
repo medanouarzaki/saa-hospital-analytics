@@ -21,6 +21,7 @@ from generator import (
     alea,
     config,
     ecriture,
+    facturation,
     mouvements,
     parcours,
     passages,
@@ -87,12 +88,32 @@ def _generer_urgences(contexte: Contexte, generateur: np.random.Generator) -> li
     return urgences.generer_lignes(lignes_passages, generateur, entrees=contexte.entrees)
 
 
+def _generer_factures(contexte: Contexte, generateur: np.random.Generator) -> list[dict]:
+    # les deux tables de facturation partagent un seul tirage aleatoire (memes factures,
+    # memes lignes) : ce generateur calcule les deux et met la seconde de cote dans le
+    # contexte, pour que _generer_lignes_facture la consomme sans retirer de nombres.
+    lignes_passages = contexte.lignes["source.passages"]
+    lignes_mouvements = contexte.lignes["source.mouvements"]
+    lignes_factures, lignes_lignes = facturation.generer_lignes(
+        lignes_passages, lignes_mouvements, generateur, entrees=contexte.entrees
+    )
+    contexte.meta["lignes_facture_en_attente"] = lignes_lignes
+    return lignes_factures
+
+
+def _generer_lignes_facture(contexte: Contexte, generateur: np.random.Generator) -> list[dict]:
+    del generateur
+    return contexte.meta.pop("lignes_facture_en_attente")
+
+
 REGISTRE_GENERATEURS: tuple[tuple[str, GenerateurTable], ...] = (
     ("source.patients", _generer_patients),
     ("source.rendez_vous", _generer_rendez_vous),
     ("source.passages", _generer_passages),
     ("source.mouvements", _generer_mouvements),
     ("source.passages_urgences", _generer_urgences),
+    ("source.factures", _generer_factures),
+    ("source.lignes_facture", _generer_lignes_facture),
 )
 
 
