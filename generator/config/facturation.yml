@@ -1,30 +1,29 @@
 parametres:
 - nom: taux_facturation
   valeur:
-    HOS: 0.95
-    CE: 0.92
-    UR: 0.35
+    HOS: 0.85
+    CE: 0.8
+    UR: 0.4
   unite: proportion d'épisodes donnant lieu à une facture, par code de nomenclature_type_episode
   provenance: HYP
-  preuve: sans_preuve_externe
+  preuve: S-20
   note: 'Nom imposé par la relation R-20 du registre des relations injectées, qui porte
     deux paramètres séparés par une virgule (taux_facturation, taux_recouvrement) ; seul le
     premier relève de ce lot, le second (taux_recouvrement) de la table des créances, non
     écrite ici. R-20 affirme explicitement que ce taux diffère par type d''épisode - un
-    paramètre scalaire unique, retenu jusqu''à ce lot, ne pouvait porter cette différence ;
-    la forme change ici (correspondance type d''épisode vers taux), pas le nom, conformément
-    à la consigne. Aucune source ne mesure ces taux pour cet établissement, tous trois posés.
-    Un séjour d''hospitalisation se facture presque toujours (95 %) : la sortie déclenche
-    presque systématiquement les formalités administratives d''un dossier déjà lourd. Une
-    consultation externe programmée se facture largement (92 %), un rendez-vous laissant le
-    temps de constituer le dossier. Un passage aux urgences se facture beaucoup moins souvent
-    (35 %) : l''urgence de la prise en charge laisse peu de temps aux formalités, une partie
-    des patients repart sans que le dossier administratif soit clos, une autre relève d''un
-    suivi que l''établissement ne peut pas toujours rattacher à temps. Un type d''épisode
-    absent de cette correspondance fait échouer le chargement (accès direct par clé, aucune
-    valeur par défaut) plutôt que de recevoir un taux non posé. Si l''un de ces taux était
-    faux, le nombre de factures et de lignes de la catégorie concernée serait faussé, sans
-    effet sur les autres catégories ni sur la répartition des lignes entre actes.'
+    paramètre scalaire unique ne pouvait porter cette différence ; la forme (correspondance
+    type d''épisode vers taux) ne change pas ici, seules les valeurs et la provenance
+    changent. Le document de cadrage fixe ces trois taux (séjours 85 %, consultations
+    externes 80 %, urgences 40 %), en restant HYP mais désormais avec S-20 en borne basse
+    documentée pour les urgences : le rapport de la Cour des comptes mesure 3 477
+    consultations payées sur 160 659 passages aux urgences en 2016 (2,16 %), très inférieur
+    aux 40 % retenus - le cadrage impute cet écart à la généralisation de l''AMO depuis
+    2016, un ajustement déclaré et non mesuré (l''étude S-20 elle-même porte sur un exercice
+    antérieur à cette généralisation). Un type d''épisode absent de cette correspondance
+    fait échouer le chargement (accès direct par clé, aucune valeur par défaut) plutôt que
+    de recevoir un taux non posé. Si l''un de ces taux était faux, le nombre de factures et
+    de lignes de la catégorie concernée serait faussé, sans effet sur les autres catégories
+    ni sur la répartition des lignes entre actes.'
 
 - nom: types_episode_facturables
   valeur:
