@@ -1,34 +1,46 @@
 parametres:
 - nom: taux_facturation
-  valeur: 0.92
-  unite: proportion d'épisodes (hospitalisation ou consultation externe) donnant lieu à une
-    facture
+  valeur:
+    HOS: 0.95
+    CE: 0.92
+    UR: 0.35
+  unite: proportion d'épisodes donnant lieu à une facture, par code de nomenclature_type_episode
   provenance: HYP
   preuve: sans_preuve_externe
-  note: Nom imposé par la relation R-20 du registre des relations injectées, qui porte
+  note: 'Nom imposé par la relation R-20 du registre des relations injectées, qui porte
     deux paramètres séparés par une virgule (taux_facturation, taux_recouvrement) ; seul le
     premier relève de ce lot, le second (taux_recouvrement) de la table des créances, non
-    écrite ici. Aucune source ne mesure ce taux pour cet établissement. Posé à 92 %,
-    majoritaire mais laissant une part d'épisodes non facturés (formalités incomplètes,
-    dossier en attente). Si ce taux était faux, le nombre de factures et de lignes serait
-    faussé dans son ensemble, sans effet sur la répartition des lignes entre catégories
-    d'actes.
+    écrite ici. R-20 affirme explicitement que ce taux diffère par type d''épisode - un
+    paramètre scalaire unique, retenu jusqu''à ce lot, ne pouvait porter cette différence ;
+    la forme change ici (correspondance type d''épisode vers taux), pas le nom, conformément
+    à la consigne. Aucune source ne mesure ces taux pour cet établissement, tous trois posés.
+    Un séjour d''hospitalisation se facture presque toujours (95 %) : la sortie déclenche
+    presque systématiquement les formalités administratives d''un dossier déjà lourd. Une
+    consultation externe programmée se facture largement (92 %), un rendez-vous laissant le
+    temps de constituer le dossier. Un passage aux urgences se facture beaucoup moins souvent
+    (35 %) : l''urgence de la prise en charge laisse peu de temps aux formalités, une partie
+    des patients repart sans que le dossier administratif soit clos, une autre relève d''un
+    suivi que l''établissement ne peut pas toujours rattacher à temps. Un type d''épisode
+    absent de cette correspondance fait échouer le chargement (accès direct par clé, aucune
+    valeur par défaut) plutôt que de recevoir un taux non posé. Si l''un de ces taux était
+    faux, le nombre de factures et de lignes de la catégorie concernée serait faussé, sans
+    effet sur les autres catégories ni sur la répartition des lignes entre actes.'
 
 - nom: types_episode_facturables
   valeur:
   - HOS
   - CE
+  - UR
   unite: liste de codes de nomenclature_type_episode
   provenance: HYP
   preuve: sans_preuve_externe
-  note: Les urgences (UR) ne sont pas retenues comme type d'épisode facturable direct -
-    aucun acte de consultation propre aux urgences n'existe dans la nomenclature des actes
-    déjà close (aucune lettre ni acte "urgence" n'y figurant), et facturer un passage aux
-    urgences sans aucune ligne violerait la règle qu'aucune facture n'est sans ligne. Les
-    examens de laboratoire et l'imagerie qu'un passage aux urgences a pu déclencher restent
-    non matérialisés dans cette table, comme le rattachement d'un séjour d'hospitalisation
-    à son passage aux urgences déclencheur l'est déjà resté au lot précédent - conséquence du
-    périmètre du relevé, pas un oubli. Si l'un des deux types retenus était faux, le nombre de
+  note: Les urgences (UR) sont retenues depuis ce lot, désormais que la nomenclature des
+    actes porte un acte de consultation propre aux urgences (CONS-UR). Un passage aux
+    urgences orienté vers l'hospitalisation (orientation_sortie égale à HO) est exclu de ce
+    type facturable - la prestation qu'il déclenche est déjà portée par le séjour
+    d'hospitalisation qui en résulte, et le facturer une seconde fois doublerait la même
+    prise en charge (mesuré avant d'écrire, voir le rapport - 842 passages sur 27360 sur
+    une exécution de référence). Si l'un des trois types retenus était faux, le nombre de
     factures de ce type serait nul plutôt que produit, un défaut immédiatement visible.
 
 - nom: part_episodes_imagerie
@@ -175,31 +187,6 @@ parametres:
   note: Aucune source ne documente ce délai. Posé sans source, majoritairement court (émission
     le jour même ou le lendemain du dernier acte). Si ce délai était faux, la date de facture
     affichée serait faussée, sans effet sur la date d'acte elle-même ni sur les montants.
-
-- nom: seuil_dirhams_part_organisme_ambulatoire
-  valeur: 200
-  unite: dirhams, seuil de montant total au-delà duquel le taux ambulatoire réduit s'applique
-  provenance: DOC
-  preuve: S-18
-  note: 'Les taux de prise en charge de la tarification nationale de référence fixent la part
-    organisme à 100 % en hospitalisation et hôpital de jour, et à 80 % en ambulatoire au-delà de
-    200 dirhams (S-18, déjà cité par le registre pour part_organisme). En deçà de ce seuil en
-    ambulatoire, S-18 ne précise pas de taux réduit : la part organisme y est posée à 100 %
-    également, à défaut d''indication contraire, une simplification documentée ici. L''exception
-    du régime AMO-Tadamon (part patient nulle même au-delà du seuil, S-15) n''est pas
-    matérialisée : aucun code de nomenclature_compagnie_assurance ne distingue ce régime des
-    autres organismes assureurs, la retenir exigerait d''inventer une donnée absente du relevé.
-    Si ce seuil était faux, la répartition organisme/patient des montants serait faussée, sans
-    effet sur le montant total de la facture lui-même.'
-
-- nom: taux_part_organisme_ambulatoire_haut
-  valeur: 0.8
-  unite: proportion du montant total pris en charge par l'organisme, ambulatoire au-delà du
-    seuil
-  provenance: DOC
-  preuve: S-18
-  note: Voir la note de seuil_dirhams_part_organisme_ambulatoire, qui porte l'explication
-    commune aux deux paramètres.
 
 - nom: comptes_utilisateurs_facturation
   valeur:

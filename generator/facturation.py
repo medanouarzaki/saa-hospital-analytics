@@ -1,9 +1,10 @@
 """Génère les tables des factures et des lignes de facture depuis les épisodes existants.
 
-Seuls les épisodes d'hospitalisation (HOS) et de consultation externe (CE) sont facturables
-(voir la note de `types_episode_facturables` : les urgences ne portent aucun acte de
-consultation propre dans la nomenclature des actes, déjà close). Un séjour porte une ligne
-par journée réellement occupée, reconstruite depuis `source.mouvements` (admission au
+Les épisodes d'hospitalisation (HOS), de consultation externe (CE) et d'urgences (UR) sont
+facturables (voir la note de `types_episode_facturables`) ; un passage aux urgences orienté
+vers l'hospitalisation en est exclu, pour ne pas facturer deux fois la même prise en charge.
+Un séjour porte une ligne par journée réellement occupée, reconstruite depuis
+`source.mouvements` (admission au
 premier jour, sortie effective si le séjour en porte une, sinon fin de période) — jamais
 depuis la durée indépendamment tirée par `generator/mouvements.py` lui-même. Les examens de
 laboratoire sont d'abord dénombrés par catégorie mesurée non nulle (jamais depuis le total
@@ -80,6 +81,7 @@ def _construire_sejours(
 def generer_lignes(
     lignes_passages: list[dict],
     lignes_mouvements: list[dict],
+    lignes_urgences: list[dict],
     generateur: np.random.Generator,
     entrees: dict[str, dict] | None = None,
 ) -> tuple[list[dict], list[dict]]:
@@ -99,8 +101,6 @@ def generer_lignes(
     repartition_types_facture = entrees["repartition_types_facture"]["valeur"]
     repartition_etats_facture = entrees["repartition_etats_facture"]["valeur"]
     delai_emission = entrees["delai_jours_emission_facture"]["valeur"]
-    seuil_ambulatoire = entrees["seuil_dirhams_part_organisme_ambulatoire"]["valeur"]
-    taux_organisme_haut = entrees["taux_part_organisme_ambulatoire_haut"]["valeur"]
     comptes = entrees["comptes_utilisateurs_facturation"]["valeur"]
     gabarit_facture = entrees["gabarit_identifiant_facture"]["valeur"]
 
@@ -139,14 +139,26 @@ def generer_lignes(
     sejours = _construire_sejours(lignes_passages, lignes_mouvements, date_fin)
     lignes_h = [p for p in lignes_passages if p["type_passage"] == "H"]
     lignes_ce = [p for p in lignes_passages if p["type_passage"] == "C"]
+    lignes_u = [p for p in lignes_passages if p["type_passage"] == "U"]
+
+    # un passage aux urgences oriente vers l'hospitalisation (HO) n'est pas retenu comme
+    # episode urgences facturable a part entiere : la prestation qu'il declenche est deja
+    # portee par le sejour d'hospitalisation qui en resulte (journees, laboratoire,
+    # imagerie), et la facturer une seconde fois via une consultation aux urgences
+    # doublerait la meme prise en charge. Mesure avant d'ecrire (voir le rapport) : 842
+    # passages sur 27360 (3,08 %) sont dans ce cas sur une execution de reference.
+    orientations = {u["n_passage"]: u["orientation_sortie"] for u in lignes_urgences}
+    lignes_u_facturables = [p for p in lignes_u if orientations.get(p["n_passage"]) != "HO"]
 
     episodes: list[tuple[str, dict]] = []
     if "HOS" in types_facturables:
         episodes.extend(("HOS", p) for p in lignes_h)
     if "CE" in types_facturables:
         episodes.extend(("CE", p) for p in lignes_ce)
+    if "UR" in types_facturables:
+        episodes.extend(("UR", p) for p in lignes_u_facturables)
 
-    episodes_factures = [ep for ep in episodes if generateur.random() < taux_facturation]
+    episodes_factures = [ep for ep in episodes if generateur.random() < taux_facturation[ep[0]]]
 
     # creneaux de prelevement : un par jour de sejour facture (poids poids_jour_hos), un par
     # episode de consultation facture (poids poids_ce). Tires sans remise plus bas, pour
@@ -242,6 +254,15 @@ def generer_lignes(
                         "service_executant": sejour["unite"],
                     }
                 )
+        elif type_episode == "UR":
+            sous_lignes.append(
+                {
+                    "code_acte": "CONS-UR",
+                    "quantite": 1,
+                    "date_acte": passage["date_heure_entree"].date(),
+                    "service_executant": "UR",
+                }
+            )
         else:
             code_acte = acte_pour_activite(passage["activite"])
             sous_lignes.append(
@@ -312,11 +333,12 @@ def generer_lignes(
             )
 
         montant_total = round(montant_total, 2)
-        if type_episode == "HOS" or montant_total <= seuil_ambulatoire:
-            part_organisme = montant_total
-        else:
-            part_organisme = round(montant_total * taux_organisme_haut, 2)
-        part_patient = round(montant_total - part_organisme, 2)
+        # part organisme/part patient par defaut, avant toute prise en charge : le patient
+        # porte la totalite. generator/prises_en_charge.py corrige ces deux colonnes en
+        # place pour toute facture couverte par une prise en charge accordee (direction
+        # unique retenue : la prise en charge gouverne, la facture est corrigee ensuite).
+        part_organisme = 0.0
+        part_patient = montant_total
 
         ligne_facture = {
             "n_facture": n_facture,
@@ -326,7 +348,11 @@ def generer_lignes(
             "code_diagnostic_cim10": _tirage_uniforme_liste(diagnostics, generateur),
             "date_facture": date_facture,
             "type_facture": _tirage_pondere_dict(repartition_types_facture, generateur),
-            "service_emetteur": sejours[n_episode]["unite"] if type_episode == "HOS" else "CE",
+            "service_emetteur": (
+                sejours[n_episode]["unite"]
+                if type_episode == "HOS"
+                else ("UR" if type_episode == "UR" else "CE")
+            ),
             "etat": _tirage_pondere_dict(repartition_etats_facture, generateur),
             "montant_total": montant_total,
             "part_organisme": part_organisme,

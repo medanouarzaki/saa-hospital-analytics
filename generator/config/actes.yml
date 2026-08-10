@@ -49,6 +49,12 @@ parametres:
     coefficient: 1
     type_rattachement: activite
     rattachement: '11'
+  - code: CONS-UR
+    libelle: Consultation aux urgences
+    lettre_cle: Cs
+    coefficient: 1.5
+    type_rattachement: service
+    rattachement: UR
   - code: LAB-IS-01
     libelle: Sérologie hépatite B
     lettre_cle: B
@@ -220,4 +226,13 @@ parametres:
     documentée dans sa propre note) : un acte par journée d''hospitalisation, coefficient 1. Son
     rattachement de nomenclature (service HM) est générique, la table des lignes de facture portant par
     ailleurs sa propre colonne service_executant, renseignée avec l''unité réelle du séjour (HM, HPED ou
-    HGO) pour chaque ligne engendrée.'
+    HGO) pour chaque ligne engendrée.
+    Un trente-quatrième acte, CONS-UR, porte la consultation aux urgences elle-même : lettre Cs
+    (consultation spécialiste), déjà documentée par S-17, aucune lettre nouvelle requise. Coefficient posé
+    à 1,5, supérieur au coefficient 1 des consultations programmées des huit spécialités : une prise en
+    charge aux urgences mobilise davantage de ressources (tri, actes de surveillance non détaillés en
+    ligne séparée, disponibilité continue) qu''une consultation programmée, sans qu''aucune source ne
+    chiffre l''écart exact. Rattachement au service UR (déjà présent dans nomenclature_service), pas à une
+    activité : aucune des huit spécialités de nomenclature_activite ne couvre la médecine d''urgence en
+    tant que telle. Si ce coefficient était faux, le montant absolu des lignes de consultation aux
+    urgences serait faussé, sans effet sur le nombre de passages facturés ni sur les autres actes.'
