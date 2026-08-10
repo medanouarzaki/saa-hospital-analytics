@@ -27,6 +27,7 @@ from generator import (
     passages,
     patients,
     prises_en_charge,
+    recouvrement,
     registre,
     urgences,
     volumes,
@@ -105,8 +106,14 @@ def _generer_factures(contexte: Contexte, generateur: np.random.Generator) -> li
     lignes_prises_en_charge = prises_en_charge.generer_lignes(
         lignes_factures, lignes_patients, generateur, entrees=contexte.entrees
     )
+    lignes_encaissements, lignes_creances, lignes_relances = recouvrement.generer_lignes(
+        lignes_factures, generateur, entrees=contexte.entrees
+    )
     contexte.meta["lignes_facture_en_attente"] = lignes_lignes
     contexte.meta["prises_en_charge_en_attente"] = lignes_prises_en_charge
+    contexte.meta["encaissements_en_attente"] = lignes_encaissements
+    contexte.meta["creances_en_attente"] = lignes_creances
+    contexte.meta["relances_en_attente"] = lignes_relances
     return lignes_factures
 
 
@@ -120,6 +127,21 @@ def _generer_prises_en_charge(contexte: Contexte, generateur: np.random.Generato
     return contexte.meta.pop("prises_en_charge_en_attente")
 
 
+def _generer_encaissements(contexte: Contexte, generateur: np.random.Generator) -> list[dict]:
+    del generateur
+    return contexte.meta.pop("encaissements_en_attente")
+
+
+def _generer_creances(contexte: Contexte, generateur: np.random.Generator) -> list[dict]:
+    del generateur
+    return contexte.meta.pop("creances_en_attente")
+
+
+def _generer_relances(contexte: Contexte, generateur: np.random.Generator) -> list[dict]:
+    del generateur
+    return contexte.meta.pop("relances_en_attente")
+
+
 REGISTRE_GENERATEURS: tuple[tuple[str, GenerateurTable], ...] = (
     ("source.patients", _generer_patients),
     ("source.rendez_vous", _generer_rendez_vous),
@@ -129,6 +151,9 @@ REGISTRE_GENERATEURS: tuple[tuple[str, GenerateurTable], ...] = (
     ("source.factures", _generer_factures),
     ("source.lignes_facture", _generer_lignes_facture),
     ("source.prises_en_charge", _generer_prises_en_charge),
+    ("source.encaissements", _generer_encaissements),
+    ("source.creances", _generer_creances),
+    ("source.relances", _generer_relances),
 )
 
 
