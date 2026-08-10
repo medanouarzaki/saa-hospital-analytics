@@ -66,11 +66,21 @@ parametres:
     libelle: Patient non identifié
   - code: EV
     libelle: Évasion
+  - code: RCV
+    libelle: Recouvré
   unite: couples code-libellé
   provenance: DOC
   preuve: S-20
-  note: Le rapport de la Cour des comptes relève des sorties sans règlement, des patients non identifiés
+  note: 'Le rapport de la Cour des comptes relève des sorties sans règlement, des patients non identifiés
     et des évasions comme motifs de non-recouvrement (S-20, déjà cité par le registre pour cette colonne).
+    Un quatrième code, RCV (Recouvré), ajouté à ce lot en valeur - permission explicite pour l''état d''une
+    créance soldée, la table des créances ne portant aucune colonne dédiée à un état propre. Une créance
+    dont le montant restant atteint zéro est écrite dans cet état final (motif_non_recouvrement = RCV,
+    montant_restant = 0) plutôt que retirée de la table : la distinction entre une créance encore ouverte
+    et une créance soldée est ainsi portée par une colonne du registre (motif_non_recouvrement, conjointement
+    avec montant_restant), jamais par une convention implicite. Si ce code était mal posé, l''état final
+    d''une créance recouvrée serait mal étiqueté, sans effet sur son montant ni sur celui des créances
+    encore ouvertes.'
 - nom: nomenclature_canal_relance
   valeur:
   - code: TEL
