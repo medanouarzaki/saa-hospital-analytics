@@ -9,6 +9,7 @@ partagée de tests/conftest.py.
 """
 
 import re
+from collections import Counter
 from datetime import timedelta
 
 import pytest
@@ -23,22 +24,59 @@ TERMES_INTERDITS = ["chirurg", "bactério", "bacterio", "parasito", "hygiène al
 TOLERANCE_TAUX = 0.02
 TOLERANCE_RATIO = 0.02
 
+# Correspondance structurelle type_passage -> type_episode (pas les taux eux-memes, lus
+# depuis la configuration par le test).
+CORRESPONDANCE_TYPE_PASSAGE = {"H": "HOS", "C": "CE", "U": "UR"}
+
 
 @pytest.fixture(scope="module")
 def generation(generation_partagee: dict) -> dict:
     return generation_partagee
 
 
-def test_taux_facturation(generation: dict) -> None:
+def test_taux_facturation_par_type_episode(generation: dict) -> None:
     entrees = generation["entrees"]
     lignes_pas = generation["lignes"]["source.passages"]
+    lignes_urg = generation["lignes"]["source.passages_urgences"]
     lignes_fac = generation["lignes"][TABLE_FACTURES]
 
     taux_cfg = entrees["taux_facturation"]["valeur"]
-    n_eligibles = sum(1 for p in lignes_pas if p["type_passage"] in ("H", "C"))
-    taux_mesure = len(lignes_fac) / n_eligibles
+    orientations = {u["n_passage"]: u["orientation_sortie"] for u in lignes_urg}
+    n_factures_par_type = Counter(f["type_episode"] for f in lignes_fac)
 
-    assert abs(taux_mesure - taux_cfg) < TOLERANCE_TAUX, (taux_mesure, taux_cfg)
+    for code_passage, type_episode in CORRESPONDANCE_TYPE_PASSAGE.items():
+        episodes = [p for p in lignes_pas if p["type_passage"] == code_passage]
+        if type_episode == "UR":
+            episodes = [p for p in episodes if orientations.get(p["n_passage"]) != "HO"]
+        n_eligibles = len(episodes)
+        taux_mesure = n_factures_par_type.get(type_episode, 0) / n_eligibles
+        assert abs(taux_mesure - taux_cfg[type_episode]) < TOLERANCE_TAUX, (
+            type_episode,
+            taux_mesure,
+            taux_cfg[type_episode],
+        )
+
+
+def test_urgences_facturees(generation: dict) -> None:
+    lignes_fac = generation["lignes"][TABLE_FACTURES]
+    lignes_lig = generation["lignes"][TABLE_LIGNES]
+
+    factures_ur = {f["n_facture"] for f in lignes_fac if f["type_episode"] == "UR"}
+    assert len(factures_ur) > 0
+
+    montant_ur = sum(ligne["montant"] for ligne in lignes_lig if ligne["n_facture"] in factures_ur)
+    assert montant_ur > 0
+
+
+def test_aucune_double_facturation_urgences_hospitalisation(generation: dict) -> None:
+    lignes_urg = generation["lignes"]["source.passages_urgences"]
+    lignes_fac = generation["lignes"][TABLE_FACTURES]
+
+    n_passages_ho = {u["n_passage"] for u in lignes_urg if u["orientation_sortie"] == "HO"}
+    assert n_passages_ho, "aucun passage oriente vers l'hospitalisation a controler"
+
+    n_episodes_ur_factures = {f["n_episode"] for f in lignes_fac if f["type_episode"] == "UR"}
+    assert n_episodes_ur_factures.isdisjoint(n_passages_ho)
 
 
 def test_rattachement(generation: dict) -> None:

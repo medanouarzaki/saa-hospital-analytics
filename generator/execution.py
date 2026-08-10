@@ -26,6 +26,7 @@ from generator import (
     parcours,
     passages,
     patients,
+    prises_en_charge,
     registre,
     urgences,
     volumes,
@@ -89,21 +90,34 @@ def _generer_urgences(contexte: Contexte, generateur: np.random.Generator) -> li
 
 
 def _generer_factures(contexte: Contexte, generateur: np.random.Generator) -> list[dict]:
-    # les deux tables de facturation partagent un seul tirage aleatoire (memes factures,
-    # memes lignes) : ce generateur calcule les deux et met la seconde de cote dans le
-    # contexte, pour que _generer_lignes_facture la consomme sans retirer de nombres.
+    # les trois tables issues de la facturation partagent un seul tirage aleatoire : ce
+    # generateur calcule les lignes de facture et les prises en charge, met les deux de
+    # cote dans le contexte pour que les generateurs suivants les consomment sans retirer
+    # de nombres, et rend les factures apres que la prise en charge en a corrige en place
+    # part_organisme et part_patient -- avant l'ecriture du fichier, jamais apres.
     lignes_passages = contexte.lignes["source.passages"]
     lignes_mouvements = contexte.lignes["source.mouvements"]
+    lignes_urgences = contexte.lignes["source.passages_urgences"]
+    lignes_patients = contexte.lignes["source.patients"]
     lignes_factures, lignes_lignes = facturation.generer_lignes(
-        lignes_passages, lignes_mouvements, generateur, entrees=contexte.entrees
+        lignes_passages, lignes_mouvements, lignes_urgences, generateur, entrees=contexte.entrees
+    )
+    lignes_prises_en_charge = prises_en_charge.generer_lignes(
+        lignes_factures, lignes_patients, generateur, entrees=contexte.entrees
     )
     contexte.meta["lignes_facture_en_attente"] = lignes_lignes
+    contexte.meta["prises_en_charge_en_attente"] = lignes_prises_en_charge
     return lignes_factures
 
 
 def _generer_lignes_facture(contexte: Contexte, generateur: np.random.Generator) -> list[dict]:
     del generateur
     return contexte.meta.pop("lignes_facture_en_attente")
+
+
+def _generer_prises_en_charge(contexte: Contexte, generateur: np.random.Generator) -> list[dict]:
+    del generateur
+    return contexte.meta.pop("prises_en_charge_en_attente")
 
 
 REGISTRE_GENERATEURS: tuple[tuple[str, GenerateurTable], ...] = (
@@ -114,6 +128,7 @@ REGISTRE_GENERATEURS: tuple[tuple[str, GenerateurTable], ...] = (
     ("source.passages_urgences", _generer_urgences),
     ("source.factures", _generer_factures),
     ("source.lignes_facture", _generer_lignes_facture),
+    ("source.prises_en_charge", _generer_prises_en_charge),
 )
 
 

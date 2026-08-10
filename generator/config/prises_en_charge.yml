@@ -1,0 +1,152 @@
+parametres:
+- nom: taux_demande_par_type_episode
+  valeur:
+    HOS: 0.95
+    CE: 0.85
+    UR: 0.5
+  unite: proportion des factures éligibles (patient couvert) donnant lieu à une demande de
+    prise en charge, par code de nomenclature_type_episode
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune source ne mesure ce taux pour cet établissement. Un séjour d'hospitalisation
+    donne presque toujours lieu à une demande (95 %), le montant en jeu et la durée du
+    séjour laissant le temps de constituer le dossier. Une consultation externe suit de
+    près (85 %). C'est aux urgences que la démarche aboutit le moins souvent (50 %) - le
+    temps et les papiers manquent dans l'urgence de la prise en charge. Un type d'épisode
+    absent de cette correspondance fait échouer le chargement plutôt que recevoir un taux
+    par défaut. Si l'un de ces taux était faux, le nombre de prises en charge de la
+    catégorie concernée serait faussé, sans effet sur les autres catégories ni sur
+    l'éligibilité elle-même.
+
+- nom: taux_refus_prise_en_charge
+  valeur: 0.08
+  unite: proportion des demandes de prise en charge refusées, hors demandes encore en
+    instance à la fin de la période
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Aucune source ne mesure ce taux. Posé à 8 %, minoritaire : une demande émanant
+    d''un patient déjà couvert (l''éligibilité l''exige) aboutit le plus souvent, le refus
+    restant l''exception (droits fermés entre-temps, dossier incomplet, organisme non
+    reconnu — voir la note de motifs_refus_prise_en_charge). Si ce taux était faux, la part
+    de créances qui naîtront du refus (lot suivant) serait faussée, sans effet sur le nombre
+    de demandes lui-même.'
+
+- nom: motifs_refus_prise_en_charge
+  valeur:
+    DROITS_FERMES: 0.5
+    DOSSIER_INCOMPLET: 0.3
+    ORGANISME_NON_RECONNU: 0.2
+  unite: proportion par motif, parmi les demandes refusées
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Aucune colonne du registre des champs ne porte le motif de refus d''une prise en
+    charge (les dix colonnes de source.prises_en_charge s''arrêtent à taux_prise_en_charge
+    et date_extraction, aucune n''est prévue pour un motif) : ce paramètre documente,
+    pour le rapport et pour la justification du taux de refus, la répartition qualitative
+    des raisons de refus dans un établissement de ce type, sans être matérialisé par une
+    colonne de la table générée — inventer une colonne excéderait le relevé. Droits fermés
+    (l''organisme a suspendu la couverture) domine, dossier incomplet et organisme non
+    reconnu se partagent le solde. Si cette répartition était fausse, seule la
+    justification qualitative du taux de refus serait affaiblie, sans effet sur aucune
+    donnée générée.'
+
+- nom: correspondance_regime_compagnie_assurance
+  valeur:
+    '00116': CNSS
+    '00042': TNS
+    '00089': ACHAMIL
+  unite: correspondance code de nomenclature_compagnie_assurance vers code de
+    nomenclature_organisme_regime
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'La colonne organisme de source.prises_en_charge se rattache, dans la correspondance
+    déjà écrite (generator/config/nomenclatures_structure.yml), à nomenclature_organisme_regime
+    (CNOPS, CNSS, TADAMON, TNS, ACHAMIL) et non à nomenclature_compagnie_assurance (00116,
+    00042, 00089, SANS) déjà portée par la fiche patient : les deux nomenclatures décrivent
+    des notions différentes (le régime AMO gestionnaire, contre la compagnie d''assurance
+    inscrite sur la fiche). generator/config/demographie.yml le note déjà explicitement pour
+    repartition_couverture : "la correspondance entre regimes nationaux et compagnies de
+    nomenclature_compagnie_assurance n''est pas etablie". Ce lot pose donc la correspondance
+    minimale nécessaire pour remplir la colonne organisme depuis la compagnie déjà tirée sur
+    la fiche patient : CNSS PIPC (00116) vers le régime CNSS, dont il porte le nom ; SAHAM
+    (00042) et RMA (00089), deux assureurs privés sans régime AMO propre parmi les cinq codes
+    disponibles, vers TNS et ACHAMIL respectivement, les deux régimes couvrant le plus
+    directement une clientèle assurée par un intermédiaire privé. CNOPS et TADAMON ne sont pas
+    utilisés, aucune des trois compagnies retenues par repartition_couverture ne leur
+    correspondant avec autant de vraisemblance. Si cette correspondance était fausse, la
+    répartition par régime affichée serait faussée, sans effet sur le nombre de prises en
+    charge ni sur les montants, qui suivent taux_couverture_par_organisme indexé sur le même
+    code.'
+
+- nom: taux_couverture_par_organisme
+  valeur:
+    CNSS: 0.9
+    TNS: 0.85
+    ACHAMIL: 0.85
+  unite: proportion du montant total de la facture prise en charge par l'organisme, par code
+    de nomenclature_organisme_regime, appliquée à toute demande (accordée ou non)
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Le registre documente, pour la colonne taux_prise_en_charge, un taux qui dépend du
+    type d''épisode et d''un seuil de montant (S-18 : cent pour cent en hospitalisation et
+    hôpital de jour, quatre-vingts pour cent en ambulatoire au-delà de deux cents dirhams) —
+    la règle déjà posée dans generator/config/facturation.yml au lot précédent
+    (seuil_dirhams_part_organisme_ambulatoire, taux_part_organisme_ambulatoire_haut), retirée
+    de ce fichier car ce lot pose à la place, comme son étape 5 l''exige explicitement
+    ("le taux de couverture dépend de l''organisme"), un taux par organisme plutôt que par
+    type d''épisode et seuil. Simplification posée qui diverge du mécanisme précis que S-18
+    documente, retenue parce que la consigne de ce lot la demande sans ambiguïté ; les deux
+    mécanismes ne sont pas mathématiquement incompatibles (un taux par organisme reste un
+    taux, seul son critère de sélection change), donc pas une contradiction interne au
+    prompt. CNSS, régime du plus grand nombre de patients couverts (repartition_couverture,
+    50 % via 00116), porte le taux le plus élevé (90 %) ; TNS et ACHAMIL portent 85 %. Le
+    taux est appliqué à toute demande, accordée ou non (colonne taux_prise_en_charge,
+    l''entitlement configuré), le montant réellement pris en charge (part_organisme de la
+    facture) restant nul pour une demande refusée ou encore en instance. Si un taux était
+    faux, le montant pris en charge des factures de ce régime serait faussé, sans effet sur
+    le nombre de demandes ni sur les autres régimes.'
+
+- nom: regle_arrondi_montant_pris_en_charge
+  valeur: arrondi au centième le plus proche
+  unite: règle
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Même convention d'arrondi que le montant total de la facture (round(..., 2)) — un
+    montant en dirhams ne porte pas plus de deux décimales dans ce générateur. Posée pour
+    rester cohérente avec le reste de la chaîne de facturation.
+
+- nom: delai_jours_decision_prise_en_charge
+  valeur:
+    '0': 0.2
+    '1': 0.25
+    '2': 0.2
+    '3': 0.15
+    '5': 0.1
+    '10': 0.1
+  unite: proportion par nombre de jours entre la date de facture (prise comme point de
+    départ de la démarche, faute de colonne dédiée à la date de demande) et la date de
+    vérification/décision
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Le registre des champs ne porte qu''une seule colonne de date pour cette table,
+    date_verification ("le patient présente les documents exigés selon son statut de
+    couverture, ce qui date la vérification", S-27) : aucune colonne distincte ne porte la
+    date de la demande elle-même. Ce lot retient donc la date de facture comme point de
+    départ implicite de la démarche (la demande suit la facturation, jamais ne la précède,
+    conformément à la note de facturation.yml sur le délai d''émission), et date_verification
+    comme la date de décision, conformément à sa propre note. Un délai qui, ajouté à la date
+    de facture, dépasserait la fin de la période produit une demande en instance
+    (nomenclature_etat_prise_en_charge, code N) sans date de vérification, jamais une
+    décision fictive au-delà de la période couverte. Aucune source ne mesure ce délai, posé
+    majoritairement court (moins de trois jours dans les deux tiers des cas), avec une queue
+    plus longue (dix jours) pour les dossiers plus complexes. Si ce délai était faux, la
+    distribution affichée au tableau de bord serait faussée, sans effet sur le taux de
+    refus ni sur le montant pris en charge d''une demande accordée.'
+
+- nom: gabarit_identifiant_prise_en_charge
+  valeur: PEC-{rang:07d}
+  unite: gabarit de formatage
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Même convention que les autres identifiants générés par ce générateur (FAC),
+    numérotation séquentielle sur sept chiffres.
