@@ -14,35 +14,13 @@ from pathlib import Path
 import pytest
 import yaml
 
-from generator import (
-    alea,
-    config,
-    ecriture,
-    parcours,
-    patients,
-    temporel,
-    volumes,
-)
+from generator import alea, temporel
 from generator import rendez_vous as rdv
 
 TABLE = "source.rendez_vous"
 GRAINE = 1
 
-PILOTES = {
-    "H": "admissions_annuelles",
-    "C": "consultations_specialisees_externes",
-    "U": "passages_urgences_par_jour",
-}
-
 RACINE = Path(__file__).resolve().parent.parent
-
-
-def entrees_config() -> dict[str, dict]:
-    return {e["nom"]: e for e in config.charger_entrees()}
-
-
-def comptes_par_categorie(entrees: dict[str, dict]) -> dict[str, dict[date, int]]:
-    return {cat: volumes.comptes_journaliers(nom, entrees=entrees) for cat, nom in PILOTES.items()}
 
 
 def patient_id_de(n_ipp: str) -> int:
@@ -50,30 +28,15 @@ def patient_id_de(n_ipp: str) -> int:
 
 
 @pytest.fixture(scope="module")
-def generation(tmp_path_factory) -> dict:
-    entrees = entrees_config()
-    rng = alea.construire_generateur(GRAINE)
-    comptes = comptes_par_categorie(entrees)
-    episodes, population = parcours.construire_parcours(comptes, rng, entrees=entrees)
-    lignes = rdv.generer_lignes(episodes, population, rng, entrees=entrees)
-
-    racine = tmp_path_factory.mktemp("rdv_generation")
-    execution = ecriture.Execution(
-        racine,
-        "scenario_30",
-        GRAINE,
-        entrees["date_debut"]["valeur"],
-        entrees["date_fin"]["valeur"],
-    )
-    execution.ecrire_table(TABLE, lignes)
-
+def generation(generation_partagee: dict) -> dict:
+    partagee = generation_partagee
     return {
-        "entrees": entrees,
-        "episodes": episodes,
-        "population": population,
-        "lignes": lignes,
-        "execution": execution,
-        "racine": racine,
+        "entrees": partagee["entrees"],
+        "episodes": partagee["episodes"],
+        "population": partagee["population"],
+        "lignes": partagee["lignes"][TABLE],
+        "execution": partagee["execution"],
+        "racine": partagee["racine"],
     }
 
 
@@ -274,22 +237,10 @@ def test_debordement_de_periode(generation: dict) -> None:
     assert all(ligne["rdv_supplementaire"] for ligne in debordement)
 
 
-_CACHE_GENERATION_PATIENTS: dict = {}
-
-
-def generation_patients() -> dict:
-    if not _CACHE_GENERATION_PATIENTS:
-        entrees = entrees_config()
-        rng = alea.construire_generateur(GRAINE)
-        comptes = comptes_par_categorie(entrees)
-        episodes, population = parcours.construire_parcours(comptes, rng, entrees=entrees)
-        lignes = patients.generer_lignes(episodes, population, rng, entrees=entrees)
-        _CACHE_GENERATION_PATIENTS["lignes"] = lignes
-    return _CACHE_GENERATION_PATIENTS
-
-
-def test_anteriorite_complete_naissance_fiche_prise_rdv(generation: dict) -> None:
-    lignes_patients = generation_patients()["lignes"]
+def test_anteriorite_complete_naissance_fiche_prise_rdv(
+    generation: dict, generation_partagee: dict
+) -> None:
+    lignes_patients = generation_partagee["lignes"]["source.patients"]
     lignes_rdv = generation["lignes"]
 
     naissance_par_patient: dict[int, date] = {}

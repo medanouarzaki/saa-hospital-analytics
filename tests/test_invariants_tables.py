@@ -18,7 +18,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from generator import config, ecriture, execution, nomenclatures, registre
+from generator import ecriture, execution, nomenclatures, registre
 
 RACINE = Path(__file__).resolve().parent.parent
 GRAINE = 1
@@ -31,16 +31,9 @@ GRAINE = 1
 SEUIL_PART_MINUIT = 0.01
 
 
-def entrees_config() -> dict[str, dict]:
-    return {e["nom"]: e for e in config.charger_entrees()}
-
-
 @pytest.fixture(scope="module")
-def generation(tmp_path_factory) -> dict:
-    entrees = entrees_config()
-    racine = tmp_path_factory.mktemp("invariants_generation")
-    execution_obj, lignes = execution.executer(racine, GRAINE, entrees=entrees)
-    return {"entrees": entrees, "execution": execution_obj, "lignes": lignes}
+def generation(generation_partagee: dict) -> dict:
+    return generation_partagee
 
 
 def _lire_entete(execution_obj: ecriture.Execution, table: str) -> list[str]:

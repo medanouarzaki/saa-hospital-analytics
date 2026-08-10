@@ -14,10 +14,9 @@ from datetime import date
 
 import pytest
 
-from generator import config, execution, volumes
+from generator import volumes
 
 TABLE = "source.passages"
-GRAINE = 1
 
 PILOTES = {
     "H": "admissions_annuelles",
@@ -26,20 +25,13 @@ PILOTES = {
 }
 
 
-def entrees_config() -> dict[str, dict]:
-    return {e["nom"]: e for e in config.charger_entrees()}
-
-
 def patient_id_de(n_ipp: str) -> int:
     return int(n_ipp.split("-")[1])
 
 
 @pytest.fixture(scope="module")
-def generation(tmp_path_factory) -> dict:
-    entrees = entrees_config()
-    racine = tmp_path_factory.mktemp("passages_generation")
-    execution_obj, lignes = execution.executer(racine, GRAINE, entrees=entrees)
-    return {"entrees": entrees, "execution": execution_obj, "lignes": lignes}
+def generation(generation_partagee: dict) -> dict:
+    return generation_partagee
 
 
 def test_bijection_avec_fil_des_episodes(generation: dict) -> None:

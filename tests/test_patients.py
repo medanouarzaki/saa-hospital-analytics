@@ -16,30 +16,9 @@ from datetime import date
 import numpy as np
 import pytest
 
-from generator import alea, config, ecriture, parcours, patients, registre, volumes
+from generator import ecriture, patients, registre
 
 TABLE = "source.patients"
-GRAINE = 1
-
-PILOTES = {
-    "H": "admissions_annuelles",
-    "C": "consultations_specialisees_externes",
-    "U": "passages_urgences_par_jour",
-}
-
-
-def entrees_config() -> dict[str, dict]:
-    return {e["nom"]: e for e in config.charger_entrees()}
-
-
-def comptes_par_categorie(entrees: dict[str, dict]) -> dict[str, dict[date, int]]:
-    return {cat: volumes.comptes_journaliers(nom, entrees=entrees) for cat, nom in PILOTES.items()}
-
-
-def construire_episodes_population(graine: int, entrees: dict[str, dict]):
-    rng = alea.construire_generateur(graine)
-    comptes = comptes_par_categorie(entrees)
-    return parcours.construire_parcours(comptes, rng, entrees=entrees)
 
 
 def bornes_jours(tranche: str) -> tuple[int, int | None]:
@@ -61,30 +40,15 @@ def tranche_de_age_jours(age_jours: int, tranches: list[str]) -> str:
 
 
 @pytest.fixture(scope="module")
-def generation(tmp_path_factory) -> dict:
-    entrees = entrees_config()
-    rng = alea.construire_generateur(GRAINE)
-    comptes = comptes_par_categorie(entrees)
-    episodes, population = parcours.construire_parcours(comptes, rng, entrees=entrees)
-    lignes = patients.generer_lignes(episodes, population, rng, entrees=entrees)
-
-    racine = tmp_path_factory.mktemp("patients_generation")
-    execution = ecriture.Execution(
-        racine,
-        "scenario_30",
-        GRAINE,
-        entrees["date_debut"]["valeur"],
-        entrees["date_fin"]["valeur"],
-    )
-    execution.ecrire_table(TABLE, lignes)
-
+def generation(generation_partagee: dict) -> dict:
+    partagee = generation_partagee
     return {
-        "entrees": entrees,
-        "episodes": episodes,
-        "population": population,
-        "lignes": lignes,
-        "execution": execution,
-        "racine": racine,
+        "entrees": partagee["entrees"],
+        "episodes": partagee["episodes"],
+        "population": partagee["population"],
+        "lignes": partagee["lignes"][TABLE],
+        "execution": partagee["execution"],
+        "racine": partagee["racine"],
     }
 
 
