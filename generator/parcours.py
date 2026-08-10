@@ -69,7 +69,7 @@ def _tirer_creation_fiche_consultation(
         delai = 0
     else:
         mediane = entrees["delai_rdv_par_specialite"]["valeur"][activite]
-        ecart_type_log = entrees["ecart_type_log_delai"]["valeur"]
+        ecart_type_log = entrees["ecart_type_log_delai_par_specialite"]["valeur"][activite]
         delai = max(0, int(round(generateur.lognormal(math.log(mediane), ecart_type_log))))
     jour_prise = jour_episode - timedelta(days=delai)
     jour_prise = _jour_ouvert_le_plus_proche_avant(jour_prise, entrees, cache_poids)

@@ -53,29 +53,38 @@ parametres:
     fixe independamment.'
 - nom: taux_absenteisme_par_specialite
   valeur:
-    '20': 0.12
-    '21': 0.1
-    '30': 0.08
-    '14': 0.09
-    '4': 0.11
-    '28': 0.07
-    '29': 0.09
-    '11': 0.06
+    '20': 0.2227
+    '21': 0.1856
+    '30': 0.1485
+    '14': 0.167
+    '4': 0.2041
+    '28': 0.1299
+    '29': 0.167
+    '11': 0.1113
   unite: proportion par code de nomenclature_activite
   provenance: DOC
   preuve: S-24
   note: 'Nom impose par la relation R-02 du registre des relations injectees. S-24 documente que le niveau
     d''absenteisme differe par specialite independamment du delai, sans fournir les taux exacts par specialite
-    de cet etablissement : le classement retenu ici (medecine generale et cardiologie les plus touchees,
-    dermatologie la moins touchee) est pose dans l''ordre de grandeur plausible, pas mesure. Si ces taux
-    etaient faux, le classement des specialites par absenteisme affiche au tableau de bord serait errone,
-    sans effet sur le nombre total de rendez-vous honores.'
+    de cet etablissement. Le document de cadrage fixe deux nouvelles contraintes agregees : un taux global
+    de 18 % et une variance par specialite comprise entre 11 % et 27 %, sans fournir non plus les huit
+    valeurs par specialite. Les valeurs precedentes (posees, 6 % a 12 %, classement plausible medecine
+    generale/cardiologie les plus touchees, dermatologie la moins touchee) sont reprises a l''echelle par
+    un facteur unique (x1,855670), choisi pour reproduire exactement la moyenne ponderee par
+    repartition_activites_rdv du cadrage (18,00 % mesure apres application, voir Etape 5) tout en preservant
+    le classement relatif d''origine : un facteur constant ne peut pas satisfaire simultanement une moyenne
+    et deux bornes independantes (trois contraintes, un seul degre de liberte), le choix retenu privilegie
+    la moyenne, citee au singulier ("dix-huit pour cent global"), sur les bornes, citees comme un intervalle
+    ("comprise entre"). Plage resultante 11,13 % a 22,27 %, a l''interieur de l''intervalle cadre sans en
+    toucher la borne haute -- ecart signale, pas force. Si ces taux etaient faux, le classement des specialites
+    par absenteisme affiche au tableau de bord serait errone, sans effet sur le nombre total de rendez-vous
+    honores.'
 - nom: delai_rdv_par_specialite
   valeur:
-    '20': 7
+    '20': 5
     '21': 21
-    '30': 5
-    '14': 14
+    '30': 14
+    '14': 30
     '4': 30
     '28': 45
     '29': 18
@@ -83,57 +92,86 @@ parametres:
   unite: delai median en jours par code de nomenclature_activite (loi log-normale)
   provenance: DOC
   preuve: S-20
-  note: 'Nom impose par la relation R-03 du registre des relations injectees. S-20 documente que le delai
-    d''obtention suit une loi log-normale de mediane propre a chaque specialite, sans fournir les medianes
-    exactes de cet etablissement : l''ophtalmologie (45 j) et la cardiologie (30 j) sont posees comme
-    les plus engorgees, la pediatrie (5 j) et la medecine generale (7 j) les plus rapides, ordre de grandeur
-    plausible, pas mesure. Une activite absente de cette table doit faire echouer le chargement plutot
-    que de recevoir une valeur par defaut : generator/rendez_vous.py leve une KeyError explicite, sans
-    valeur de repli. Si ces medianes etaient fausses, le classement des specialites par delai median affiche
-    au tableau de bord serait errone, et la conclusion sur la specialite la plus engorgee refleterait
-    la mediane fixee plutot qu''une mesure reelle -- consequence deja ecrite dans le registre des relations
-    injectees.'
-- nom: ecart_type_log_delai
-  valeur: 0.5
-  unite: ecart-type du logarithme du delai (loi log-normale, meme pour toutes les activites)
-  provenance: HYP
-  preuve: sans_preuve_externe
-  note: Ecart-type du logarithme neperien du delai en jours, pose sans source, identique pour toutes les
-    specialites (seule la mediane varie par specialite, comme le prescrit R-03). Une valeur de 0,5 produit
-    une dispersion modérée autour de la mediane, plausible pour un delai de rendez-vous hospitalier. Si
-    cette valeur etait fausse, l'etalement de la distribution des delais serait plus ou moins large, sans
-    effet sur la mediane par specialite ni sur aucun total.
+  note: 'Nom impose par la relation R-03 du registre des relations injectees. Le document de cadrage donne
+    desormais les medianes exactes de trois des huit activites de cette table par correspondance directe
+    de libelle : medecine generale/centre de diagnostic (code 20, 5 j), pediatrie (code 30, 14 j),
+    gyneco-obstetrique (code 14, 30 j) -- reprises telles quelles, provenance DOC. Les trois autres
+    specialites du cadrage (pneumologie, stomatologie, explorations fonctionnelles) n''ont aucun equivalent
+    dans nomenclature_activite (huit specialites non chirurgicales mesurees, S-30, restriction deja justifiee
+    au lot qui l''a ecrite) et ne sont donc pas appliquees ici -- ecart documente a l''Etape 1, pas une
+    correspondance forcee. Les cinq activites de la nomenclature sans equivalent cadrage (medecine interne
+    21, cardiologie 4, ophtalmologie 28, ORL 29, dermatologie 11) conservent leur valeur posee au lot
+    precedent, ordre de grandeur plausible, non mesuree, HYP dans les faits meme si le nom du parametre
+    reste unique et sa provenance globale DOC pour les trois valeurs desormais sourcees. Une activite absente
+    de cette table doit faire echouer le chargement plutot que de recevoir une valeur par defaut :
+    generator/rendez_vous.py leve une KeyError explicite, sans valeur de repli -- verifie par mutation a
+    l''etape 3, faute de test dedie prealable. Si les trois medianes sourcees etaient fausses, le classement
+    des specialites par delai median affiche au tableau de bord serait errone pour ces trois-la ; si les
+    cinq autres etaient fausses, la consequence est la meme mais relève d''une hypothese non mesuree comme
+    avant ce lot.'
+- nom: ecart_type_log_delai_par_specialite
+  valeur:
+    '20': 1.0
+    '21': 0.5
+    '30': 0.9111
+    '14': 0.7653
+    '4': 0.5
+    '28': 0.5
+    '29': 0.5
+    '11': 0.5
+  unite: ecart-type du logarithme du delai (loi log-normale), par code de nomenclature_activite
+  provenance: DOC
+  preuve: S-20
+  note: 'Remplace ecart_type_log_delai (valeur unique, 0,5, retiree) : le document de cadrage donne
+    desormais, pour les trois specialites a correspondance directe (medecine generale 20, pediatrie 30,
+    gyneco-obstetrique 14), un couple (mediane, 90e centile) plutot qu''une seule mediane. Deux points
+    determinent les deux parametres d''une loi log-normale : mu = ln(mediane), sigma = (ln(p90) - mu) /
+    z90 avec z90 = 1,2815515655446004 (90e centile de la loi normale centree reduite). Calcul, pas pose :
+    code 20 (5 j, 18 j) -> sigma = (ln(18) - ln(5)) / z90 = 1,2810 / 1,28155 = 0,99961, arrondi 1,0 ;
+    code 30 (14 j, 45 j) -> sigma = (ln(45) - ln(14)) / z90 = 1,16760 / 1,28155 = 0,91108, arrondi 0,9111 ;
+    code 14 (30 j, 80 j) -> sigma = (ln(80) - ln(30)) / z90 = 0,98083 / 1,28155 = 0,76535, arrondi 0,7653.
+    Les cinq activites sans equivalent cadrage conservent la valeur unique posee au lot precedent (0,5,
+    HYP dans les faits). Si un ecart-type source etait faux, l''etalement de la distribution des delais de
+    cette specialite serait plus ou moins large, sans effet sur sa mediane ni sur aucun total.'
 - nom: taux_annulation
-  valeur: 0.06
+  valeur: 0.07
   unite: proportion
   provenance: HYP
   preuve: S-20
   note: 'Nom impose par la relation R-16 du registre des relations injectees : "Une part fixee des rendez-vous
     est annulee, distincte de l''absenteisme." S-20 est cite comme source de la relation elle-meme (l''existence
-    d''un phenomene d''annulation distinct de l''absence), pas de sa valeur chiffree pour cet etablissement,
-    restee HYP. Si ce taux etait faux, le volume de rendez-vous annules affiche serait faussee, sans effet
-    sur le nombre de rendez-vous honores.'
+    d''un phenomene d''annulation distinct de l''absence), pas de sa valeur chiffree pour cet etablissement.
+    Le document de cadrage fixe desormais cette valeur a 7 %, restant neanmoins HYP -- le cadrage lui-meme
+    ne cite aucune source propre a ce chiffre, contrairement aux quatre parametres dont l''Etape 2 impose
+    explicitement le passage a DOC. Si ce taux etait faux, le volume de rendez-vous annules affiche serait
+    faussee, sans effet sur le nombre de rendez-vous honores.'
 - nom: part_rdv_jour_meme
-  valeur: 0.03
+  valeur: 0.06
   unite: proportion
   provenance: HYP
   preuve: REL-RDV.C02
-  note: Nom impose par la relation R-17 du registre des relations injectees. Le rendez-vous releve au
-    poste (REL-RDV.C02) atteste d'un ecart d'une seconde entre creation et rendez-vous, preuve que le
-    phenomene existe ; sa frequence dans les donnees (3 %) est posee, pas mesuree -- le registre le dit
-    lui-meme explicitement ("sa frequence dans les donnees est un parametre"). Si ce taux etait faux,
-    le mode a zero jour de la distribution des delais affichee serait plus ou moins marque, sans effet
-    sur aucun total.
+  note: 'Nom impose par la relation R-17 du registre des relations injectees, qui fixe explicitement une
+    "part FIXEE" (au singulier, scalaire) des rendez-vous pris jour meme -- la forme du parametre ne change
+    donc pas. Le rendez-vous releve au poste (REL-RDV.C02) atteste d''un ecart d''une seconde entre creation
+    et rendez-vous, preuve que le phenomene existe ; sa frequence dans les donnees, relevee a 6 % par le
+    document de cadrage, remplace la valeur posee precedente (3 %) -- toujours pas mesuree, R-17 le dit
+    lui-meme explicitement. Le cadrage note en outre que le phenomene se concentre sur la medecine generale
+    et le centre de diagnostic : cette concentration n''est pas modelisee separement par specialite, R-17
+    imposant une part unique et non une correspondance ; elle demeure une observation qualitative non
+    matérialisee par ce parametre, comme deja le cas pour la valeur precedente. Si ce taux etait faux, le
+    mode a zero jour de la distribution des delais affichee serait plus ou moins marque, sans effet sur
+    aucun total.'
 - nom: part_patients_adresses
-  valeur: 0.15
+  valeur: 0.25
   unite: proportion
   provenance: HYP
   preuve: REL-RDV.R03
   note: 'Nom impose par la relation R-18 du registre des relations injectees. Le code d''origine correspondant
     (AU, AUTRES HOPITAUX) est deja releve au poste (REL-RDV.R03, nomenclature_origine) : ce parametre
-    fixe seulement la part des rendez-vous qui le portent, pas le code lui-meme. Si ce taux etait faux,
-    la part de patients adresses affichee page Patients serait faussee, sans effet sur aucun total de
-    rendez-vous.'
+    fixe seulement la part des rendez-vous qui le portent, pas le code lui-meme. Valeur portee de 15 % a
+    25 % par ce lot, conformement au document de cadrage ; le cadrage ne cite aucune source propre a ce
+    chiffre, la provenance reste HYP. Si ce taux etait faux, la part de patients adresses affichee page
+    Patients serait faussee, sans effet sur aucun total de rendez-vous.'
 - nom: repartition_types_attention
   valeur:
     '1': 0.35

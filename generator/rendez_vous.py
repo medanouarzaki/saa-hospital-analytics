@@ -242,7 +242,7 @@ def generer_lignes(
     repartition_activites = entrees["repartition_activites_rdv"]["valeur"]
     repartition_types_attention = entrees["repartition_types_attention"]["valeur"]
     delais_medians = entrees["delai_rdv_par_specialite"]["valeur"]
-    ecart_type_log = entrees["ecart_type_log_delai"]["valeur"]
+    ecart_types_log = entrees["ecart_type_log_delai_par_specialite"]["valeur"]
     pente = entrees["pente_absenteisme_delai"]["valeur"]
     taux_absenteisme = entrees["taux_absenteisme_par_specialite"]["valeur"]
     taux_annulation = entrees["taux_annulation"]["valeur"]
@@ -259,6 +259,11 @@ def generer_lignes(
         if activite not in delais_medians:
             raise KeyError(
                 f"activite sans delai declare dans delai_rdv_par_specialite : {activite}"
+            )
+        if activite not in ecart_types_log:
+            raise KeyError(
+                "activite sans ecart-type declare dans "
+                f"ecart_type_log_delai_par_specialite : {activite}"
             )
         if activite not in taux_absenteisme:
             raise KeyError(
@@ -318,6 +323,7 @@ def generer_lignes(
     for activite, episodes_activite in episodes_par_activite.items():
         agenda = correspondance_activite_agenda[activite]
         mediane = delais_medians[activite]
+        ecart_type_log = ecart_types_log[activite]
         p_abs = taux_absenteisme[activite]
 
         # --- rendez-vous honores : un par episode, tenu ---
