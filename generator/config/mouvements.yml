@@ -1,0 +1,68 @@
+parametres:
+- nom: taux_admission_urgence
+  valeur: 0.3
+  unite: proportion des sejours
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune source ne relie le mode d'admission (ordinaire ou urgence, nomenclature_mode_admission,
+    articles 40/42/45 du reglement interieur) a une proportion mesuree pour cet
+    etablissement. Pose sans source. Si ce taux etait faux, la part d'admissions en urgence
+    affichee serait faussee, sans effet sur le nombre total de sejours, fixe par le nombre
+    de passages d'hospitalisation.
+- nom: repartition_mode_sortie
+  valeur:
+    R: 0.85
+    I: 0.05
+    D: 0.1
+  unite: proportion par code de nomenclature_mode_sortie
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune source ne documente la repartition des sorties (reguliere avec billet,
+    a l'insu du personnel, deces - articles 79/80 du reglement interieur) pour cet
+    etablissement. Posee sans source, une sortie reguliere dominant tres largement. Si
+    cette repartition etait fausse, la mortalite hospitaliere affichee serait faussee,
+    sans effet sur le nombre de sejours clos.
+- nom: part_sejours_avec_mutation
+  valeur: 0.2
+  unite: proportion des sejours
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Part des sejours qui changent de lit une fois en cours de sejour, posee sans
+    source. Si ce taux etait faux, le nombre de lignes de mutation serait faux, sans effet
+    sur le nombre de sejours ni sur les journees d'hospitalisation totales.
+- nom: ecart_type_log_duree_sejour
+  valeur: 0.5
+  unite: ecart-type du logarithme de la duree de sejour
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Meme construction que ecart_type_log_duree (generator/config/passages.yml) et
+    ecart_type_log_delai (generator/config/rendez_vous.yml) - ecart-type pose sans source,
+    la moyenne (pas la mediane) de la loi log-normale est ajustee pour reproduire la duree
+    moyenne de sejour mesuree (journees d'hospitalisation publiees / admissions fixees,
+    voir le rapport), pas une valeur posee independamment.
+- nom: gabarit_identifiant_sejour
+  valeur: SEJ-{rang:07d}
+  unite: gabarit de formatage
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Gabarit interprete par le generateur a partir du rang d'apparition du passage
+    d'hospitalisation correspondant, jamais ecrit en dur ailleurs. Choix technique, non
+    observe.
+- nom: gabarit_identifiant_mouvement
+  valeur: MVT-{rang:07d}
+  unite: gabarit de formatage
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Gabarit interprete par le generateur a partir du rang d'apparition de la ligne de
+    mouvement (une valeur par ligne, admission, mutation ou sortie confondues - le meme
+    principe de numerotation generale que le registre des champs decrit a l'article 35 du
+    reglement interieur, sans distinguer les mutations des autres mouvements). Choix
+    technique, non observe.
+- nom: gabarit_identifiant_lit
+  valeur: LIT-{rang:03d}
+  unite: gabarit de formatage
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Gabarit interprete par le generateur a partir du rang du lit dans le pool dont la
+    taille est capacite_litiere_fonctionnelle (generator/config/volumetrie.yml, lu, non
+    modifie). Choix technique, non observe.
