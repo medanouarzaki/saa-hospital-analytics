@@ -107,6 +107,10 @@ parametres:
     libelle: Facturation
   - code: ECO
     libelle: Économat
+  - code: HPED
+    libelle: Hospitalisation pédiatrie
+  - code: HGO
+    libelle: Hospitalisation gynéco-obstétrique
   unite: couples code-libellé
   provenance: HYP
   preuve: S-27
@@ -114,7 +118,13 @@ parametres:
     nommer individuellement. Liste posée par convention, à partir des fonctions explicitement décrites
     par le règlement intérieur (accueil et admission, facturation, recouvrement). Aucun service à caractère
     chirurgical n''y figure : la source mesure l''activité chirurgicale à zéro pour l''établissement,
-    sur deux exercices.'
+    sur deux exercices. Deux unités d''hospitalisation ajoutées (HPED, HGO) : une seule unité pour huit
+    spécialités de consultation n''est pas vraisemblable. La pédiatrie (spécialité 30) et la
+    gynécologie-obstétrique (spécialité 14) sont des unités d''hospitalisation courantes et non
+    chirurgicales dans un hôpital provincial, distinctes de la médecine générale/interne/cardiologie déjà
+    regroupées sous HM. L''ophtalmologie, l''ORL et la dermatologie restent purement ambulatoires (aucun
+    volume d''hospitalisation ne leur est déjà rattaché dans ce générateur) : aucune unité n''est ajoutée
+    pour elles, pour ne pas inventer une hospitalisation non appuyée par un volume mesuré.'
 - nom: nomenclature_agenda
   valeur:
   - code: MG
