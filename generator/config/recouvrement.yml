@@ -77,6 +77,21 @@ parametres:
     fausse, le nombre de lignes d'encaissement par facture partiellement réglée en plusieurs
     fois serait faussé, sans effet sur le montant total encaissé.
 
+- nom: montant_minimal_encaissement
+  valeur: 5
+  unite: dirhams, montant minimal d'une ligne d'encaissement issue d'un versement partiel
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune source ne fixe ce seuil. Posé à 5 dirhams - un règlement de quelques centimes
+    n'a pas de sens (mesuré avant d'écrire, un minimum de 0,01 DH observé sur la sortie du
+    lot précédent). Un versement partiel qui tomberait sous ce seuil est absorbé par le
+    versement voisin plutôt que produit tel quel ; la somme des encaissements d'une facture
+    reste inchangée, seul leur nombre de lignes diminue. Ne s'applique pas à un versement
+    unique déjà minoritaire en montant (un dû résiduel réellement inférieur au seuil reste
+    encaissé pour sa valeur exacte, faute de versement voisin avec lequel le fusionner). Si
+    ce seuil était faux, le nombre de lignes d'encaissement serait faussé, sans effet sur le
+    montant total encaissé par facture.
+
 - nom: delai_jours_encaissement_patient
   valeur:
     '0': 0.5
