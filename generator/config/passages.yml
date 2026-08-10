@@ -139,6 +139,17 @@ parametres:
     justification: Constante a faux sur toutes les lignes - case a cocher jamais observee
       au poste (REL-RDV.R14, aucune_valeur_observee), posee par convention comme valeur
       par defaut la plus plausible d'une case non cochee.
+  - table: source.passages_urgences
+    colonne: date_heure_pec_medicale
+    justification: 'Horodatage continu (delai_pec_par_niveau tire par une loi log-normale a
+      la seconde pres, ajoute a l''heure d''arrivee) sur 27360 lignes de la periode - une
+      collision exacte entre deux tirages reste possible mathematiquement mais n''est pas
+      garantie sur une execution donnee, la resolution effective (secondes sur pres de deux
+      ans et demi) rendant l''entiere distinction la realisation la plus frequente, pas une
+      anomalie de generation. Mesure avant d''ecrire ce lot (voir le rapport) : 27360 valeurs
+      distinctes sur 27360 lignes apres l''alignement de repartition_niveaux_tri sur le
+      document de cadrage, qui deplace la distribution des delais tires sans en reduire la
+      continuite.'
   unite: liste de colonnes non identifiantes legitimement a valeur unique ou entierement
     distincte sur toute la periode, par table
   provenance: HYP

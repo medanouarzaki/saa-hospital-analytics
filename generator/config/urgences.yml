@@ -1,22 +1,41 @@
 parametres:
 - nom: repartition_niveaux_tri
   valeur:
-    '1': 0.03
-    '2': 0.07
-    '3': 0.26
-    '4': 0.4
-    '5': 0.24
+    '1': 0.02
+    '2': 0.08
+    '3': 0.27
+    '4': 0.41
+    '5': 0.22
   unite: proportion par code de nomenclature_niveau_tri
-  provenance: HYP
-  preuve: S-12
-  note: Nom impose par la relation R-09 du registre des relations injectees. S-12 ne mesure
+  provenance: DOC
+  preuve: S-14
+  note: 'Nom impose par la relation R-09 du registre des relations injectees. S-12 ne mesurait
     que trois groupes de gravite (urgences vitales environ 10 %, urgences reelles non
-    vitales 26 %, consultations non urgentes 64 %, deja notes a la nomenclature des cinq
-    niveaux comme reserve explicite sur l'echelle). Repartition posee en distribuant chaque
-    groupe sur les niveaux qui le composent (1+2 pour le groupe vital, 3 seul pour le
-    groupe intermediaire, 4+5 pour le groupe non urgent), la part relative a l'interieur de
-    chaque groupe n'etant pas mesuree. Si cette repartition etait fausse, la pyramide de
-    gravite de la page Urgences serait faussee, sans effet sur le nombre total de passages.
+    vitales 26 %, consultations non urgentes 64 %), la repartition precedente distribuait
+    chaque groupe sur ses niveaux sans mesure de la part interieure a chaque groupe.
+    Provenance portee a DOC - le document de cadrage donne desormais la calibration des
+    cinq niveaux elle-meme, adossee a S-14 (l''echelle FRENCH deja citee par
+    delai_pec_par_niveau pour ses cibles de delai). Si cette repartition etait fausse, la
+    pyramide de gravite de la page Urgences serait faussee, sans effet sur le nombre total
+    de passages.'
+- nom: part_passages_consultation_ordinaire
+  valeur: 0.307
+  unite: proportion des passages relevant d'une consultation ordinaire (non urgente au sens
+    clinique), mesure descriptive sans colonne dediee
+  provenance: DOC
+  preuve: S-13
+  note: 'Parametre ajoute par ce lot : S-13 mesure 30,7 % de consultations non appropriees
+    aux urgences sur 410 patients au CHP de Nador (2010). Le registre des champs de
+    source.passages_urgences ne porte aucune colonne dediee au caractere ordinaire ou non
+    d''un passage (seul niveau_tri existe, et sa repartition en cinq niveaux ne recoupe pas
+    directement ce seuil binaire) : ce parametre documente la mesure pour le rapport et la
+    justification d''une filiere courte, sans etre applique par le generateur ni verifie sur
+    une colonne produite -- inventer une colonne excederait le releve, exactement comme deja
+    pratique pour motifs_refus_prise_en_charge (prises_en_charge.yml). Etude anterieure a la
+    generalisation de l''AMO et portant sur un etablissement distinct ; retenue comme la
+    seule mesure chiffree disponible pour cette grandeur au Maroc. Si cette valeur etait
+    fausse, seule la justification qualitative de la recommandation d''une filiere courte
+    serait affaiblie, sans effet sur aucune donnee generee.'
 - nom: delai_pec_par_niveau
   valeur:
     '1': 1
@@ -49,34 +68,38 @@ parametres:
     tableau de bord serait faux, sans effet sur la mediane des delais par niveau elle-meme.
 - nom: orientation_urgences
   valeur:
-    RD: 0.9
-    HO: 0.0322
-    TR: 0.02
-    SC: 0.04
-    DC: 0.0078
+    RD: 0.76
+    HO: 0.102
+    TR: 0.12
+    SC: 0.015
+    DC: 0.003
   unite: proportion par code de nomenclature_orientation_sortie
   provenance: HYP
   preuve: sans_preuve_externe
-  note: 'Nom impose par la relation R-11 du registre des relations injectees. Le registre
-    des champs ne porte aucune colonne reliant un sejour d''hospitalisation au passage aux
-    urgences qui l''a declenche ; en inventer une depasserait le releve. L''accord entre
-    les deux tables est donc agrege, non materialise ligne a ligne : la part HO ci-dessus
-    (3,22 %) est mesuree pour egaler exactement le rapport entre les admissions de mode
-    urgence deja fixees par generator/mouvements.py (880) et le nombre de passages aux
-    urgences sur la periode (27360, mesure avant d''ecrire ce fichier, voir le rapport),
-    plutot que posee independamment. C''est ce paramètre-ci, et non plus un taux propre a
-    generator/mouvements.py, qui fixe desormais ce flux : generator/mouvements.py lit
-    orientation_urgences[''HO''] et le ramene a une proportion des admissions
-    d''hospitalisation (une population bien plus restreinte que les passages aux
-    urgences), pour que le nombre d''admissions de mode urgence egale en agrege le nombre
-    de passages aux urgences orientes vers l''hospitalisation.
-    Le rattachement d''un sejour donne a son passage aux urgences declencheur devra etre
-    reconstitue par rapprochement sur le patient et la date lors d''un travail ulterieur de
-    rapprochement, ce n''est pas un oubli de ce lot mais une consequence du perimetre du
-    releve. Les quatre autres parts (RD, TR, SC, DC) sont posees sans source, dans l''ordre
-    de grandeur attendu (le retour a domicile domine tres largement). Si l''une de ces
-    parts etait fausse, la repartition des issues de la page Urgences serait faussee, sans
-    effet sur le nombre total de passages.'
+  note: 'Nom impose par la relation R-11 du registre des relations injectees. Valeurs
+    portees aux cinq chiffres du document de cadrage (domicile 76 %, hospitalisation
+    10,2 %, transfert 12 %, sortie contre avis 1,5 %, deces 0,3 %) ; le cadrage ne cite
+    aucune source propre a ce bloc (contrairement aux trois autres lignes de sa section
+    Urgences), provenance restee HYP. Il justifie seulement le taux de transfert ("relevé
+    et non résiduel : un établissement sans chirurgie ni réanimation transfère tout ce qui
+    en relève"), retenu tel quel comme les quatre autres.
+
+    Consequence mesuree de ce changement, gardee volontairement telle quelle sur decision
+    explicite (question posee, reponse recue: appliquer le cadrage tel quel et laisser
+    l''Etape 4 de ce lot reveler la tension plutot que de l''arbitrer en amont) : le
+    registre des champs ne porte aucune colonne reliant un sejour d''hospitalisation au
+    passage aux urgences qui l''a declenche ; generator/mouvements.py lit HO et le ramene
+    a une proportion des admissions d''hospitalisation (population plus restreinte que les
+    passages aux urgences), pour que le nombre d''admissions de mode urgence egale en
+    agrege le nombre de passages aux urgences orientes vers l''hospitalisation -- c''est ce
+    mecanisme, deja en place, qui traduit desormais 10,2 % de ~27360 passages sur la
+    periode (soit environ 2792) en une part des 2980 admissions de la periode (soit
+    environ 93,7 %, mesuree a l''Etape 4) plutot que les 29 % mesures avant ce lot : une
+    consequence arithmetique directe de la valeur HO du cadrage combinee au fil des
+    episodes gele (admissions_annuelles, S-30), pas un choix de ce lot. Si HO etait faux,
+    la part d''admissions de mode urgence serait faussee dans la meme proportion, sans
+    effet sur le nombre total de sejours ni sur le nombre de passages aux urgences,
+    tous deux geles independamment.'
 - nom: modulateur_origine_tri
   valeur:
     '1': 2.0
@@ -105,19 +128,22 @@ parametres:
     le nombre total de passages.'
 - nom: repartition_modes_arrivee
   valeur:
-    PC: 0.15
-    SMUR: 0.1
-    MP: 0.65
-    TP: 0.1
+    PC: 0.09
+    SMUR: 0.15
+    MP: 0.72
+    TP: 0.04
   unite: proportion par code de nomenclature_mode_arrivee
   provenance: HYP
   preuve: sans_preuve_externe
-  note: Aucune source ne quantifie la repartition entre les quatre modes d'arrivee deja
-    documentes (S-12). Les moyens propres dominent tres largement, plausible pour un
-    hopital provincial sans SMUR dedie a grande echelle. Posee sans source. Si cette
-    repartition etait fausse, la part d'arrivees medicalisees affichee serait faussee, avec
-    un effet indirect sur le niveau de tri moyen via le modulateur d'origine, sans effet
-    sur le nombre total de passages.
+  note: Le document de cadrage donne desormais une repartition chiffree entre les quatre
+    modes d'arrivee deja documentes (S-12) - moyens propres (MP, 72 %), ambulance (SMUR,
+    15 %), protection civile (PC, 9 %), transfert (TP, transport prive, 4 %) - mais la
+    classe lui-meme HYP, sans source propre a cette valeur, seule l'existence des quatre
+    modes restant sourcee (S-12). Les moyens propres dominent tres largement, plausible pour
+    un hopital provincial sans SMUR dedie a grande echelle. Si cette repartition etait
+    fausse, la part d'arrivees medicalisees affichee serait faussee, avec un effet indirect
+    sur le niveau de tri moyen via le modulateur d'origine, sans effet sur le nombre total
+    de passages.
 - nom: repartition_motifs_recours
   valeur:
     RESP: 0.15
