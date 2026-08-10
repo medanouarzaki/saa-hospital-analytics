@@ -193,6 +193,12 @@ parametres:
     coefficient: 8
     type_rattachement: service
     rattachement: RAD
+  - code: HOSP-J
+    libelle: Journée d'hospitalisation
+    lettre_cle: J
+    coefficient: 1
+    type_rattachement: service
+    rattachement: HM
   unite: couples code-libellé, plus lettre clé, coefficient et rattachement
   provenance: HYP
   preuve: S-17
@@ -209,4 +215,9 @@ parametres:
     pour qu''une table des lignes de facture répartissant des dizaines de milliers d''examens sur ces
     catégories ne les concentre pas sur une poignée de codes. Si un coefficient individuel était faux, le
     montant absolu des lignes portant cet acte serait faussé, sans effet sur le nombre d''actes par
-    catégorie ni sur les totaux mesurés par ailleurs.'
+    catégorie ni sur les totaux mesurés par ailleurs.
+    Un trente-troisième acte, HOSP-J, porte la lettre J ajoutée à la tarification (décision posée,
+    documentée dans sa propre note) : un acte par journée d''hospitalisation, coefficient 1. Son
+    rattachement de nomenclature (service HM) est générique, la table des lignes de facture portant par
+    ailleurs sa propre colonne service_executant, renseignée avec l''unité réelle du séjour (HM, HPED ou
+    HGO) pour chaque ligne engendrée.'

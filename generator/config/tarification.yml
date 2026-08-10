@@ -4,39 +4,61 @@ parametres:
   - code: C
     libelle: Consultation généraliste
     valeur_unitaire: 50.00
+    provenance: DOC
   - code: Cs
     libelle: Consultation spécialiste
     valeur_unitaire: 75.00
+    provenance: DOC
   - code: Cp
     libelle: Consultation pédiatre
     valeur_unitaire: 120.00
+    provenance: DOC
   - code: B
     libelle: Acte de biologie
     valeur_unitaire: 0.90
+    provenance: DOC
   - code: Z
     libelle: Acte de radiologie
     valeur_unitaire: 9.00
+    provenance: DOC
   - code: KE
     libelle: Acte d'exploration fonctionnelle
     valeur_unitaire: 10.00
-  unite: couples code-libellé, valeur unitaire en dirhams
-  provenance: DOC
+    provenance: DOC
+  - code: J
+    libelle: Journée d'hospitalisation
+    valeur_unitaire: 180.00
+    provenance: HYP
+  unite: couples code-libellé, valeur unitaire en dirhams, provenance propre à chaque lettre
+  provenance: HYP
   preuve: S-17
-  note: 'Les six lettres retenues et leurs valeurs sont lues telles quelles sur la grille 1 de la convention
-    du secteur public (S-17, contenu lu) : « C 50,00 ; Cs 75,00 ; Cp 120,00 ; B 0,90 ; Z 9,00 ; KE 10,00
-    dirhams ». Cinq lettres de cette même grille en sont écartées. CNPSY (consultation neuropsychiatre)
-    et D (acte dentaire), car aucune spécialité de neuropsychiatrie ni de stomatologie n''est retenue par
-    nomenclature_activite. AMM, dont S-17 ne précise pas le champ d''application, et qu''aucune activité
-    mesurée ne permet de rattacher avec certitude. K, enfin : dans la nomenclature générale des actes
-    professionnels dont cette grille dérive, K désigne historiquement le coefficient des actes de chirurgie
-    et actes techniques lourds ; l''établissement ne pratique aucune chirurgie (interventions_chirurgicales
-    mesurée à zéro sur deux exercices), et retenir K contredirait ce constat même si S-17 le classe dans
-    la grille des lettres clés plutôt que dans celle, distincte, des forfaits de chirurgie. P (anatomo-cyto-pathologie)
-    n''est pas retenue non plus : aucune catégorie d''examens de laboratoire mesurée ne lui correspond
-    (les six catégories de la source sont bactériologie, parasitologie, hygiène alimentaire, immuno-sérologie,
-    hématologie-transfusion, chimie biologie). Si une valeur était fausse, les montants absolus des lignes
-    de facture portant cette lettre seraient faussés, sans effet sur les proportions entre lettres ni sur
-    les taux de recouvrement, calculés ailleurs.'
+  note: 'La provenance de ce paramètre est mixte, portée individuellement par chaque entrée
+    (champ provenance propre à chaque lettre, six DOC et une HYP) ; le champ provenance de ce
+    niveau, contraint à DOC, HYP ou OBS par le schéma de configuration, est fixé à HYP - la
+    valeur la moins engageante des deux, puisqu''au moins une entrée (J) est posée sans source.
+    Les six premières lettres et leurs valeurs sont lues telles quelles sur la grille 1 de la
+    convention du secteur public (S-17, contenu lu) : « C 50,00 ; Cs 75,00 ; Cp 120,00 ; B 0,90 ; Z 9,00 ;
+    KE 10,00 dirhams ». Cinq lettres de cette même grille en sont écartées. CNPSY (consultation
+    neuropsychiatre) et D (acte dentaire), car aucune spécialité de neuropsychiatrie ni de stomatologie
+    n''est retenue par nomenclature_activite. AMM, dont S-17 ne précise pas le champ d''application, et
+    qu''aucune activité mesurée ne permet de rattacher avec certitude. K, enfin : dans la nomenclature
+    générale des actes professionnels dont cette grille dérive, K désigne historiquement le coefficient
+    des actes de chirurgie et actes techniques lourds ; l''établissement ne pratique aucune chirurgie
+    (interventions_chirurgicales mesurée à zéro sur deux exercices), et retenir K contredirait ce constat
+    même si S-17 le classe dans la grille des lettres clés plutôt que dans celle, distincte, des forfaits
+    de chirurgie. P (anatomo-cyto-pathologie) n''est pas retenue non plus : aucune catégorie d''examens de
+    laboratoire mesurée ne lui correspond. Si l''une de ces six valeurs était fausse, les montants absolus
+    des lignes portant cette lettre seraient faussés, sans effet sur les proportions entre lettres ni sur
+    les taux de recouvrement, calculés ailleurs.
+    La septième lettre, J, est posée : la source ne documente, pour le secteur public, que la grille des
+    lettres clés et celle des forfaits d''actes de chirurgie ; aucun prix de journée n''y figure. L''
+    établissement en pratique un néanmoins — sans lui, les 2980 hospitalisations et les journées qu''elles
+    portent ne produiraient aucune recette, un trou visible et faux pour un hôpital public marocain, qui
+    facture bien la journée d''hospitalisation. La valeur retenue, 180 dirhams, est posée sans source,
+    dans l''ordre de grandeur d''un tarif de journée d''hôpital public marocain. Si cette valeur était
+    fausse, les montants absolus des lignes de journée seraient faussés, sans effet sur les proportions
+    entre lettres, ni sur les taux de facturation et de recouvrement, les grandeurs exploitées par
+    l''analyse.'
 - nom: regle_montant_ligne_facture
   valeur: valeur_unitaire(lettre_cle) * coefficient(acte) * quantite(ligne)
   unite: formule
@@ -46,5 +68,5 @@ parametres:
     clé et de son coefficient (S-17) ; la quantité, propre à la ligne de facture et non à l''acte, multiplie
     ce produit lorsqu''un même acte est répété sur une même ligne (voir la note de la colonne quantite au
     registre des champs). Ce paramètre ne porte pas de valeur numérique : il fixe la règle que
-    tests/test_nomenclatures.py vérifie sur des cas fabriqués, et qu''un futur générateur de la table des
-    lignes de facture devra appliquer telle quelle. Table des lignes de facture non écrite par ce lot.'
+    tests/test_nomenclatures.py vérifie sur des cas fabriqués, et que generator/facturation.py applique
+    telle quelle pour chaque ligne de source.lignes_facture, jamais recalculée d''une autre façon.'
