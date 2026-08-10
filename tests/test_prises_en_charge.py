@@ -86,14 +86,36 @@ def test_somme_des_parts(generation: dict) -> None:
         ), facture
 
 
-def test_taux_par_organisme(generation: dict) -> None:
+def test_taux_selon_type_et_seuil(generation: dict) -> None:
+    # remplace test_taux_par_organisme (lot precedent) : le taux de prise en charge ne
+    # depend plus de l'organisme mais du type d'episode et, en ambulatoire, d'un seuil de
+    # montant (regle S-18).
     entrees = generation["entrees"]
+    lignes_fac = generation["lignes"][TABLE_FACTURES]
     lignes_pec = generation["lignes"][TABLE]
-    taux_cfg = entrees["taux_couverture_par_organisme"]["valeur"]
+
+    taux_hos = entrees["taux_part_organisme_hospitalisation"]["valeur"]
+    taux_ambu_haut = entrees["taux_part_organisme_ambulatoire_haut"]["valeur"]
+    seuil = entrees["seuil_dirhams_part_organisme_ambulatoire"]["valeur"]
+    facture_par_episode = {f["n_episode"]: f for f in lignes_fac}
 
     assert lignes_pec
+    n_hos = n_ambu_haut = n_ambu_bas = 0
     for pec in lignes_pec:
-        assert pec["taux_prise_en_charge"] == taux_cfg[pec["organisme"]], pec
+        facture = facture_par_episode[pec["n_episode"]]
+        if pec["type_episode"] == "HOS":
+            assert pec["taux_prise_en_charge"] == taux_hos, pec
+            n_hos += 1
+        elif facture["montant_total"] > seuil:
+            assert pec["taux_prise_en_charge"] == taux_ambu_haut, pec
+            n_ambu_haut += 1
+        else:
+            assert pec["taux_prise_en_charge"] == 0.0, pec
+            n_ambu_bas += 1
+
+    assert n_hos > 0, "aucune prise en charge d'hospitalisation à contrôler"
+    assert n_ambu_haut > 0, "aucune prise en charge ambulatoire au-dessus du seuil à contrôler"
+    assert n_ambu_bas > 0, "aucune prise en charge ambulatoire sous le seuil à contrôler"
 
 
 def test_ordre_des_dates(generation: dict) -> None:

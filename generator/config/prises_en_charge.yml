@@ -75,36 +75,48 @@ parametres:
     utilisés, aucune des trois compagnies retenues par repartition_couverture ne leur
     correspondant avec autant de vraisemblance. Si cette correspondance était fausse, la
     répartition par régime affichée serait faussée, sans effet sur le nombre de prises en
-    charge ni sur les montants, qui suivent taux_couverture_par_organisme indexé sur le même
-    code.'
+    charge ni sur les montants, qui suivent désormais le type d''épisode et le montant de la
+    facture (taux_part_organisme_hospitalisation, taux_part_organisme_ambulatoire_haut,
+    seuil_dirhams_part_organisme_ambulatoire), non plus l''organisme lui-même.'
 
-- nom: taux_couverture_par_organisme
-  valeur:
-    CNSS: 0.9
-    TNS: 0.85
-    ACHAMIL: 0.85
-  unite: proportion du montant total de la facture prise en charge par l'organisme, par code
-    de nomenclature_organisme_regime, appliquée à toute demande (accordée ou non)
-  provenance: HYP
-  preuve: sans_preuve_externe
-  note: 'Le registre documente, pour la colonne taux_prise_en_charge, un taux qui dépend du
-    type d''épisode et d''un seuil de montant (S-18 : cent pour cent en hospitalisation et
-    hôpital de jour, quatre-vingts pour cent en ambulatoire au-delà de deux cents dirhams) —
-    la règle déjà posée dans generator/config/facturation.yml au lot précédent
-    (seuil_dirhams_part_organisme_ambulatoire, taux_part_organisme_ambulatoire_haut), retirée
-    de ce fichier car ce lot pose à la place, comme son étape 5 l''exige explicitement
-    ("le taux de couverture dépend de l''organisme"), un taux par organisme plutôt que par
-    type d''épisode et seuil. Simplification posée qui diverge du mécanisme précis que S-18
-    documente, retenue parce que la consigne de ce lot la demande sans ambiguïté ; les deux
-    mécanismes ne sont pas mathématiquement incompatibles (un taux par organisme reste un
-    taux, seul son critère de sélection change), donc pas une contradiction interne au
-    prompt. CNSS, régime du plus grand nombre de patients couverts (repartition_couverture,
-    50 % via 00116), porte le taux le plus élevé (90 %) ; TNS et ACHAMIL portent 85 %. Le
-    taux est appliqué à toute demande, accordée ou non (colonne taux_prise_en_charge,
-    l''entitlement configuré), le montant réellement pris en charge (part_organisme de la
-    facture) restant nul pour une demande refusée ou encore en instance. Si un taux était
-    faux, le montant pris en charge des factures de ce régime serait faussé, sans effet sur
-    le nombre de demandes ni sur les autres régimes.'
+- nom: taux_part_organisme_hospitalisation
+  valeur: 1.0
+  unite: proportion du montant total de la facture prise en charge par l'organisme, séjours
+    d'hospitalisation (aucun code d'hôpital de jour distinct dans ce générateur)
+  provenance: DOC
+  preuve: S-18
+  note: 'Remplace taux_couverture_par_organisme (retiré, un taux par organisme plutôt que par
+    type d''épisode et seuil de montant), mécanisme posé à un lot antérieur en écart déclaré
+    par rapport à S-18, que ce lot corrige pour appliquer la règle documentée telle quelle :
+    S-18 décrit une prise en charge totale des frais en hospitalisation et hôpital de jour
+    sur la base de la TNR. Ce générateur ne porte pas de type d''épisode "hôpital de jour"
+    distinct (seuls HOS, CE, UR existent) ; la règle s''applique donc au seul type HOS. Si ce
+    taux était faux, le montant pris en charge des factures d''hospitalisation serait faussé,
+    sans effet sur les factures ambulatoires ni sur le nombre de demandes.'
+- nom: taux_part_organisme_ambulatoire_haut
+  valeur: 0.8
+  unite: proportion du montant total de la facture prise en charge par l'organisme, factures
+    ambulatoires (CE, UR) au-delà du seuil
+  provenance: DOC
+  preuve: S-18
+  note: S-18 documente un ticket modérateur de 20 % de la TNR en ambulatoire public au-delà de
+    deux cents dirhams, donc une prise en charge organisme de 80 % au-delà de ce seuil.
+    Applicable aux types d'épisode CE et UR (ambulatoires dans ce générateur). Si ce taux
+    était faux, le montant pris en charge des factures ambulatoires au-delà du seuil serait
+    faussé, sans effet sur les factures d'hospitalisation ni sur celles sous le seuil.
+- nom: seuil_dirhams_part_organisme_ambulatoire
+  valeur: 200
+  unite: dirhams, montant total de la facture en deçà duquel aucune prise en charge organisme
+    ne s'applique en ambulatoire
+  provenance: DOC
+  preuve: S-18
+  note: S-18 documente un seuil de deux cents dirhams en deçà duquel aucun tiers payant ne
+    s'applique en ambulatoire public. Sous ce seuil, la prise en charge organisme est nulle
+    (part_organisme reste à 0, part_patient couvre le montant total), au-delà,
+    taux_part_organisme_ambulatoire_haut s'applique. Si ce seuil était faux, la frontière
+    entre facture prise en charge et facture non prise en charge en ambulatoire serait
+    faussée, sans effet sur le montant pris en charge d'une facture qui reste du même côté du
+    seuil.
 
 - nom: regle_arrondi_montant_pris_en_charge
   valeur: arrondi au centième le plus proche

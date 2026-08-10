@@ -54,7 +54,9 @@ def generer_lignes(
     taux_demande = entrees["taux_demande_par_type_episode"]["valeur"]
     taux_refus = entrees["taux_refus_prise_en_charge"]["valeur"]
     correspondance_regime = entrees["correspondance_regime_compagnie_assurance"]["valeur"]
-    taux_couverture_par_organisme = entrees["taux_couverture_par_organisme"]["valeur"]
+    taux_hospitalisation = entrees["taux_part_organisme_hospitalisation"]["valeur"]
+    taux_ambulatoire_haut = entrees["taux_part_organisme_ambulatoire_haut"]["valeur"]
+    seuil_ambulatoire = entrees["seuil_dirhams_part_organisme_ambulatoire"]["valeur"]
     delai_decision = entrees["delai_jours_decision_prise_en_charge"]["valeur"]
     gabarit_pec = entrees["gabarit_identifiant_prise_en_charge"]["valeur"]
 
@@ -73,7 +75,15 @@ def generer_lignes(
         if generateur.random() >= taux_demande[facture["type_episode"]]:
             continue
 
-        taux_couverture = taux_couverture_par_organisme[organisme]
+        # regle S-18 : prise en charge totale en hospitalisation, ticket moderateur en
+        # ambulatoire (CE, UR) au-dela d'un seuil de montant, aucune prise en charge en
+        # deca -- remplace un taux par organisme, ecart declare a S-18 corrige par ce lot.
+        if facture["type_episode"] == "HOS":
+            taux_couverture = taux_hospitalisation
+        elif facture["montant_total"] > seuil_ambulatoire:
+            taux_couverture = taux_ambulatoire_haut
+        else:
+            taux_couverture = 0.0
         delai = int(_tirage_pondere_dict(delai_decision, generateur))
         date_decision = facture["date_facture"] + timedelta(days=delai)
 
