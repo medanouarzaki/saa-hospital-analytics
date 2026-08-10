@@ -1,0 +1,196 @@
+parametres:
+- nom: repartition_niveaux_tri
+  valeur:
+    '1': 0.03
+    '2': 0.07
+    '3': 0.26
+    '4': 0.4
+    '5': 0.24
+  unite: proportion par code de nomenclature_niveau_tri
+  provenance: HYP
+  preuve: S-12
+  note: Nom impose par la relation R-09 du registre des relations injectees. S-12 ne mesure
+    que trois groupes de gravite (urgences vitales environ 10 %, urgences reelles non
+    vitales 26 %, consultations non urgentes 64 %, deja notes a la nomenclature des cinq
+    niveaux comme reserve explicite sur l'echelle). Repartition posee en distribuant chaque
+    groupe sur les niveaux qui le composent (1+2 pour le groupe vital, 3 seul pour le
+    groupe intermediaire, 4+5 pour le groupe non urgent), la part relative a l'interieur de
+    chaque groupe n'etant pas mesuree. Si cette repartition etait fausse, la pyramide de
+    gravite de la page Urgences serait faussee, sans effet sur le nombre total de passages.
+- nom: delai_pec_par_niveau
+  valeur:
+    '1': 1
+    '2': 20
+    '3': 75
+    '4': 120
+    '5': 240
+  unite: minutes, cible de delai avant prise en charge medicale par niveau de tri
+  provenance: DOC
+  preuve: S-14
+  note: Nom impose par la relation R-10 du registre des relations injectees. S-14 (echelle
+    FRENCH) documente six niveaux (1, 2, 3A, 3B, 4, 5) et leurs delais maximaux (1, 20, 60,
+    90, 120, 240 minutes) ; la nomenclature deja ecrite de ce generateur n'en retient que
+    cinq, le niveau 3 fusionnant 3A et 3B sans que la part de chaque sous-niveau dans la
+    fusion soit connue. La valeur retenue pour le niveau 3, 75 minutes, est la moyenne
+    simple des deux delais sources (60 et 90), a defaut d'une ponderation mesuree. Si ces
+    cibles etaient fausses, l'indicateur de conformite au delai affiche par niveau serait
+    faux, sans effet sur le nombre total de passages ni sur leur repartition par niveau.
+- nom: taux_respect_cible
+  valeur: 0.75
+  unite: proportion de passages vus dans le delai cible de leur niveau
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Nom impose par la relation R-10 du registre des relations injectees. La consequence
+    inscrite au registre est explicite - "le TAUX DE RESPECT est imposé" - ce taux n'est
+    donc mesure par aucune source, contrairement aux cibles elles-memes (delai_pec_par_niveau,
+    DOC S-14). Pose a 75 %, identique pour tous les niveaux ; la loi de delai est construite
+    (voir generator/urgences.py) pour que ce taux mesure sur les donnees reproduise
+    exactement ce parametre. Si ce taux etait faux, l'indicateur de conformite affiche au
+    tableau de bord serait faux, sans effet sur la mediane des delais par niveau elle-meme.
+- nom: orientation_urgences
+  valeur:
+    RD: 0.9
+    HO: 0.0322
+    TR: 0.02
+    SC: 0.04
+    DC: 0.0078
+  unite: proportion par code de nomenclature_orientation_sortie
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Nom impose par la relation R-11 du registre des relations injectees. Le registre
+    des champs ne porte aucune colonne reliant un sejour d''hospitalisation au passage aux
+    urgences qui l''a declenche ; en inventer une depasserait le releve. L''accord entre
+    les deux tables est donc agrege, non materialise ligne a ligne : la part HO ci-dessus
+    (3,22 %) est mesuree pour egaler exactement le rapport entre les admissions de mode
+    urgence deja fixees par generator/mouvements.py (880) et le nombre de passages aux
+    urgences sur la periode (27360, mesure avant d''ecrire ce fichier, voir le rapport),
+    plutot que posee independamment. C''est ce paramètre-ci, et non plus un taux propre a
+    generator/mouvements.py, qui fixe desormais ce flux : generator/mouvements.py lit
+    orientation_urgences[''HO''] et le ramene a une proportion des admissions
+    d''hospitalisation (une population bien plus restreinte que les passages aux
+    urgences), pour que le nombre d''admissions de mode urgence egale en agrege le nombre
+    de passages aux urgences orientes vers l''hospitalisation.
+    Le rattachement d''un sejour donne a son passage aux urgences declencheur devra etre
+    reconstitue par rapprochement sur le patient et la date lors d''un travail ulterieur de
+    rapprochement, ce n''est pas un oubli de ce lot mais une consequence du perimetre du
+    releve. Les quatre autres parts (RD, TR, SC, DC) sont posees sans source, dans l''ordre
+    de grandeur attendu (le retour a domicile domine tres largement). Si l''une de ces
+    parts etait fausse, la repartition des issues de la page Urgences serait faussee, sans
+    effet sur le nombre total de passages.'
+- nom: modulateur_origine_tri
+  valeur:
+    '1': 2.0
+    '2': 1.5
+    '3': 1.0
+    '4': 0.6
+    '5': 0.3
+  unite: multiplicateur de poids par niveau de tri, applique aux arrivees en mode SMUR
+  provenance: DOC
+  preuve: S-14
+  note: 'Nom impose par la relation R-12 du registre des relations injectees ("Un patient
+    adresse par un medecin est prioritaire au tri"). Le registre des champs de
+    source.passages_urgences ne porte aucune colonne d''origine ou d''adressage distincte
+    du mode d''arrivee deja ecrit (nomenclature_mode_arrivee : PC, SMUR, MP, TP) : le mode
+    SMUR (ambulance medicalisee, dejà evaluee par une equipe medicale avant l''arrivee) est
+    retenu comme le proxy le plus proche de "adresse par un medecin" disponible dans ce
+    schema, a defaut d''une colonne dediee - une lecture posee, pas une mesure. Les
+    multiplicateurs favorisent les niveaux les plus graves (1, 2) pour les arrivees SMUR et
+    defavorisent les niveaux les moins graves (4, 5), dans le sens que R-12 impose. La
+    repartition conditionnelle au mode non-SMUR est resolue algebriquement (voir
+    generator/urgences.py) pour que la moyenne ponderee par la part d''arrivees SMUR
+    reproduise exactement repartition_niveaux_tri, jamais approchee par tirage : le
+    modulateur redistribue a l''interieur de la repartition globale, il ne la deplace pas.
+    Si ces multiplicateurs etaient faux, la correlation entre mode d''arrivee et niveau de
+    tri affichee serait faussee, sans effet sur la repartition globale des niveaux ni sur
+    le nombre total de passages.'
+- nom: repartition_modes_arrivee
+  valeur:
+    PC: 0.15
+    SMUR: 0.1
+    MP: 0.65
+    TP: 0.1
+  unite: proportion par code de nomenclature_mode_arrivee
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune source ne quantifie la repartition entre les quatre modes d'arrivee deja
+    documentes (S-12). Les moyens propres dominent tres largement, plausible pour un
+    hopital provincial sans SMUR dedie a grande echelle. Posee sans source. Si cette
+    repartition etait fausse, la part d'arrivees medicalisees affichee serait faussee, avec
+    un effet indirect sur le niveau de tri moyen via le modulateur d'origine, sans effet
+    sur le nombre total de passages.
+- nom: repartition_motifs_recours
+  valeur:
+    RESP: 0.15
+    DIG: 0.18
+    TRAUM: 0.22
+    CARDIO: 0.1
+    FIEVRE: 0.15
+    AUTRE: 0.2
+  unite: proportion par code de nomenclature_motif_recours
+  provenance: HYP
+  preuve: S-13
+  note: S-13 documente l'existence de motifs de recours repartis par chapitre CIM-10 sans
+    fournir de repartition chiffree transposable directement aux six codes deja ecrits de
+    nomenclature_motif_recours. Repartition posee dans un ordre de grandeur plausible
+    (traumatismes et motifs digestifs frequents dans un service d'urgences generaliste).
+    Si cette repartition etait fausse, la page Urgences afficherait une composition par
+    motif invraisemblable, sans effet sur aucun total.
+- nom: duree_mediane_minutes_presence_urgences
+  valeur: 150
+  unite: minutes, mediane d'une loi log-normale
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune source ne documente la duree totale de presence aux urgences (arrivee a
+    sortie) pour cet etablissement. Posee sans source, superieure au delai median avant
+    prise en charge (les niveaux les moins graves, majoritaires, attendent l'essentiel de
+    ce temps). Tiree independamment de la duree deja posee dans
+    generator/config/passages.yml (duree_mediane_minutes_par_categorie, categorie U) pour
+    le passage generique correspondant, les deux mesurant la meme reference mais par des
+    modules distincts, comme deja pratique entre generator/passages.py et
+    generator/mouvements.py. Si cette valeur etait fausse, la duree de presence affichee
+    serait faussee, sans effet sur le delai de prise en charge lui-meme.
+- nom: ecart_type_log_duree_urgences
+  valeur: 0.4
+  unite: ecart-type du logarithme de la duree de presence, identique a tous les niveaux
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Meme convention que les autres ecarts-types de loi log-normale de ce generateur
+    (ecart_type_log_duree, ecart_type_log_duree_sejour). Pose sans source.
+- nom: ecart_type_log_delai_pec
+  valeur: 0.6
+  unite: ecart-type du logarithme du delai avant prise en charge medicale, identique a
+    tous les niveaux
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Pose sans source, comme les autres ecarts-types de loi log-normale de ce
+    generateur. La moyenne de la loi (parametree via mu, voir generator/urgences.py) est
+    resolue pour que la proportion de tirages sous la cible de chaque niveau reproduise
+    exactement taux_respect_cible, une contrainte de construction verifiee par le test
+    correspondant plutot qu'une valeur posee independamment.
+- nom: taux_consentement_transfert
+  valeur: 0.95
+  unite: proportion des passages transferes
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Part des transferts pour lesquels le consentement est recueilli, posee sans
+    source, tres majoritaire par construction (un transfert refuse devient une sortie
+    contre avis, deja comptee separement dans orientation_urgences). Colonne facultative
+    meme pour un transfert. Si ce taux etait faux, la part de transferts consentis
+    affichee serait faussee, sans effet sur le nombre total de transferts.
+- nom: taux_famille_informee
+  valeur: 0.97
+  unite: proportion des passages en deces
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Part des deces pour lesquels la famille est renseignee comme informee, posee sans
+    source, tres majoritaire. Colonne facultative meme pour un deces. Si ce taux etait
+    faux, la part affichee serait faussee, sans effet sur le nombre total de deces.
+- nom: taux_inventaire_effets
+  valeur: 0.97
+  unite: proportion des passages en deces
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Part des deces pour lesquels l'inventaire des effets personnels est renseigne
+    comme etabli, posee sans source, tres majoritaire. Colonne facultative meme pour un
+    deces. Si ce taux etait faux, la part affichee serait faussee, sans effet sur le
+    nombre total de deces.

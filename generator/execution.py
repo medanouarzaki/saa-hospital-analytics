@@ -26,6 +26,7 @@ from generator import (
     passages,
     patients,
     registre,
+    urgences,
     volumes,
 )
 from generator import rendez_vous as rdv
@@ -81,11 +82,17 @@ def _generer_mouvements(contexte: Contexte, generateur: np.random.Generator) -> 
     return lignes
 
 
+def _generer_urgences(contexte: Contexte, generateur: np.random.Generator) -> list[dict]:
+    lignes_passages = contexte.lignes["source.passages"]
+    return urgences.generer_lignes(lignes_passages, generateur, entrees=contexte.entrees)
+
+
 REGISTRE_GENERATEURS: tuple[tuple[str, GenerateurTable], ...] = (
     ("source.patients", _generer_patients),
     ("source.rendez_vous", _generer_rendez_vous),
     ("source.passages", _generer_passages),
     ("source.mouvements", _generer_mouvements),
+    ("source.passages_urgences", _generer_urgences),
 )
 
 
