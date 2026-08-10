@@ -17,7 +17,17 @@ from pathlib import Path
 
 import numpy as np
 
-from generator import alea, config, ecriture, parcours, passages, patients, registre, volumes
+from generator import (
+    alea,
+    config,
+    ecriture,
+    mouvements,
+    parcours,
+    passages,
+    patients,
+    registre,
+    volumes,
+)
 from generator import rendez_vous as rdv
 
 PILOTES = {
@@ -33,6 +43,7 @@ class Contexte:
     episodes: list[dict]
     population: list[dict]
     lignes: dict[str, list[dict]] = field(default_factory=dict)
+    meta: dict[str, object] = field(default_factory=dict)
 
 
 GenerateurTable = Callable[["Contexte", np.random.Generator], list[dict]]
@@ -61,10 +72,20 @@ def _generer_passages(contexte: Contexte, generateur: np.random.Generator) -> li
     )
 
 
+def _generer_mouvements(contexte: Contexte, generateur: np.random.Generator) -> list[dict]:
+    lignes_passages = contexte.lignes["source.passages"]
+    lignes, n_depassements = mouvements.generer_lignes(
+        lignes_passages, generateur, entrees=contexte.entrees
+    )
+    contexte.meta["mouvements_n_depassements_capacite"] = n_depassements
+    return lignes
+
+
 REGISTRE_GENERATEURS: tuple[tuple[str, GenerateurTable], ...] = (
     ("source.patients", _generer_patients),
     ("source.rendez_vous", _generer_rendez_vous),
     ("source.passages", _generer_passages),
+    ("source.mouvements", _generer_mouvements),
 )
 
 
@@ -100,7 +121,7 @@ def executer(
     taux_urgences_par_jour: float | None = None,
     generateurs: tuple[tuple[str, GenerateurTable], ...] = REGISTRE_GENERATEURS,
     entrees: dict[str, dict] | None = None,
-) -> tuple[ecriture.Execution, dict[str, list[dict]]]:
+) -> tuple[ecriture.Execution, Contexte]:
     if entrees is None:
         entrees = {e["nom"]: e for e in config.charger_entrees()}
 
@@ -132,4 +153,4 @@ def executer(
         execution.ecrire_table(table, lignes)
 
     execution.ecrire_manifeste()
-    return execution, contexte.lignes
+    return execution, contexte
