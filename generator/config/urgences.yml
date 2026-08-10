@@ -135,23 +135,39 @@ parametres:
     (traumatismes et motifs digestifs frequents dans un service d'urgences generaliste).
     Si cette repartition etait fausse, la page Urgences afficherait une composition par
     motif invraisemblable, sans effet sur aucun total.
-- nom: duree_mediane_minutes_presence_urgences
-  valeur: 150
-  unite: minutes, mediane d'une loi log-normale
+- nom: duree_mediane_minutes_post_prise_en_charge_par_orientation
+  valeur:
+    RD: 60
+    TR: 150
+    HO: 90
+    SC: 30
+    DC: 45
+  unite: minutes, mediane d'une loi log-normale, mesuree depuis la prise en charge medicale
+    jusqu'a la sortie, par code de nomenclature_orientation_sortie
   provenance: HYP
   preuve: sans_preuve_externe
-  note: Aucune source ne documente la duree totale de presence aux urgences (arrivee a
-    sortie) pour cet etablissement. Posee sans source, superieure au delai median avant
-    prise en charge (les niveaux les moins graves, majoritaires, attendent l'essentiel de
-    ce temps). Tiree independamment de la duree deja posee dans
-    generator/config/passages.yml (duree_mediane_minutes_par_categorie, categorie U) pour
-    le passage generique correspondant, les deux mesurant la meme reference mais par des
-    modules distincts, comme deja pratique entre generator/passages.py et
-    generator/mouvements.py. Si cette valeur etait fausse, la duree de presence affichee
-    serait faussee, sans effet sur le delai de prise en charge lui-meme.
+  note: 'Remplace une premiere version ou la duree totale de presence (arrivee a sortie)
+    etait tiree independamment du delai avant prise en charge, sans egard a l''orientation
+    de sortie : sur une execution de mesure, cette premiere version faisait sortir 6038
+    passages sur 27360 (22 %) exactement une seconde apres leur prise en charge, la duree
+    tiree se trouvant alors plus courte que le delai deja ecoule (frequent pour les niveaux
+    de tri les moins graves, dont le delai cible est le plus long) ; le mecanisme de secours
+    forcait alors la sortie a une seconde apres la prise en charge, un artefact sans rapport
+    avec l''orientation reelle. Corrige en tirant desormais, pour chaque passage, une duree
+    ecoulee depuis la prise en charge (jamais depuis l''arrivee), dependante de l''orientation
+    de sortie : un transfert suppose une regulation, un transport et l''accord d''un service
+    receveur (mediane la plus longue, 150 minutes) ; une sortie contre avis est la plus
+    rapide par construction (30 minutes) ; une orientation vers l''hospitalisation suppose
+    la disponibilite d''un lit et un brancardage (90 minutes) ; un deces suppose des
+    demarches de constat (45 minutes) ; un retour a domicile suppose une simple surveillance
+    et les formalites de sortie (60 minutes, la valeur la plus basse apres la sortie contre
+    avis). Valeurs posees sans source, dans cet ordre de grandeur relatif. Si l''une etait
+    fausse, la duree de presence affichee pour l''orientation concernee serait faussee, sans
+    effet sur le delai de prise en charge ni sur la repartition des orientations elles-memes.'
 - nom: ecart_type_log_duree_urgences
   valeur: 0.4
-  unite: ecart-type du logarithme de la duree de presence, identique a tous les niveaux
+  unite: ecart-type du logarithme de la duree post-prise en charge, identique a toutes les
+    orientations
   provenance: HYP
   preuve: sans_preuve_externe
   note: Meme convention que les autres ecarts-types de loi log-normale de ce generateur

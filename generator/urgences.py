@@ -92,7 +92,9 @@ def generer_lignes(
     repartition_arrivee = entrees["repartition_modes_arrivee"]["valeur"]
     repartition_motifs = entrees["repartition_motifs_recours"]["valeur"]
     repartition_unites = entrees["repartition_unites_hospitalisation"]["valeur"]
-    duree_mediane_presence = entrees["duree_mediane_minutes_presence_urgences"]["valeur"]
+    duree_mediane_post_pec_par_orientation = entrees[
+        "duree_mediane_minutes_post_prise_en_charge_par_orientation"
+    ]["valeur"]
     ecart_type_log_duree = entrees["ecart_type_log_duree_urgences"]["valeur"]
     ecart_type_log_delai = entrees["ecart_type_log_delai_pec"]["valeur"]
     motifs_transfert = [c["code"] for c in entrees["nomenclature_motif_transfert"]["valeur"]]
@@ -109,7 +111,10 @@ def generer_lignes(
         niveau: _mu_lognormal_pour_quantile(cible, taux_respect_cible, ecart_type_log_delai)
         for niveau, cible in delai_par_niveau.items()
     }
-    mu_presence = math.log(duree_mediane_presence)
+    mu_post_pec_par_orientation = {
+        orientation: math.log(mediane)
+        for orientation, mediane in duree_mediane_post_pec_par_orientation.items()
+    }
 
     lignes_u = [ligne for ligne in lignes_passages if ligne["type_passage"] == "U"]
 
@@ -135,18 +140,28 @@ def generer_lignes(
         )
         pec = arrivee + timedelta(seconds=delai_secondes)
 
-        duree_presence_secondes = max(
-            1, round(60 * float(generateur.lognormal(mu_presence, ecart_type_log_duree)))
+        orientation_sortie = _tirage_pondere_dict(orientation, generateur)
+
+        # tiree depuis la prise en charge, jamais depuis l'arrivee, et dependante de
+        # l'orientation : voir la note de duree_mediane_minutes_post_prise_en_charge_par_orientation
+        # pour l'artefact que cet ordre corrige (une duree totale independante du delai
+        # pouvait se trouver plus courte que le delai deja ecoule).
+        duree_post_pec_secondes = max(
+            1,
+            round(
+                60
+                * float(
+                    generateur.lognormal(
+                        mu_post_pec_par_orientation[orientation_sortie], ecart_type_log_duree
+                    )
+                )
+            ),
         )
-        sortie = arrivee + timedelta(seconds=duree_presence_secondes)
-        if sortie <= pec:
-            sortie = pec + timedelta(seconds=1)
+        sortie = pec + timedelta(seconds=duree_post_pec_secondes)
         if sortie.date() > date_fin:
             sortie = datetime.combine(date_fin, datetime.max.time())
             if sortie <= pec:
                 pec = sortie - timedelta(minutes=1)
-
-        orientation_sortie = _tirage_pondere_dict(orientation, generateur)
 
         service_orientation = None
         if orientation_sortie == "HO":

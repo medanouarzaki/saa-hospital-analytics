@@ -166,6 +166,28 @@ def test_ordre_des_horodatages(generation: dict) -> None:
         assert ligne["date_heure_pec_medicale"] < ligne["date_heure_sortie"], ligne
 
 
+def test_duree_presence_par_orientation(generation: dict) -> None:
+    # seuil mesuré : sur une exécution de mesure, la plus petite durée minimale par
+    # orientation était de 11,37 minutes (sortie contre avis) ; 5 minutes reste en deçà de
+    # toute mesure mais exclut la reprise de l'ancien artefact (sortie une seconde après la
+    # prise en charge, mesuré à 22 % des lignes avant correction).
+    SEUIL_MINUTES = 5
+
+    lignes_urg = generation["lignes"][TABLE]
+    by_orientation: dict[str, list[float]] = {}
+    for ligne in lignes_urg:
+        duree = (ligne["date_heure_sortie"] - ligne["date_heure_arrivee"]).total_seconds() / 60
+        by_orientation.setdefault(ligne["orientation_sortie"], []).append(duree)
+
+    assert by_orientation
+    for orientation, valeurs in by_orientation.items():
+        assert min(valeurs) > SEUIL_MINUTES, (orientation, min(valeurs))
+
+    mediane_tr = statistics.median(by_orientation["TR"])
+    mediane_rd = statistics.median(by_orientation["RD"])
+    assert mediane_tr > mediane_rd, (mediane_tr, mediane_rd)
+
+
 def test_effet_ramadan_sur_les_arrivees(generation: dict) -> None:
     entrees = generation["entrees"]
     lignes_urg = generation["lignes"][TABLE]
