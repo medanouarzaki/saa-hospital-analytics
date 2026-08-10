@@ -78,8 +78,9 @@ def _generer_passages(contexte: Contexte, generateur: np.random.Generator) -> li
 
 def _generer_mouvements(contexte: Contexte, generateur: np.random.Generator) -> list[dict]:
     lignes_passages = contexte.lignes["source.passages"]
+    lignes_patients = contexte.lignes["source.patients"]
     lignes, n_depassements = mouvements.generer_lignes(
-        lignes_passages, generateur, entrees=contexte.entrees
+        lignes_passages, lignes_patients, generateur, entrees=contexte.entrees
     )
     contexte.meta["mouvements_n_depassements_capacite"] = n_depassements
     return lignes

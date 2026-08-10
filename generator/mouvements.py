@@ -8,11 +8,16 @@ séjour est tirée par ce module, indépendamment de celle déjà tirée par
 médiane, est ajustée pour reproduire le rapport journées d'hospitalisation / admissions
 mesuré (voir le rapport), le seul degré de liberté qui reste une fois les admissions et
 leur date déjà fixées par le fil des épisodes. Chaque séjour est admis dans l'une des trois
-unités d'hospitalisation non chirurgicales ; une mutation change toujours d'unité, jamais
-vers celle d'origine. Un lit ne porte jamais deux séjours qui se chevauchent au sein d'une
-même unité : l'attribution se fait par un balayage chronologique des occupations, séparé
-par unité (chacune sa propre dotation), avec un mécanisme explicite si sa capacité venait à
-être dépassée. La part d'admissions de mode urgence est dérivée de la part d'orientation
+unités d'hospitalisation non chirurgicales, restreinte aux unités éligibles pour son patient :
+la gynéco-obstétrique (HGO) n'admet que des patientes (sexe F), la pédiatrie (HPED) que des
+patients de quinze ans révolus au plus à la date d'admission — deux contraintes dures du
+document de cadrage, absentes de tout contrôle avant ce lot (mesuré avant d'écrire, voir le
+rapport : 300 admissions HGO sur 573 et 596 admissions HPED sur 806 en désaccord). Une
+mutation change toujours d'unité, jamais vers celle d'origine, et respecte la même
+éligibilité. Un lit ne porte jamais deux séjours qui se chevauchent au sein d'une même unité :
+l'attribution se fait par un balayage chronologique des occupations, séparé par unité (chacune
+sa propre dotation), avec un mécanisme explicite si sa capacité venait à être dépassée. La
+part d'admissions de mode urgence est dérivée de la part d'orientation
 vers l'hospitalisation des urgences (`orientation_urgences["HO"]`, voir
 `generator/config/urgences.yml`), pas tirée indépendamment : les deux décrivent le même
 flux et doivent s'accorder en décompte agrégé. `orientation_urgences["HO"]` est une part
@@ -138,12 +143,38 @@ def _attribuer_lits(
     return n_depassements
 
 
+def _age_revolus(date_naissance: date, date_reference: date) -> int:
+    age = date_reference.year - date_naissance.year
+    if (date_reference.month, date_reference.day) < (date_naissance.month, date_naissance.day):
+        age -= 1
+    return age
+
+
+def _unites_eligibles(
+    patient: dict, date_admission: date, unites: list[str], age_max_pediatrie: int
+) -> list[str]:
+    eligibles = []
+    for unite in unites:
+        if unite == "HGO" and patient["sexe"] != "F":
+            continue
+        if (
+            unite == "HPED"
+            and _age_revolus(patient["date_naissance"], date_admission) > age_max_pediatrie
+        ):
+            continue
+        eligibles.append(unite)
+    return eligibles
+
+
 def generer_lignes(
     lignes_passages: list[dict],
+    lignes_patients: list[dict],
     generateur: np.random.Generator,
     entrees: dict[str, dict] | None = None,
 ) -> tuple[list[dict], int]:
     entrees = _entrees(entrees)
+    patients_par_ipp = {p["n_ipp"]: p for p in lignes_patients}
+    age_max_pediatrie = entrees["age_maximal_revolus_pediatrie"]["valeur"]
 
     date_debut = date.fromisoformat(entrees["date_debut"]["valeur"])
     date_fin = date.fromisoformat(entrees["date_fin"]["valeur"])
@@ -183,7 +214,12 @@ def generer_lignes(
         n_sejour = gabarit_sejour.format(rang=rang)
         admission = passage["date_heure_entree"]
         ferme = passage["date_heure_sortie"] is not None
-        unite_admission = _tirage_pondere_dict(repartition_unites, generateur)
+        patient = patients_par_ipp[passage["n_ipp"]]
+        unites_eligibles = _unites_eligibles(
+            patient, admission.date(), list(repartition_unites), age_max_pediatrie
+        )
+        poids_eligibles = {u: repartition_unites[u] for u in unites_eligibles}
+        unite_admission = _tirage_pondere_dict(poids_eligibles, generateur)
 
         if ferme:
             duree_jours = max(1 / 24, float(generateur.lognormal(mu, ecart_type_log)))
@@ -197,9 +233,15 @@ def generer_lignes(
             sortie = None
             fin_balayage = datetime.combine(date_fin, datetime.max.time())
 
+        # une mutation change toujours d'unite, vers une unite eligible pour le meme
+        # patient (jamais celle d'origine) : sans alternative eligible -- un homme de
+        # plus de quinze ans revolus, seul HM lui est ouvert -- aucune mutation n'est
+        # possible, quel que soit le tirage de part_mutation.
+        autres_unites = [u for u in unites_eligibles if u != unite_admission]
         avec_mutation = (
             ferme
             and (fin_balayage - admission) > timedelta(days=1)
+            and bool(autres_unites)
             and generateur.random() < part_mutation
         )
         mutation_ts = None
@@ -207,9 +249,6 @@ def generer_lignes(
         if avec_mutation:
             fraction = generateur.uniform(0.2, 0.8)
             mutation_ts = admission + (fin_balayage - admission) * fraction
-            # une mutation change toujours d'unite : tirage uniforme parmi les unites
-            # autres que celle d'origine, jamais celle-ci.
-            autres_unites = [u for u in repartition_unites if u != unite_admission]
             unite_destination = autres_unites[int(generateur.integers(0, len(autres_unites)))]
 
         sejour = {
