@@ -1,0 +1,115 @@
+parametres:
+- nom: taux_doublons
+  valeur: 0.04
+  unite: proportion de personnes portant deux fiches patient
+  provenance: HYP
+  preuve: S-20
+  note: 'Nom impose par la relation R-14 du registre des relations injectees. S-20 (Cour des
+    comptes, hopital prefectoral de Meknes) etablit l''EXISTENCE de l''attribution de
+    plusieurs identifiants au meme patient, mais ne chiffre aucune ampleur : la valeur de
+    4 % est posee, adossee au cadrage, sans mesure source. Si cette valeur etait fausse, le
+    nombre de paires que le bloc de rapprochement probabiliste doit retrouver serait faux
+    dans la meme proportion, et la precision (rappel, precision) mesuree pour ce bloc contre
+    la verite terrain injectee ne refleterait pas sa performance sur un taux reel.'
+- nom: distribution_variations
+  valeur:
+    translitteration_prenom: 0.2
+    prenom_compose_inverse: 0.15
+    faute_frappe_date_naissance: 0.2
+    piece_identite_absente: 0.15
+    telephone_different: 0.15
+    adresse_mise_a_jour: 0.15
+  unite: poids relatifs par categorie de variation, normalises avant tirage
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Nom impose par la relation R-14 du registre des relations injectees. Le cadrage
+    liste six variations combinees sans en donner la ponderation relative : poids poses,
+    legerement superieurs pour la translitteration et la faute de frappe sur la date de
+    naissance (jugees les plus frequentes dans une saisie manuelle), le reste reparti a
+    egalite. Si cette repartition etait fausse, la composition des paires de la verite
+    terrain par type de variation serait faussee, sans effet sur le nombre total de paires
+    ni sur la conservation des personnes et des episodes.'
+- nom: nombre_variations_par_paire
+  valeur:
+    min: 1
+    max: 2
+  unite: bornes entieres inclusives du nombre de variations appliquees a une paire
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Ce que le mecanisme exige, en sus des deux noms imposes ci-dessus : le cadrage dit
+    que chaque paire porte au moins une variation, sans plafond. Un maximum de deux est pose
+    pour eviter que les deux fiches d''une meme paire divergent au point de ne plus rien
+    partager d''identifiant, ce qui viderait le probleme d''appariement de sa difficulte. Si
+    ce plafond etait plus eleve, les paires de la verite terrain seraient statistiquement
+    plus faciles a separer par le rapprochement ; plus bas (fixe a 1), elles seraient plus
+    difficiles.'
+- nom: loi_ouverture_seconde_fiche
+  valeur: uniforme
+  unite: loi de tirage du point de scission parmi les episodes eligibles d'une personne
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Ce que le mecanisme exige : parmi les episodes d''une personne retenue, posterieurs
+    au premier, le point ou la seconde fiche prend le relais est tire uniformement. Aucune
+    source ne documente une loi differente (par exemple un biais vers une scission tardive).
+    Si cette loi etait fausse, la repartition du nombre d''episodes entre premiere et seconde
+    fiche, pour une meme personne, serait faussee, sans effet sur le nombre total d''episodes
+    ni sur le nombre de personnes portant un doublon.'
+- nom: variantes_translitteration_prenoms
+  valeur:
+    Mohammed: [Mohamed, Mohammad]
+    Ahmed: [Ahmad]
+    Youssef: [Yousef, Yussuf]
+    Hassan: [Hassane]
+    Omar: [Oumar]
+    Khalid: [Khaled]
+    Aziz: [Abdelaziz]
+    Brahim: [Ibrahim]
+    Fouad: [Fouade]
+    Samir: [Sameer]
+    Fatima: [Fatema, Fatiha]
+    Khadija: [Khadidja]
+    Aicha: [Aycha, Ayesha]
+    Malika: [Maleeka]
+    Naima: [Naeema]
+    Zineb: [Zaineb]
+    Amina: [Aminah]
+    Samira: [Sameera]
+    Souad: [Souade]
+    Meryem: [Meriem, Mariam]
+  unite: table prenom vers variantes graphiques usuelles, ressource propre au mecanisme de doublon
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Ce que le mecanisme exige : la translitteration variable d''un meme prenom suppose
+    des variantes graphiques connues. La liste versionnee de prenoms
+    (generator/config/demographie.yml, hors liste d''ecriture de ce lot) n''en porte aucune
+    (mesure : 0 / 40, voir le rapport). Cette table couvre la moitie des prenoms de la liste
+    (10 masculins, 10 feminins) avec une a deux variantes usuelles chacun, posee sans source,
+    et vit uniquement ici : elle n''est lue que par le mecanisme d''injection des doublons,
+    jamais par le tirage normal d''un prenom. Une personne dont le prenom n''y figure pas ne
+    peut pas recevoir la variation translitteration_prenom ; le mecanisme d''injection choisit
+    alors une autre categorie pour cette paire (voir generator/doublons.py). Si cette table
+    etait trop courte, une plus grande part des paires assignees a cette categorie
+    retomberait sur une autre variation, sans effet sur le nombre total de paires.'
+- nom: paires_prenoms_composes
+  valeur:
+  - [Mohamed, Amine]
+  - [Fatima, Zahra]
+  - [Ahmed, Reda]
+  - [Mohamed, Yassine]
+  - [Imane, Meryem]
+  - [Abdel, Ilah]
+  - [Mohamed, Ali]
+  - [Aya, Nour]
+  unite: paires ordonnees de composantes de prenoms composes, ressource propre au mecanisme de doublon
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Ce que le mecanisme exige : la variation prenom_compose_inverse suppose un prenom
+    compose existant, affiche dans un ordre different sur chacune des deux fiches. Aucun
+    prenom compose ne figure dans la liste versionnee de prenoms (mesure : 0 / 40, voir le
+    rapport), et cette liste est hors perimetre d''ecriture de ce lot. Cette table de huit
+    paires, posee sans source, sert exclusivement a construire, pour une paire de fiches
+    assignee a cette categorie, un prenom compose impose des les deux fiches (premiere
+    fiche : partie1 partie2, seconde fiche : partie2 partie1) avant toute generation de
+    ligne -- voir generator/doublons.py et generator/patients.py. Si cette table etait plus
+    courte, les prenoms composes injectes se repeteraient davantage entre paires distinctes,
+    sans effet sur le nombre total de paires.'
