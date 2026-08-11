@@ -77,13 +77,8 @@ def test_part_organisme_accord_facture(generation: dict) -> None:
         assert facture["part_patient"] == pytest.approx(facture["montant_total"]), facture
 
 
-def test_somme_des_parts(generation: dict) -> None:
-    lignes_fac = generation["lignes"][TABLE_FACTURES]
-    assert lignes_fac
-    for facture in lignes_fac:
-        assert facture["part_organisme"] + facture["part_patient"] == pytest.approx(
-            facture["montant_total"]
-        ), facture
+# part organisme + part patient == total (regle inter-tables du cadrage) est verifie par
+# tests/test_coherence_inter_tables.py::test_regle_04..., deplacee depuis ce fichier.
 
 
 def test_taux_selon_type_et_seuil(generation: dict) -> None:

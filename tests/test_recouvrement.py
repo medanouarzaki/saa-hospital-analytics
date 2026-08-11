@@ -52,18 +52,18 @@ def _premier_par_creance(lignes_cre: list[dict]) -> dict[str, dict]:
 
 
 def test_rattachement(generation: dict) -> None:
+    # le rattachement encaissement -> facture est verifie par
+    # tests/test_coherence_inter_tables.py::test_regle_02_encaissement_rattache_a_une_facture
+    # (regle inter-tables du cadrage, deplacee depuis ce test).
     lignes_fac = generation["lignes"][TABLE_FAC]
-    lignes_enc = generation["lignes"][TABLE_ENC]
     lignes_cre = generation["lignes"][TABLE_CRE]
     lignes_rel = generation["lignes"][TABLE_REL]
 
     n_factures = {f["n_facture"] for f in lignes_fac}
     n_creances = {c["n_creance"] for c in lignes_cre}
 
-    assert lignes_enc and lignes_cre and lignes_rel
+    assert lignes_cre and lignes_rel
 
-    for enc in lignes_enc:
-        assert enc["n_facture"] in n_factures, enc
     for cre in lignes_cre:
         assert cre["n_facture"] in n_factures, cre
     for rel in lignes_rel:
@@ -294,19 +294,17 @@ def test_montant_minimal_encaissement(generation: dict) -> None:
 
 
 def test_ordre_des_dates(generation: dict) -> None:
+    # aucun encaissement anterieur a sa facture est verifie par
+    # tests/test_coherence_inter_tables.py::test_regle_05_aucun_encaissement_anterieur_a_sa_facture
+    # (regle inter-tables du cadrage, deplacee depuis ce test).
     entrees = generation["entrees"]
     lignes_fac = generation["lignes"][TABLE_FAC]
-    lignes_enc = generation["lignes"][TABLE_ENC]
     lignes_cre = generation["lignes"][TABLE_CRE]
     lignes_rel = generation["lignes"][TABLE_REL]
 
     date_facture_par_id = {f["n_facture"]: f["date_facture"] for f in lignes_fac}
     seuil = entrees["seuil_jours_anciennete_creance"]["valeur"]
     delai_relances = entrees["delai_jours_entre_relances"]["valeur"]
-
-    assert lignes_enc
-    for enc in lignes_enc:
-        assert enc["date_encaissement"].date() >= date_facture_par_id[enc["n_facture"]], enc
 
     assert lignes_cre
     for cre in lignes_cre:

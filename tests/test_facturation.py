@@ -1,14 +1,15 @@
 """Contrôles propres aux tables de facturation (generator/facturation.py).
 
 Ne porte que ce que tests/test_invariants_tables.py ne couvre pas déjà génériquement : le
-taux de facturation, le rattachement facture/ligne/épisode, la numérotation des lignes, les
+taux de facturation, le rattachement ligne/facture, la numérotation des lignes, les
 volumes de laboratoire par catégorie, le ratio d'examens par prélèvement, la cohérence des
-journées facturées avec la table des mouvements, le calcul des montants, l'absence d'actes
-interdits, l'ordre des dates et la provenance de la tarification. Consomme la génération
-partagée de tests/conftest.py.
+journées facturées avec la table des mouvements, le calcul des montants, l'ordre des dates
+et la provenance de la tarification. Les règles de cohérence inter-tables du cadrage
+(facture rattachée à un épisode, somme des lignes égale le total, absence d'actes interdits)
+sont vérifiées par tests/test_coherence_inter_tables.py. Consomme la génération partagée de
+tests/conftest.py.
 """
 
-import re
 from collections import Counter
 from datetime import timedelta
 
@@ -18,8 +19,6 @@ from generator import facturation
 
 TABLE_FACTURES = "source.factures"
 TABLE_LIGNES = "source.lignes_facture"
-
-TERMES_INTERDITS = ["chirurg", "bactério", "bacterio", "parasito", "hygiène aliment"]
 
 TOLERANCE_TAUX = 0.02
 TOLERANCE_RATIO = 0.02
@@ -80,18 +79,16 @@ def test_aucune_double_facturation_urgences_hospitalisation(generation: dict) ->
 
 
 def test_rattachement(generation: dict) -> None:
-    lignes_pas = generation["lignes"]["source.passages"]
+    # le rattachement facture -> episode est verifie par
+    # tests/test_coherence_inter_tables.py::test_regle_01_facture_rattachee_a_un_episode
+    # (regle inter-tables du cadrage, deplacee depuis ce test).
     lignes_fac = generation["lignes"][TABLE_FACTURES]
     lignes_lig = generation["lignes"][TABLE_LIGNES]
 
-    n_episodes = {p["n_passage"] for p in lignes_pas}
     n_factures = {f["n_facture"] for f in lignes_fac}
 
     assert lignes_fac, "aucune facture à contrôler"
     assert lignes_lig, "aucune ligne à contrôler"
-
-    for facture in lignes_fac:
-        assert facture["n_episode"] in n_episodes, facture
 
     factures_avec_ligne = {ligne["n_facture"] for ligne in lignes_lig}
     assert factures_avec_ligne == n_factures, (
@@ -173,9 +170,11 @@ def test_journees_facturees(generation: dict) -> None:
 
 
 def test_montants(generation: dict) -> None:
+    # la somme des lignes egale le total facture est verifiee par
+    # tests/test_coherence_inter_tables.py::test_regle_03_somme_des_lignes_egale_le_total_facture
+    # (regle inter-tables du cadrage, deplacee depuis ce test).
     entrees = generation["entrees"]
     lignes_lig = generation["lignes"][TABLE_LIGNES]
-    lignes_fac = generation["lignes"][TABLE_FACTURES]
 
     valeurs_lettres = {
         lettre["code"]: lettre["valeur_unitaire"]
@@ -193,42 +192,11 @@ def test_montants(generation: dict) -> None:
             attendu,
         )
 
-    montants_par_facture: dict[str, float] = {}
-    for ligne in lignes_lig:
-        montants_par_facture[ligne["n_facture"]] = (
-            montants_par_facture.get(ligne["n_facture"], 0.0) + ligne["montant"]
-        )
 
-    assert lignes_fac
-    for facture in lignes_fac:
-        attendu = round(montants_par_facture[facture["n_facture"]], 2)
-        assert facture["montant_total"] == pytest.approx(attendu), (
-            facture["n_facture"],
-            facture["montant_total"],
-            attendu,
-        )
-
-
-def test_aucun_acte_interdit(generation: dict) -> None:
-    entrees = generation["entrees"]
-    lignes_lig = generation["lignes"][TABLE_LIGNES]
-
-    motif = re.compile(r"chirurg|bactério|bacterio|parasito|hygiène aliment", re.IGNORECASE)
-    assert motif.search("Cure de hernie inguinale (chirurgie générale)"), (
-        "le motif ne détecte pas son propre cas positif"
-    )
-
-    libelles = {acte["libelle"] for acte in entrees["nomenclature_actes"]["valeur"]}
-    assert libelles
-    for libelle in libelles:
-        for terme in TERMES_INTERDITS:
-            assert terme not in libelle.lower(), (libelle, terme)
-
-    libelles_lignes = {ligne["libelle_acte"] for ligne in lignes_lig}
-    assert libelles_lignes
-    for libelle in libelles_lignes:
-        for terme in TERMES_INTERDITS:
-            assert terme not in libelle.lower(), (libelle, terme)
+# l'absence d'acte interdit (chirurgie, bactériologie, parasitologie, hygiène alimentaire)
+# est verifiee par
+# tests/test_coherence_inter_tables.py::test_regle_12_aucun_acte_interdit_produit
+# (regle inter-tables du cadrage, deplacee depuis ce fichier).
 
 
 def test_ordre_des_dates(generation: dict) -> None:

@@ -51,20 +51,9 @@ def test_bijection_avec_fil_des_episodes(generation: dict) -> None:
         assert mesure_par_type[categorie] == attendu, categorie
 
 
-def test_rattachement_au_rendez_vous_honore(generation: dict) -> None:
-    lignes_passages = generation["lignes"][TABLE]
-    lignes_rdv = generation["lignes"]["source.rendez_vous"]
-
-    honores = [ligne for ligne in lignes_rdv if ligne["etat"] == "HO"]
-    n_rdv_honores = {ligne["n_rdv"] for ligne in honores}
-    assert len(n_rdv_honores) == len(honores), "identifiant de rendez-vous honoré en double"
-
-    passages_rattaches = [ligne for ligne in lignes_passages if ligne["n_rdv"] is not None]
-    assert len(passages_rattaches) == len(honores)
-
-    n_rdv_references = [ligne["n_rdv"] for ligne in passages_rattaches]
-    assert len(n_rdv_references) == len(set(n_rdv_references)), "rendez-vous référencé deux fois"
-    assert set(n_rdv_references) == n_rdv_honores, "un rendez-vous référencé n'existe pas"
+# le rattachement rendez-vous honore/annule <-> passage (regle inter-tables du cadrage) est
+# verifie par tests/test_coherence_inter_tables.py::test_regle_09..., deplacee depuis ce
+# fichier.
 
 
 def test_aucun_rattachement_indu(generation: dict) -> None:

@@ -79,67 +79,10 @@ def test_rattachement_bijection_avec_passages_hospitalisation(generation: dict) 
     assert admissions_mouvements == admissions_passages
 
 
-def test_journees_hospitalisation(generation: dict) -> None:
-    entrees = generation["entrees"]
-    lignes_mvt = generation["lignes"][TABLE]
-    lignes_passages = generation["lignes"]["source.passages"]
-    lignes_h = [ligne for ligne in lignes_passages if ligne["type_passage"] == "H"]
-    date_fin = date.fromisoformat(entrees["date_fin"]["valeur"])
-
-    groupes = _par_sejour(lignes_mvt)
-    journees_par_annee: dict[int, float] = defaultdict(float)
-    for lignes_du_sejour in groupes.values():
-        admission = _admission(lignes_du_sejour)["date_heure_admission"]
-        fin = _fin_pour_calcul(lignes_du_sejour, date_fin)
-        duree_jours = (fin - admission).total_seconds() / 86400
-        if admission.year == fin.year:
-            journees_par_annee[admission.year] += duree_jours
-        else:
-            fin_annee = date(admission.year, 12, 31)
-            jours_annee_admission = (fin_annee - admission.date()).days + 1
-            journees_par_annee[admission.year] += min(jours_annee_admission, duree_jours)
-            reste = duree_jours - jours_annee_admission
-            if reste > 0:
-                journees_par_annee[fin.year] += reste
-
-    total_mesure = sum(journees_par_annee.values())
-    cible = mvt_mod._duree_moyenne_cible_jours(lignes_h, entrees) * len(lignes_h)
-
-    # tolerance recalibree par ce lot : la restriction d'eligibilite des unites
-    # d'hospitalisation (HGO, HPED) fait varier, pour une grande partie des patients, la
-    # taille du tableau de poids soumis a _tirage_pondere_dict (1 a 3 codes selon
-    # eligibilite plutot que toujours 3), ce qui deplace systematiquement le flux de tirages
-    # aleatoires ulterieurs (dont la duree de sejour) par rapport a l'ancien mecanisme, sans
-    # affecter la cible elle-meme (independante de l'unite). Mesure sur 3 graines
-    # independantes avec le code aligne : ecarts relatifs 3,11 % ; 3,95 % ; 4,56 %.
-    TOLERANCE_RELATIVE = 0.05
-    assert abs(total_mesure - cible) / cible < TOLERANCE_RELATIVE, (total_mesure, cible)
-
-
-def test_duree_moyenne_de_sejour(generation: dict) -> None:
-    entrees = generation["entrees"]
-    lignes_mvt = generation["lignes"][TABLE]
-    lignes_passages = generation["lignes"]["source.passages"]
-    lignes_h = [ligne for ligne in lignes_passages if ligne["type_passage"] == "H"]
-    date_fin = date.fromisoformat(entrees["date_fin"]["valeur"])
-
-    groupes = _par_sejour(lignes_mvt)
-    durees = []
-    for lignes_du_sejour in groupes.values():
-        admission = _admission(lignes_du_sejour)["date_heure_admission"]
-        fin = _fin_pour_calcul(lignes_du_sejour, date_fin)
-        durees.append((fin - admission).total_seconds() / 86400)
-
-    dms_mesuree = sum(durees) / len(durees)
-    dms_cible = mvt_mod._duree_moyenne_cible_jours(lignes_h, entrees)
-    dms_publiee = entrees["dms_publie"]["valeur"]
-
-    # tolerance recalibree par ce lot, meme cause que test_journees_hospitalisation
-    # (restriction d'eligibilite des unites, taille variable du tableau de poids soumis a
-    # _tirage_pondere_dict). Mesure sur 3 graines independantes avec le code aligne : ecarts
-    # 0,2038 ; 0,2589 ; 0,2988 jour.
-    TOLERANCE_JOURS = 0.35
-    assert abs(dms_mesuree - dms_cible) < TOLERANCE_JOURS, (dms_mesuree, dms_cible, dms_publiee)
+# les journees d'hospitalisation (par annee civile et sur la periode) et la duree moyenne
+# de sejour sont verifiees par tests/test_coherence_inter_tables.py
+# (conformite de volumetrie, et regle 13 pour la duree moyenne) -- deplacees depuis ce
+# fichier plutot que dupliquees.
 
 
 def test_capacite_jamais_depassee(generation: dict) -> None:
@@ -175,29 +118,8 @@ def test_capacite_jamais_depassee(generation: dict) -> None:
     assert max_occ <= capacite, (max_occ, capacite)
 
 
-def test_taux_occupation(generation: dict) -> None:
-    entrees = generation["entrees"]
-    lignes_mvt = generation["lignes"][TABLE]
-    capacite = entrees["capacite_litiere_fonctionnelle"]["valeur"]
-    tom_publie = entrees["tom_publie"]["valeur"]
-    date_debut = date.fromisoformat(entrees["date_debut"]["valeur"])
-    date_fin = date.fromisoformat(entrees["date_fin"]["valeur"])
-    n_jours_periode = (date_fin - date_debut).days + 1
-
-    groupes = _par_sejour(lignes_mvt)
-    total_journees = 0.0
-    for lignes_du_sejour in groupes.values():
-        admission = _admission(lignes_du_sejour)["date_heure_admission"]
-        fin = _fin_pour_calcul(lignes_du_sejour, date_fin)
-        total_journees += (fin - admission).total_seconds() / 86400
-
-    tom_mesure = total_journees / (capacite * n_jours_periode) * 100
-
-    # tolerance recalibree par ce lot, meme cause que test_journees_hospitalisation.
-    # Mesure sur 3 graines independantes avec le code aligne : ecarts 1,89 ; 2,34 ; 2,67
-    # points.
-    TOLERANCE_POINTS = 3.0
-    assert abs(tom_mesure - tom_publie) < TOLERANCE_POINTS, (tom_mesure, tom_publie)
+# le taux d'occupation moyen (TOM) est verifie par
+# tests/test_coherence_inter_tables.py::test_regle_13..., deplace depuis ce fichier.
 
 
 def test_lits_sans_collision(generation: dict) -> None:
@@ -227,25 +149,10 @@ def test_lits_sans_collision(generation: dict) -> None:
             assert fin_a <= debut_b, (lit, (debut_a, fin_a), (debut_b, fin_b))
 
 
-def test_ordre_des_horodatages(generation: dict) -> None:
-    lignes_mvt = generation["lignes"][TABLE]
-    groupes = _par_sejour(lignes_mvt)
-
-    assert groupes, "aucun séjour à contrôler"
-    for lignes_du_sejour in groupes.values():
-        admission = _admission(lignes_du_sejour)["date_heure_admission"]
-        mutations = [
-            ligne["date_heure_mutation"]
-            for ligne in lignes_du_sejour
-            if ligne["date_heure_mutation"] is not None
-        ]
-        sortie = _sortie(lignes_du_sejour)
-
-        if mutations:
-            assert admission < mutations[0], (admission, mutations[0])
-        if sortie is not None:
-            derniere_reference = mutations[0] if mutations else admission
-            assert derniere_reference < sortie, (derniere_reference, sortie)
+# l'ordre admission < mutation < sortie est verifie par
+# tests/test_coherence_inter_tables.py::test_regle_06_aucune_sortie_anterieure_a_son_admission
+# et test_regle_08_aucune_mutation_hors_intervalle_admission_sortie (regles inter-tables du
+# cadrage, deplacees depuis ce fichier).
 
 
 def test_sejours_en_cours(generation: dict) -> None:
@@ -370,41 +277,6 @@ def test_aucune_activite_chirurgicale(generation: dict) -> None:
             assert not motif.search(libelle), (nom_nomenclature, code, libelle)
 
 
-def test_coherence_urgences_hospitalisation(generation: dict) -> None:
-    # regle de coherence inter-tables du document de cadrage : passages_annuels_urgences x
-    # taux_hospitalisation_urgences == sejours_annuels x part_sejours_provenant_urgences.
-    # sejours_annuels (admissions_annuelles, S-30) et le scenario retenu de passages par jour
-    # sont geles par la volumetrie ; taux_hospitalisation_urgences (orientation_urgences[HO])
-    # est pose independamment ; part_sejours_provenant_urgences est la grandeur DERIVEE --
-    # generator/mouvements.py la calcule (taux_urgence) depuis les deux autres pour que
-    # l'egalite tienne par construction, jamais tiree independamment. Ce test la verifie sur
-    # les donnees effectivement produites plutot que sur le seul calcul analytique.
-    entrees = generation["entrees"]
-    lignes_urg = generation["lignes"]["source.passages_urgences"]
-    lignes_mvt = generation["lignes"][TABLE]
-
-    date_debut = date.fromisoformat(entrees["date_debut"]["valeur"])
-    date_fin = date.fromisoformat(entrees["date_fin"]["valeur"])
-    n_jours_periode = (date_fin - date_debut).days + 1
-
-    taux_hospitalisation_urgences = entrees["orientation_urgences"]["valeur"]["HO"]
-    sejours_annuels = entrees["admissions_annuelles"]["valeur"]
-
-    n_passages_urgences_periode = len(lignes_urg)
-    passages_annuels_urgences = n_passages_urgences_periode * 365 / n_jours_periode
-
-    admissions = [ligne for ligne in lignes_mvt if ligne["date_heure_admission"] is not None]
-    n_urgence = sum(1 for a in admissions if a["mode_admission"] == "U")
-    part_sejours_provenant_urgences = n_urgence / len(admissions)
-
-    membre_gauche = passages_annuels_urgences * taux_hospitalisation_urgences
-    membre_droit = sejours_annuels * part_sejours_provenant_urgences
-
-    assert membre_gauche == pytest.approx(membre_droit, rel=0.03), (
-        passages_annuels_urgences,
-        taux_hospitalisation_urgences,
-        sejours_annuels,
-        part_sejours_provenant_urgences,
-        membre_gauche,
-        membre_droit,
-    )
+# l'egalite de coherence urgences-hospitalisation et la part mesuree suivant le parametre
+# pose sont verifiees par tests/test_coherence_inter_tables.py::test_regle_10... et
+# test_regle_10_bis... (regles inter-tables du cadrage, deplacees depuis ce fichier).
