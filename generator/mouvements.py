@@ -203,97 +203,157 @@ def generer_lignes(
     n_ho_attendu = part_orientation_ho * n_urgences_total
     taux_urgence = n_ho_attendu / len(lignes_h) if lignes_h else 0.0
 
-    # premiere passe : construit chaque sejour (un ou deux segments d'occupation), sans
-    # attribuer de lit -- l'attribution se fait globalement par unite, apres coup, sur
-    # l'ensemble des segments de la periode, pour que la capacite de chaque unite soit
-    # respectee sur toute la periode et non sejour par sejour.
-    sejours: list[dict] = []
-    segments: list[dict] = []
+    # le nombre de sejours a marquer d'un mode d'admission urgence est connu d'avance
+    # (taux_urgence x effectif, arrondi) : une repartition exacte -- choisir precisement ce
+    # nombre de sejours au hasard, sans remise -- donne la meme distribution marginale
+    # qu'un tirage bernoulli independant par sejour, sans aucune variance sur le total
+    # (mesure avant d'ecrire, voir le rapport : ecart jusqu'a 3,65 % avec le tirage
+    # independant, sur une regle de cadrage exigeant 3 %). Meme principe que
+    # generator/temporel.py::repartir_total pour un total journalier, applique ici a un
+    # tirage sans remise plutot qu'a la methode du plus grand reste (aucune ponderation
+    # par jour n'entre en jeu, chaque sejour est equiprobable).
+    n_urgence_cible = min(round(taux_urgence * len(lignes_h)), len(lignes_h))
+    indices_urgence = (
+        set(generateur.choice(len(lignes_h), size=n_urgence_cible, replace=False).tolist())
+        if n_urgence_cible > 0
+        else set()
+    )
 
-    for rang, passage in enumerate(lignes_h):
-        n_sejour = gabarit_sejour.format(rang=rang)
-        admission = passage["date_heure_entree"]
-        ferme = passage["date_heure_sortie"] is not None
-        patient = patients_par_ipp[passage["n_ipp"]]
-        unites_eligibles = _unites_eligibles(
-            patient, admission.date(), list(repartition_unites), age_max_pediatrie
+    def _construire_et_attribuer(
+        mu_essai: float,
+    ) -> tuple[list[dict], list[dict], int, float, float]:
+        # une passe complete : construit chaque sejour (un ou deux segments d'occupation),
+        # puis attribue les lits -- l'attribution se fait globalement par unite, sur
+        # l'ensemble des segments de la periode, pour que la capacite de chaque unite soit
+        # respectee sur toute la periode et non sejour par sejour. Rendue reappelable (avec
+        # un mu different) pour compenser la perte de troncature mesuree ci-dessous : k*X
+        # suit une log-normale de meme ecart-type, mu decale de ln(k), pas une distorsion
+        # artificielle de la forme de la distribution.
+        sejours: list[dict] = []
+        segments: list[dict] = []
+        total_intended = 0.0
+
+        for rang, passage in enumerate(lignes_h):
+            n_sejour = gabarit_sejour.format(rang=rang)
+            admission = passage["date_heure_entree"]
+            ferme = passage["date_heure_sortie"] is not None
+            patient = patients_par_ipp[passage["n_ipp"]]
+            unites_eligibles = _unites_eligibles(
+                patient, admission.date(), list(repartition_unites), age_max_pediatrie
+            )
+            poids_eligibles = {u: repartition_unites[u] for u in unites_eligibles}
+            unite_admission = _tirage_pondere_dict(poids_eligibles, generateur)
+
+            if ferme:
+                duree_jours = max(1 / 24, float(generateur.lognormal(mu_essai, ecart_type_log)))
+                total_intended += duree_jours
+                sortie = admission + timedelta(days=duree_jours)
+                if sortie.date() > date_fin:
+                    sortie = datetime.combine(date_fin, admission.time())
+                    if sortie <= admission:
+                        sortie = admission + timedelta(hours=1)
+                fin_balayage = sortie
+            else:
+                sortie = None
+                fin_balayage = datetime.combine(date_fin, datetime.max.time())
+
+            # une mutation change toujours d'unite, vers une unite eligible pour le meme
+            # patient (jamais celle d'origine) : sans alternative eligible -- un homme de
+            # plus de quinze ans revolus, seul HM lui est ouvert -- aucune mutation n'est
+            # possible, quel que soit le tirage de part_mutation.
+            autres_unites = [u for u in unites_eligibles if u != unite_admission]
+            avec_mutation = (
+                ferme
+                and (fin_balayage - admission) > timedelta(days=1)
+                and bool(autres_unites)
+                and generateur.random() < part_mutation
+            )
+            mutation_ts = None
+            unite_destination = None
+            if avec_mutation:
+                fraction = generateur.uniform(0.2, 0.8)
+                mutation_ts = admission + (fin_balayage - admission) * fraction
+                unite_destination = autres_unites[int(generateur.integers(0, len(autres_unites)))]
+
+            sejour = {
+                "n_sejour": n_sejour,
+                "n_ipp": passage["n_ipp"],
+                "admission": admission,
+                "sortie_visible": sortie,
+                "mutation_ts": mutation_ts,
+                "unite_admission": unite_admission,
+                "unite_destination": unite_destination,
+            }
+            sejours.append(sejour)
+
+            if mutation_ts is not None:
+                segment_1 = {
+                    "debut": admission,
+                    "fin": mutation_ts,
+                    "sejour": sejour,
+                    "role": "admission",
+                    "unite": unite_admission,
+                }
+                segment_2 = {
+                    "debut": mutation_ts,
+                    "fin": fin_balayage,
+                    "sejour": sejour,
+                    "role": "mutation",
+                    "unite": unite_destination,
+                }
+                segments.append(segment_1)
+                segments.append(segment_2)
+                sejour["segment_admission"] = segment_1
+                sejour["segment_mutation"] = segment_2
+            else:
+                segment_1 = {
+                    "debut": admission,
+                    "fin": fin_balayage,
+                    "sejour": sejour,
+                    "role": "admission",
+                    "unite": unite_admission,
+                }
+                segments.append(segment_1)
+                sejour["segment_admission"] = segment_1
+                sejour["segment_mutation"] = None
+
+        avant = {id(s): (s["fin"] - s["debut"]).total_seconds() / 86400 for s in segments}
+        n_depassements = _attribuer_lits(segments, capacite_par_unite, gabarit_lit)
+        perte = sum(
+            avant[id(s)] - (s["fin"] - s["debut"]).total_seconds() / 86400 for s in segments
         )
-        poids_eligibles = {u: repartition_unites[u] for u in unites_eligibles}
-        unite_admission = _tirage_pondere_dict(poids_eligibles, generateur)
+        return sejours, segments, n_depassements, total_intended, perte
 
-        if ferme:
-            duree_jours = max(1 / 24, float(generateur.lognormal(mu, ecart_type_log)))
-            sortie = admission + timedelta(days=duree_jours)
-            if sortie.date() > date_fin:
-                sortie = datetime.combine(date_fin, admission.time())
-                if sortie <= admission:
-                    sortie = admission + timedelta(hours=1)
-            fin_balayage = sortie
-        else:
-            sortie = None
-            fin_balayage = datetime.combine(date_fin, datetime.max.time())
-
-        # une mutation change toujours d'unite, vers une unite eligible pour le meme
-        # patient (jamais celle d'origine) : sans alternative eligible -- un homme de
-        # plus de quinze ans revolus, seul HM lui est ouvert -- aucune mutation n'est
-        # possible, quel que soit le tirage de part_mutation.
-        autres_unites = [u for u in unites_eligibles if u != unite_admission]
-        avec_mutation = (
-            ferme
-            and (fin_balayage - admission) > timedelta(days=1)
-            and bool(autres_unites)
-            and generateur.random() < part_mutation
+    # la troncature par dotation retranche des journees a la cible relevee (mesure avant
+    # d'ecrire, voir le rapport : jusqu'a 3,8 % du total intentionne, sur des sejours trop
+    # peu nombreux -- 60 a 73 sur pres de 3000 -- pour que le seul arrondi les explique).
+    # Corrige en recalibrant la loi de duree sur la perte mesuree, plutot qu'en
+    # redistribuant les journees perdues sur d'autres sejours : la redistribution
+    # deplacerait des sorties deja coherentes avec l'ordre des mouvements et risquerait une
+    # bosse artificielle dans la distribution ; le recalibrage ne fait que decaler mu,
+    # laissant la forme log-normale intacte.
+    #
+    # Une correction pleine et reappliquee (facteur = intentionne / (intentionne - perte),
+    # applique integralement a chaque essai) diverge : mesure avant d'ecrire (voir le
+    # rapport) -- inflige plus de duree cree plus de croisements, donc plus de troncature,
+    # plus vite que la correction ne le compense, et le total final finit par depasser la
+    # cible de plus de 10 % en boucle. Un demi-pas (la moitie du facteur log-corrige a
+    # chaque essai) converge : mesure avant d'ecrire, ecart ramene sous 2,5 % en six essais
+    # au plus sur les graines testees, plafond de securite pour rester fini. Aucun nombre
+    # tire en dehors du generateur recu.
+    cible_totale = moyenne_cible_jours * len(lignes_h)
+    AMORTISSEMENT = 0.5
+    mu_essai = mu
+    sejours, segments, n_depassements, total_intended, perte = _construire_et_attribuer(mu_essai)
+    for _ in range(6):
+        total_final = total_intended - perte
+        if cible_totale <= 0 or abs(total_final - cible_totale) / cible_totale <= 0.01:
+            break
+        facteur = cible_totale / total_final
+        mu_essai = mu_essai + AMORTISSEMENT * math.log(facteur)
+        sejours, segments, n_depassements, total_intended, perte = _construire_et_attribuer(
+            mu_essai
         )
-        mutation_ts = None
-        unite_destination = None
-        if avec_mutation:
-            fraction = generateur.uniform(0.2, 0.8)
-            mutation_ts = admission + (fin_balayage - admission) * fraction
-            unite_destination = autres_unites[int(generateur.integers(0, len(autres_unites)))]
-
-        sejour = {
-            "n_sejour": n_sejour,
-            "n_ipp": passage["n_ipp"],
-            "admission": admission,
-            "sortie_visible": sortie,
-            "mutation_ts": mutation_ts,
-            "unite_admission": unite_admission,
-            "unite_destination": unite_destination,
-        }
-        sejours.append(sejour)
-
-        if mutation_ts is not None:
-            segment_1 = {
-                "debut": admission,
-                "fin": mutation_ts,
-                "sejour": sejour,
-                "role": "admission",
-                "unite": unite_admission,
-            }
-            segment_2 = {
-                "debut": mutation_ts,
-                "fin": fin_balayage,
-                "sejour": sejour,
-                "role": "mutation",
-                "unite": unite_destination,
-            }
-            segments.append(segment_1)
-            segments.append(segment_2)
-            sejour["segment_admission"] = segment_1
-            sejour["segment_mutation"] = segment_2
-        else:
-            segment_1 = {
-                "debut": admission,
-                "fin": fin_balayage,
-                "sejour": sejour,
-                "role": "admission",
-                "unite": unite_admission,
-            }
-            segments.append(segment_1)
-            sejour["segment_admission"] = segment_1
-            sejour["segment_mutation"] = None
-
-    n_depassements = _attribuer_lits(segments, capacite_par_unite, gabarit_lit)
 
     lignes: list[dict] = []
     rang_mouvement = 0
@@ -303,11 +363,11 @@ def generer_lignes(
         rang_mouvement += 1
         return gabarit_mouvement.format(rang=rang_mouvement)
 
-    for sejour in sejours:
+    for indice_sejour, sejour in enumerate(sejours):
         segment_admission = sejour["segment_admission"]
         segment_mutation = sejour["segment_mutation"]
 
-        mode_admission = "U" if generateur.random() < taux_urgence else "O"
+        mode_admission = "U" if indice_sejour in indices_urgence else "O"
         ligne_admission = {
             "n_sejour": sejour["n_sejour"],
             "n_ipp": sejour["n_ipp"],
