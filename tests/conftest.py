@@ -31,7 +31,13 @@ def generation_partagee(tmp_path_factory) -> dict:
     racine = tmp_path_factory.mktemp("generation_partagee")
     execution_obj, contexte = execution.executer(racine, GRAINE_PARTAGEE, entrees=entrees)
     return {
-        "entrees": entrees,
+        # contexte.entrees, pas la variable locale entrees ci-dessus : depuis que
+        # generator/execution.py copie entrees en interne pour ne jamais muter l'objet
+        # reçu en argument (mesuré avant d'écrire, voir le rapport -- deux appels avec le
+        # même entrees produisaient des empreintes différentes autrement), la variable
+        # locale ne porte plus les valeurs dérivées (orientation_urgences["HO"]) que les
+        # tests attendent.
+        "entrees": contexte.entrees,
         "episodes": contexte.episodes,
         "population": contexte.population,
         "lignes": contexte.lignes,
