@@ -20,6 +20,7 @@ import numpy as np
 from generator import (
     alea,
     config,
+    defauts,
     doublons,
     ecriture,
     facturation,
@@ -248,8 +249,18 @@ def executer(
         rng_table = _generateur_pour(graine, indice + 1)
         lignes = generer(contexte, rng_table)
         contexte.lignes[table] = lignes
+
+    # passe distincte, apres que toutes les tables bien formees existent en memoire et
+    # avant qu'aucune ne soit ecrite : c'est ce qui permet a generator/defauts.py de
+    # compter exactement ce qu'il altere (voir son propre docstring), et a
+    # generator/verite_terrain.py de recevoir le decompte complet en un seul appel.
+    rng_defauts = _generateur_pour(graine, len(generateurs) + 1)
+    alterations = defauts.injecter_defauts(contexte.lignes, rng_defauts, entrees=contexte.entrees)
+    contexte.meta["defauts_alterations"] = alterations
+
+    for table, lignes in contexte.lignes.items():
         execution.ecrire_table(table, lignes)
 
     execution.ecrire_manifeste()
-    verite_terrain.ecrire(execution, contexte.meta.get("doublons_paires", []))
+    verite_terrain.ecrire(execution, contexte.meta.get("doublons_paires", []), alterations)
     return execution, contexte
