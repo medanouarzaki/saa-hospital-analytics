@@ -20,6 +20,7 @@ import numpy as np
 from generator import (
     alea,
     config,
+    doublons,
     ecriture,
     facturation,
     mouvements,
@@ -30,6 +31,7 @@ from generator import (
     recouvrement,
     registre,
     urgences,
+    verite_terrain,
     volumes,
 )
 from generator import rendez_vous as rdv
@@ -54,9 +56,20 @@ GenerateurTable = Callable[["Contexte", np.random.Generator], list[dict]]
 
 
 def _generer_patients(contexte: Contexte, generateur: np.random.Generator) -> list[dict]:
-    return patients.generer_lignes(
+    # generator/doublons.py mute contexte.episodes et contexte.population en place (fiches
+    # en double ajoutees a la population, episodes posterieurs au point de scission
+    # reattaches a la nouvelle fiche) : les generateurs de table suivants (rendez-vous,
+    # passages, mouvements), qui relisent contexte.episodes/population, voient donc la
+    # population deja etendue sans avoir a le savoir. Le meme generateur continue son flux
+    # entre les deux appels, gouverne integralement par la graine de la table patients.
+    lignes = patients.generer_lignes(
         contexte.episodes, contexte.population, generateur, entrees=contexte.entrees
     )
+    lignes_doublons, paires = doublons.injecter_doublons(
+        contexte.episodes, contexte.population, lignes, generateur, entrees=contexte.entrees
+    )
+    contexte.meta["doublons_paires"] = paires
+    return lignes + lignes_doublons
 
 
 def _generer_rendez_vous(contexte: Contexte, generateur: np.random.Generator) -> list[dict]:
@@ -238,4 +251,5 @@ def executer(
         execution.ecrire_table(table, lignes)
 
     execution.ecrire_manifeste()
+    verite_terrain.ecrire(execution, contexte.meta.get("doublons_paires", []))
     return execution, contexte
