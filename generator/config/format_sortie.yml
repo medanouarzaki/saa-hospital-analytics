@@ -86,7 +86,8 @@ parametres:
     note: >-
       Choix technique du générateur, indépendant du système source : saut de
       ligne Unix (LF) plutôt que Windows (CRLF), retenu pour la portabilité
-      et condition du déterminisme octet à octet mesuré à l'étape 1.3.
+      et condition du déterminisme octet à octet des sorties produites à
+      graine identique.
 
   - nom: encodage
     valeur: utf-8

@@ -47,7 +47,7 @@ parametres:
   preuve: sans_preuve_externe
   note: 'Le registre ne porte, pour source.encaissements, aucune colonne débiteur distincte
     (les huit colonnes s''arrêtent à date_extraction) : le débiteur d''un encaissement -
-    l''organisme ou le patient, comme l''exige l''étape 4 - se déduit donc du mode de
+    l''organisme ou le patient - se déduit donc du mode de
     règlement plutôt que d''une colonne supplémentaire, qui excéderait le relevé. Le
     virement, mode de paiement institutionnel, est posé du côté organisme ; les espèces, le
     chèque et la carte bancaire, réglés au guichet par la personne présente, du côté patient.

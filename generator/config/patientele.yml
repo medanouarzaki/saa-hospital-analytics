@@ -49,7 +49,7 @@ parametres:
       préexistante ou déjà créé pendant la période) plutôt qu'à un patient nouveau. Posée
       faute de source, cette part est un paramètre d'entrée du tirage, alors que
       l'effectif final de la file active en découle : ce dernier n'est pas fixé
-      directement, c'est une sortie mesurée à l'étape 5, pas une entrée déclarée. Si
+      directement, c'est une grandeur mesurée en sortie, pas une entrée déclarée. Si
       cette part était fausse, la taille de la population totale de patients produite
       serait décalée dans le sens opposé, sans effet sur le nombre d'épisodes.
 
