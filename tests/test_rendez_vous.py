@@ -27,6 +27,12 @@ def patient_id_de(n_ipp: str) -> int:
     return int(n_ipp.split("-")[1])
 
 
+def _charger_verite_terrain(execution) -> dict:
+    chemin = execution.racine / execution.scenario / "verite_terrain.yml"
+    with chemin.open(encoding="utf-8") as f:
+        return yaml.safe_load(f)
+
+
 @pytest.fixture(scope="module")
 def generation(generation_partagee: dict) -> dict:
     partagee = generation_partagee
@@ -211,23 +217,41 @@ def test_ordre_des_dates(generation: dict) -> None:
     population = generation["population"]
     date_creation_par_patient = {p["patient_id"]: p["date_creation"] for p in population}
 
+    vt = _charger_verite_terrain(generation["execution"])
+    n_rdv_exemptes = {entree["identifiant"] for entree in vt["dates_aberrantes"]["entrees"]}
+    assert len(n_rdv_exemptes) == vt["dates_aberrantes"]["decompte"]
+
     assert len(lignes) > 0
+    n_verifies = 0
     for ligne in lignes:
+        if ligne["n_rdv"] in n_rdv_exemptes:
+            continue
+        n_verifies += 1
         assert ligne["date_creation"].date() <= ligne["date_rendez_vous"].date(), ligne
         pid = patient_id_de(ligne["n_ipp"])
         assert date_creation_par_patient[pid] <= ligne["date_creation"].date(), ligne
+    assert n_verifies > 0
 
 
 def test_jours_ouverts(generation: dict) -> None:
     entrees = generation["entrees"]
     lignes = generation["lignes"]
 
+    vt = _charger_verite_terrain(generation["execution"])
+    n_rdv_exemptes = {entree["identifiant"] for entree in vt["dates_aberrantes"]["entrees"]}
+    assert len(n_rdv_exemptes) == vt["dates_aberrantes"]["decompte"]
+
     n_fermes = 0
+    n_verifies = 0
     for ligne in lignes:
+        if ligne["n_rdv"] in n_rdv_exemptes:
+            continue
+        n_verifies += 1
         if temporel.poids_jour(ligne["date_creation"].date(), "programme", entrees) <= 0:
             n_fermes += 1
         if temporel.poids_jour(ligne["date_rendez_vous"].date(), "programme", entrees) <= 0:
             n_fermes += 1
+    assert n_verifies > 0
     assert n_fermes == 0
 
 
@@ -265,13 +289,26 @@ def test_anteriorite_complete_naissance_fiche_prise_rdv(
             assert naissance_par_patient[pid] == naissance
             assert fiche_par_patient[pid] == fiche
 
+    vt = _charger_verite_terrain(generation["execution"])
+    n_ipp_ages_exemptes = {entree["identifiant"] for entree in vt["ages_incoherents"]["entrees"]}
+    assert len(n_ipp_ages_exemptes) == vt["ages_incoherents"]["decompte"]
+    n_rdv_dates_exemptes = {entree["identifiant"] for entree in vt["dates_aberrantes"]["entrees"]}
+    assert len(n_rdv_dates_exemptes) == vt["dates_aberrantes"]["decompte"]
+
     assert lignes_rdv, "aucune ligne de rendez-vous"
+    n_verifies = 0
     for ligne in lignes_rdv:
         pid = patient_id_de(ligne["n_ipp"])
+        age_exempte = ligne["n_ipp"] in n_ipp_ages_exemptes
+        date_exemptee = ligne["n_rdv"] in n_rdv_dates_exemptes
         naissance = naissance_par_patient[pid]
         fiche = fiche_par_patient[pid]
         prise = ligne["date_creation"].date()
         rendez_vous_jour = ligne["date_rendez_vous"].date()
-        assert naissance < fiche, (pid, naissance, fiche)
+        if not age_exempte:
+            assert naissance < fiche, (pid, naissance, fiche)
         assert fiche <= prise, (pid, fiche, prise)
-        assert prise <= rendez_vous_jour, (pid, prise, rendez_vous_jour)
+        if not date_exemptee:
+            n_verifies += 1
+            assert prise <= rendez_vous_jour, (pid, prise, rendez_vous_jour)
+    assert n_verifies > 0

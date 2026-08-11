@@ -15,6 +15,7 @@ from datetime import date
 
 import numpy as np
 import pytest
+import yaml
 
 from generator import ecriture, patients, registre
 
@@ -63,6 +64,12 @@ def toutes_les_lignes_csv(execution: ecriture.Execution) -> list[dict]:
     return lignes
 
 
+def _charger_verite_terrain(execution: ecriture.Execution) -> dict:
+    chemin = execution.racine / execution.scenario / "verite_terrain.yml"
+    with chemin.open(encoding="utf-8") as f:
+        return yaml.safe_load(f)
+
+
 def test_effectif_recompute_independamment(generation: dict) -> None:
     population = generation["population"]
     lignes = generation["lignes"]
@@ -78,10 +85,20 @@ def test_ordre_des_dates_sur_toutes_les_lignes(generation: dict) -> None:
     lignes = generation["lignes"]
     assert len(lignes) > 0
 
+    vt = _charger_verite_terrain(generation["execution"])
+    entrees_ages = vt["ages_incoherents"]["entrees"]
+    n_ipp_exemptes = {entree["identifiant"] for entree in entrees_ages}
+    assert len(n_ipp_exemptes) == vt["ages_incoherents"]["decompte"]
+
+    n_ipp_verifies = 0
     for ligne in lignes:
+        if ligne["n_ipp"] in n_ipp_exemptes:
+            continue
+        n_ipp_verifies += 1
         assert ligne["date_naissance"] < ligne["date_attribution"], ligne
         if ligne["date_modification"] is not None:
             assert ligne["date_modification"].date() > ligne["date_attribution"], ligne
+    assert n_ipp_verifies > 0
 
 
 def test_structure_age_ponderee_par_categorie(generation: dict) -> None:
@@ -281,8 +298,14 @@ def test_ordres_vraisemblance(generation: dict) -> None:
         for couple in entrees["nomenclature_etat_civil"]["valeur"]
         if "VEUF" in couple["libelle"].upper()
     )
+    vt = _charger_verite_terrain(generation["execution"])
+    n_ipp_ages_exemptes = {entree["identifiant"] for entree in vt["ages_incoherents"]["entrees"]}
+    assert len(n_ipp_ages_exemptes) == vt["ages_incoherents"]["decompte"]
+
     n_mineurs_veufs = 0
     for ligne in lignes:
+        if ligne["n_ipp"] in n_ipp_ages_exemptes:
+            continue
         age_annees = (ligne["date_attribution"] - ligne["date_naissance"]).days / 365
         if age_annees < patients.AGE_MAJORITE_ANNEES and ligne["etat_civil"] == code_veuf:
             n_mineurs_veufs += 1
@@ -361,9 +384,15 @@ def test_taux_renseignement(generation: dict) -> None:
     total = len(lignes)
 
     taux_attendu = entrees["taux_renseignement"]["valeur"]
+    taux_champs_manquants = entrees["taux_champs_manquants"]["valeur"]
     # tolerance mesuree sur 5 graines independantes : ecart maximal observe 0,0056
     TOLERANCE = 0.02
     for colonne, taux in taux_attendu.items():
+        # email, telephone_2 et profession recoivent en plus une absence injectee
+        # (generator/defauts.py) au-dela de l'absence structurelle mesuree ici : leur taux
+        # de presence final est gouverne par taux_champs_manquants, pas par ce parametre.
+        if colonne in taux_champs_manquants:
+            taux = 1 - taux_champs_manquants[colonne]
         n_renseigne = sum(1 for ligne in lignes if ligne[colonne] is not None)
         part = n_renseigne / total
         assert abs(part - taux) < TOLERANCE, (colonne, taux, part)

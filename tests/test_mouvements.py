@@ -12,6 +12,7 @@ from collections import defaultdict
 from datetime import date, datetime
 
 import pytest
+import yaml
 
 from generator import mouvements as mvt_mod
 from generator import nomenclatures
@@ -22,6 +23,12 @@ TABLE = "source.mouvements"
 @pytest.fixture(scope="module")
 def generation(generation_partagee: dict) -> dict:
     return generation_partagee
+
+
+def _charger_verite_terrain(execution) -> dict:
+    chemin = execution.racine / execution.scenario / "verite_terrain.yml"
+    with chemin.open(encoding="utf-8") as f:
+        return yaml.safe_load(f)
 
 
 def _par_sejour(lignes: list[dict]) -> dict[str, list[dict]]:
@@ -188,6 +195,10 @@ def test_eligibilite_unites_maternite_pediatrie(generation: dict) -> None:
     age_max_pediatrie = entrees["age_maximal_revolus_pediatrie"]["valeur"]
     patients_par_ipp = {p["n_ipp"]: p for p in lignes_pat}
 
+    vt = _charger_verite_terrain(generation["execution"])
+    n_ipp_ages_exemptes = {entree["identifiant"] for entree in vt["ages_incoherents"]["entrees"]}
+    assert len(n_ipp_ages_exemptes) == vt["ages_incoherents"]["decompte"]
+
     admissions = [ligne for ligne in lignes_mvt if ligne["date_heure_admission"] is not None]
     n_hgo = n_hped = 0
     for ligne in admissions:
@@ -197,6 +208,8 @@ def test_eligibilite_unites_maternite_pediatrie(generation: dict) -> None:
             n_hgo += 1
             assert patient["sexe"] == "F", ligne
         elif service == "HPED":
+            if ligne["n_ipp"] in n_ipp_ages_exemptes:
+                continue
             n_hped += 1
             age = mvt_mod._age_revolus(
                 patient["date_naissance"], ligne["date_heure_admission"].date()

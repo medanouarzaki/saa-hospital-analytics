@@ -14,6 +14,7 @@ from collections import Counter, defaultdict
 from datetime import date
 
 import pytest
+import yaml
 
 TABLE_ENC = "source.encaissements"
 TABLE_CRE = "source.creances"
@@ -27,6 +28,12 @@ MOTIF_SOLDE = "RCV"
 @pytest.fixture(scope="module")
 def generation(generation_partagee: dict) -> dict:
     return generation_partagee
+
+
+def _charger_verite_terrain(execution) -> dict:
+    chemin = execution.racine / execution.scenario / "verite_terrain.yml"
+    with chemin.open(encoding="utf-8") as f:
+        return yaml.safe_load(f)
 
 
 def _debiteur(entrees: dict, mode_reglement: str) -> str:
@@ -76,6 +83,10 @@ def test_jamais_plus_que_du(generation: dict) -> None:
     lignes_fac = generation["lignes"][TABLE_FAC]
     lignes_enc = generation["lignes"][TABLE_ENC]
 
+    vt = _charger_verite_terrain(generation["execution"])
+    n_facture_exemptees = {entree["identifiant"] for entree in vt["factures_sans_pec"]["entrees"]}
+    assert len(n_facture_exemptees) == vt["factures_sans_pec"]["decompte"]
+
     dus = {f["n_facture"]: (f["part_patient"], f["part_organisme"]) for f in lignes_fac}
     encaisse = defaultdict(lambda: {"PATIENT": 0.0, "ORGANISME": 0.0})
     for enc in lignes_enc:
@@ -83,10 +94,21 @@ def test_jamais_plus_que_du(generation: dict) -> None:
         encaisse[enc["n_facture"]][debiteur] += enc["montant"]
 
     assert encaisse
+    n_verifiees = 0
     for n_facture, (du_patient, du_organisme) in dus.items():
+        if n_facture in n_facture_exemptees:
+            # generator/defauts.py retire, apres coup, la prise en charge de cette facture
+            # et remet part_organisme a 0 pour rester coherent avec source.factures -- mais
+            # source.encaissements a deja ete generee avant cette passe, sur la base de
+            # l'ancien part_organisme (accorde) : un encaissement organisme deja percu pour
+            # une couverture retiree apres coup est exactement le symptome que cette
+            # categorie de defaut doit produire pour le bloc de rapprochement ulterieur.
+            continue
+        n_verifiees += 1
         e = encaisse[n_facture]
         assert e["PATIENT"] <= du_patient + 0.02, (n_facture, e["PATIENT"], du_patient)
         assert e["ORGANISME"] <= du_organisme + 0.02, (n_facture, e["ORGANISME"], du_organisme)
+    assert n_verifiees > 0
 
 
 def test_montant_creance_se_calcule(generation: dict) -> None:
