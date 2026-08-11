@@ -69,37 +69,56 @@ parametres:
 - nom: orientation_urgences
   valeur:
     RD: 0.76
-    HO: 0.102
     TR: 0.12
     SC: 0.015
     DC: 0.003
-  unite: proportion par code de nomenclature_orientation_sortie
+  unite: proportion par code de nomenclature_orientation_sortie (hors HO, calculee -
+    voir note)
   provenance: HYP
   preuve: sans_preuve_externe
-  note: 'Nom impose par la relation R-11 du registre des relations injectees. Valeurs
-    portees aux cinq chiffres du document de cadrage (domicile 76 %, hospitalisation
-    10,2 %, transfert 12 %, sortie contre avis 1,5 %, deces 0,3 %) ; le cadrage ne cite
-    aucune source propre a ce bloc (contrairement aux trois autres lignes de sa section
-    Urgences), provenance restee HYP. Il justifie seulement le taux de transfert ("relevé
-    et non résiduel : un établissement sans chirurgie ni réanimation transfère tout ce qui
-    en relève"), retenu tel quel comme les quatre autres.
-
-    Consequence mesuree de ce changement, gardee volontairement telle quelle sur decision
-    explicite (question posee, reponse recue: appliquer le cadrage tel quel et laisser
-    l''Etape 4 de ce lot reveler la tension plutot que de l''arbitrer en amont) : le
-    registre des champs ne porte aucune colonne reliant un sejour d''hospitalisation au
-    passage aux urgences qui l''a declenche ; generator/mouvements.py lit HO et le ramene
-    a une proportion des admissions d''hospitalisation (population plus restreinte que les
-    passages aux urgences), pour que le nombre d''admissions de mode urgence egale en
-    agrege le nombre de passages aux urgences orientes vers l''hospitalisation -- c''est ce
-    mecanisme, deja en place, qui traduit desormais 10,2 % de ~27360 passages sur la
-    periode (soit environ 2792) en une part des 2980 admissions de la periode (soit
-    environ 93,7 %, mesuree a l''Etape 4) plutot que les 29 % mesures avant ce lot : une
-    consequence arithmetique directe de la valeur HO du cadrage combinee au fil des
-    episodes gele (admissions_annuelles, S-30), pas un choix de ce lot. Si HO etait faux,
-    la part d''admissions de mode urgence serait faussee dans la meme proportion, sans
-    effet sur le nombre total de sejours ni sur le nombre de passages aux urgences,
-    tous deux geles independamment.'
+  note: 'Nom impose par la relation R-11 du registre des relations injectees. Ce parametre
+    ne pose plus la part hospitalisation (code HO) : le lot precedent l''avait appliquee
+    telle que donnee par le document de cadrage (10,2 %), et avait mesure que, combinee au
+    fil des episodes gele (admissions_annuelles, S-30) et au scenario retenu de passages
+    aux urgences, elle impliquait environ 93,7 % des admissions d''hospitalisation
+    provenant des urgences -- deja signale a l''epoque comme une tension. Poussee aux
+    trois scenarios de l''analyse de sensibilite (14, 30, 54 passages/jour,
+    generator/config/volumetrie.yml), la meme valeur donne des parts de 43 %, 93 % et
+    168 % : le troisieme est arithmetiquement impossible (une part ne depasse pas 1),
+    l''analyse de sensibilite ne pouvait plus etre produite. Le sens de la derivation est
+    inverse par ce lot : c''est desormais part_sejours_provenant_urgences (une propriete
+    d''organisation de l''etablissement, independante du volume de passages) qui est posee,
+    et HO qui en est calcule, scenario par scenario -- generator/urgences.py calcule HO =
+    part_sejours_provenant_urgences x admissions_annuelles / passages_annuels_du_scenario,
+    puis redistribue RD, TR, SC et DC ci-dessus sur le complement (1 - HO), en conservant
+    leurs proportions relatives d''origine (leur somme ci-dessous, 0,898, n''est plus 1 par
+    construction). Si l''une des quatre valeurs ci-dessus etait fausse, la repartition des
+    issues autres que l''hospitalisation serait faussee proportionnellement, sans effet sur
+    HO lui-meme.'
+- nom: part_sejours_provenant_urgences
+  valeur: 0.57
+  unite: proportion des sejours d'hospitalisation dont l'admission provient des urgences
+    (mode_admission = U), independante du scenario de volumetrie retenu
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Parametre ajoute par ce lot, remplace la part HO precedemment posee dans
+    orientation_urgences (voir sa note). Intervalle admissible calcule a partir d''une
+    borne haute et d''une borne basse de plausibilite pour le taux d''hospitalisation aux
+    urgences qui en derive : borne haute 15,3 %, calculee (pas posee) depuis les taux
+    d''hospitalisation par niveau de tri documentes par S-14 (80,9 % / 59,6 % / 25,5 % /
+    4,0 % / 1,7 % pour les niveaux 1 a 5), ponderes par repartition_niveaux_tri deja
+    aligne sur le cadrage (2/8/27/41/22 %) - la depasser hospitaliserait plus que ce que la
+    gravite mesuree des passages autorise. Borne basse 3 %, posee : en dessous, un service
+    d''urgences n''hospitaliserait presque personne, ce qui contredirait jusqu''a
+    l''existence des niveaux 1 et 2 (urgences vitales, taux de 80,9 % et 59,6 % selon
+    S-14). Aux trois scenarios de volumetrie geles (14, 30, 54 passages/jour), le facteur
+    admissions_annuelles/passages_annuels_scenario vaut 0,23425 (bas), 0,10932 (retenu) et
+    0,06073 (haut) ; l''intervalle admissible sur cette part est [0,4940 ; 0,6525]
+    (calcul complet au rapport). Valeur retenue : 0,57, le milieu arrondi de cet
+    intervalle, la position la moins sensible a l''incertitude relative de l''une ou
+    l''autre borne. Si cette part etait fausse, le taux d''hospitalisation derive serait
+    faux aux trois scenarios dans la meme proportion, sans effet sur le nombre total de
+    sejours ni sur le nombre de passages aux urgences, tous deux geles independamment.'
 - nom: modulateur_origine_tri
   valeur:
     '1': 2.0

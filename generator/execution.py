@@ -198,6 +198,22 @@ def executer(
         taux_urgences_par_jour = entrees["passages_urgences_par_jour"]["valeur"]
     scenario = f"scenario_{round(taux_urgences_par_jour)}"
 
+    # HO (hospitalisation) de orientation_urgences est calculé, pas posé (voir
+    # generator/urgences.py::orientation_urgences_derivee) : dépend du scénario de
+    # passages effectivement retenu pour cette exécution, résolu ci-dessus. Calculé une
+    # seule fois ici, avant tout générateur de table, pour que urgences.py et
+    # mouvements.py lisent la même valeur dérivée sans recalcul ni divergence. Copie
+    # locale de l'entrée avant écrasement : muter le dict reçu en argument corromprait un
+    # second appel avec le même objet entrees (mesuré avant d'écrire, voir le rapport --
+    # deux exécutions à la même graine partageant l'entrees de l'appelant redérivaient HO
+    # depuis un dict déjà dérivé par le premier appel, cassant la reproductibilité).
+    passages_annuels = taux_urgences_par_jour * 365
+    entrees = dict(entrees)
+    entrees["orientation_urgences"] = dict(entrees["orientation_urgences"])
+    entrees["orientation_urgences"]["valeur"] = urgences.orientation_urgences_derivee(
+        entrees, passages_annuels
+    )
+
     rng_episodes = _generateur_pour(graine, 0)
     comptes = {
         cat: volumes.comptes_journaliers(

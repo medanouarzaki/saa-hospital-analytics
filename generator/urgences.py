@@ -37,6 +37,27 @@ def _tirage_pondere_dict(poids_par_code: dict[str, float], generateur: np.random
     return codes[int(generateur.choice(len(codes), p=poids))]
 
 
+def orientation_urgences_derivee(
+    entrees: dict[str, dict], passages_annuels: float
+) -> dict[str, float]:
+    # HO (hospitalisation) n'est plus posé : dérivé de part_sejours_provenant_urgences (une
+    # propriété d'organisation, indépendante du volume de passages), du nombre annuel de
+    # séjours mesuré (admissions_annuelles, S-30) et du nombre annuel de passages du
+    # scénario effectivement retenu pour cette exécution. Les quatre autres orientations,
+    # posées dans orientation_urgences (RD, TR, SC, DC, dont la somme n'est plus 1), se
+    # redistribuent sur le complément (1 - HO) en conservant leurs proportions relatives.
+    part = entrees["part_sejours_provenant_urgences"]["valeur"]
+    admissions_annuelles = entrees["admissions_annuelles"]["valeur"]
+    ho = part * admissions_annuelles / passages_annuels
+
+    base = entrees["orientation_urgences"]["valeur"]
+    somme_base = sum(base.values())
+    echelle = (1 - ho) / somme_base
+    derivee = {code: poids * echelle for code, poids in base.items()}
+    derivee["HO"] = ho
+    return derivee
+
+
 def _tirage_uniforme_liste(valeurs: list, generateur: np.random.Generator):
     return valeurs[int(generateur.integers(0, len(valeurs)))]
 
