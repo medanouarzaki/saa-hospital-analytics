@@ -233,7 +233,12 @@ def _generer_ligne_patient(
 
     code_postal = entrees["codes_postaux_par_ville"]["valeur"][ville_province]
 
-    email = f"patient{rang}@exemple.ma" if _renseigne("email", entrees, generateur) else None
+    domaine_email = _tirage_uniforme_liste(entrees["domaines_email"]["valeur"], generateur)
+    email = (
+        f"{prenom.lower()}.{nom_famille_1.lower()}@{domaine_email}"
+        if _renseigne("email", entrees, generateur)
+        else None
+    )
     telephone_2 = None
     if _renseigne("telephone_2", entrees, generateur):
         telephone_2 = f"0620{generateur.integers(0, 999999):06d}"
