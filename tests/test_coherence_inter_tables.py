@@ -230,12 +230,15 @@ def test_regle_10_egalite_urgences_hospitalisees_et_sejours_urgences(generation:
     membre_gauche = passages_annuels_urgences * taux_hospitalisation_urgences
     membre_droit = sejours_annuels * part_sejours_provenant_urgences
 
-    # tolerance mesuree : la part posee (0,57, generator/config/urgences.yml) tombe pres
-    # du point de variance maximale d'un tirage bernoulli (p(1-p) maximal a p=0,5),
-    # consequence structurelle de l'intervalle admissible calcule au rapport, pas un choix
-    # arbitraire de ce test. Sur ~2980 admissions par periode, ecart mesure sur 2 graines
-    # independantes : 3,65 % et 2,20 %.
-    TOLERANCE_RELATIVE = 0.05
+    # le mode d'admission urgence des sejours n'est plus tire independamment par sejour
+    # (generator/mouvements.py) : le nombre de sejours a marquer est calcule d'avance
+    # (taux_urgence x effectif, arrondi), puis exactement ce nombre est choisi au hasard,
+    # sans remise -- une repartition exacte, sans variance sur le total. L'egalite est
+    # desormais vraie a une constante pres (la seule proratisation restante entre
+    # admissions_annuelles et l'effectif reellement fixe par le fil des episodes) : ecart
+    # mesure identique sur trois graines independantes, 0,38 %, bien sous les 3 % que le
+    # cadrage impose.
+    TOLERANCE_RELATIVE = 0.03
     assert membre_gauche == pytest.approx(membre_droit, rel=TOLERANCE_RELATIVE), (
         passages_annuels_urgences,
         taux_hospitalisation_urgences,
@@ -359,12 +362,13 @@ def test_regle_13_indicateurs_sejour_recalcules_depuis_les_donnees(generation: d
     trot_mesure = admissions_annuelles_mesure / capacite
     irot_mesure = (capacite * jours_an - journees_annuelles) / admissions_annuelles_mesure
 
-    # tolerance mesuree, plus large que le 3 % initialement retenu : la restriction
-    # d'eligibilite des unites d'hospitalisation (HGO, HPED, lot anterieur) deplace
-    # systematiquement le flux de tirages aleatoires de duree de sejour, un effet deja
-    # mesure et documente pour TOM et DMS. Mesure sur 2 graines independantes : TOM 3,52 %
-    # et 4,36 % ; DMS 3,73 % et 4,56 % ; TROT 0,28 % et 0,28 % ; IROT 5,14 % et 6,12 %.
-    TOLERANCE_RELATIVE = 0.07
+    # tolerance ramenee a 3 % (cadrage) : la cause de la derive precedente (troncature par
+    # dotation retranchant des journees a la cible) est corrigee a la source
+    # (generator/mouvements.py, recalibrage convergent de la loi de duree), pas contournee
+    # par une tolerance elargie. Mesure sur 3 graines independantes apres correction : TOM
+    # 0,07 % ; 0,69 % ; 0,94 %. DMS 0,28 % ; 0,48 % ; 1,15 %. TROT 0,28 % (inchange, ne
+    # depend pas de la duree). IROT 1,07 % ; 0,18 % ; 2,10 %.
+    TOLERANCE_RELATIVE = 0.03
     assert tom_mesure == pytest.approx(entrees["tom_publie"]["valeur"], rel=TOLERANCE_RELATIVE)
     assert dms_mesure == pytest.approx(entrees["dms_publie"]["valeur"], rel=TOLERANCE_RELATIVE)
     assert trot_mesure == pytest.approx(entrees["trot_publie"]["valeur"], rel=TOLERANCE_RELATIVE)
@@ -452,12 +456,11 @@ def test_volumetrie_journees_hospitalisation_conforme(generation: dict) -> None:
         prorata = volumes.rapport_annee_partielle(annee, "programme", entrees)
         cible[annee] = journees_annuel_publie * prorata
 
-    # tolerance elargie, meme cause que la regle 13 (indicateurs de sejour) : la
-    # restriction d'eligibilite des unites d'hospitalisation (HGO, HPED, lot anterieur)
-    # deplace systematiquement le flux de tirages aleatoires de duree de sejour. Mesure
-    # sur cette execution : ecarts 3,60 % (2024), 4,08 % (2025), 0,10 % (2026, periode
-    # partielle, moins de sejours accumules).
-    _comparer_par_annee_et_periode(mesure, cible, "journées d'hospitalisation", tolerance=0.07)
+    # tolerance ramenee a 3 % (cadrage), meme cause et meme correction que la regle 13 :
+    # la troncature par dotation, source de la derive precedente, est desormais compensee a
+    # la source (generator/mouvements.py). Mesure sur 3 graines independantes apres
+    # correction, la plus large des trois annees a chaque graine : 2,26 % ; 2,40 % ; 2,08 %.
+    _comparer_par_annee_et_periode(mesure, cible, "journées d'hospitalisation", tolerance=0.03)
 
 
 def test_volumetrie_laboratoire_conforme(generation: dict) -> None:
