@@ -51,7 +51,16 @@ def generer_lignes(
     date_debut = date.fromisoformat(entrees["date_debut"]["valeur"])
     date_fin = date.fromisoformat(entrees["date_fin"]["valeur"])
 
-    taux_demande = entrees["taux_demande_par_type_episode"]["valeur"]
+    taux_demande_pose = entrees["taux_demande_par_type_episode"]["valeur"]
+    facteur_reduction = entrees["facteur_reduction_demande_structurelle"]["valeur"]
+    # resserre la part structurelle de factures sans demande (1 - taux_demande_pose) avant
+    # que generator/defauts.py n'injecte, de facon tracee, le complement necessaire pour
+    # atteindre taux_factures_sans_pec -- reconciliation mesuree et justifiee au rapport,
+    # conserve la hierarchie deja modelisee entre types d'episode sans la faire disparaitre.
+    taux_demande = {
+        type_episode: 1 - (1 - taux) * facteur_reduction
+        for type_episode, taux in taux_demande_pose.items()
+    }
     taux_refus = entrees["taux_refus_prise_en_charge"]["valeur"]
     correspondance_regime = entrees["correspondance_regime_compagnie_assurance"]["valeur"]
     taux_hospitalisation = entrees["taux_part_organisme_hospitalisation"]["valeur"]
