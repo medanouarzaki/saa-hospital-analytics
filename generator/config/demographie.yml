@@ -391,7 +391,7 @@ parametres:
     commentaire: 0.12
     email: 0.85
     nom_famille_2: 0.9
-    profession: 0.4
+    profession: 0.6
   unite: proportion de fiches ou la colonne est renseignee
   provenance: HYP
   preuve: sans_preuve_externe
@@ -403,7 +403,19 @@ parametres:
     de donnees normal : ce n''est pas un defaut injecte. Le decompte de la verite terrain, dans un lot
     ulterieur, ne doit compter que les defauts reellement injectes, pas ces absences structurelles. Si
     ces taux etaient faux, la part de fiches renseignees pour ces colonnes serait faussee, sans effet
-    sur aucun total.'
+    sur aucun total. Profession reajuste de 0,4 a 0,6 dans un lot ulterieur : le taux de champs
+    manquants du cadrage pour cette colonne (44 % de manquant au total) est inferieur a ce que
+    l''ancienne valeur (0,4 renseigne, 60 % manquant) produisait a elle seule -- un mecanisme
+    d''injection ne peut qu''ajouter de l''absence, jamais en retirer. Le tirage de la profession
+    consomme un nombre de tirages aleatoires variable (un tirage supplementaire pour chaque fiche
+    renseignee), si bien que deplacer ce seuil decale la position du flux aleatoire pour toutes
+    les fiches suivantes et, par ricochet, les tables qui lisent source.patients en entree
+    (mesure avant d''ecrire : un premier essai a 0,7 renseigne faisait sortir la conformite des
+    journees d''hospitalisation de sa tolerance de 3 % etablie a un lot anterieur, 3,34 % contre
+    1,65 % avant ajustement). Remonter la part structurelle a 60 % renseigne (40 % manquant, la
+    plus petite hausse qui reste sous la cible de 44 %) laisse un espace etroit mais suffisant a
+    l''injection, tout en minimisant ce decalage -- revarifie a cette valeur, la conformite reste
+    verte (voir le rapport).'
 - nom: liste_professions
   valeur:
   - Enseignant

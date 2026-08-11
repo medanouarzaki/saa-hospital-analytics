@@ -113,3 +113,118 @@ parametres:
     ligne -- voir generator/doublons.py et generator/patients.py. Si cette table etait plus
     courte, les prenoms composes injectes se repeteraient davantage entre paires distinctes,
     sans effet sur le nombre total de paires.'
+- nom: taux_champs_manquants
+  valeur:
+    email: 0.78
+    telephone_2: 0.96
+    quartier: 0.31
+    profession: 0.44
+  unite: proportion finale (structurelle et injectee combinees) de fiches ou la colonne est absente, par colonne de source.patients
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Nom impose par la relation R-15 du registre des relations injectees. Le cadrage donne un
+    taux de manquant par colonne pour courriel (78 %) et quartier (31 %), lus tels quels. Pour le
+    deuxieme telephone, le cadrage donne 4 % ; lu comme taux de manquant, cela impliquerait 96 % des
+    patients porteurs d''un deuxieme numero, invraisemblable sur un formulaire d''admission et
+    incompatible avec la mesure actuelle (85,17 % deja manquant, structurellement) -- lu comme taux
+    de renseignement (4 % des patients en portent un), la valeur retenue ici est son complement,
+    0,96, plausible et du meme ordre de grandeur que la mesure actuelle. Pour profession, le cadrage
+    donne 44 % de manquant, mesure inferieure a ce que produisait a elle seule l''ancienne valeur de
+    taux_renseignement.profession (60 % manquant) : cette derniere a ete reajustee a 0,6 (40 %
+    manquant structurel, la plus petite hausse qui passe sous la cible, voir
+    generator/config/demographie.yml) pour laisser a l''injection la place d''atteindre exactement
+    la cible tout en minimisant le decalage du flux aleatoire que ce reajustement induit sur les
+    fiches suivantes. generator/defauts.py mesure d''abord la part deja absente par
+    le mecanisme structurel existant (taux_renseignement), puis choisit exactement le nombre de
+    lignes actuellement renseignees qu''il faut faire basculer a vide pour que le taux final observe
+    egale ce parametre. Si ces taux etaient faux, le classement des colonnes par completude affiche
+    en page Qualite des donnees serait faux, sans effet sur aucun total de lignes.'
+- nom: taux_defauts_surface
+  valeur:
+    casse_accents: 0.02
+    espaces_multiples: 0.015
+    majuscules: 0.01
+  unite: proportion de fiches dont la colonne adresse recoit chaque categorie d'alteration de surface
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Le cadrage mentionne trois phenomenes de surface (casse et accents incoherents, espaces
+    multiples, une partie du corpus en majuscules) sans taux. Poses ici a un ordre de grandeur
+    plausible pour une saisie manuelle d''accueil : la plupart des fiches sont saisies correctement,
+    une petite minorite porte une casse ou des accents incoherents (2 %, le defaut de saisie le plus
+    frequent), moins portent un espace surnumeraire (1,5 %, une faute de frappe plus rare), et une
+    part encore plus faible est entierement saisie en majuscules (1 %, un choix de saisie deliberement
+    plus rare qu''une simple faute). Applique a la seule colonne adresse (texte libre, non identifiante,
+    non codee) de source.patients. Si ces taux etaient faux, seule la part de fiches montrant chaque
+    symptome de qualite serait faussee, sans effet sur aucun total ni sur les colonnes codees.'
+- nom: taux_dates_aberrantes
+  valeur: 0.003
+  unite: proportion de lignes de source.rendez_vous dont date_rendez_vous recoit une valeur hors plage
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Taux impose par le cadrage (0,3 %). Applique a la colonne date_rendez_vous (horodatage,
+    non identifiante, non codee) de source.rendez_vous plutot qu''a date_extraction : cette derniere
+    est bornee par generator/ecriture.py::_valider_bornage_periode et ferait echouer l''ecriture
+    hors de la liste d''ecriture de ce lot. La valeur hors plage produite est une date reelle mais
+    tres anterieure (annee 1900), jamais posterieure a la fin de periode, pour ne jamais entrer dans
+    le perimetre du dela deja gere par generator/rendez_vous.py (rdv_supplementaire, etat EI). Une
+    date reellement mal formee (chaine non calendaire) est hors de portee sans modifier
+    generator/ecriture.py::mettre_en_forme, qui exige un objet date/datetime valide pour ce
+    type_metier -- generator/ecriture.py n''est pas dans la liste d''ecriture de ce lot. Si ce taux
+    etait faux, le nombre de lignes que le bloc de quarantaine doit rejeter pour cette raison serait
+    faux, sans effet sur aucun autre total.'
+- nom: taux_ages_incoherents
+  valeur: 0.005
+  unite: proportion de fiches dont date_naissance est rendue incoherente avec date_attribution
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Taux impose par le cadrage (0,5 %). Applique a date_naissance (source.patients), jamais a
+    un identifiant. Deux formes tirees a parts egales : une naissance posterieure ou egale a la date
+    de creation de la fiche (age negatif), ou une naissance de plus de 120 ans anterieure a cette
+    meme date (age implausible). Si ce taux etait faux, le nombre de fiches que le bloc de
+    quarantaine doit signaler pour cette raison serait faux, sans effet sur aucun autre total.'
+- nom: taux_rdv_doublon_creneau
+  valeur: 0.012
+  unite: proportion de rendez-vous honores dupliques sur le meme creneau
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Taux impose par le cadrage (1,2 %). Applique en ajoutant, pour chaque rendez-vous honore
+    (etat HO) retenu, une ligne supplementaire portant le meme n_ipp, le meme agenda et le meme
+    date_rendez_vous, un nouvel identifiant n_rdv, et l''etat AN (annule, code deja porte par
+    nomenclature_etat_rendez_vous) plutot que HO -- la double reservation est decouverte et annulee,
+    jamais honoree deux fois. Aucune ligne existante n''est modifiee ; la table croit exactement du
+    nombre de doublons injectes. Si ce taux etait faux, le nombre de doublons de creneau que le bloc
+    de quarantaine doit detecter serait faux, sans effet sur la bijection entre rendez-vous honores
+    et episodes de consultation.'
+- nom: taux_factures_sans_pec
+  valeur: 0.03
+  unite: proportion de factures de patients couverts se retrouvant sans prise en charge
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Taux impose par le cadrage (3 %). La mesure structurelle actuelle (taux_demande_par_type_episode
+    de generator/prises_en_charge.py, non ajuste) produit a elle seule 30,53 % de factures couvertes
+    sans prise en charge -- tres au-dessus de la cible, pour la meme raison que profession a
+    l''etape des champs manquants : un mecanisme d''injection ne peut qu''ajouter des cas, jamais en
+    retirer. generator/config/prises_en_charge.yml n''est pas dans la liste d''ecriture de ce lot ;
+    facteur_reduction_demande_structurelle (ci-dessous), lu par generator/prises_en_charge.py,
+    resserre proportionnellement ce taux structurel avant l''injection, qui fournit ensuite
+    exactement le complement necessaire pour atteindre 3 % au total. generator/defauts.py retire la
+    prise en charge de factures actuellement accordees (etat O) chez des patients couverts, et remet
+    part_organisme a 0 et part_patient au montant total de la facture retiree, pour que les deux
+    colonnes restent coherentes entre elles apres retrait. Si ce taux etait faux, le nombre de
+    factures que le bloc de quarantaine doit rapprocher d''une prise en charge manquante serait faux,
+    sans effet sur les factures des patients non couverts.'
+- nom: facteur_reduction_demande_structurelle
+  valeur: 0.02
+  unite: multiplicateur applique a la part structurelle de factures sans demande de prise en charge, par type d'episode
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Ce que le mecanisme exige, en reconciliation avec taux_demande_par_type_episode (existant,
+    generator/config/prises_en_charge.yml, hors liste d''ecriture de ce lot) : generator/prises_en_charge.py
+    multiplie la part structurelle de non-demande (1 - taux_demande_par_type_episode[type]) par ce
+    facteur avant de tirer, ramenant proportionnellement chaque type sous la cible du cadrage
+    (0,1 % pour HOS, 0,3 % pour CE, 1 % pour UR, contre 5 %/15 %/50 % avant) sans effacer la
+    hierarchie deja modelisee entre types d''episode. Pose a 0,02 par mesure : ce facteur ramene la
+    part structurelle totale bien en-deca de 3 %, laissant a generator/defauts.py la plus grande part
+    du taux cible a fournir, de facon tracee. Si ce facteur etait faux, la part de factures sans PEC
+    imputable au mecanisme structurel plutot qu''a l''injection tracee serait faussee, sans effet sur
+    le taux final observe (fixe par taux_factures_sans_pec) ni sur les patients non couverts.'
