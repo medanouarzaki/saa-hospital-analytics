@@ -91,6 +91,7 @@ jobs:
               tests/test_aucune_image.py
               tests/test_calendrier.py
               tests/test_coherence_inter_tables.py
+              tests/test_controles.py
               tests/test_parcours.py
               tests/test_patients.py
               tests/test_relations.py
