@@ -20,13 +20,33 @@ jobs:
 
       - run: uv run sqlfluff lint --dialect postgres .
 
-      - run: uv run pytest tests/test_aucune_image.py -v
+      - run: |
+          uv run python3 -c '
+          import pathlib
+          import re
+          import subprocess
 
-      - run: uv run pytest tests/test_sources.py -v -s
+          fichiers = [p for p in pathlib.Path("tests").glob("*.py") if p.name != "test_provenance.py"]
+          n_independant = sum(
+              len(re.findall(r"(?m)^def test_", p.read_text(encoding="utf-8"))) for p in fichiers
+          )
 
-      - run: uv run pytest tests/test_relations.py -v
+          resultat = subprocess.run(
+              ["uv", "run", "pytest", "tests/", "--ignore=tests/test_provenance.py", "--collect-only", "-q"],
+              capture_output=True,
+              text=True,
+              check=True,
+          )
+          n_collecte = int(re.search(r"(\d+) tests? collected", resultat.stdout).group(1))
 
-      - run: uv run pytest tests/test_aucune_trace_processus.py -v
+          assert n_independant == n_collecte, (
+              f"collecte pytest ({n_collecte}) != fonctions test_ comptees independamment "
+              f"({n_independant}) : un fichier de test est probablement mal nomme"
+          )
+          print(f"controle de collecte : {n_collecte} tests, en accord avec le compte independant")
+          '
+
+      - run: uv run pytest tests/ --ignore=tests/test_provenance.py -v -s
 
   provenance:
     runs-on: ubuntu-latest

@@ -1,0 +1,218 @@
+parametres:
+- nom: nomenclature_sexe
+  valeur:
+  - code: M
+    libelle: Masculin
+  - code: F
+    libelle: Féminin
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune valeur n'est observée pour cette colonne au relevé de champs (seul le libellé « Sexe »
+    y figure). Convention binaire standard retenue. Si un troisième code existait dans le système en place,
+    les patients qui le portent seraient rejetés au chargement plutôt que mal classés, la mise en forme
+    du bloc d'écriture ne validant aucune valeur.
+- nom: nomenclature_type_piece_identite
+  valeur:
+  - code: C
+    libelle: C.I.N
+  - code: P
+    libelle: Passeport
+  - code: S
+    libelle: Carte de séjour
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: REL-PAT.D09
+  note: Le couple C / C.I.N est relevé à l'écran (REL-PAT.D09) ; les deux autres codes sont posés par
+    convention, aucune valeur observée ne les porte. Si l'un des deux codes posés était faux, seule la
+    vraisemblance du tableau de bord serait affectée pour les patients concernés, sans effet sur aucun
+    total.
+- nom: nomenclature_etat_civil
+  valeur:
+  - code: C
+    libelle: CÉLIBATAIRE
+  - code: M
+    libelle: MARIÉ(E)
+  - code: D
+    libelle: DIVORCÉ(E)
+  - code: V
+    libelle: VEUF(VE)
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: REL-PAT.D11
+  note: 'Le couple C / CÉLIBATAIRE est relevé à l''écran (REL-PAT.D11) ; les trois autres codes sont posés
+    par convention. Effet d''une valeur fausse : vraisemblance du tableau de bord seulement, sans effet
+    sur aucun total.'
+- nom: nomenclature_type_patient
+  valeur:
+  - code: AS
+    libelle: Assuré
+  - code: AY
+    libelle: Ayant droit
+  - code: PY
+    libelle: Payant
+  - code: IN
+    libelle: Indigent
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune valeur n'est observée pour cette colonne. Catégories posées par convention, plausibles
+    dans le contexte de la couverture maladie marocaine (assuré, ayant droit, payant direct, indigent).
+    Si cette liste était fausse, la répartition des patients par statut de couverture affichée au tableau
+    de bord serait invraisemblable, sans effet sur aucun total.
+- nom: nomenclature_type_domicile
+  valeur:
+  - code: U
+    libelle: Urbain
+  - code: R
+    libelle: Rural
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune valeur n'est observée pour cette colonne. Convention binaire usuelle retenue.
+- nom: nomenclature_environnement
+  valeur:
+  - code: U
+    libelle: Urbain
+  - code: R
+    libelle: Rural
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune valeur n'est observée pour cette colonne, distincte de type_domicile au registre mais de
+    même nature apparente. Convention binaire usuelle retenue par défaut de mieux.
+- nom: nomenclature_region
+  valeur:
+  - code: FM
+    libelle: Fès-Meknès
+  - code: TT
+    libelle: Tanger-Tétouan-Al Hoceïma
+  - code: CS
+    libelle: Casablanca-Settat
+  - code: RS
+    libelle: Rabat-Salé-Kénitra
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: S-05
+  note: S-05 établit l'existence de la région Fès-Meknès pour l'établissement, mais ne fournit pas de
+    liste des régions du royaume. Les trois autres codes sont posés par convention, à titre de régions
+    d'origine plausibles pour des patients extérieurs à la région d'implantation. Si cette liste était
+    fausse ou incomplète, des patients d'une région non listée seraient rejetés au chargement, sans effet
+    sur aucun total mesuré ailleurs.
+- nom: nomenclature_province
+  valeur:
+  - code: MEK
+    libelle: Meknès
+  - code: FES
+    libelle: Fès
+  - code: ELH
+    libelle: El Hajeb
+  - code: IFR
+    libelle: Ifrane
+  - code: KHE
+    libelle: Khénifra
+  - code: SEF
+    libelle: Séfrou
+  - code: CAS
+    libelle: Casablanca
+  - code: RAB
+    libelle: Rabat
+  - code: TNG
+    libelle: Tanger-Asilah
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: S-05
+  note: S-05 établit l'existence de la préfecture de Meknès, siège de l'établissement, mais ne fournit
+    pas la liste complète des préfectures et provinces de la région. Les six premiers codes sont posés
+    par convention parmi les préfectures et provinces de la région Fès-Meknès. CAS, RAB et TNG s'y
+    ajoutent comme chef-lieu de rattachement pour les patients dont la région de résidence
+    (nomenclature_region) est Casablanca-Settat, Rabat-Salé-Kénitra ou Tanger-Tétouan-Al Hoceïma ; sans
+    eux, aucune province ne pouvait s'accorder avec une région extérieure à Fès-Meknès. Si ces trois
+    codes étaient faux, la province affichée pour les patients hors région d'implantation serait
+    imprécise (un seul chef-lieu représentant toute la région), sans effet sur aucun total.
+- nom: nomenclature_ville
+  valeur:
+  - code: MEK
+    libelle: Meknès
+  - code: FES
+    libelle: Fès
+  - code: ELH
+    libelle: El Hajeb
+  - code: IFR
+    libelle: Ifrane
+  - code: KHE
+    libelle: Khénifra
+  - code: CAS
+    libelle: Casablanca
+  - code: RAB
+    libelle: Rabat
+  - code: TNG
+    libelle: Tanger
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune source enregistrée ne fournit de liste de villes. Les cinq premiers codes sont posés par
+    convention, villes plausibles de la région d'implantation de l'établissement. CAS, RAB et TNG s'y
+    ajoutent, même justification que pour nomenclature_province, pour donner une ville cohérente aux
+    patients des régions Casablanca-Settat, Rabat-Salé-Kénitra et Tanger-Tétouan-Al Hoceïma. Si cette
+    liste était fausse ou incomplète, des patients d'une ville non listée seraient rejetés au chargement,
+    sans effet sur aucun total mesuré ailleurs.
+- nom: nomenclature_pays
+  valeur:
+  - code: '504'
+    libelle: MAROC
+  - code: '250'
+    libelle: FRANCE
+  - code: '012'
+    libelle: ALGÉRIE
+  - code: '788'
+    libelle: TUNISIE
+  - code: '724'
+    libelle: ESPAGNE
+  - code: '478'
+    libelle: MAURITANIE
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: REL-PAT.H07
+  note: 'Le couple 504 / MAROC est relevé à l''écran à deux reprises, comme nationalité (REL-PAT.H07)
+    et comme pays de naissance (REL-PAT.N05) : la même nomenclature dessert les deux colonnes. Les codes
+    suivent la numérotation ISO 3166-1 numérique, dont 504 est le code réel du Maroc. Les cinq autres
+    pays sont posés par convention. Le code 012 (Algérie) illustre le zéro de tête que la colonne, écrite
+    en texte, préserve.'
+- nom: nomenclature_compagnie_assurance
+  valeur:
+  - code: '00116'
+    libelle: CNSS PIPC
+  - code: '00042'
+    libelle: SAHAM ASSURANCE
+  - code: 00089
+    libelle: RMA
+  - code: SANS
+    libelle: Sans assurance
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: REL-PAT.A01
+  note: 'Le couple 00116 / CNSS PIPC est relevé à l''écran (REL-PAT.A01), zéros de tête compris : c''est
+    la preuve directe que ces codes doivent être du texte. Les trois autres codes sont posés par convention.
+    Si cette liste était fausse, la répartition des patients par compagnie affichée au tableau de bord
+    serait invraisemblable, sans effet sur aucun total.'
+- nom: nomenclature_organisme_regime
+  valeur:
+  - code: CNOPS
+    libelle: CNOPS
+  - code: CNSS
+    libelle: CNSS
+  - code: TADAMON
+    libelle: AMO-Tadamon
+  - code: TNS
+    libelle: AMO-TNS
+  - code: ACHAMIL
+    libelle: AMO-Achamil
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: S-15
+  note: 'S-15 nomme les régimes AMO-Tadamon, AMO-TNS et AMO-Achamil ; S-31 nomme la CNOPS et la CNSS comme
+    organismes gestionnaires distincts sur toute la période générée. Aucune source ne fournit de code
+    abrégé formel pour ces régimes : les codes eux-mêmes sont posés, les libellés reprennent les noms
+    des sources. Si un régime était mal codé, le taux de couverture par régime affiché serait faussé sans
+    effet sur les totaux agrégés.'

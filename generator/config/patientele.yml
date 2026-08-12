@@ -1,0 +1,93 @@
+parametres:
+  - nom: effectif_file_preexistante
+    valeur: 500
+    unite: patients
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Effectif de patients déjà connus de l'établissement au premier jour de la période,
+      posé sans source externe. Si cette valeur était fausse, la population totale et le
+      nombre de patients à un seul épisode en seraient décalés d'autant, sans effet sur
+      le nombre d'épisodes produits, qui reste piloté par les volumes mesurés.
+
+  - nom: anciennete_maximale_file_preexistante_jours
+    valeur: 3650
+    unite: jours
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Ancienneté maximale des fiches de la file préexistante, posée à dix ans faute de
+      source. Toutes les dates de création de la file préexistante sont antérieures au
+      début de la période, sans dépasser cette ancienneté. Si cette valeur était fausse,
+      seule l'étalement des dates de création les plus anciennes en serait affecté, sans
+      effet sur le nombre d'épisodes ni sur la part de patients connus.
+
+  - nom: regime_extraction
+    valeur:
+      premiere_extraction: complete
+      extractions_suivantes: delta
+    unite: régime d'extraction
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      La première extraction de la période porte l'intégralité de la file préexistante
+      (extraction complète) ; les suivantes ne portent que les fiches créées ou modifiées
+      dans la journée (delta). Ce régime est ce qui rend la table des patients
+      référentiellement complète pour les épisodes de la période : sans l'extraction
+      complète initiale, des épisodes attribués à des patients de la file préexistante
+      pointeraient vers des patients jamais extraits. Posé comme paramètre explicite
+      plutôt que comme propriété implicite du code, pour qu'un changement de régime ne
+      passe pas inaperçu.
+
+  - nom: part_patients_connus
+    valeur: 0.4
+    unite: proportion
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Part des épisodes de la période attribués à un patient déjà connu (file
+      préexistante ou déjà créé pendant la période) plutôt qu'à un patient nouveau. Posée
+      faute de source, cette part est un paramètre d'entrée du tirage, alors que
+      l'effectif final de la file active en découle : ce dernier n'est pas fixé
+      directement, c'est une grandeur mesurée en sortie, pas une entrée déclarée. Si
+      cette part était fausse, la taille de la population totale de patients produite
+      serait décalée dans le sens opposé, sans effet sur le nombre d'épisodes.
+
+  - nom: loi_decroissance_retour
+    valeur:
+      forme: exponentielle
+      echelle_jours: 180
+    unite: loi de décroissance et échelle
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Un patient déjà connu revient d'autant plus volontiers que son dernier épisode est
+      récent : le poids de retour décroît exponentiellement avec le nombre de jours
+      écoulés depuis son dernier épisode, à l'échelle de 180 jours (un patient vu il y a
+      180 jours pèse un facteur e⁻¹ face à un patient vu le jour même). Forme et échelle
+      posées faute de source. Si cette échelle était fausse, la répartition du nombre
+      d'épisodes par patient serait plus ou moins concentrée sur les patients récents,
+      sans effet sur le nombre total d'épisodes ni sur la part de patients connus, qui
+      restent fixés par ailleurs.
+
+  - nom: domaines_email
+    valeur:
+      - gmail.com
+      - yahoo.fr
+      - hotmail.com
+      - outlook.com
+      - menara.ma
+    unite: liste de fournisseurs de messagerie
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Avant ce lot, l'adresse portait un préfixe fixe suivi du rang de la fiche
+      (patient{rang}@exemple.ma) : une valeur séquentielle, le symptôme même que le lot de
+      vraisemblance avait éliminé sur les autres colonnes de texte libre. L'adresse est
+      désormais construite depuis le prénom et le premier nom de famille de la fiche, suivis
+      d'un domaine tiré uniformément dans cette liste ; les collisions entre deux fiches
+      partageant prénom, nom et domaine sont possibles et ne sont pas évitées, comme pour
+      toute adresse réelle. Quatre fournisseurs génériques usuels et un fournisseur
+      marocain historique (Menara, Maroc Telecom), posés sans source. Si cette liste était
+      fausse ou trop courte, seule la vraisemblance des domaines affichés serait affectée,
+      sans effet sur le taux de renseignement de la colonne ni sur aucun total.

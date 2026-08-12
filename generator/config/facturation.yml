@@ -1,0 +1,212 @@
+parametres:
+- nom: taux_facturation
+  valeur:
+    HOS: 0.85
+    CE: 0.8
+    UR: 0.4
+  unite: proportion d'épisodes donnant lieu à une facture, par code de nomenclature_type_episode
+  provenance: HYP
+  preuve: S-20
+  note: 'Nom imposé par la relation R-20 du registre des relations injectées, qui porte
+    deux paramètres séparés par une virgule (taux_facturation, taux_recouvrement) ; seul le
+    premier relève de ce lot, le second (taux_recouvrement) de la table des créances, non
+    écrite ici. R-20 affirme explicitement que ce taux diffère par type d''épisode - un
+    paramètre scalaire unique ne pouvait porter cette différence ; la forme (correspondance
+    type d''épisode vers taux) ne change pas ici, seules les valeurs et la provenance
+    changent. Le document de cadrage fixe ces trois taux (séjours 85 %, consultations
+    externes 80 %, urgences 40 %), en restant HYP mais désormais avec S-20 en borne basse
+    documentée pour les urgences : le rapport de la Cour des comptes mesure 3 477
+    consultations payées sur 160 659 passages aux urgences en 2016 (2,16 %), très inférieur
+    aux 40 % retenus - le cadrage impute cet écart à la généralisation de l''AMO depuis
+    2016, un ajustement déclaré et non mesuré (l''étude S-20 elle-même porte sur un exercice
+    antérieur à cette généralisation). Un type d''épisode absent de cette correspondance
+    fait échouer le chargement (accès direct par clé, aucune valeur par défaut) plutôt que
+    de recevoir un taux non posé. Si l''un de ces taux était faux, le nombre de factures et
+    de lignes de la catégorie concernée serait faussé, sans effet sur les autres catégories
+    ni sur la répartition des lignes entre actes.'
+
+- nom: types_episode_facturables
+  valeur:
+  - HOS
+  - CE
+  - UR
+  unite: liste de codes de nomenclature_type_episode
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Les urgences (UR) sont retenues depuis ce lot, désormais que la nomenclature des
+    actes porte un acte de consultation propre aux urgences (CONS-UR). Un passage aux
+    urgences orienté vers l'hospitalisation (orientation_sortie égale à HO) est exclu de ce
+    type facturable - la prestation qu'il déclenche est déjà portée par le séjour
+    d'hospitalisation qui en résulte, et le facturer une seconde fois doublerait la même
+    prise en charge (mesuré avant d'écrire, voir le rapport - 842 passages sur 27360 sur
+    une exécution de référence). Si l'un des trois types retenus était faux, le nombre de
+    factures de ce type serait nul plutôt que produit, un défaut immédiatement visible.
+
+- nom: part_episodes_imagerie
+  valeur: 0.08
+  unite: proportion des épisodes facturés (hospitalisation ou consultation) donnant lieu à au
+    moins un acte d'imagerie
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucun volume d'imagerie n'est mesuré par la source (contrairement au laboratoire) ;
+    posé sans source, minoritaire (l'imagerie n'est pas systématique). Si ce taux était faux,
+    le nombre de lignes d'imagerie serait faussé, sans effet sur les lignes de consultation,
+    de journée ou de laboratoire.
+
+- nom: loi_nombre_actes_imagerie_par_episode
+  valeur:
+    '1': 0.75
+    '2': 0.2
+    '3': 0.05
+  unite: proportion par nombre d'actes d'imagerie, conditionnelle à un épisode retenu par
+    part_episodes_imagerie
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Posée sans source, décroissante (un seul acte d'imagerie domine). Si cette loi était
+    fausse, le nombre de lignes d'imagerie par épisode concerné serait faussé, sans effet sur
+    la part d'épisodes concernés elle-même.
+
+- nom: poids_relatif_prelevement_jour_hospitalisation
+  valeur: 1.0
+  unite: poids par jour de séjour facturé, dans le tirage sans remise des créneaux de
+    prélèvement
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Avec poids_relatif_prelevement_episode_consultation (même valeur par défaut), fixe la
+    proportion des prélèvements de laboratoire entre types d'épisode. Un créneau existe par
+    jour de séjour facturé (poids poids_relatif_prelevement_jour_hospitalisation chacun) et un
+    par épisode de consultation (poids poids_relatif_prelevement_episode_consultation) ; à
+    poids égal par créneau, un séjour de six jours offre mécaniquement six créneaux contre un
+    seul pour une consultation, ce qui répond à la consigne sans confondre volume de créneaux
+    disponibles et proportion fixée par type. Si ce poids était faux relativement à l'autre, la
+    part des prélèvements issus de l'hospitalisation plutôt que de la consultation serait
+    faussée, sans effet sur le nombre total d'examens ni sur le ratio examens par prélèvement.
+
+- nom: poids_relatif_prelevement_episode_consultation
+  valeur: 1.0
+  unite: poids par épisode de consultation facturé, dans le tirage sans remise des créneaux de
+    prélèvement
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Voir la note de poids_relatif_prelevement_jour_hospitalisation, qui porte l'explication
+    commune aux deux poids.
+
+- nom: loi_nombre_examens_par_prelevement
+  valeur:
+    '3': 0.15
+    '4': 0.2
+    '5': 0.25
+    '6': 0.2
+    '7': 0.15
+    '8': 0.05
+  unite: proportion par nombre d'examens groupés sous un même prélèvement (même facture, même
+    date d'acte)
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Nom du paramètre libre, mais sa moyenne est contrainte par ratio_examens_par_prelevement
+    (nom imposé par la relation R-19, 5,15, voir generator/config/volumetrie.yml) - construction
+    exacte, 3×0,15 + 4×0,2 + 5×0,25 + 6×0,2 + 7×0,15 + 8×0,05 = 5,15, vérifiée par le test
+    correspondant plutôt que posée indépendamment. Si la forme de cette loi était fausse tout en
+    conservant sa moyenne, la dispersion du nombre d'examens par prélèvement serait faussée,
+    sans effet sur le ratio moyen mesuré ni sur le nombre total d'examens.
+
+- nom: repartition_categories_examens_laboratoire
+  valeur:
+    immuno_serologie: 0.13843
+    hematologie_transfusion: 0.26629
+    chimie_biologie: 0.59528
+  unite: proportion par catégorie d'examens de laboratoire mesurée non nulle
+  provenance: DOC
+  preuve: S-30
+  note: 'Parts calculées directement depuis les volumes annuels mesurés de chaque catégorie
+    (generator/config/volumetrie.yml) rapportés à leur somme (6866 + 13206 + 29525 = 49597) :
+    0,13843 ; 0,26629 ; 0,59528. Pas posées : dérivées d''une mesure. Le nombre total d''examens
+    à répartir entre ces trois catégories est lui-même dérivé de la somme des volumes annuels de
+    chaque catégorie proratisés indépendamment sur la période, jamais du volume total proratisé
+    séparément (les deux diffèrent d''une unité par arrondi indépendant, mesuré avant d''écrire
+    ce fichier, voir le rapport) : c''est la somme des catégories qui gouverne, cette
+    répartition n''en étant qu''une reformulation en proportions. Si ces parts étaient fausses,
+    la répartition des lignes de laboratoire entre catégories serait faussée, sans effet sur le
+    nombre total d''examens.'
+
+- nom: loi_quantite_ligne_laboratoire
+  valeur:
+    '1': 0.95
+    '2': 0.05
+  unite: proportion par quantité, lignes de laboratoire uniquement
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Le registre déclare la colonne quantite hypothétique et sa note précise l''effet d''une
+    valeur fausse : "les montants resteraient exacts et seul le dénombrement des actes par ligne
+    serait affecté" (docs/champs/registre_champs.yml, source.lignes_facture.quantite). Appliquée
+    ici aux seules lignes de laboratoire (un même examen répété le même jour sur le même
+    prélèvement, rare) : les lignes de consultation, de journée et d''imagerie portent une
+    quantité fixée à 1, un acte de ce type n''ayant pas vocation à se répéter plusieurs fois sur
+    une même ligne dans ce générateur. Si cette loi était fausse, le nombre de lignes de
+    laboratoire pour un compte d''examens donné serait faussé, sans effet sur le compte
+    d''examens lui-même ni sur les montants.'
+
+- nom: repartition_types_facture
+  valeur:
+    PUB: 0.7
+    PRIV: 0.2
+    MUT: 0.1
+  unite: proportion par code de nomenclature_type_facture
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune source ne quantifie la répartition entre les trois types déjà documentés (S-09).
+    Les entités publiques dominent, plausible pour un hôpital public marocain. Posée sans
+    source. Si cette répartition était fausse, la composition par type affichée serait faussée,
+    sans effet sur le nombre total de factures.
+
+- nom: repartition_etats_facture
+  valeur:
+    FAC: 0.85
+    EA: 0.1
+    AU: 0.05
+  unite: proportion par code de nomenclature_etat_facture
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune source ne quantifie la répartition entre les trois états déjà documentés (S-09).
+    L'état facturé domine largement, plausible pour des factures déjà émises. Posée sans
+    source. Si cette répartition était fausse, la composition par état affichée serait faussée,
+    sans effet sur le nombre total de factures.
+
+- nom: delai_jours_emission_facture
+  valeur:
+    '0': 0.3
+    '1': 0.3
+    '2': 0.2
+    '3': 0.1
+    '4': 0.1
+  unite: proportion par nombre de jours entre le dernier acte de l'épisode et l'émission de la
+    facture
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune source ne documente ce délai. Posé sans source, majoritairement court (émission
+    le jour même ou le lendemain du dernier acte). Si ce délai était faux, la date de facture
+    affichée serait faussée, sans effet sur la date d'acte elle-même ni sur les montants.
+
+- nom: comptes_utilisateurs_facturation
+  valeur:
+  - ADM-ACC01
+  - ADM-ACC02
+  - AGT-GUI01
+  - INF-BUR01
+  - INF-BUR02
+  unite: liste de comptes utilisateurs
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Même ensemble de comptes que comptes_utilisateurs_rdv (generator/config/rendez_vous.yml),
+    comptes_utilisateurs_passages (generator/config/passages.yml) et
+    comptes_utilisateurs_systeme (generator/config/demographie.yml), pour cree_par. Répété ici
+    plutôt que référencé pour que ce fichier reste lisible indépendamment ; les listes doivent
+    rester synchronisées si l'une est modifiée.
+
+- nom: gabarit_identifiant_facture
+  valeur: FAC-{rang:07d}
+  unite: gabarit de formatage
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Même convention que les autres identifiants générés par ce générateur (SEJ, MVT),
+    numérotation séquentielle sur sept chiffres.

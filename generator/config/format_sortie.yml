@@ -1,0 +1,124 @@
+parametres:
+  - nom: format_horodatage
+    valeur: "%m/%d/%Y %I:%M:%S %p"
+    unite: gabarit strftime
+    provenance: HYP
+    preuve: REL-RDV.R08
+    note: >-
+      L'ordre mois/jour/année, la présence des secondes et le suffixe de
+      demi-journée " AM" (espace précédent) sont déterminés par les deux
+      horodatages relevés REL-RDV.R08 et REL-RDV.C02, qui portent la même
+      date 07/28/2026 (28 exclut toute lecture jour/mois) et des secondes
+      distinctes (:07 et :06). Le remplissage par zéro de l'heure et la
+      graphie exacte du suffixe "PM" ne sont pas déterminés : les deux
+      échantillons portent tous deux l'heure 10, déjà sur deux chiffres, et
+      aucun n'est en après-midi. Retenus par convention (comportement par
+      défaut de %I en Python, "PM" majuscule symétrique à "AM"). Si ce
+      remplissage était faux, la couche intermédiaire devrait reconnaître un
+      format alternatif, sans effet sur aucun total.
+
+  - nom: format_date
+    valeur: "%m/%d/%Y"
+    unite: gabarit strftime
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Aucune valeur d'un champ à type_apparent: date n'est observée dans le
+      relevé. Le format retenu reprend par convention le même ordre
+      mois/jour/année que l'horodatage observé, sans confirmation
+      indépendante. Si cet ordre était faux pour les colonnes de type date,
+      la couche intermédiaire devrait reparser un format différent, sans
+      effet sur aucun total.
+
+  - nom: separateur_decimal
+    valeur: "."
+    unite: caractère
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Aucune valeur décimale n'est observée dans le relevé. Le point est
+      retenu par convention. Si ce séparateur était faux, la couche
+      intermédiaire devrait reconnaître une virgule, sans effet sur aucun
+      total si elle est programmée en conséquence.
+
+  - nom: nombre_decimales
+    valeur: 2
+    unite: décimales
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Nombre de décimales retenu pour les colonnes de type_metier decimal
+      (montants, taux), non observé, par convention monétaire usuelle. Si
+      cette valeur était fausse, une précision serait tronquée ou étendue
+      sans effet sur aucun total tant que la couche intermédiaire reparse le
+      même nombre de décimales.
+
+  - nom: representation_booleen
+    valeur:
+      vrai: "1"
+      faux: "0"
+    unite: paire de chaînes
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Aucun champ booléen n'a de valeur observée dans le relevé. "1"/"0" est
+      retenu par convention plutôt que "true"/"false" ou "oui"/"non", en
+      cohérence avec le principe que toute valeur écrite est du texte. Si
+      cette représentation était fausse, la couche intermédiaire devrait
+      reconnaître une autre paire, sans effet sur aucun total.
+
+  - nom: valeur_manquante
+    valeur: ""
+    unite: chaîne
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Représentation d'une valeur manquante par une chaîne vide, convention
+      CSV usuelle, non observée directement. Si une autre convention était
+      attendue, la couche intermédiaire devrait distinguer une chaîne vide
+      légitime d'une valeur manquante, sans effet sur aucun total.
+
+  - nom: fin_de_ligne
+    valeur: "\n"
+    unite: caractère
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Choix technique du générateur, indépendant du système source : saut de
+      ligne Unix (LF) plutôt que Windows (CRLF), retenu pour la portabilité
+      et condition du déterminisme octet à octet des sorties produites à
+      graine identique.
+
+  - nom: encodage
+    valeur: utf-8
+    unite: encodage
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Choix technique du générateur : UTF-8, nécessaire pour les caractères
+      accentués du français présents dans plusieurs colonnes de texte.
+
+  - nom: politique_guillemets_csv
+    valeur: minimal
+    unite: politique de guillemets
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Politique de guillemets CSV retenue : guillemets seulement quand le
+      champ contient le séparateur, un guillemet ou une fin de ligne
+      (équivalent de csv.QUOTE_MINIMAL). Choix technique du générateur, non
+      observé.
+
+  - nom: gabarit_arborescence
+    valeur: "{scenario}/{table}/{date_extraction}"
+    unite: gabarit de chemin
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Gabarit interprété par le module d'écriture, jamais concaténé
+      ailleurs dans le code. {scenario} est dérivé du nombre de passages aux
+      urgences par jour retenu dans la configuration temporelle, pas écrit
+      en dur ; {table} est le nom de table du registre des champs ;
+      {date_extraction} est la date d'extraction de la partition. Si ce
+      gabarit changeait, seule l'organisation des fichiers sur disque en
+      serait affectée, sans effet sur leur contenu.

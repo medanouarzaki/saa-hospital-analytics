@@ -1,0 +1,52 @@
+parametres:
+  - nom: correspondance_volume_flux
+    valeur:
+      admissions_annuelles: programme
+      consultations_specialisees_externes: programme
+      prelevements_laboratoire: programme
+      examens_laboratoire_total: programme
+      examens_bacteriologie: programme
+      examens_parasitologie: programme
+      examens_hygiene_alimentaire: programme
+      examens_immuno_serologie: programme
+      examens_hematologie_transfusion: programme
+      examens_chimie_biologie: programme
+      interventions_chirurgicales: programme
+      passages_urgences_par_jour: urgences
+    unite: correspondance nom de volume vers flux
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Rattachement posé, aucune source enregistrée ne l'établit. Les onze volumes annuels
+      mesurés (admissions, consultations spécialisées, prélèvements et examens de
+      laboratoire, interventions chirurgicales) relèvent tous de l'activité programmée :
+      aucun d'eux n'est mesuré séparément pour un flux d'urgences. Seul
+      passages_urgences_par_jour suit le flux urgences, par construction de son nom et de
+      sa note au fichier des volumes. Si l'un de ces rattachements était faux, la
+      modulation temporelle appliquée au volume concerné serait celle d'un autre flux
+      (profil horaire, hebdomadaire et effet Ramadan différents), sans changer le total
+      annuel produit.
+
+  - nom: nature_conversion_volume
+    valeur:
+      admissions_annuelles: volume_annuel
+      consultations_specialisees_externes: volume_annuel
+      prelevements_laboratoire: volume_annuel
+      examens_laboratoire_total: volume_annuel
+      examens_bacteriologie: volume_annuel
+      examens_parasitologie: volume_annuel
+      examens_hygiene_alimentaire: volume_annuel
+      examens_immuno_serologie: volume_annuel
+      examens_hematologie_transfusion: volume_annuel
+      examens_chimie_biologie: volume_annuel
+      interventions_chirurgicales: volume_annuel
+      passages_urgences_par_jour: taux_journalier
+    unite: correspondance nom de volume vers nature de conversion
+    provenance: OBS
+    preuve: generator/config/volumetrie.yml
+    note: >-
+      Nature lue directement de l'unité portée par chaque paramètre au fichier des
+      volumes : « ... par an » pour un volume annuel à conserver par année civile,
+      « ... par jour » pour un taux journalier à multiplier par le nombre de jours.
+      Appliquer la mauvaise nature à un volume produirait un facteur d'environ trois cent
+      soixante-cinq sur son total.

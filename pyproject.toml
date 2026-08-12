@@ -34,3 +34,6 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 
 [tool.uv]
 package = false
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

@@ -1,0 +1,274 @@
+parametres:
+- nom: taux_recouvrement
+  valeur:
+    HOS: 0.9
+    CE: 0.85
+    UR: 0.6
+  unite: proportion du montant dû (organisme et patient réunis) effectivement encaissée sur
+    la période, par code de nomenclature_type_episode
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Second nom imposé par la relation R-20 du registre des relations injectées, qui porte
+    deux paramètres (taux_facturation, taux_recouvrement) - le premier relève du lot
+    précédent. R-20 affirme explicitement que ce taux diffère par type d'épisode, une
+    correspondance dès l'écriture de ce paramètre, jamais un scalaire. Aucune source ne
+    mesure ces taux pour cet établissement. Un séjour d'hospitalisation se recouvre le mieux
+    (90 %), le montant en jeu justifiant un suivi administratif serré. Une consultation
+    externe suit (85 %). Un passage aux urgences se recouvre le moins bien (60 %) - la même
+    urgence qui limite déjà le taux de facturation et le taux de demande de prise en charge
+    limite aussi le suivi du recouvrement lui-même. Un type d'épisode absent de cette
+    correspondance fait échouer le chargement plutôt que recevoir un taux par défaut. Si
+    l'un de ces taux était faux, le montant encaissé de la catégorie concernée serait
+    faussé, sans effet sur les autres catégories.
+
+- nom: repartition_modes_reglement
+  valeur:
+    ESP: 0.4
+    CHQ: 0.15
+    VIR: 0.25
+    CB: 0.2
+  unite: proportion par code de nomenclature_mode_reglement
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Voir la note de nomenclature_mode_reglement (generator/config/nomenclatures_recouvrement.yml)
+    - aucune source ne documente les moyens de paiement acceptés au guichet, une répartition
+    fausse ne fausse ni le taux de recouvrement ni l'ancienneté des créances, qui ne
+    dépendent que du montant et de la date. Espèces domine (guichet direct), virement
+    (organisme) suit ; posée sans source.
+
+- nom: correspondance_debiteur_mode_reglement
+  valeur:
+    ESP: PATIENT
+    CHQ: PATIENT
+    CB: PATIENT
+    VIR: ORGANISME
+  unite: correspondance code de nomenclature_mode_reglement vers débiteur
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Le registre ne porte, pour source.encaissements, aucune colonne débiteur distincte
+    (les huit colonnes s''arrêtent à date_extraction) : le débiteur d''un encaissement -
+    l''organisme ou le patient - se déduit donc du mode de
+    règlement plutôt que d''une colonne supplémentaire, qui excéderait le relevé. Le
+    virement, mode de paiement institutionnel, est posé du côté organisme ; les espèces, le
+    chèque et la carte bancaire, réglés au guichet par la personne présente, du côté patient.
+    Si cette correspondance était fausse, la répartition organisme/patient des encaissements
+    serait faussée, sans effet sur le montant total encaissé par facture.'
+
+- nom: part_encaissements_partiels
+  valeur: 0.3
+  unite: proportion des factures partiellement recouvrées donnant lieu à plusieurs
+    encaissements plutôt qu'un seul
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune source ne mesure ce taux. Posé à 30 %, minoritaire - la majorité des factures
+    recouvrées le sont en un seul règlement. Si ce taux était faux, le nombre de lignes
+    d'encaissement par facture serait faussé, sans effet sur le montant total encaissé.
+
+- nom: loi_nombre_versements
+  valeur:
+    '2': 0.7
+    '3': 0.2
+    '4': 0.1
+  unite: proportion par nombre de versements, conditionnelle à une facture retenue par
+    part_encaissements_partiels
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Posée sans source, décroissante (deux versements dominent). Si cette loi était
+    fausse, le nombre de lignes d'encaissement par facture partiellement réglée en plusieurs
+    fois serait faussé, sans effet sur le montant total encaissé.
+
+- nom: montant_minimal_encaissement
+  valeur: 5
+  unite: dirhams, montant minimal d'une ligne d'encaissement issue d'un versement partiel
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune source ne fixe ce seuil. Posé à 5 dirhams - un règlement de quelques centimes
+    n'a pas de sens (mesuré avant d'écrire, un minimum de 0,01 DH observé sur la sortie du
+    lot précédent). Un versement partiel qui tomberait sous ce seuil est absorbé par le
+    versement voisin plutôt que produit tel quel ; la somme des encaissements d'une facture
+    reste inchangée, seul leur nombre de lignes diminue. Ne s'applique pas à un versement
+    unique déjà minoritaire en montant (un dû résiduel réellement inférieur au seuil reste
+    encaissé pour sa valeur exacte, faute de versement voisin avec lequel le fusionner). Si
+    ce seuil était faux, le nombre de lignes d'encaissement serait faussé, sans effet sur le
+    montant total encaissé par facture.
+
+- nom: delai_jours_encaissement_patient
+  valeur:
+    '0': 0.5
+    '1': 0.3
+    '3': 0.15
+    '7': 0.05
+  unite: proportion par nombre de jours entre la date de facture et l'encaissement, part
+    patient
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune source ne documente ce délai. Posé majoritairement court (le jour même ou le
+    lendemain) - un patient présent au guichet règle typiquement au moment de la
+    facturation. Si ce délai était faux, la date d'encaissement affichée serait faussée,
+    sans effet sur le montant.
+
+- nom: delai_jours_encaissement_organisme
+  valeur:
+    '15': 0.2
+    '30': 0.3
+    '45': 0.3
+    '60': 0.2
+  unite: proportion par nombre de jours entre la date de facture et l'encaissement, part
+    organisme
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune source ne documente ce délai. Posé nettement plus long que le délai patient -
+    un organisme payeur traite les factures par lot, sur un cycle administratif de plusieurs
+    semaines. Si ce délai était faux, la date d'encaissement affichée serait faussée, sans
+    effet sur le montant ni sur le délai patient.
+
+- nom: seuil_jours_anciennete_creance
+  valeur: 60
+  unite: jours après la date de facture au-delà desquels un dû non soldé devient une créance
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune source ne mesure ce seuil. Posé à 60 jours, un ordre de grandeur usuel de
+    délai de règlement avant bascule en créance dans un établissement public. Si ce seuil
+    était faux, le nombre de créances et leur ancienneté moyenne seraient faussés, sans
+    effet sur le montant dû lui-même.
+
+- nom: tranches_anciennete_creances
+  valeur:
+  - borne_basse: 0
+    borne_haute: 30
+    libelle: 0-30 jours
+  - borne_basse: 31
+    borne_haute: 90
+    libelle: 31-90 jours
+  - borne_basse: 91
+    borne_haute: 180
+    libelle: 91-180 jours
+  - borne_basse: 181
+    borne_haute: null
+    libelle: plus de 180 jours
+  unite: tranches d'ancienneté employées par l'analyse (bornes en jours depuis la naissance
+    de la créance)
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Tranches posées sans source, dans l'ordre de grandeur usuel d'une page de
+    recouvrement (moins d'un mois, un trimestre, un semestre, au-delà). Si ces tranches
+    étaient fausses, la répartition affichée par tranche serait faussée, sans effet sur le
+    montant total des créances.
+
+- nom: seuil_montant_relance
+  valeur: 200
+  unite: dirhams, montant restant dû en deçà duquel aucune relance n'est engagée
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune source ne mesure ce seuil - le rapport de la Cour des comptes constate au
+    contraire l'absence de diligences de recouvrement dans l'établissement observé (voir la
+    note de n_relance au registre des champs) ; ce paramètre et l'ensemble de la
+    configuration de source.relances posent donc une procédure qui démontre une
+    calculabilité, pas une pratique observée. 200 dirhams, un montant sous lequel une
+    démarche de relance coûterait plus qu'elle ne rapporterait, posé par analogie avec le
+    seuil déjà retenu pour la part organisme ambulatoire (lot antérieur). Si ce seuil était
+    faux, le nombre de relances serait faussé, sans effet sur le montant des créances
+    elles-mêmes.
+
+- nom: loi_nombre_relances_par_creance
+  valeur:
+    '1': 0.5
+    '2': 0.3
+    '3': 0.15
+    '4': 0.05
+  unite: proportion par nombre de relances, conditionnelle à une créance retenue par
+    seuil_montant_relance
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune procédure de relance n'étant observée dans l'établissement (voir
+    seuil_montant_relance), cette loi démontre une calculabilité, non une mesure. Posée
+    décroissante, une seule relance dominant. Si cette loi était fausse, le nombre de
+    relances par créance serait faussé, sans effet sur le taux de recouvrement.
+
+- nom: delai_jours_entre_relances
+  valeur: 15
+  unite: jours entre deux relances successives d'une même créance
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune procédure de relance n'étant observée dans l'établissement (voir
+    seuil_montant_relance), ce délai démontre une calculabilité, non une mesure. Posé à 15
+    jours, un rythme usuel de relance commerciale. Si ce délai était faux, l'espacement des
+    relances affiché serait faussé, sans effet sur leur nombre.
+
+- nom: repartition_canaux_relance
+  valeur:
+    TEL: 0.4
+    SMS: 0.3
+    COUR: 0.2
+    EMAIL: 0.1
+  unite: proportion par code de nomenclature_canal_relance
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Voir la note de nomenclature_canal_relance - aucune procédure de relance n'étant
+    observée, cette répartition démontre une calculabilité, non une mesure. Téléphone et SMS
+    dominent, les plus rapides à engager. Posée sans source.
+
+- nom: repartition_resultats_relance
+  valeur:
+    SANS: 0.5
+    PART: 0.2
+    PAYE: 0.2
+    REFUS: 0.1
+  unite: proportion par code de nomenclature_resultat_relance
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Voir la note de nomenclature_resultat_relance - aucune procédure de relance n'étant
+    observée, cette répartition démontre une calculabilité, non une mesure. Sans effet
+    domine (une relance qui aboutit reste l'exception), payé et paiement partiel se
+    partagent le reste. Posée sans source. Une relance aboutie (PAYE ou PART) déclenche
+    l'encaissement correspondant plutôt que d'être tirée indépendamment de lui (§4 du
+    rapport) - c'est le résultat de la relance qui gouverne l'encaissement, pas l'inverse.
+
+- nom: repartition_motifs_non_recouvrement
+  valeur:
+    SR: 0.6
+    PNI: 0.3
+    EV: 0.1
+  unite: proportion par code de nomenclature_motif_non_recouvrement
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Voir la note de nomenclature_motif_non_recouvrement (S-20, déjà cité par le
+    registre) - le rapport de la Cour des comptes relève des sorties sans règlement, des
+    patients non identifiés et des évasions, sans en donner la proportion relative. Sortie
+    sans règlement posée majoritaire, le cas le plus fréquent pour un établissement public.
+    Posée sans source pour la répartition elle-même.
+
+- nom: comptes_regisseurs
+  valeur:
+  - REG-GUI01
+  - REG-GUI02
+  - REG-CAI01
+  unite: liste de comptes régisseurs
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Le rapport de la Cour des comptes (S-20, déjà cité par le registre pour la colonne
+    regisseur) décrit un paiement direct chez le régisseur sans nommer de comptes
+    individuels. Liste posée par convention, distincte des comptes utilisateurs des autres
+    modules (facturation, rendez-vous, passages), un régisseur relevant d'une fonction
+    propre à l'encaissement.
+
+- nom: gabarit_identifiant_encaissement
+  valeur: ENC-{rang:07d}
+  unite: gabarit de formatage
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Même convention que les autres identifiants générés par ce générateur.
+
+- nom: gabarit_identifiant_creance
+  valeur: CRE-{rang:07d}
+  unite: gabarit de formatage
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Même convention que les autres identifiants générés par ce générateur.
+
+- nom: gabarit_identifiant_relance
+  valeur: REL-{rang:07d}
+  unite: gabarit de formatage
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Même convention que les autres identifiants générés par ce générateur.

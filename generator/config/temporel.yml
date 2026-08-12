@@ -1,0 +1,80 @@
+parametres:
+  - nom: profil_horaire
+    valeur:
+      programme:
+        [
+          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+          0.17, 0.19, 0.16, 0.13, 0.10, 0.07, 0.07, 0.06, 0.05,
+          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        ]
+      urgences:
+        [
+          0.0326, 0.0272, 0.0217, 0.0217, 0.0217, 0.0272, 0.0326, 0.038,
+          0.0489, 0.0543, 0.0598, 0.0598, 0.0543, 0.0489, 0.0489, 0.0489,
+          0.0489, 0.0543, 0.0543, 0.0489, 0.0435, 0.038, 0.0326, 0.033,
+        ]
+      fenetre_pic_programme: [8, 9, 10, 11]
+      fenetre_apres_creux_programme: [15, 16]
+    unite: poids par heure (index 0 = 0h, somme à 1)
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Relation R-04. Flux programme : pic entre 8 et 11 heures, creux après
+      14 heures, nul hors amplitude d'ouverture, tel que relevé au poste.
+      Flux urgences : vingt-quatre valeurs strictement positives, renflement
+      diurne et creux nocturne, retenues faute de source publiée — le
+      service fonctionne en continu depuis la rénovation de l'établissement.
+      Les deux listes somment chacune à 1, vérifié par test.
+
+  - nom: profil_hebdomadaire
+    valeur:
+      programme: [1.20, 1.05, 1.00, 1.00, 0.85, 0.40, 0.00]
+      urgences: [1.00, 1.00, 1.00, 1.00, 1.05, 1.10, 1.05]
+    unite: coefficient par jour (index 0 = lundi ... 6 = dimanche)
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Relation R-05. Flux programme : lundi le plus chargé, samedi réduit,
+      vendredi abaissé pour la prière, dimanche annulé — l'activité
+      programmée ne s'y tient pas. Flux urgences : sept coefficients
+      strictement positifs, le service ne fermant jamais. Le classement des
+      jours est imposé par la relation ; aucune conclusion sur le
+      dimensionnement du guichet ne peut s'en déduire.
+
+  - nom: effet_calendaire
+    valeur:
+      coefficient_ferie_programme: 0.0
+      coefficient_aout_programme: 0.85
+      coefficient_ferie_urgences: 1.0
+      coefficient_aout_urgences: 1.0
+    unite: coefficients multiplicatifs
+    provenance: HYP
+    preuve: S-26
+    note: >-
+      Relation R-07. Le flux programmé est annulé les jours fériés
+      (coefficient nul) et abaissé en août ; le flux urgences n'est modulé
+      par aucun des deux, faute de source permettant de faire autrement.
+      Seules les dates des jours fériés viennent d'une source (S-26) ;
+      l'ampleur de la chute d'activité est posée. Si ces coefficients
+      étaient faux, l'ampleur de la modulation calendaire serait faussée
+      sans qu'aucune conclusion sur les effectifs de garde ne puisse
+      s'appuyer sur cette page du tableau de bord.
+
+  - nom: effet_ramadan
+    valeur:
+      coefficient_programme: 0.75
+      decalage_heures_programme: 1
+      coefficient_urgences: 1.0
+      heure_rupture_jeune: 19
+      duree_report_heures: 2
+      intensite_report_urgences: 1.3
+    unite: coefficients et heures
+    provenance: HYP
+    preuve: S-26
+    note: >-
+      Relation R-06. Seules les dates du Ramadan viennent d'une source
+      (S-26) ; l'ampleur de l'effet est posée. heure_rupture_jeune est une
+      valeur unique là où l'heure réelle varie de plus d'une heure entre le
+      Ramadan de février et celui d'avril ; si cette valeur était fausse,
+      seul le pic vespéral serait décalé dans le temps, sans effet sur aucun
+      total.

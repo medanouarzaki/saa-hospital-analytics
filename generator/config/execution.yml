@@ -1,0 +1,24 @@
+parametres:
+  - nom: graine_aleatoire
+    valeur: 42
+    unite: entier
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Valeur arbitraire, sans effet sur les propriétés statistiques de la
+      sortie produite : elle ne détermine que son identité octet à octet.
+      Deux graines distinctes produisent des tirages différents mais
+      également valides.
+
+  - nom: algorithme_generateur
+    valeur: PCG64
+    unite: nom d'algorithme
+    provenance: HYP
+    preuve: sans_preuve_externe
+    note: >-
+      Reproductibilité garantie pour une version donnée de numpy, elle-même
+      figée par le fichier de verrouillage du projet : c'est ce couple
+      algorithme-version qui rend la reproductibilité opposable, pas la
+      graine seule. Si numpy changeait de version sans que ce paramètre soit
+      revu, la reproductibilité octet à octet cesserait d'être garantie même
+      à graine égale.

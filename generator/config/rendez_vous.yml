@@ -1,0 +1,318 @@
+parametres:
+- nom: correspondance_activite_agenda
+  valeur:
+    '20': MG
+    '21': MI
+    '30': PED
+    '14': GYN
+    '4': CAR
+    '28': OPH
+    '29': ORL
+    '11': DER
+  unite: code de nomenclature_activite vers code de nomenclature_agenda
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Correspondance un-a-un deduite du rapprochement des libelles des deux nomenclatures deja ecrites
+    (Medecine generale/MG, Medecine interne/MI, Pediatrie/PED, Gynecologie-obstetrique/GYN, Cardiologie/CAR,
+    Ophtalmologie/OPH, Oto-rhino-laryngologie/ORL, Dermatologie/DER) : un agenda est le carnet de rendez-vous
+    d''une activite, les deux nomenclatures portent huit entrees chacune avec la meme correspondance implicite
+    de specialites. Aucune des deux nomenclatures ne restructuree, seule une table de correspondance est
+    ajoutee. Si cette correspondance etait fausse, un rendez-vous porterait un agenda d''une autre specialite
+    que son activite, incoherence relevable par un controle croise, sans effet sur aucun total.'
+- nom: repartition_activites_rdv
+  valeur:
+    '20': 0.3
+    '21': 0.1
+    '30': 0.15
+    '14': 0.12
+    '4': 0.1
+    '28': 0.1
+    '29': 0.08
+    '11': 0.05
+  unite: proportion par code de nomenclature_activite
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Repartition des rendez-vous honores entre les huit activites de consultation externe, posee sans
+    source. La medecine generale (30 %) et la pediatrie (15 %) dominent, plausibles pour un hopital provincial.
+    Si cette repartition etait fausse, la composition par specialite affichee au tableau de bord serait
+    invraisemblable, sans effet sur le nombre total de rendez-vous honores, fixe par le nombre d'episodes
+    de consultation.
+- nom: pente_absenteisme_delai
+  valeur: 0.012
+  unite: multiplicateur de probabilite par jour de delai
+  provenance: HYP
+  preuve: ''
+  note: 'Nom impose par la relation R-01 du registre des relations injectees : "L''absentéisme croît avec
+    le délai d''obtention, à l''intérieur d''une même spécialité." Forme retenue : probabilite_absence(delai)
+    = taux_absenteisme_par_specialite[activite] * (1 + pente_absenteisme_delai * delai_jours), plafonnee.
+    A 0,012 par jour, un delai de 30 jours multiplie la probabilite de base par 1,36 ; un delai de 90
+    jours la multiplie par 2,08. Cette forme lineaire est posee, pas mesuree : R-01 ne fixe pas de statut
+    de preuve (source vide dans le registre). Si cette pente etait fausse, le nuage delai/absenteisme
+    de la page Rendez-vous serait plus ou moins marque, potentiellement plat si la pente etait nulle,
+    sans effet sur le nombre total de rendez-vous honores ni sur le taux moyen d''absenteisme par specialite,
+    fixe independamment.'
+- nom: taux_absenteisme_par_specialite
+  valeur:
+    '20': 0.2227
+    '21': 0.1856
+    '30': 0.1485
+    '14': 0.167
+    '4': 0.2041
+    '28': 0.1299
+    '29': 0.167
+    '11': 0.1113
+  unite: proportion par code de nomenclature_activite
+  provenance: DOC
+  preuve: S-24
+  note: 'Nom impose par la relation R-02 du registre des relations injectees. S-24 documente que le niveau
+    d''absenteisme differe par specialite independamment du delai, sans fournir les taux exacts par specialite
+    de cet etablissement. Le document de cadrage fixe deux nouvelles contraintes agregees : un taux global
+    de 18 % et une variance par specialite comprise entre 11 % et 27 %, sans fournir non plus les huit
+    valeurs par specialite. Les valeurs precedentes (posees, 6 % a 12 %, classement plausible medecine
+    generale/cardiologie les plus touchees, dermatologie la moins touchee) sont reprises a l''echelle par
+    un facteur unique (x1,855670), choisi pour reproduire exactement la moyenne ponderee par
+    repartition_activites_rdv du cadrage (18,00 % mesure apres application, voir Etape 5) tout en preservant
+    le classement relatif d''origine : un facteur constant ne peut pas satisfaire simultanement une moyenne
+    et deux bornes independantes (trois contraintes, un seul degre de liberte), le choix retenu privilegie
+    la moyenne, citee au singulier ("dix-huit pour cent global"), sur les bornes, citees comme un intervalle
+    ("comprise entre"). Plage resultante 11,13 % a 22,27 %, a l''interieur de l''intervalle cadre sans en
+    toucher la borne haute -- ecart signale, pas force. Si ces taux etaient faux, le classement des specialites
+    par absenteisme affiche au tableau de bord serait errone, sans effet sur le nombre total de rendez-vous
+    honores.'
+- nom: delai_rdv_par_specialite
+  valeur:
+    '20': 5
+    '21': 21
+    '30': 14
+    '14': 30
+    '4': 30
+    '28': 45
+    '29': 18
+    '11': 25
+  unite: delai median en jours par code de nomenclature_activite (loi log-normale)
+  provenance: DOC
+  preuve: S-20
+  note: 'Nom impose par la relation R-03 du registre des relations injectees. Le document de cadrage donne
+    desormais les medianes exactes de trois des huit activites de cette table par correspondance directe
+    de libelle : medecine generale/centre de diagnostic (code 20, 5 j), pediatrie (code 30, 14 j),
+    gyneco-obstetrique (code 14, 30 j) -- reprises telles quelles, provenance DOC. Les trois autres
+    specialites du cadrage (pneumologie, stomatologie, explorations fonctionnelles) n''ont aucun equivalent
+    dans nomenclature_activite (huit specialites non chirurgicales mesurees, S-30, restriction deja justifiee
+    au lot qui l''a ecrite) et ne sont donc pas appliquees ici -- ecart documente a l''Etape 1, pas une
+    correspondance forcee. Les cinq activites de la nomenclature sans equivalent cadrage (medecine interne
+    21, cardiologie 4, ophtalmologie 28, ORL 29, dermatologie 11) conservent leur valeur posee au lot
+    precedent, ordre de grandeur plausible, non mesuree, HYP dans les faits meme si le nom du parametre
+    reste unique et sa provenance globale DOC pour les trois valeurs desormais sourcees. Une activite absente
+    de cette table doit faire echouer le chargement plutot que de recevoir une valeur par defaut :
+    generator/rendez_vous.py leve une KeyError explicite, sans valeur de repli -- verifie par mutation a
+    l''etape 3, faute de test dedie prealable. Si les trois medianes sourcees etaient fausses, le classement
+    des specialites par delai median affiche au tableau de bord serait errone pour ces trois-la ; si les
+    cinq autres etaient fausses, la consequence est la meme mais relève d''une hypothese non mesuree comme
+    avant ce lot.'
+- nom: ecart_type_log_delai_par_specialite
+  valeur:
+    '20': 1.0
+    '21': 0.5
+    '30': 0.9111
+    '14': 0.7653
+    '4': 0.5
+    '28': 0.5
+    '29': 0.5
+    '11': 0.5
+  unite: ecart-type du logarithme du delai (loi log-normale), par code de nomenclature_activite
+  provenance: DOC
+  preuve: S-20
+  note: 'Remplace ecart_type_log_delai (valeur unique, 0,5, retiree) : le document de cadrage donne
+    desormais, pour les trois specialites a correspondance directe (medecine generale 20, pediatrie 30,
+    gyneco-obstetrique 14), un couple (mediane, 90e centile) plutot qu''une seule mediane. Deux points
+    determinent les deux parametres d''une loi log-normale : mu = ln(mediane), sigma = (ln(p90) - mu) /
+    z90 avec z90 = 1,2815515655446004 (90e centile de la loi normale centree reduite). Calcul, pas pose :
+    code 20 (5 j, 18 j) -> sigma = (ln(18) - ln(5)) / z90 = 1,2810 / 1,28155 = 0,99961, arrondi 1,0 ;
+    code 30 (14 j, 45 j) -> sigma = (ln(45) - ln(14)) / z90 = 1,16760 / 1,28155 = 0,91108, arrondi 0,9111 ;
+    code 14 (30 j, 80 j) -> sigma = (ln(80) - ln(30)) / z90 = 0,98083 / 1,28155 = 0,76535, arrondi 0,7653.
+    Les cinq activites sans equivalent cadrage conservent la valeur unique posee au lot precedent (0,5,
+    HYP dans les faits). Si un ecart-type source etait faux, l''etalement de la distribution des delais de
+    cette specialite serait plus ou moins large, sans effet sur sa mediane ni sur aucun total.'
+- nom: taux_annulation
+  valeur: 0.07
+  unite: proportion
+  provenance: HYP
+  preuve: S-20
+  note: 'Nom impose par la relation R-16 du registre des relations injectees : "Une part fixee des rendez-vous
+    est annulee, distincte de l''absenteisme." S-20 est cite comme source de la relation elle-meme (l''existence
+    d''un phenomene d''annulation distinct de l''absence), pas de sa valeur chiffree pour cet etablissement.
+    Le document de cadrage fixe desormais cette valeur a 7 %, restant neanmoins HYP -- le cadrage lui-meme
+    ne cite aucune source propre a ce chiffre, contrairement aux quatre parametres dont l''Etape 2 impose
+    explicitement le passage a DOC. Si ce taux etait faux, le volume de rendez-vous annules affiche serait
+    faussee, sans effet sur le nombre de rendez-vous honores.'
+- nom: part_rdv_jour_meme
+  valeur: 0.06
+  unite: proportion
+  provenance: HYP
+  preuve: REL-RDV.C02
+  note: 'Nom impose par la relation R-17 du registre des relations injectees, qui fixe explicitement une
+    "part FIXEE" (au singulier, scalaire) des rendez-vous pris jour meme -- la forme du parametre ne change
+    donc pas. Le rendez-vous releve au poste (REL-RDV.C02) atteste d''un ecart d''une seconde entre creation
+    et rendez-vous, preuve que le phenomene existe ; sa frequence dans les donnees, relevee a 6 % par le
+    document de cadrage, remplace la valeur posee precedente (3 %) -- toujours pas mesuree, R-17 le dit
+    lui-meme explicitement. Le cadrage note en outre que le phenomene se concentre sur la medecine generale
+    et le centre de diagnostic : cette concentration n''est pas modelisee separement par specialite, R-17
+    imposant une part unique et non une correspondance ; elle demeure une observation qualitative non
+    matérialisee par ce parametre, comme deja le cas pour la valeur precedente. Si ce taux etait faux, le
+    mode a zero jour de la distribution des delais affichee serait plus ou moins marque, sans effet sur
+    aucun total.'
+- nom: part_patients_adresses
+  valeur: 0.25
+  unite: proportion
+  provenance: HYP
+  preuve: REL-RDV.R03
+  note: 'Nom impose par la relation R-18 du registre des relations injectees. Le code d''origine correspondant
+    (AU, AUTRES HOPITAUX) est deja releve au poste (REL-RDV.R03, nomenclature_origine) : ce parametre
+    fixe seulement la part des rendez-vous qui le portent, pas le code lui-meme. Valeur portee de 15 % a
+    25 % par ce lot, conformement au document de cadrage ; le cadrage ne cite aucune source propre a ce
+    chiffre, la provenance reste HYP. Si ce taux etait faux, la part de patients adresses affichee page
+    Patients serait faussee, sans effet sur aucun total de rendez-vous.'
+- nom: repartition_types_attention
+  valeur:
+    '1': 0.35
+    '2': 0.65
+  unite: proportion par code de nomenclature_type_attention
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'La consultation de suivi (code 2) domine la premiere consultation (code 1), plausible pour une
+    file active dominee par des patients deja connus (mesure du lot de la table des patients : profil_recours_demographique).
+    Pose sans source. Si cette repartition etait fausse, la part de premieres consultations affichee serait
+    faussee, sans effet sur aucun total.'
+- nom: part_liste_attente
+  valeur: 0.04
+  unite: proportion des rendez-vous en instance inscrits en liste d'attente
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Part des rendez-vous encore en instance (au-dela de la fin de periode, sans issue connue) qui
+    figurent en outre sur la liste d'attente des consultations du bloc REL-RDV.L01-L03, plutot que simplement
+    programmes. Pose sans source. Si ce taux etait faux, la taille de la liste d'attente affichee serait
+    faussee, sans effet sur le nombre de rendez-vous en instance lui-meme.
+- nom: duree_minutes
+  valeur: 0
+  unite: minutes
+  provenance: OBS
+  preuve: REL-RDV.R12
+  note: 'La seule valeur observee au poste (REL-RDV.R12) est zero. Ce n''est pas un accident de generation
+    a corriger comme les colonnes dagenerees du lot precedent : c''est l''unique donnee reelle disponible
+    sur cette colonne, et rien n''indique que le systeme en place la renseigne jamais autrement (aucune
+    autre valeur relevee, aucune source documentaire ne decrit une duree calculee). Retenue telle quelle
+    pour toutes les lignes : une valeur inventee non appuyee par la preuve serait moins fidele que la
+    reproduction de l''unique fait observe. Si cette valeur etait fausse, la duree affichee serait invraisemblable,
+    sans effet sur aucun total.'
+- nom: comptes_utilisateurs_rdv
+  valeur:
+  - ADM-ACC01
+  - ADM-ACC02
+  - INF-BUR01
+  - INF-BUR02
+  - AGT-GUI01
+  unite: liste de comptes utilisateurs
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Meme ensemble de comptes que comptes_utilisateurs_systeme (demographie.yml), pour cree_par, modifie_par,
+    confirme_par et annule_par. Repete ici plutot que reference pour que ce fichier reste lisible independamment
+    ; les deux listes doivent rester synchronisees si l'une est modifiee.
+- nom: code_etat_absence
+  valeur: CO
+  unite: code de nomenclature_etat_rendez_vous
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Un rendez-vous non honore reste a l'etat confirme (CO), la nomenclature ne porte
+    aucun code dedie a l'absence. L'absence se deduit, en aval, de l'absence de passage
+    associe a un rendez-vous confirme dont la date est passee, plutot que d'un etat propre
+    a cette table. C'est fidele au fonctionnement d'un carnet de rendez-vous reel observe
+    (bloc Controle de modifications, confirme_par et date_conf distincts d'annule_par et
+    date_annul) ; la reconstitution du taux d'absence a partir de ce rapprochement
+    appartient a la couche intermediaire, pas a ce generateur. Si ce code etait faux, la
+    colonne etat afficherait un code absent de la nomenclature, rejete au chargement, sans
+    effet sur le nombre de rendez-vous par categorie (honore, annule, en instance), fixes
+    independamment de ce code.
+- nom: taux_medecin_adresse
+  valeur: 0.6
+  unite: proportion des rendez-vous d'origine externe
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Part des rendez-vous d'origine externe (AU) qui nomment en outre le medecin
+    adressant (medecin_ext), colonne facultative meme pour un adressage. Pose sans source.
+    Si ce taux etait faux, la part de rendez-vous adresses nommant un medecin serait
+    faussee, sans effet sur le nombre de rendez-vous adresses lui-meme, fixe par
+    part_patients_adresses.
+- nom: taux_service_adresse
+  valeur: 0.4
+  unite: proportion des rendez-vous d'origine externe
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Part des rendez-vous d'origine externe (AU) qui nomment en outre le service
+    d'origine (service_ext), colonne facultative meme pour un adressage. Pose sans source.
+    Si ce taux etait faux, la part de rendez-vous adresses nommant un service serait
+    faussee, sans effet sur le nombre de rendez-vous adresses lui-meme.
+- nom: liste_services_adressants
+  valeur:
+  - Medecine generale
+  - Consultations externes
+  - Urgences
+  - Medecine interne
+  - Pediatrie
+  unite: liste de noms de service libres
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: service_ext est un champ texte libre (aucune nomenclature ne le couvre), tire
+    uniformement dans cette liste posee sans source quand renseigne. Si cette liste etait
+    fausse ou trop courte, la vraisemblance du service affiche serait affectee, sans effet
+    sur aucun total.
+- nom: taux_renseignement_rdv
+  valeur:
+    modifie_par: 0.05
+  unite: proportion de rendez-vous ou la colonne est renseignee
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: modifie_par et date_mod sont facultatifs, comme les colonnes correspondantes de
+    la table des patients (taux_renseignement, demographie.yml). Une valeur absente ici
+    parce que la colonne est facultative et n'a pas ete saisie est une absence
+    structurelle, qui fait partie du jeu de donnees normal, ce n'est pas un defaut
+    injecte. Le decompte de la verite terrain, dans un lot ulterieur, ne doit compter que
+    les defauts reellement injectes, pas ces absences structurelles. Si ce taux etait
+    faux, la part de rendez-vous modifies affichee serait faussee, sans effet sur aucun
+    total.
+- nom: contraintes_coherence_rendez_vous
+  valeur:
+  - colonne_a: origine
+    colonne_b: hopital_cs
+    nature: presence_conditionnee
+    valeur_a_declenchante: AU
+    tolerance: 0.0
+    justification: Une ligne dont l'origine est un adressage externe (AU) nomme toujours
+      un etablissement d'origine (hopital_cs) ; une ligne d'origine spontanee (SP) n'en
+      nomme jamais. Meme mecanisme de configuration que contraintes_coherence
+      (coherence.yml, lot de la table des patients), repris ici sous un nom distinct
+      faute d'ecriture autorisee sur ce fichier dans ce lot ; verifie par un test
+      generique qui lit cette liste sans citer les colonnes en dur.
+  unite: liste de contraintes d'accord intra-ligne pour source.rendez_vous
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Meme schema que contraintes_coherence (generator/config/coherence.yml), nature
+    presence_conditionnee signifie que colonne_b est renseignee si et seulement si
+    colonne_a vaut valeur_a_declenchante. Lu par generator/rendez_vous.py (application) et
+    par tests/test_rendez_vous.py (verification generique).
+- nom: colonnes_toujours_vides_rendez_vous
+  valeur:
+  - colonne: observations
+    justification: Champ libre du bloc Donner rendez-vous (registre des champs,
+      REL-RDV.R07) ; aucune valeur n'est relevee au poste pour cette colonne, et
+      aucune source documentaire ne decrit comment le systeme en place la
+      renseigne. generator/rendez_vous.py ne l'ecrit donc jamais (valeur vide sur
+      toutes les lignes), meme choix que duree_minutes pour les colonnes sans
+      preuve d'une variation reelle. Une colonne entierement vide est sinon un
+      signal d'anomalie de generation ; celle-ci est declaree ici pour que le test
+      qui verifie l'absence de colonne vide non justifiee la distingue d'un defaut.
+  unite: liste de colonnes de source.rendez_vous legitimement vides sur toute la periode
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Lu par tests/test_rendez_vous.py (verification generique de vacuite des
+    colonnes) pour exclure cette liste du controle plutot que de le desactiver
+    globalement.

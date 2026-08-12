@@ -1,0 +1,229 @@
+parametres:
+- nom: nomenclature_activite
+  valeur:
+  - code: '20'
+    libelle: Médecine générale
+  - code: '21'
+    libelle: Médecine interne
+  - code: '30'
+    libelle: Pédiatrie
+  - code: '14'
+    libelle: Gynécologie-obstétrique
+  - code: '4'
+    libelle: Cardiologie
+  - code: '28'
+    libelle: Ophtalmologie
+  - code: '29'
+    libelle: Oto-rhino-laryngologie
+  - code: '11'
+    libelle: Dermatologie
+  unite: couples code-libellé
+  provenance: DOC
+  preuve: S-30
+  note: 'Codes et libellés repris de la nomenclature nationale des spécialités médicales (S-30, tableau
+    38, pages 63-64), restreinte à huit spécialités de médecine générale. La restriction est délibérée
+    : elle exclut les six spécialités chirurgicales de la liste nationale (la source mesure l''activité
+    chirurgicale à zéro pour l''établissement sur deux exercices) et coïncide avec le nombre de médecins
+    de consultations spécialisées mesuré par ailleurs (huit). Une classification complète à trente-neuf
+    entrées produirait des activités jamais honorées par l''établissement.'
+- nom: nomenclature_origine
+  valeur:
+  - code: AU
+    libelle: AUTRES HÔPITAUX
+  - code: SP
+    libelle: Consultation spontanée
+  - code: MG
+    libelle: Médecin généraliste
+  - code: UR
+    libelle: Urgences
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: REL-RDV.R03
+  note: Le couple AU / AUTRES HÔPITAUX est relevé à l'écran (REL-RDV.R03). Les trois autres codes sont
+    posés par convention. Si l'un était faux, la répartition des rendez-vous par origine affichée au tableau
+    de bord serait invraisemblable, sans effet sur aucun total.
+- nom: nomenclature_etablissements_partenaires
+  valeur:
+  - code: HR
+    libelle: Hôpital régional
+  - code: CS
+    libelle: Centre de santé
+  - code: CHU
+    libelle: CHU
+  - code: AU
+    libelle: Autre établissement
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune valeur n'est observée pour cette colonne, dont le libellé « Hôpital/C.S. » suggère un renvoi
+    vers un établissement partenaire lorsque l'origine du rendez-vous est un autre hôpital. Codes posés
+    par convention.
+- nom: nomenclature_type_attention
+  valeur:
+  - code: '1'
+    libelle: Première consultation
+  - code: '2'
+    libelle: Consultation de suivi
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Aucune valeur n'est observée pour cette colonne. Distinction usuelle première consultation / suivi
+    retenue par convention.
+- nom: nomenclature_etat_rendez_vous
+  valeur:
+  - code: EI
+    libelle: En instance
+  - code: CO
+    libelle: Confirmé
+  - code: AN
+    libelle: Annulé
+  - code: HO
+    libelle: Honoré
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: REL-RDV.R11
+  note: 'Le libellé « En instance » est relevé à l''écran à la création d''un rendez-vous (REL-RDV.R11),
+    mais aucun code ne l''accompagnait dans le relevé : le code EI qui lui est associé ici est posé, pas
+    observé. Les trois autres états sont posés par convention.'
+- nom: nomenclature_service
+  valeur:
+  - code: ACC
+    libelle: Accueil et admissions
+  - code: CE
+    libelle: Consultations externes
+  - code: UR
+    libelle: Urgences
+  - code: HM
+    libelle: Hospitalisation médecine
+  - code: LAB
+    libelle: Laboratoire
+  - code: RAD
+    libelle: Radiologie
+  - code: PHA
+    libelle: Pharmacie
+  - code: BE
+    libelle: Bureau des entrées
+  - code: FAC
+    libelle: Facturation
+  - code: ECO
+    libelle: Économat
+  - code: HPED
+    libelle: Hospitalisation pédiatrie
+  - code: HGO
+    libelle: Hospitalisation gynéco-obstétrique
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: S-27
+  note: 'L''article 27 du règlement intérieur affirme que l''hôpital s''organise en services sans les
+    nommer individuellement. Liste posée par convention, à partir des fonctions explicitement décrites
+    par le règlement intérieur (accueil et admission, facturation, recouvrement). Aucun service à caractère
+    chirurgical n''y figure : la source mesure l''activité chirurgicale à zéro pour l''établissement,
+    sur deux exercices. Deux unités d''hospitalisation ajoutées (HPED, HGO) : une seule unité pour huit
+    spécialités de consultation n''est pas vraisemblable. La pédiatrie (spécialité 30) et la
+    gynécologie-obstétrique (spécialité 14) sont des unités d''hospitalisation courantes et non
+    chirurgicales dans un hôpital provincial, distinctes de la médecine générale/interne/cardiologie déjà
+    regroupées sous HM. L''ophtalmologie, l''ORL et la dermatologie restent purement ambulatoires (aucun
+    volume d''hospitalisation ne leur est déjà rattaché dans ce générateur) : aucune unité n''est ajoutée
+    pour elles, pour ne pas inventer une hospitalisation non appuyée par un volume mesuré.'
+- nom: nomenclature_agenda
+  valeur:
+  - code: MG
+    libelle: Agenda Médecine générale
+  - code: MI
+    libelle: Agenda Médecine interne
+  - code: PED
+    libelle: Agenda Pédiatrie
+  - code: GYN
+    libelle: Agenda Gynécologie-obstétrique
+  - code: CAR
+    libelle: Agenda Cardiologie
+  - code: OPH
+    libelle: Agenda Ophtalmologie
+  - code: ORL
+    libelle: Agenda ORL
+  - code: DER
+    libelle: Agenda Dermatologie
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Rien au registre ne décrit l'agenda comme une clé technique plutôt qu'un code de référentiel ;
+    retenu ici comme une liste déroulante à choix borné, un agenda par spécialité retenue dans nomenclature_activite,
+    décision posée. Si le système en place distinguait plusieurs agendas par spécialité (un par praticien),
+    cette nomenclature sous-compterait les agendas réels sans fausser aucun total mesuré par ailleurs.
+- nom: nomenclature_type_passage
+  valeur:
+  - code: H
+    libelle: Hospitalisés
+  - code: C
+    libelle: Consultation
+  - code: U
+    libelle: Urgences
+  unite: couples code-libellé
+  provenance: DOC
+  preuve: S-06
+  note: 'La liste de travail du module Médicos regroupe les patients par type d''épisode : hospitalisés,
+    consultation, urgences (S-06, déjà cité par le registre pour cette colonne).'
+- nom: nomenclature_mode_prise_en_charge
+  valeur:
+  - code: AMB
+    libelle: Ambulatoire
+  - code: HOS
+    libelle: Hospitalier
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: S-18
+  note: S-18 décrit une distinction du tiers payant selon le régime et le caractère ambulatoire ou hospitalier
+    de la prestation, sans énumérer de codes précis. Les deux valeurs posées ici reprennent la seule dimension
+    que S-18 décrit explicitement.
+- nom: nomenclature_mode_admission
+  valeur:
+  - code: O
+    libelle: Ordinaire
+  - code: U
+    libelle: Urgence
+  unite: couples code-libellé
+  provenance: DOC
+  preuve: S-27
+  note: 'Les articles 40, 42 et 45 du règlement intérieur : l''admission est ordinaire ou en urgence,
+    et les formalités diffèrent (déjà cité par le registre pour cette colonne).'
+- nom: nomenclature_mode_sortie
+  valeur:
+  - code: R
+    libelle: Sortie régulière avec billet
+  - code: I
+    libelle: Sortie à l'insu du personnel
+  - code: D
+    libelle: Décès
+  unite: couples code-libellé
+  provenance: DOC
+  preuve: S-27
+  note: 'Les articles 79 et 80 du règlement intérieur : sortie régulière avec billet, sortie à l''insu
+    du personnel, décès (déjà cité par le registre pour cette colonne).'
+- nom: nomenclature_type_episode
+  valeur:
+  - code: HOS
+    libelle: Hospitalisation
+  - code: CE
+    libelle: Consultation externe
+  - code: UR
+    libelle: Urgences
+  unite: couples code-libellé
+  provenance: HYP
+  preuve: S-27
+  note: L'article 36 du règlement intérieur établit une taxonomie réglementaire des modes d'utilisation
+    de l'hôpital sans l'énumérer. Les trois valeurs posées ici reprennent les trois grands modes d'utilisation
+    déjà distingués ailleurs dans le règlement (admission ordinaire, consultation, urgence).
+- nom: nomenclature_etat_prise_en_charge
+  valeur:
+  - code: O
+    libelle: Droits ouverts
+  - code: F
+    libelle: Droits fermés
+  - code: N
+    libelle: Non vérifié
+  unite: couples code-libellé
+  provenance: DOC
+  preuve: S-19
+  note: 'Aucune demande de prise en charge préalable n''est exigée dans le secteur public : l''état constate
+    l''ouverture des droits, il n''enregistre pas un accord. Valeurs retenues : droits ouverts, droits
+    fermés, non vérifié (S-19, déjà cité par le registre pour cette colonne).'

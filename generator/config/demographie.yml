@@ -1,0 +1,514 @@
+parametres:
+- nom: structure_age
+  valeur:
+    tranches:
+    - 0-4
+    - 5-14
+    - 15-24
+    - 25-44
+    - 45-64
+    - 65+
+    parts:
+    - 0.08
+    - 0.17
+    - 0.16
+    - 0.3
+    - 0.2
+    - 0.09
+  unite: tranches et parts
+  provenance: HYP
+  preuve: S-05
+  note: 'S-05 mentionne l''existence d''une pyramide des ages de la prefecture de Meknes, mais son contenu
+    chiffre n''est pas extrait dans le depot (document source absent de ~/extraction-sc/) : seule l''existence
+    de la source est etablie, pas ses valeurs. Les six tranches et leurs parts sont posees par convention,
+    plausibles pour une population marocaine jeune. Si cette structure etait fausse, la pyramide des ages
+    affichee au tableau de bord serait invraisemblable, sans effet sur le nombre de fiches produites.'
+- nom: repartition_sexe
+  valeur:
+    M: 0.497
+    F: 0.503
+  unite: proportion
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Repartition posee a parite quasi stricte, conforme a l'ordre de grandeur national usuel, sans
+    source enregistree specifique a l'etablissement. Si cette repartition etait fausse, la parite affichee
+    serait legerement faussee, sans effet sur le nombre de fiches produites.
+- nom: repartition_couverture
+  valeur:
+    '00116': 0.5
+    '00042': 0.15
+    00089: 0.15
+    SANS: 0.2
+  unite: proportion par code de nomenclature_compagnie_assurance
+  provenance: HYP
+  preuve: S-15
+  note: 'Nom impose par la relation R-08 du registre des relations injectees. S-15 mesure les parts nationales
+    des regimes AMO (Tadamon, TNS, Achamil, autres), mais R-08 dit lui-meme explicitement que les effectifs
+    nationaux sont sources, la cle de recours hospitalier ne l''est pas : la correspondance entre regimes
+    nationaux et compagnies de nomenclature_compagnie_assurance n''est pas etablie, la repartition retenue
+    ici est posee, informee sans etre derivee. 00116 (CNSS PIPC) est majoritaire, seule compagnie concretement
+    observee au releve de champs (REL-PAT.A01). Si cette repartition etait fausse, la composition par
+    regime affichee au tableau de bord serait imposee a tort, sans effet sur le nombre de fiches produites.'
+- nom: profil_recours_demographique
+  valeur:
+    H:
+      0-4: 1.6
+      5-14: 0.8
+      15-24: 0.8
+      25-44: 0.9
+      45-64: 1.1
+      65+: 1.6
+    U:
+      0-4: 1.5
+      5-14: 0.9
+      15-24: 0.9
+      25-44: 0.9
+      45-64: 1.0
+      65+: 1.5
+    C:
+      0-4: 0.7
+      5-14: 0.9
+      15-24: 1.1
+      25-44: 1.3
+      45-64: 1.1
+      65+: 0.9
+  unite: multiplicateurs par categorie de premier episode et par tranche d'age
+  provenance: HYP
+  preuve: S-05
+  note: 'Nom impose par la relation R-13 du registre des relations injectees. Multiplicateurs appliques
+    a structure_age selon la categorie du premier episode du patient (H, C ou U), puis renormalises. R-13
+    (S-05) dit que le recours surrepresente les moins de 5 ans, les femmes de 18 a 45 ans et les plus
+    de 60 ans, sans chiffrer l''ampleur : l''ampleur retenue ici (facteurs 1,5 a 1,6 pour les tranches
+    extremes en H et U, 1,1 a 1,3 pour les tranches medianes en C) est posee, pas mesuree. La variation
+    par sexe decrite par R-13 n''est pas reprise separement, simplification explicite : seule la variation
+    par age et par categorie est modelisee. Si ces facteurs etaient faux, l''ecart de structure d''age
+    entre categories serait plus ou moins marque, potentiellement jusqu''a disparaitre, sans effet sur
+    le nombre de fiches produites par categorie.'
+- nom: prenoms_masculins
+  valeur:
+  - Mohammed
+  - Ahmed
+  - Youssef
+  - Hassan
+  - Omar
+  - Karim
+  - Rachid
+  - Said
+  - Abdelillah
+  - Mustapha
+  - Khalid
+  - Aziz
+  - Yassine
+  - Hamid
+  - Brahim
+  - Larbi
+  - Noureddine
+  - Abderrahim
+  - Fouad
+  - Samir
+  unite: liste de prenoms
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Liste de vingt prenoms masculins usuels au Maroc, posee sans source enregistree. Sert aussi de
+    vivier pour nom_pere. Si cette liste etait fausse ou trop courte, la vraisemblance des prenoms affiches
+    serait affectee, sans effet sur aucun total.
+- nom: prenoms_feminins
+  valeur:
+  - Fatima
+  - Khadija
+  - Aicha
+  - Malika
+  - Naima
+  - Latifa
+  - Zineb
+  - Amina
+  - Samira
+  - Nadia
+  - Rachida
+  - Karima
+  - Saida
+  - Hafida
+  - Souad
+  - Wafaa
+  - Ilham
+  - Meryem
+  - Zohra
+  - Loubna
+  unite: liste de prenoms
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Liste de vingt prenoms feminins usuels au Maroc, posee sans source enregistree. Sert aussi de
+    vivier pour nom_mere. Si cette liste etait fausse ou trop courte, la vraisemblance des prenoms affiches
+    serait affectee, sans effet sur aucun total.
+- nom: noms_famille
+  valeur:
+  - Alaoui
+  - Bennani
+  - Idrissi
+  - Tazi
+  - Fassi
+  - Chraibi
+  - Berrada
+  - Squalli
+  - Lahlou
+  - Amrani
+  - Sbai
+  - Kettani
+  - Benjelloun
+  - Cherkaoui
+  - Belghiti
+  - Moussaoui
+  - Ziani
+  - Ouazzani
+  - Sekkat
+  - Bakkali
+  unite: liste de noms de famille
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Liste de vingt noms de famille usuels au Maroc, posee sans source enregistree. Sert a tirer independamment
+    nom_famille_1 et nom_famille_2. Si cette liste etait fausse ou trop courte, la vraisemblance des noms
+    affiches serait affectee, sans effet sur aucun total.
+- nom: repartition_residence
+  valeur:
+    region:
+      FM: 0.95
+      TT: 0.02
+      CS: 0.02
+      RS: 0.01
+    par_region:
+      FM:
+        MEK: 0.7
+        FES: 0.1
+        ELH: 0.08
+        IFR: 0.07
+        KHE: 0.05
+      TT:
+        TNG: 1.0
+      CS:
+        CAS: 1.0
+      RS:
+        RAB: 1.0
+    environnement:
+      U: 0.639
+      R: 0.361
+  unite: proportion par code de nomenclature, par colonne geographique
+  provenance: HYP
+  preuve: S-05
+  note: 'Restructure au lot de correction de vraisemblance : la region est tiree en premier, puis ville
+    et province partagent le meme tirage par_region[region], donc portent toujours le meme code par construction.
+    Avant cette restructuration, ville, province et region etaient tirees independamment, ce qui produisait
+    48,93 % de lignes ou ville differait de province et 5,15 % de lignes ou une province de Fes-Meknes
+    etait associee a une region differente (mesure du lot de correction). MEK domine (70 %) la region
+    Fes-Meknes, coherent avec l''implantation de l''etablissement a Meknes ; TT, CS et RS ne portent chacune
+    qu''un seul chef-lieu (TNG, CAS, RAB), une simplification explicite qui ne distingue pas les provinces
+    a l''interieur de ces regions minoritaires. Le partage urbain/rural (63,9 % / 36,1 %) reprend la mesure
+    regionale de S-05 (2 855 366 urbains, 1 612 545 ruraux sur 4 467 911), seule part de cette entree
+    directement mesuree ; les poids par ville et par region sont poses sans source. Si cette repartition
+    etait fausse, la carte de provenance des patients serait faussee, sans effet sur le nombre de fiches
+    produites.'
+- nom: repartition_pays
+  valeur:
+    '504': 0.95
+    '250': 0.01
+    '012': 0.01
+    '788': 0.01
+    '724': 0.01
+    '478': 0.01
+  unite: proportion par code de nomenclature_pays
+  provenance: HYP
+  preuve: REL-PAT.H07
+  note: 'Repartition retenue pour nationalite et pays_naissance, partagee entre les deux colonnes, tirees
+    independamment l''une de l''autre (accord non exige : la nationalite et le pays de naissance sont
+    deux attributs distincts qui peuvent legitimement differer, mesure du lot de correction : 9,45 % de
+    lignes ou ils different, un taux compatible avec un tirage independant a 95 % / 95 %, sans signal
+    d''incoherence). Le code 504 (MAROC) est dominant a 95 %, conforme a ce que le releve de champs observe
+    comme la nationalite et le pays de naissance de la tres grande majorite des patients d''un hopital
+    provincial (REL-PAT.H07, REL-PAT.N05). Les cinq autres codes se partagent le reste a parts egales,
+    pose sans source distincte. Si cette repartition etait fausse, la part de patients etrangers affichee
+    serait faussee, sans effet sur aucun total.'
+- nom: gabarit_identifiant_patient
+  valeur: IPP-{rang:06d}
+  unite: gabarit de formatage
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Gabarit interprete par le generateur a partir du rang d''apparition rendu par le fil des episodes,
+    jamais ecrit en dur ailleurs. Choix technique, non observe : le releve de champs ne montre aucune
+    valeur de n_ipp. Si ce gabarit etait faux, seule la forme visuelle de l''identifiant en serait affectee,
+    sans effet sur son rang ni sur sa croissance.'
+- nom: taux_avertissements_sms
+  valeur: 0.6
+  unite: proportion
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Part des patients ayant active les avertissements SMS, posee sans source. Si ce taux etait faux,
+    seule la proportion affichee serait affectee, sans effet sur aucun total.
+- nom: taux_avertissements_email
+  valeur: 0.3
+  unite: proportion
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Part des patients ayant active les avertissements courriel, posee sans source. Si ce taux etait
+    faux, seule la proportion affichee serait affectee, sans effet sur aucun total.
+- nom: taux_exitus_par_tranche
+  valeur:
+    0-4: 0.006
+    5-14: 0.01
+    15-24: 0.016
+    25-44: 0.024
+    45-64: 0.04
+    65+: 0.08
+  unite: proportion par tranche d'age
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Remplace au lot de correction le taux_exitus scalaire unique (0,02 pour toute la population),
+    qui ne satisfaisait que la moitie de l'exigence de vraisemblance (part tres minoritaire, mais aucune
+    croissance avec l'age). Chaque taux croit strictement avec la tranche, reste minoritaire (maximum
+    8 %), et sa moyenne ponderee par structure_age (~0,024) reste proche de l'ancien taux scalaire, pour
+    une part globale de deces affichee comparable. Poses sans source faute de statistique de mortalite
+    hospitaliere disponible pour l'etablissement. Si ces taux etaient faux, la courbe de mortalite par
+    age serait plus ou moins marquee, potentiellement jusqu'a s'aplatir, sans effet sur le nombre de fiches
+    produites.
+- nom: taux_modification_fiche
+  valeur: 0.15
+  unite: proportion
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Part des fiches patient modifiees au moins une fois apres leur creation, posee sans source. Ce
+    parametre n''est pas decoratif : sans lui, aucune fiche ne reparait dans une partition ulterieure,
+    et la couche d''historisation des blocs suivants n''aurait rien a historiser. Si ce taux etait faux,
+    le volume de fiches reapparaissant serait faussee dans le meme sens, sans effet sur le nombre de fiches
+    distinctes produites.'
+- nom: loi_delai_modification
+  valeur:
+    forme: exponentielle
+    echelle_jours: 90
+  unite: loi de decroissance et echelle
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Delai entre la creation d'une fiche et sa modification, tire d'une loi exponentielle d'echelle
+    90 jours, posee sans source. Si cette echelle etait fausse, la repartition des modifications dans
+    le temps serait plus ou moins concentree pres de la creation, sans effet sur le nombre de fiches modifiees,
+    fixe par taux_modification_fiche.
+- nom: distribution_piece_identite
+  valeur:
+    national:
+      C: 0.92
+      P: 0.04
+      S: 0.04
+    etranger:
+      C: 0.05
+      P: 0.5
+      S: 0.45
+  unite: proportion par code de nomenclature_type_piece_identite, selon la nationalite
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Ajoute au lot de correction : avant, type_piece_identite etait tiree uniformement sur les trois
+    codes (33 % chacun), une repartition uniforme sur une nomenclature ou une distribution etait attendue
+    (releve au 1.2 du lot de correction). La C.I.N (C) domine tres largement chez les patients de nationalite
+    marocaine (code 504 de repartition_pays) ; passeport et carte de sejour dominent chez les patients
+    de nationalite etrangere, conforme au fait qu''un etranger ne detient generalement pas de C.I.N marocaine.
+    Pose sans source specifique. Si cette repartition etait fausse, la part de chaque piece d''identite
+    affichee serait faussee, sans effet sur aucun total.'
+- nom: distribution_etat_civil_adulte
+  valeur:
+    15-24:
+      C: 0.75
+      M: 0.23
+      D: 0.02
+      V: 0.0
+    25-44:
+      C: 0.3
+      M: 0.6
+      D: 0.09
+      V: 0.01
+    45-64:
+      C: 0.08
+      M: 0.68
+      D: 0.14
+      V: 0.1
+    65+:
+      C: 0.04
+      M: 0.5
+      D: 0.11
+      V: 0.35
+  unite: proportion par code de nomenclature_etat_civil, par tranche d'age, pour les 18 ans et plus
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Ajoute au lot de correction : avant, etat_civil etait tiree uniformement sur les quatre codes
+    (25 % chacun) pour tous les patients, y compris les mineurs, une repartition uniforme sur une nomenclature
+    ou une distribution etait attendue, avec des mineurs veufs (releve au 1.2 et a l''etape 3 du lot de
+    correction). Les patients de moins de 18 ans ne sont pas tires depuis cette table : ils recoivent
+    le code C (celibataire) de maniere deterministe, hors de toute distribution. Pour les 18 ans et plus,
+    cette table est indexee par la tranche d''age de structure_age (qui contient des mineurs et des majeurs
+    dans la tranche 15-24 : la table s''applique aux seuls majeurs de cette tranche, le code gerant separement
+    les moins de 18 ans). Le veuvage croit strictement avec l''age (0 puis 1 %, 10 %, 35 %) tout en restant
+    minoritaire ; le celibat decroit fortement avec l''age. Pose sans source. Si ces repartitions etaient
+    fausses, la pyramide d''etat civil affichee serait faussee, sans effet sur aucun total.'
+- nom: distribution_type_patient
+  valeur:
+    assure:
+      AS: 0.65
+      PY: 0.15
+      IN: 0.05
+      AY: 0.15
+    non_assure:
+      PY: 0.55
+      IN: 0.3
+      AY: 0.15
+  unite: proportion par code de nomenclature_type_patient, selon la presence d'une compagnie d'assurance
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Ajoute au lot de correction : avant, type_patient etait tiree uniformement sur les quatre codes
+    independamment de compagnie_assurance, ce qui produisait 4,96 % de fiches sans compagnie d''assurance
+    (SANS) marquees neanmoins Assure (AS), mesure du lot de correction. Le code AS (Assure) est desormais
+    exclu du tirage lorsque compagnie_assurance vaut SANS : une fiche sans compagnie ne peut plus etre
+    de type Assure. Poids poses sans source specifique. Si ces repartitions etaient fausses, la part de
+    chaque type de patient affichee serait faussee, sans effet sur aucun total.'
+- nom: codes_postaux_par_ville
+  valeur:
+    MEK: '50000'
+    FES: '30000'
+    ELH: '51750'
+    IFR: '53000'
+    KHE: '54350'
+    CAS: '20000'
+    RAB: '10000'
+    TNG: '90000'
+  unite: code postal par code de nomenclature_ville
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Ajoute au lot de correction : avant, code_postal valait la constante 50000 (celui de Meknes)
+    pour toutes les lignes quelle que soit la ville, une colonne a valeur unique sur toute la table (releve
+    au 1.2) et incoherente avec ville pour 29,80 % des fiches hors Meknes (mesure du lot de correction).
+    Chaque code postal ici est le code reel de sa ville de nomenclature_ville. Si l''un de ces codes etait
+    faux, seule la vraisemblance de l''adresse affichee pour cette ville serait affectee, sans effet sur
+    aucun total.'
+- nom: taux_renseignement
+  valeur:
+    telephone_2: 0.15
+    telephone_3: 0.04
+    telephone_4: 0.01
+    commentaire: 0.12
+    email: 0.85
+    nom_famille_2: 0.9
+    profession: 0.6
+  unite: proportion de fiches ou la colonne est renseignee
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Ajoute au lot de correction : ces sept colonnes sont facultatives, une fiche reelle ne les renseigne
+    pas toutes. Avant, telephone_2/3/4 et commentaire etaient vides sur 100 % des lignes et profession
+    valait la constante NON PRECISEE sur 100 % des lignes (colonnes a valeur unique, relevees au 1.2) ;
+    email et nom_famille_2 etaient renseignees sur 100 % des lignes. Une valeur absente ici parce que la
+    colonne est facultative et n''a pas ete saisie est une absence structurelle, qui fait partie du jeu
+    de donnees normal : ce n''est pas un defaut injecte. Le decompte de la verite terrain, dans un lot
+    ulterieur, ne doit compter que les defauts reellement injectes, pas ces absences structurelles. Si
+    ces taux etaient faux, la part de fiches renseignees pour ces colonnes serait faussee, sans effet
+    sur aucun total. Profession reajuste de 0,4 a 0,6 dans un lot ulterieur : le taux de champs
+    manquants du cadrage pour cette colonne (44 % de manquant au total) est inferieur a ce que
+    l''ancienne valeur (0,4 renseigne, 60 % manquant) produisait a elle seule -- un mecanisme
+    d''injection ne peut qu''ajouter de l''absence, jamais en retirer. Le tirage de la profession
+    consomme un nombre de tirages aleatoires variable (un tirage supplementaire pour chaque fiche
+    renseignee), si bien que deplacer ce seuil decale la position du flux aleatoire pour toutes
+    les fiches suivantes et, par ricochet, les tables qui lisent source.patients en entree
+    (mesure avant d''ecrire : un premier essai a 0,7 renseigne faisait sortir la conformite des
+    journees d''hospitalisation de sa tolerance de 3 % etablie a un lot anterieur, 3,34 % contre
+    1,65 % avant ajustement). Remonter la part structurelle a 60 % renseigne (40 % manquant, la
+    plus petite hausse qui reste sous la cible de 44 %) laisse un espace etroit mais suffisant a
+    l''injection, tout en minimisant ce decalage -- revarifie a cette valeur, la conformite reste
+    verte (voir le rapport).'
+- nom: liste_professions
+  valeur:
+  - Enseignant
+  - Commercant
+  - Fonctionnaire
+  - Agriculteur
+  - Artisan
+  - Chauffeur
+  - Infirmier
+  - Comptable
+  - Retraite
+  - Etudiant
+  unite: liste de professions
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: Ajoute au lot de correction, pour remplacer la constante NON PRECISEE (releve au 1.2 comme
+    colonne a valeur unique). Dix professions usuelles posees sans source, tirees uniformement quand
+    profession est renseignee (taux_renseignement.profession). Si cette liste etait fausse ou trop
+    courte, la vraisemblance des professions affichees serait affectee, sans effet sur aucun total.
+- nom: pool_foyers
+  valeur:
+    taille_moyenne_foyer: 3.5
+    voies:
+    - Avenue Hassan II
+    - Rue Moulay Ismail
+    - Boulevard Mohammed V
+    - Avenue des FAR
+    - Rue de la Liberte
+    - Boulevard Zerktouni
+    - Avenue Allal Ben Abdellah
+    - Rue Ibn Khaldoun
+    - Avenue Al Massira
+    - Boulevard Abdelmoumen
+    - Rue Oued Ziz
+    - Avenue Okba Ibn Nafii
+    - Rue Sidi Said
+    - Boulevard Circulaire
+    - Avenue My Youssef
+    - Rue Antsirabe
+    - Boulevard Bir Anzarane
+    - Avenue Fal Ould Oumeir
+    - Rue Tafraouti
+    - Avenue Al Qods
+    - Rue de Fes
+    - Boulevard Bab Mansour
+    - Avenue Agdal
+    - Rue Toulal
+    - Boulevard Roudani
+    - Avenue Ain Karma
+    - Rue Zitoune
+    - Boulevard Al Wahda
+    - Avenue Hamria
+    - Rue Sidi Amar
+    plage_numero_voie:
+    - 1
+    - 240
+    prefixes_telephone:
+    - '0661'
+    - '0662'
+    - '0663'
+    - '0664'
+    - '0665'
+    - '0666'
+    - '0667'
+    - 0668
+    - 0669
+    plage_numero_telephone:
+    - 0
+    - 99999
+  unite: modele de foyers partages
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Ajoute au lot de correction : avant, adresse et telephone_1 etaient construites par concatenation
+    d''un prefixe fixe et du rang de la ligne, autant de valeurs distinctes que de fiches (releve au 1.2),
+    rendant tout rapprochement par foyer impossible (0 couple de fiches partageant un meme telephone,
+    mesure du 1.3 du lot de correction). Desormais, les patients sont regroupes en foyers de taille moyenne
+    3,5 ; chaque foyer recoit une adresse (une voie de la liste ci-dessus et un numero dans la plage)
+    et un telephone (un prefixe operateur plausible et un numero dans la plage) tires une seule fois,
+    partages par tous ses membres. Voies et prefixes poses sans source, plausibles pour une ville marocaine.
+    Si ce modele etait faux, la repartition des adresses et des telephones par foyer serait faussee, sans
+    effet sur le nombre de fiches produites.'
+- nom: comptes_utilisateurs_systeme
+  valeur:
+  - ADM-ACC01
+  - ADM-ACC02
+  - INF-BUR01
+  - INF-BUR02
+  - AGT-GUI01
+  unite: liste de comptes utilisateurs
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Ajoute au lot de correction : avant, cree_par valait la constante SYSTEME pour toutes les lignes
+    (colonne a valeur unique, relevee au 1.2), et modifie_par n''avait que deux valeurs (vide ou SYSTEME).
+    Desormais, cree_par et modifie_par sont tires dans ce petit ensemble de comptes plausibles (agents
+    d''accueil, infirmiers de bureau des entrees), poses sans source. Si cette liste etait fausse, les
+    comptes affiches seraient invraisemblables, sans effet sur aucun total.'

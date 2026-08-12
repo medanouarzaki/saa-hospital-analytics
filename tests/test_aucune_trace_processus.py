@@ -5,16 +5,32 @@ Deux contrôles. Le premier porte sur un motif volontairement limité à trois
 catégories de vocabulaire GÉNÉRIQUE et PUBLIC : noms de fournisseurs d'outils
 génératifs, formules de co-signature automatique, formules d'attribution de
 génération. Le second porte sur la numérotation interne d'étape de ce projet :
-le mot désignant une étape de travail suivi d'un nombre, et un identifiant de
-sous-étape combinant un chiffre et une lettre. Aucun de ces deux motifs
-n'énumère un terme de la nomenclature interne autre que sa forme : un test qui
-énumérerait ce vocabulaire interne serait lui-même la fuite qu'il prétend
-empêcher. La détection de ce vocabulaire interne reste une revue manuelle,
-plus large, exécutée avant chaque publication — ce test-ci est un filet
-permanent, pas un remplacement.
+le mot désignant un bloc ou un lot de travail suivi d'un nombre, le mot
+désignant une étape suivi d'un nombre (avec ou sans le préfixe bloc/lot), et
+un identifiant de sous-étape combinant un chiffre et une lettre. Aucun de ces
+motifs n'énumère un terme de la nomenclature interne autre que sa forme : un
+test qui énumérerait ce vocabulaire interne serait lui-même la fuite qu'il
+prétend empêcher. La détection de ce vocabulaire interne reste une revue
+manuelle, plus large, exécutée avant chaque publication — ce test-ci est un
+filet permanent, pas un remplacement.
+
+Le motif d'étape seule (sans préfixe bloc/lot) a été élargi après qu'une revue
+manuelle, pas ce filet, a trouvé trois notes de configuration référençant une
+étape numérotée sans ce préfixe : le filet ne couvrait alors que la forme
+préfixée. Quatre catégories d'emploi légitime du mot « étape » ou « passe »
+existent dans le dépôt et doivent rester vertes après cet élargissement : la
+clé `steps` du workflow CI (vocabulaire de la plateforme, ne contient pas le
+mot « étape », hors motif par construction), une procédure réglementaire de
+sortie citée dans la documentation (« étapes » n'y est jamais suivi d'un
+chiffre, hors motif par construction), les commentaires décrivant un
+algorithme à deux passes dans `generator/parcours.py` et son test (le mot
+« passe », pas « étape », hors motif par construction), et ce fichier
+lui-même (exclusion déclarée ci-dessous, seule catégorie qui ne doit sa
+sécurité qu'à une exclusion explicite plutôt qu'à la forme du motif).
 
 Ce fichier est nécessairement exclu de son propre parcours : il contient les
-motifs recherchés en tant que données, pas en tant que trace.
+motifs recherchés en tant que données, pas en tant que trace. C'est
+l'exclusion déclarée mentionnée ci-dessus.
 """
 
 import re
@@ -25,6 +41,7 @@ RACINE = Path(__file__).resolve().parent.parent
 CE_FICHIER = Path(__file__).resolve().relative_to(RACINE).as_posix()
 
 MOTIF_ETAPE = re.compile(r"\b(bloc|lot)\W{0,3}[0-9]", re.IGNORECASE)
+MOTIF_ETAPE_SEULE = re.compile(r"\bétape[s]?\W{0,3}[0-9]", re.IGNORECASE)
 MOTIF_SOUS_ETAPE = re.compile(r"\b[0-9]+\.[A-Za-z]\b")
 
 MOTIFS_INTERDITS = [
@@ -86,6 +103,8 @@ def test_aucune_trace_processus_generatif() -> None:
 def test_aucune_numerotation_interne() -> None:
     fautifs = []
     for chemin in fichiers_suivis():
+        # exclusion declaree : ce fichier porte les trois motifs ci-dessus comme donnees
+        # de test, jamais comme trace reelle (voir le docstring du module).
         if chemin == CE_FICHIER:
             continue
         chemin_absolu = RACINE / chemin
@@ -96,7 +115,11 @@ def test_aucune_numerotation_interne() -> None:
         except (UnicodeDecodeError, OSError):
             continue
         for numero_ligne, ligne in enumerate(contenu.splitlines(), start=1):
-            correspondance = MOTIF_ETAPE.search(ligne) or MOTIF_SOUS_ETAPE.search(ligne)
+            correspondance = (
+                MOTIF_ETAPE.search(ligne)
+                or MOTIF_ETAPE_SEULE.search(ligne)
+                or MOTIF_SOUS_ETAPE.search(ligne)
+            )
             if correspondance:
                 fautifs.append(f"{chemin}:{numero_ligne} : '{correspondance.group(0)}'")
 
