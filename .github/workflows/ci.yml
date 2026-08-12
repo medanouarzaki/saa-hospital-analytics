@@ -79,6 +79,7 @@ jobs:
               tests/test_collecte_ci.py
               tests/test_config_generateur.py
               tests/test_ecriture.py
+              tests/test_generator_cli.py
               tests/test_invariants_tables.py
               tests/test_nomenclatures.py
               tests/test_prises_en_charge.py
