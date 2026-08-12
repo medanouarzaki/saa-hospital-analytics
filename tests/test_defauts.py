@@ -2,6 +2,7 @@
 le fichier de vérité terrain complet qu'elle produit (generator/verite_terrain.py).
 """
 
+import csv
 import subprocess
 import tempfile
 from collections import Counter
@@ -11,7 +12,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from generator import config, defauts, ecriture, execution, nomenclatures
+from generator import config, defauts, ecriture, execution, nomenclatures, patients, registre
 
 GRAINE_PARTAGEE = 1
 TOLERANCE_TAUX = 0.002
@@ -196,6 +197,90 @@ def test_exactitude_verite_terrain_biunivoque(generation: dict) -> None:
     )
     taux_factures_sans_pec = entrees["taux_factures_sans_pec"]["valeur"]
     assert abs(n_sans_pec_observe / n_couvertes - taux_factures_sans_pec) < TOLERANCE_TAUX
+
+
+def _lignes_patients_csv(execution_obj: ecriture.Execution) -> list[dict]:
+    lignes: list[dict] = []
+    for relatif in execution_obj.partitions[TABLE_PAT]:
+        if not relatif.endswith(".csv"):
+            continue
+        with (execution_obj.racine / relatif).open(encoding="utf-8") as f:
+            lignes.extend(csv.DictReader(f))
+    return lignes
+
+
+def _versions_multiples(execution_obj: ecriture.Execution) -> dict[str, tuple[dict, dict]]:
+    """Regroupe les lignes patients par n_ipp, ne retenant que les n_ipp à exactement deux
+    versions, ordonnées (création, modification) via la présence de `date_modification` --
+    indépendamment de `generator/verite_terrain.py::_calculer_fiches_modifiees`, pour que ce
+    test vérifie la propriété elle-même plutôt que la logique de production qui la calcule."""
+    par_ipp: dict[str, list[dict]] = {}
+    for ligne in _lignes_patients_csv(execution_obj):
+        par_ipp.setdefault(ligne["n_ipp"], []).append(ligne)
+    resultat = {}
+    for n_ipp, versions in par_ipp.items():
+        if len(versions) != 2:
+            continue
+        creation, modification = sorted(
+            versions, key=lambda v: v["date_modification"] == "", reverse=True
+        )
+        resultat[n_ipp] = (creation, modification)
+    return resultat
+
+
+def test_fiches_modifiees_exactement_enregistrees(generation: dict) -> None:
+    """Le changement métier est réel et exactement enregistré. Égalité d'ensembles dans les
+    deux sens (pas d'échantillon) : chaque entrée de `fiches_modifiees` correspond à une
+    différence réelle sur disque, et tout n_ipp multi-version absent de la catégorie ne porte
+    aucune différence métier réelle."""
+    execution_obj = generation["execution"]
+    vt = _charger_verite_terrain(execution_obj)
+
+    colonnes_comparees = [
+        c
+        for c in registre.colonnes_table(TABLE_PAT)
+        if c not in {"n_ipp", "date_extraction", "date_modification", "modifie_par"}
+    ]
+
+    versions = _versions_multiples(execution_obj)
+    entrees_vt = {e["n_ipp"]: e for e in vt["fiches_modifiees"]["entrees"]}
+    # non-vacuite : sur la generation partagee, des changements metier reels doivent
+    # exister, sans quoi les deux boucles ci-dessous seraient vides et l'egalite
+    # d'ensembles se verifierait trivialement sans rien prouver (regle de mutation).
+    assert vt["fiches_modifiees"]["decompte"] > 0
+    assert any(diff for diff in entrees_vt.values())
+    assert vt["fiches_modifiees"]["decompte"] == len(vt["fiches_modifiees"]["entrees"])
+    assert set(entrees_vt) <= set(versions), "une entrée de fiches_modifiees sans deux versions"
+
+    for n_ipp, (creation, modification) in versions.items():
+        diff_reel = {
+            colonne: (creation[colonne], modification[colonne])
+            for colonne in colonnes_comparees
+            if creation[colonne] != modification[colonne]
+        }
+        if n_ipp in entrees_vt:
+            colonnes_vt = entrees_vt[n_ipp]["colonnes"]
+            assert set(colonnes_vt) == set(diff_reel), n_ipp
+            for colonne, valeurs in colonnes_vt.items():
+                assert valeurs["avant"] == diff_reel[colonne][0], (n_ipp, colonne)
+                assert valeurs["apres"] == diff_reel[colonne][1], (n_ipp, colonne)
+        else:
+            assert diff_reel == {}, (n_ipp, "difference metier non enregistree")
+
+
+def test_fiches_modifiees_colonnes_du_type(generation: dict) -> None:
+    """Chaque entrée de `fiches_modifiees` ne porte que des colonnes autorisées pour son
+    `type_modification`, vérifié contre la définition partagée
+    `generator.patients.COLONNES_PAR_TYPE_MODIFICATION` (mapping unique : ni la production ni
+    ce test ne maintiennent une copie séparée de cette liste)."""
+    vt = _charger_verite_terrain(generation["execution"])
+    assert vt["fiches_modifiees"]["decompte"] > 0
+    for entree in vt["fiches_modifiees"]["entrees"]:
+        colonnes_autorisees = set(
+            patients.COLONNES_PAR_TYPE_MODIFICATION[entree["type_modification"]]
+        )
+        assert set(entree["colonnes"]) <= colonnes_autorisees, entree
+        assert set(entree["colonnes"]), entree
 
 
 def test_aucune_colonne_codee_alteree(generation: dict) -> None:

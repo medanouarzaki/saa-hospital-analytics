@@ -408,3 +408,19 @@ def test_tracabilite_repartie(generation: dict) -> None:
         ligne["modifie_par"] for ligne in lignes if ligne["modifie_par"] is not None
     }
     assert len(valeurs_modifie_par) > 1
+
+
+def test_repartition_type_modification_complete(generation: dict) -> None:
+    entrees = generation["entrees"]
+    execution_obj = generation["execution"]
+
+    repartition = entrees["repartition_type_modification"]["valeur"]
+    assert abs(sum(repartition.values()) - 1.0) < 1e-9
+    assert set(repartition) == set(patients.COLONNES_PAR_TYPE_MODIFICATION)
+
+    vt = _charger_verite_terrain(execution_obj)
+    assert vt["fiches_modifiees"]["decompte"] > 0
+    types_presents = {entree["type_modification"] for entree in vt["fiches_modifiees"]["entrees"]}
+    assert types_presents == set(repartition), (
+        "chaque type configuré doit apparaître dans la génération partagée"
+    )
