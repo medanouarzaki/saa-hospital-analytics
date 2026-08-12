@@ -46,7 +46,64 @@ jobs:
           print(f"controle de collecte : {n_collecte} tests, en accord avec le compte independant")
           '
 
-      - run: uv run pytest tests/ --ignore=tests/test_provenance.py -v -s
+      - run: uv run pytest tests/test_collecte_ci.py -v
+
+  tests-matrice:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        groupe:
+          - nom: doublons
+            fichiers: >-
+              tests/test_doublons.py
+
+          - nom: defauts-facturation-mouvements-sources
+            fichiers: >-
+              tests/test_defauts.py
+              tests/test_facturation.py
+              tests/test_mouvements.py
+              tests/test_sources.py
+
+          - nom: passages-perf-recouvrement-sensibilite-temporel
+            fichiers: >-
+              tests/test_passages.py
+              tests/test_performance_configuration.py
+              tests/test_recouvrement.py
+              tests/test_sensibilite.py
+              tests/test_temporel.py
+
+          - nom: invariants-rdv-volumes-et-fichiers-courts
+            fichiers: >-
+              tests/test_aucune_trace_processus.py
+              tests/test_collecte_ci.py
+              tests/test_config_generateur.py
+              tests/test_ecriture.py
+              tests/test_invariants_tables.py
+              tests/test_nomenclatures.py
+              tests/test_prises_en_charge.py
+              tests/test_relations_injectees.py
+              tests/test_rendez_vous.py
+              tests/test_volumes.py
+
+          - nom: coherence-parcours-patients-urgences-et-fichiers-courts
+            fichiers: >-
+              tests/test_aucune_image.py
+              tests/test_calendrier.py
+              tests/test_coherence_inter_tables.py
+              tests/test_controles.py
+              tests/test_parcours.py
+              tests/test_patients.py
+              tests/test_relations.py
+              tests/test_urgences.py
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+
+      - run: uv sync --frozen
+
+      - run: uv run pytest ${{ matrix.groupe.fichiers }} -v -s
 
   provenance:
     runs-on: ubuntu-latest
@@ -82,4 +139,4 @@ jobs:
 
       - run: uv run python ingestion/appliquer_ddl.py
 
-      - run: uv run pytest tests/test_provenance.py -v
+      - run: uv run pytest tests/test_provenance.py tests/test_quarantaine_schema.py tests/test_chargeur.py -v
