@@ -12,6 +12,7 @@ N'importe rien de `generator/` : la connexion et le registre viennent, comme le 
 `ingestion/`, du dépôt et de l'environnement seuls.
 """
 
+import argparse
 import csv
 import importlib.util
 from datetime import UTC, datetime
@@ -190,3 +191,97 @@ def charger_partition(date_iso: str, dossier: Path) -> dict[str, dict]:
             continue
         resultats[table] = charger_table_partition(table, date_iso, chemin)
     return resultats
+
+
+def _dates_partition(dossier_table: Path) -> list[str]:
+    return sorted(p.name for p in dossier_table.iterdir() if p.is_dir())
+
+
+def _agregat_initial() -> dict:
+    return {
+        "lues": 0,
+        "inserees": 0,
+        "rejetees": 0,
+        "charge": 0,
+        "bloque_seuil": 0,
+        "en_tete_invalide": 0,
+    }
+
+
+def charger_scenario(
+    racine: Path,
+    tables: list[str] | None = None,
+    date_debut: str | None = None,
+    date_fin: str | None = None,
+) -> dict[str, dict]:
+    """Charge un scénario complet, arborescence `<racine>/source.<table>/<date ISO>/<table>.csv`.
+
+    Parcourt les tables du registre (filtrées par `tables` si fourni, sinon toutes) puis
+    leurs partitions en ordre chronologique (tri lexicographique des noms de répertoire
+    `AAAA-MM-JJ`, qui coïncide avec l'ordre chronologique), et agrège les résultats par
+    table : `lues`, `inserees`, `rejetees`, et le décompte de fichiers par état (`charge`,
+    `bloque_seuil`, `en_tete_invalide`). Une table sans répertoire, ou une date sans
+    fichier pour une table, est ignorée sans erreur.
+    """
+    tables_a_charger = tables if tables is not None else _tables()
+    agregats: dict[str, dict] = {}
+
+    for table in tables_a_charger:
+        dossier_table = racine / f"source.{table}"
+        if not dossier_table.exists():
+            continue
+
+        for date_iso in _dates_partition(dossier_table):
+            if date_debut is not None and date_iso < date_debut:
+                continue
+            if date_fin is not None and date_iso > date_fin:
+                continue
+
+            chemin_csv = dossier_table / date_iso / f"{table}.csv"
+            if not chemin_csv.exists():
+                continue
+
+            resultat = charger_table_partition(table, date_iso, chemin_csv)
+            agregat = agregats.setdefault(table, _agregat_initial())
+            agregat["lues"] += resultat["lues"]
+            agregat["inserees"] += resultat["inserees"]
+            agregat["rejetees"] += resultat["rejetees"]
+            agregat[resultat["etat"]] += 1
+
+    return agregats
+
+
+def main(argv: list[str] | None = None) -> None:
+    analyseur = argparse.ArgumentParser(
+        description=(
+            "Charge un scénario complet (arborescence source.<table>/<date>/<table>.csv) "
+            "dans PostgreSQL."
+        )
+    )
+    analyseur.add_argument(
+        "racine", type=Path, help="Racine du scénario, contenant les répertoires source.<table>/"
+    )
+    analyseur.add_argument(
+        "--table",
+        action="append",
+        dest="tables",
+        metavar="TABLE",
+        help="Limiter le chargement à cette table (répétable ; toutes les tables par défaut)",
+    )
+    analyseur.add_argument(
+        "--date-debut", metavar="AAAA-MM-JJ", help="Date de partition minimale, incluse"
+    )
+    analyseur.add_argument(
+        "--date-fin", metavar="AAAA-MM-JJ", help="Date de partition maximale, incluse"
+    )
+    arguments = analyseur.parse_args(argv)
+
+    agregats = charger_scenario(
+        arguments.racine, arguments.tables, arguments.date_debut, arguments.date_fin
+    )
+    for table in sorted(agregats):
+        print(f"{table}: {agregats[table]}")
+
+
+if __name__ == "__main__":
+    main()

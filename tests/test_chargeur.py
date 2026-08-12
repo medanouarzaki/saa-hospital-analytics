@@ -279,3 +279,91 @@ def test_charger_partition_ignore_tables_absentes(tmp_path: Path) -> None:
     assert TABLE in resultats
     assert resultats[TABLE]["etat"] == "charge"
     assert len(resultats) == 1
+
+
+DATES_SCENARIO = ["2030-03-01", "2030-03-02"]
+TABLE_2 = "creances"
+COLONNES_2 = [
+    e["colonne"] for e in controles.charger_registre() if e["table"] == f"source.{TABLE_2}"
+]
+
+
+def _ligne_creances(n_creance: str, date_iso: str) -> dict[str, str]:
+    return {
+        "n_creance": n_creance,
+        "n_facture": f"FAC-{n_creance}",
+        "date_naissance_creance": _mmddyyyy(date_iso),
+        "montant_du": "100.00",
+        "montant_recouvre": "0.00",
+        "montant_restant": "100.00",
+        "type_debiteur": "PART",
+        "motif_non_recouvrement": "",
+        "date_extraction": _mmddyyyy(date_iso),
+    }
+
+
+def _nettoyer_scenario() -> None:
+    with chargeur.connexion() as conn, conn.cursor() as cur:
+        for date_iso in DATES_SCENARIO:
+            cur.execute(
+                f"delete from source.{TABLE} where date_extraction = %s", (_mmddyyyy(date_iso),)
+            )
+            cur.execute(f"delete from quarantaine.{TABLE} where rejet_partition = %s", (date_iso,))
+            cur.execute(
+                f"delete from source.{TABLE_2} where date_extraction = %s", (_mmddyyyy(date_iso),)
+            )
+            cur.execute(
+                f"delete from quarantaine.{TABLE_2} where rejet_partition = %s", (date_iso,)
+            )
+
+
+def test_charger_scenario_agregats_et_ordre_chronologique(tmp_path: Path, monkeypatch) -> None:
+    _nettoyer_scenario()
+    try:
+        for date_iso in DATES_SCENARIO:
+            (tmp_path / f"source.{TABLE}" / date_iso).mkdir(parents=True)
+            _ecrire_csv(
+                tmp_path / f"source.{TABLE}" / date_iso / f"{TABLE}.csv",
+                [_ligne(f"SC{date_iso[-2:]}", date_iso)],
+            )
+
+        # creances absente sur la seconde date : table absente sur une date.
+        (tmp_path / f"source.{TABLE_2}" / DATES_SCENARIO[0]).mkdir(parents=True)
+        with (tmp_path / f"source.{TABLE_2}" / DATES_SCENARIO[0] / f"{TABLE_2}.csv").open(
+            "w", newline="", encoding="utf-8"
+        ) as f:
+            ecrivain = csv.DictWriter(f, fieldnames=COLONNES_2)
+            ecrivain.writeheader()
+            ecrivain.writerow(_ligne_creances("SCC01", DATES_SCENARIO[0]))
+
+        appels: list[tuple[str, str]] = []
+        original = chargeur.charger_table_partition
+
+        def espion(table, date_iso, chemin_csv):
+            appels.append((table, date_iso))
+            return original(table, date_iso, chemin_csv)
+
+        monkeypatch.setattr(chargeur, "charger_table_partition", espion)
+        agregats = chargeur.charger_scenario(tmp_path, tables=[TABLE, TABLE_2])
+
+        assert agregats[TABLE] == {
+            "lues": 2,
+            "inserees": 2,
+            "rejetees": 0,
+            "charge": 2,
+            "bloque_seuil": 0,
+            "en_tete_invalide": 0,
+        }
+        assert agregats[TABLE_2] == {
+            "lues": 1,
+            "inserees": 1,
+            "rejetees": 0,
+            "charge": 1,
+            "bloque_seuil": 0,
+            "en_tete_invalide": 0,
+        }
+
+        appels_relances = [date for table, date in appels if table == TABLE]
+        assert appels_relances == sorted(appels_relances)
+    finally:
+        _nettoyer_scenario()
