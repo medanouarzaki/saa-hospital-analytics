@@ -62,6 +62,7 @@ def _tables() -> list[str]:
 
 
 _SEUIL_QUARANTAINE = controles.charger_config()["seuil_quarantaine"]["valeur"]
+_PLANCHER_REJETS_BLOQUANTS = controles.charger_config()["plancher_rejets_bloquants"]["valeur"]
 _COLONNES_TECHNIQUES = ["rejet_motifs", "rejet_date_chargement", "rejet_partition"]
 
 
@@ -144,7 +145,7 @@ def charger_table_partition(table: str, date_iso: str, chemin_csv: Path) -> dict
 
     rejetees = sum(1 for motifs in motifs_par_ligne if motifs)
 
-    if lues > 0 and rejetees / lues > _SEUIL_QUARANTAINE:
+    if lues > 0 and rejetees / lues > _SEUIL_QUARANTAINE and rejetees >= _PLANCHER_REJETS_BLOQUANTS:
         return {
             "table": table,
             "date": date_iso,

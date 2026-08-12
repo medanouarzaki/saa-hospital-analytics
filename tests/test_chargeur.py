@@ -18,6 +18,10 @@ from ingestion import chargeur, controles
 TABLE = "relances"
 COLONNES = [e["colonne"] for e in controles.charger_registre() if e["table"] == f"source.{TABLE}"]
 
+_CONFIG = controles.charger_config()
+SEUIL_QUARANTAINE = _CONFIG["seuil_quarantaine"]["valeur"]
+PLANCHER_REJETS_BLOQUANTS = _CONFIG["plancher_rejets_bloquants"]["valeur"]
+
 DATES_TEST = ["2030-01-01", "2030-01-02", "2030-01-03", "2030-01-04", "2030-01-05", "2030-01-06"]
 
 
@@ -91,12 +95,47 @@ def _fichier_sous_le_seuil(date_iso: str, prefixe: str = "L") -> list[dict[str, 
     return lignes
 
 
-def _fichier_au_dessus_du_seuil(date_iso: str, prefixe: str = "S") -> list[dict[str, str]]:
-    """2 lignes, une invalide : 1/2 = 50 %, au-dessus du seuil de 5 %."""
-    return [
-        _ligne(f"{prefixe}001", date_iso),
-        _ligne(f"{prefixe}002", date_iso, date_relance="zzz"),
-    ]
+# Décomptes de rejets fixés en dur, délibérément non recalculés depuis
+# PLANCHER_REJETS_BLOQUANTS : le nombre de lignes fabriquées doit rester un fait figé,
+# établi une fois pour toutes contre le plancher tel qu'il est déclaré aujourd'hui (2).
+# S'il était recalculé depuis la configuration à chaque exécution, muter le plancher dans
+# la configuration ferait dériver le fichier fabriqué en même temps que le code testé, et
+# la mutation ne serait jamais observable (les deux prémisses -- fichier et plancher --
+# évolueraient toujours ensemble). SEUIL_QUARANTAINE, lui, reste lu dynamiquement pour
+# n'inscrire aucun littéral de pourcentage dans ce fichier.
+N_REJETS_SOUS_PLANCHER_ACTUEL = 1  # PLANCHER_REJETS_BLOQUANTS (2) moins un
+N_REJETS_AU_PLANCHER_ACTUEL = 2  # PLANCHER_REJETS_BLOQUANTS (2)
+
+
+def _fichier_rejets_sous_plancher(date_iso: str, prefixe: str = "U") -> list[dict[str, str]]:
+    """Taux au-dessus du seuil, mais rejets sous le plancher actuel : ne doit pas être bloqué."""
+    lignes = _fichier_valide(date_iso, prefixe, 1)
+    for i in range(N_REJETS_SOUS_PLANCHER_ACTUEL):
+        lignes.append(_ligne(f"{prefixe}9{i:02d}", date_iso, date_relance="zzz"))
+    return lignes
+
+
+def _fichier_rejets_au_plancher(date_iso: str, prefixe: str = "B") -> list[dict[str, str]]:
+    """Taux au-dessus du seuil, rejets égaux au plancher actuel : doit être bloqué."""
+    lignes = _fichier_valide(date_iso, prefixe, 1)
+    for i in range(N_REJETS_AU_PLANCHER_ACTUEL):
+        lignes.append(_ligne(f"{prefixe}9{i:02d}", date_iso, date_relance="zzz"))
+    return lignes
+
+
+def _fichier_grande_partition_sous_le_seuil(
+    date_iso: str, prefixe: str = "G"
+) -> list[dict[str, str]]:
+    """Grande partition : rejets au plancher actuel, mais taux sous le seuil — ne doit pas
+    être bloqué. Sépare la conjonction (seuil ET plancher) de la disjonction (seuil OU
+    plancher), qu'aucun des autres fichiers fabriqués de ce module ne distingue : eux
+    dépassent toujours le seuil en pourcentage, cette fixture-ci reste en dessous.
+    """
+    n_valides = int(N_REJETS_AU_PLANCHER_ACTUEL / SEUIL_QUARANTAINE) + 10
+    lignes = _fichier_valide(date_iso, prefixe, n_valides)
+    for i in range(N_REJETS_AU_PLANCHER_ACTUEL):
+        lignes.append(_ligne(f"{prefixe}9{i:02d}", date_iso, date_relance="zzz"))
+    return lignes
 
 
 def test_partition_mixte_acceptees_et_rejetees(tmp_path: Path) -> None:
@@ -179,14 +218,64 @@ def test_seuil_bloque_et_contenu_anterieur_survit(tmp_path: Path) -> None:
     assert decompte_source_avant > 0
 
     chemin_bloque = tmp_path / "bloque.csv"
-    _ecrire_csv(chemin_bloque, _fichier_au_dessus_du_seuil(date_iso))
+    _ecrire_csv(chemin_bloque, _fichier_rejets_au_plancher(date_iso))
     resultat = chargeur.charger_table_partition(TABLE, date_iso, chemin_bloque)
 
     assert resultat["etat"] == "bloque_seuil"
-    assert resultat["lues"] == 2
-    assert resultat["rejetees"] == 1
+    assert resultat["lues"] == 1 + N_REJETS_AU_PLANCHER_ACTUEL
+    assert resultat["rejetees"] == N_REJETS_AU_PLANCHER_ACTUEL
     assert _decompte_source(date_iso) == decompte_source_avant
     assert _decompte_quarantaine(date_iso) == decompte_quarantaine_avant
+
+
+def test_rejet_isole_sous_plancher_charge_normalement(tmp_path: Path) -> None:
+    date_iso = "2030-01-01"
+    lignes = _fichier_rejets_sous_plancher(date_iso)
+    n_rejets_attendus = N_REJETS_SOUS_PLANCHER_ACTUEL
+    chemin = tmp_path / f"{TABLE}.csv"
+    _ecrire_csv(chemin, lignes)
+
+    resultat = chargeur.charger_table_partition(TABLE, date_iso, chemin)
+
+    assert resultat["etat"] == "charge"
+    assert resultat["lues"] == len(lignes)
+    assert resultat["rejetees"] == n_rejets_attendus
+    assert resultat["inserees"] == len(lignes) - n_rejets_attendus
+    assert _decompte_source(date_iso) == len(lignes) - n_rejets_attendus
+    assert _decompte_quarantaine(date_iso) == n_rejets_attendus
+
+
+def test_rejets_au_plancher_bloque_aucune_ecriture(tmp_path: Path) -> None:
+    date_iso = "2030-01-01"
+    lignes = _fichier_rejets_au_plancher(date_iso)
+    chemin = tmp_path / f"{TABLE}.csv"
+    _ecrire_csv(chemin, lignes)
+
+    resultat = chargeur.charger_table_partition(TABLE, date_iso, chemin)
+
+    assert resultat["etat"] == "bloque_seuil"
+    assert resultat["lues"] == len(lignes)
+    assert resultat["rejetees"] == N_REJETS_AU_PLANCHER_ACTUEL
+    assert resultat["inserees"] == 0
+    assert _decompte_source(date_iso) == 0
+    assert _decompte_quarantaine(date_iso) == 0
+
+
+def test_grande_partition_sous_le_seuil_charge_malgre_le_plancher_atteint(
+    tmp_path: Path,
+) -> None:
+    date_iso = "2030-01-01"
+    lignes = _fichier_grande_partition_sous_le_seuil(date_iso)
+    assert N_REJETS_AU_PLANCHER_ACTUEL / len(lignes) <= SEUIL_QUARANTAINE
+    chemin = tmp_path / f"{TABLE}.csv"
+    _ecrire_csv(chemin, lignes)
+
+    resultat = chargeur.charger_table_partition(TABLE, date_iso, chemin)
+
+    assert resultat["etat"] == "charge"
+    assert resultat["rejetees"] == N_REJETS_AU_PLANCHER_ACTUEL
+    assert _decompte_source(date_iso) == len(lignes) - N_REJETS_AU_PLANCHER_ACTUEL
+    assert _decompte_quarantaine(date_iso) == N_REJETS_AU_PLANCHER_ACTUEL
 
 
 def test_atomicite_sur_echec_en_cours_d_insertion(tmp_path: Path, monkeypatch) -> None:

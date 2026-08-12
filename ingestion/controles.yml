@@ -85,3 +85,15 @@ seuil_quarantaine:
     export, colonne décalée, encodage corrompu) qu'une accumulation normale de défauts de
     saisie ligne à ligne, et charger quand même noierait ce signal dans la masse des
     lignes acceptées.
+
+plancher_rejets_bloquants:
+  valeur: 2
+  note: >-
+    Un fichier n'est bloqué que si le taux de rejet dépasse le seuil ET que le nombre de
+    rejets atteint ce plancher. Le seuil en pourcentage détecte un problème systémique
+    d'extraction, qui produit par nature plusieurs lignes mauvaises ; une ligne isolée est
+    un défaut de saisie ordinaire, dont la place est la quarantaine, pas le blocage du
+    fichier entier. Sans ce plancher, une petite partition journalière voit un rejet
+    unique dépasser mécaniquement tout seuil en pourcentage (1 ligne sur moins de 20 en
+    est déjà à plus de 5 %), bloquant des lignes par ailleurs saines pour une cause qui
+    n'a rien de systémique.
