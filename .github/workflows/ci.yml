@@ -138,4 +138,4 @@ jobs:
 
       - run: uv run python ingestion/appliquer_ddl.py
 
-      - run: uv run pytest tests/test_provenance.py -v
+      - run: uv run pytest tests/test_provenance.py tests/test_quarantaine_schema.py -v
