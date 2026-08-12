@@ -75,3 +75,13 @@ booleens:
   note: >-
     Domaine confirmé mesuré sur l'intégralité du jeu de référence : aucune valeur non vide
     hors {0, 1} sur les neuf colonnes booleen du registre des champs.
+
+seuil_quarantaine:
+  valeur: 0.05
+  note: >-
+    Décision de cadrage du projet : au-delà de 5 % de lignes rejetées dans un fichier de
+    partition, le fichier est bloqué plutôt que chargé partiellement — un taux de rejet
+    aussi élevé signale plus probablement un problème d'extraction en amont (mauvais
+    export, colonne décalée, encodage corrompu) qu'une accumulation normale de défauts de
+    saisie ligne à ligne, et charger quand même noierait ce signal dans la masse des
+    lignes acceptées.
