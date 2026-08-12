@@ -1,0 +1,77 @@
+# Configuration déclarée des contrôles d'entrée de l'ingestion.
+#
+# Ce fichier ne dépend de rien sous generator/ : les formats et les bornes ci-dessous sont
+# posés côté ingestion, avec leur propre justification, indépendamment de ce que le
+# générateur du jeu de données synthétique choisit d'émettre. C'est ce qui donne un sens à
+# la réconciliation ultérieure entre les deux chaînes.
+
+formats:
+  date:
+    motif: "%m/%d/%Y"
+    libelle: "MM/DD/YYYY"
+    note: >-
+      Format d'affichage du système observé, restitué tel quel par le relevé de champs
+      (docs/observation/releve_champs.yml) : les captures d'écran de l'interface montrent
+      les dates sous cette forme, sans séparateur ni ordre alternatif observé.
+  horodatage:
+    motif: "%m/%d/%Y %I:%M:%S %p"
+    libelle: "MM/DD/YYYY hh:mm:ss AM|PM"
+    note: >-
+      Même origine que le format date : heure sur 12 heures avec indicateur AM/PM, tel
+      qu'affiché par le système observé.
+
+plages:
+  borne_basse_evenement:
+    valeur: "2000-01-01"
+    portee: "toute colonne date ou horodatage, hors date_naissance"
+    note: >-
+      Hypothèse : aucun événement du système observé (rendez-vous, passage, mouvement,
+      facture, encaissement, créance, relance...) n'est antérieur à l'an 2000 — une date
+      plus ancienne signale une valeur mal formée ou un repère technique laissé par
+      l'extraction, jamais un fait métier plausible.
+  date_naissance:
+    borne_basse:
+      valeur: "1890-01-01"
+      note: >-
+        Hypothèse de plausibilité humaine : au moment de toute extraction couverte par
+        cette chaîne, aucun patient ne peut être né avant cette date.
+    regle_intra_ligne:
+      nom: naissance_future
+      description: >-
+        date_naissance ne doit jamais être postérieure à date_extraction de la même
+        ligne : un patient ne peut pas naître après le jour où sa fiche est extraite.
+
+cles_naturelles:
+  patients: [n_ipp]
+  rendez_vous: [n_rdv]
+  passages: [n_passage]
+  mouvements: [n_mutation]
+  prises_en_charge: [n_prise_en_charge]
+  factures: [n_facture]
+  lignes_facture: [n_facture, n_ligne]
+  passages_urgences: [n_passage]
+  encaissements: [n_encaissement]
+  creances: [n_creance]
+  relances: [n_relance]
+note_cles_naturelles: >-
+  Unicité exigée dans un fichier de partition seulement : la répétition d'une même clé
+  entre deux partitions distinctes est une réextraction légitime du même enregistrement
+  après modification, pas un doublon. Constaté sur les données : source.patients.n_ipp et
+  source.creances.n_creance réapparaissent entre partitions sur le jeu de référence, sans
+  qu'aucune des onze tables ne porte de doublon de clé à l'intérieur d'un même fichier.
+
+booleens:
+  domaine: [0, 1]
+  colonnes:
+    - source.patients.avertissements_sms
+    - source.patients.avertissements_email
+    - source.patients.exitus
+    - source.rendez_vous.rdv_supplementaire
+    - source.rendez_vous.imprimer_donnees
+    - source.passages_urgences.consentement_transfert
+    - source.passages_urgences.famille_informee
+    - source.passages_urgences.inventaire_effets
+    - source.encaissements.billet_sortie_delivre
+  note: >-
+    Domaine confirmé mesuré sur l'intégralité du jeu de référence : aucune valeur non vide
+    hors {0, 1} sur les neuf colonnes booleen du registre des champs.
