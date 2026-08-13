@@ -495,6 +495,28 @@ def generer_lignes(
     return lignes
 
 
+def versions_par_ipp(lignes_patients: list[dict]) -> dict[str, list[dict]]:
+    """Regroupe les lignes patients par `n_ipp`, une entrée par n_ipp (une ou deux versions,
+    non triées ici — `version_en_vigueur` trie à l'usage). Partagé par tout lecteur aval qui
+    doit choisir la version en vigueur à la date d'un événement plutôt que la dernière
+    réextraite (voir `version_en_vigueur`)."""
+    par_ipp: dict[str, list[dict]] = {}
+    for ligne in lignes_patients:
+        par_ipp.setdefault(ligne["n_ipp"], []).append(ligne)
+    return par_ipp
+
+
+def version_en_vigueur(versions: list[dict], jour: date) -> dict:
+    """Rend la version en vigueur à `jour` : la dernière dont `date_extraction <= jour`, ou
+    la première version si aucune ne satisfait cette condition (l'événement précède toute
+    extraction connue — la première version est la meilleure information disponible)."""
+    versions_triees = sorted(versions, key=lambda v: v["date_extraction"])
+    candidates = [v for v in versions_triees if v["date_extraction"] <= jour]
+    if candidates:
+        return candidates[-1]
+    return versions_triees[0]
+
+
 def ecrire_patients(
     racine,
     scenario: str,
