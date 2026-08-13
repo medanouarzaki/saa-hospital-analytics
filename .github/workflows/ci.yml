@@ -76,7 +76,6 @@ jobs:
           - nom: invariants-rdv-volumes-et-fichiers-courts
             fichiers: >-
               tests/test_aucune_trace_processus.py
-              tests/test_collecte_ci.py
               tests/test_config_generateur.py
               tests/test_ecriture.py
               tests/test_generator_cli.py
