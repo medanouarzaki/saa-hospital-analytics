@@ -1,0 +1,71 @@
+version: 2
+
+models:
+  - name: int_patients
+    description: >
+      source.patients typée : les colonnes date/horodatage/booleen converties par les
+      macros de dbt/macros/conversions.sql, les colonnes code/texte reprises telles quelles.
+      Une ligne par version de fiche (grain n_ipp, date_extraction), inchangé par rapport à
+      la couche source.
+    tests:
+      - meme_decompte_que_la_source:
+          arguments:
+            compare_model: "{{ source('source', 'patients') }}"
+      - unique:
+          arguments:
+            column_name: "n_ipp || '|' || date_extraction"
+    columns:
+      - name: date_naissance
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'patients') }}"
+                source_column: date_naissance
+      - name: date_photo
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'patients') }}"
+                source_column: date_photo
+      - name: date_attribution
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'patients') }}"
+                source_column: date_attribution
+      - name: date_inscription
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'patients') }}"
+                source_column: date_inscription
+      - name: date_extraction
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'patients') }}"
+                source_column: date_extraction
+      - name: date_modification
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'patients') }}"
+                source_column: date_modification
+      - name: avertissements_sms
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'patients') }}"
+                source_column: avertissements_sms
+      - name: avertissements_email
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'patients') }}"
+                source_column: avertissements_email
+      - name: exitus
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'patients') }}"
+                source_column: exitus

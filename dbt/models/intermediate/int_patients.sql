@@ -1,0 +1,55 @@
+{#
+    Couche intermediate de source.patients : les 46 colonnes du registre, chaque colonne
+    typée (date/horodatage/booleen) passée par la macro de conversion correspondant à son
+    type_metier ; les colonnes code/texte reprises telles quelles. Correspondance colonne ->
+    macro générée par script depuis le registre, pas écrite de mémoire (voir le rapport).
+#}
+
+select
+    n_ipp,
+    nom,
+    nom_famille_1,
+    nom_famille_2,
+    sexe,
+    {{ convertir_date('date_naissance') }} as date_naissance,
+    type_piece_identite,
+    n_piece_identite,
+    etat_civil,
+    type_patient,
+    {{ convertir_date('date_photo') }} as date_photo,
+    modifie_par,
+    cree_par,
+    {{ convertir_date('date_attribution') }} as date_attribution,
+    compagnie_assurance,
+    police,
+    n_assure,
+    profession,
+    num_inscription,
+    {{ convertir_date('date_inscription') }} as date_inscription,
+    type_domicile,
+    adresse,
+    code_postal,
+    etat,
+    ville,
+    quartier,
+    nationalite,
+    telephone_1,
+    telephone_2,
+    telephone_3,
+    telephone_4,
+    {{ convertir_booleen('avertissements_sms') }} as avertissements_sms,
+    email,
+    {{ convertir_booleen('avertissements_email') }} as avertissements_email,
+    environnement,
+    nom_pere,
+    nom_mere,
+    etat_naissance,
+    ville_naissance,
+    pays_naissance,
+    quartier_naissance,
+    commentaire,
+    province,
+    {{ convertir_booleen('exitus') }} as exitus,
+    {{ convertir_horodatage('date_modification') }} as date_modification,
+    {{ convertir_date('date_extraction') }} as date_extraction
+from {{ source('source', 'patients') }}
