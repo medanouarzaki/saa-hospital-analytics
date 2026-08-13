@@ -23,5 +23,5 @@ seeds:
     +schema: referentiels
 
 vars:
-  dim_date_debut: "2023-08-01"
+  dim_date_debut: "2023-01-01"
   dim_date_fin: "2026-12-31"
