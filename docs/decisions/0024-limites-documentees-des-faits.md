@@ -16,12 +16,15 @@ source, soit hors du périmètre du grain déjà fixé (`docs/decisions/0023-...
 1. **Aucune distinction obstétrique n'est fabriquée.** Ni colonne, ni acte, ni paramètre de
    configuration ne distingue un accouchement d'un autre séjour du service `HGO`. Mesuré :
    401 séjours au service `HGO`, âges de 0 à 120 ans à l'admission (l'étendue complète d'un
-   service généraliste, pas celle d'une population en âge de procréer), 0 sortie par décès sur
-   396 séjours clos, et surtout : les 731 factures portant le diagnostic CIM-10 `O80`
-   (accouchement unique spontané) totalisent 6 019 lignes d'acte, dont aucune ne porte le code
-   `O80` lui-même — la totalité des lignes porte d'autres codes d'acte. Le diagnostic existe sur
-   l'en-tête de facture ; rien au grain de la ligne facturée ne le reflète. Décision : ne rien
-   fabriquer, documenter la limite.
+   service généraliste, pas celle d'une population en âge de procréer), un taux de décès de
+   10,10 % (40/396 séjours clos, code `D` de `nomenclature_mode_sortie`) statistiquement
+   indiscernable du taux tous services confondus (10,08 %, 298/2 955 séjours clos) — le service
+   ne se distingue pas des autres par ce critère non plus. 731 factures portent le diagnostic
+   CIM-10 `O80` (accouchement unique spontané), tout type d'épisode confondu ; 102 seulement
+   relèvent d'un épisode d'hospitalisation, et 20 seulement s'apparient (par le mécanisme
+   n_ipp + jour du point 2, déjà ambigu) à un séjour du service `HGO` — le diagnostic
+   d'accouchement n'est donc, à travers la facturation, ni majoritairement ni fiablement
+   rattachable au service. Décision : ne rien fabriquer, documenter la limite.
 2. **Aucun lien entre `fct_sejour` et le passage d'hospitalisation (`fct_passage` filtré sur
    `type_passage = 'H'`).** Deux durées tirées indépendamment par le générateur (établi par
    mesure antérieure), aucune clé directe entre les deux tables. Un appariement par `n_ipp` et
