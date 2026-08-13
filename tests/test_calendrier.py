@@ -170,6 +170,32 @@ def test_predicat_ramadan_sur_periode() -> None:
     assert jours_ramadan_mesures == total_independant
 
 
+def test_equivalence_derivation_feries_avec_le_generateur() -> None:
+    generer_seed_calendrier = charger_module(
+        RACINE / "docs" / "calendrier" / "generer_seed_calendrier.py"
+    )
+
+    entrees = generer_seed_calendrier._entrees()
+    annees = generer_seed_calendrier._etendue_annees()
+
+    for annee in annees:
+        lignes_annee = generer_seed_calendrier.lignes(range(annee, annee + 1), entrees)
+        feries_derivation = {
+            jour
+            for jour, categorie, _ in lignes_annee
+            if categorie in ("ferie_fixe", "ferie_mobile")
+        }
+        feries_generateur = calendrier.jours_feries(annee)
+
+        manquants_au_generateur = feries_derivation - feries_generateur
+        manquants_a_la_derivation = feries_generateur - feries_derivation
+        assert not manquants_au_generateur and not manquants_a_la_derivation, (
+            f"{annee} : absents de generator/calendrier.py::jours_feries : "
+            f"{sorted(manquants_au_generateur)} ; absents du script de dérivation : "
+            f"{sorted(manquants_a_la_derivation)}"
+        )
+
+
 def test_seed_calendrier_synchronise_avec_la_source(tmp_path: Path) -> None:
     generer_seed_calendrier = charger_module(
         RACINE / "docs" / "calendrier" / "generer_seed_calendrier.py"
