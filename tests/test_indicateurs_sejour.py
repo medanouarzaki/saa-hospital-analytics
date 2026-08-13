@@ -24,7 +24,7 @@ fait échouer le test.
 """
 
 import importlib.util
-from datetime import date, datetime, time, timezone
+from datetime import UTC, date, datetime, time
 from pathlib import Path
 
 import psycopg
@@ -64,11 +64,9 @@ def _connexion() -> psycopg.Connection:
 
 def _sejours(conn: psycopg.Connection) -> list[dict]:
     with conn.cursor() as curseur:
-        curseur.execute(
-            "select date_heure_admission, date_heure_sortie from marts.fct_sejour"
-        )
+        curseur.execute("select date_heure_admission, date_heure_sortie from marts.fct_sejour")
         colonnes = [c.name for c in curseur.description]
-        return [dict(zip(colonnes, ligne)) for ligne in curseur.fetchall()]
+        return [dict(zip(colonnes, ligne, strict=True)) for ligne in curseur.fetchall()]
 
 
 def _max_jour_admission(conn: psycopg.Connection) -> date | None:
@@ -104,7 +102,7 @@ def test_indicateurs_sejour_recalcules_depuis_fct_sejour() -> None:
     # Serveur en UTC (`show timezone`, vérifié avant d'écrire) : les colonnes
     # timestamptz de fct_sejour reviennent avec un fuseau, la borne construite ici
     # doit en porter un aussi pour rester comparable.
-    borne_fin = datetime.combine(date_fin, time(23, 59, 59), tzinfo=timezone.utc)
+    borne_fin = datetime.combine(date_fin, time(23, 59, 59), tzinfo=UTC)
     total_journees = 0.0
     for ligne in lignes:
         fin = ligne["date_heure_sortie"] if ligne["date_heure_sortie"] is not None else borne_fin

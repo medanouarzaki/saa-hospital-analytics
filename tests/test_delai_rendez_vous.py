@@ -69,7 +69,7 @@ def _lignes_agregat() -> list[dict]:
                 "ecart_type_log_delai_positif from marts.agg_delai_rendez_vous"
             )
             colonnes = [c.name for c in curseur.description]
-            return [dict(zip(colonnes, ligne)) for ligne in curseur.fetchall()]
+            return [dict(zip(colonnes, ligne, strict=True)) for ligne in curseur.fetchall()]
     finally:
         conn.close()
 
