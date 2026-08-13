@@ -1,0 +1,70 @@
+version: 2
+
+models:
+  - name: fct_sejour
+    description: >
+      service_sortie est une colonne dérivée : service_destination de la ligne de
+      mutation quand le séjour en porte une, service_accueil sinon.
+    tests:
+      - version_patient_comptable:
+          arguments:
+            jour_column: "jour_admission"
+    columns:
+      - name: n_sejour
+        tests:
+          - unique
+          - not_null
+      - name: n_ipp
+        tests:
+          - not_null
+      - name: date_heure_admission
+        tests:
+          - not_null
+      - name: jour_admission
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_date') }}"
+                field: "date_jour"
+      - name: mode_admission
+        tests:
+          - not_null
+      - name: service_accueil
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_service') }}"
+                field: "code_service"
+      - name: lit_admission
+        tests:
+          - not_null
+      - name: a_une_mutation
+        tests:
+          - not_null
+      - name: service_origine
+        tests:
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_service') }}"
+                field: "code_service"
+      - name: service_destination
+        tests:
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_service') }}"
+                field: "code_service"
+      - name: est_clos
+        tests:
+          - not_null
+      - name: service_sortie
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_service') }}"
+                field: "code_service"
+      - name: nb_lignes_mouvement
+        tests:
+          - not_null
