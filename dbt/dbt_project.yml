@@ -1,0 +1,19 @@
+name: "saa_hospital_analytics"
+version: "1.0.0"
+
+profile: "saa_hospital_analytics"
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  saa_hospital_analytics:
+    +materialized: view
+    intermediate:
+      +schema: intermediate
+    marts:
+      +schema: marts
