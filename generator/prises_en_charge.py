@@ -22,7 +22,7 @@ from datetime import date, datetime, time, timedelta
 
 import numpy as np
 
-from generator import config
+from generator import config, patients
 
 TABLE = "source.prises_en_charge"
 
@@ -69,13 +69,18 @@ def generer_lignes(
     delai_decision = entrees["delai_jours_decision_prise_en_charge"]["valeur"]
     gabarit_pec = entrees["gabarit_identifiant_prise_en_charge"]["valeur"]
 
-    patients_par_ipp = {p["n_ipp"]: p for p in lignes_patients}
+    versions_par_ipp = patients.versions_par_ipp(lignes_patients)
 
     lignes: list[dict] = []
     rang = 0
 
     for facture in lignes_factures:
-        patient = patients_par_ipp[facture["n_ipp"]]
+        # date_facture : "sert de point de depart implicite de la demarche" (docstring de ce
+        # module) -- c'est l'ancre de l'evenement, la couverture doit donc etre celle en
+        # vigueur a cette date, pas la derniere reextraite.
+        patient = patients.version_en_vigueur(
+            versions_par_ipp[facture["n_ipp"]], facture["date_facture"]
+        )
         compagnie = patient["compagnie_assurance"]
         if compagnie == "SANS":
             continue
