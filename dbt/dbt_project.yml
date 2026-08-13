@@ -17,3 +17,11 @@ models:
       +schema: intermediate
     marts:
       +schema: marts
+
+seeds:
+  saa_hospital_analytics:
+    +schema: referentiels
+
+vars:
+  dim_date_debut: "2023-08-01"
+  dim_date_fin: "2026-12-31"
