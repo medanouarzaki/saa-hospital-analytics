@@ -1,0 +1,41 @@
+version: 2
+
+models:
+  - name: agg_recouvrement
+    description: >
+      Une ligne par jour de naissance de créance et type de débiteur. Chaque créance
+      n'est comptée qu'une fois, via son instantané le plus récent (max
+      date_extraction) -- les instantanés antérieurs de la même créance sont exclus,
+      pour ne pas surcompter montant_du.
+    columns:
+      - name: jour
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_date') }}"
+                field: "date_jour"
+      - name: type_debiteur
+        tests:
+          - not_null
+      - name: n_creances
+        tests:
+          - not_null
+      - name: montant_du
+        tests:
+          - not_null
+      - name: montant_recouvre
+        tests:
+          - not_null
+      - name: montant_restant
+        tests:
+          - not_null
+      - name: taux_recouvrement
+        tests:
+          - not_null
+      - name: n_relances
+        tests:
+          - not_null
+      - name: n_relances_abouties
+        tests:
+          - not_null
