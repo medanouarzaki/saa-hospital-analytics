@@ -1,0 +1,19 @@
+version: 2
+
+models:
+  - name: dim_patient
+    description: >
+      Dimension patient en SCD type 2 : une ligne par version de fiche, bornes de validité
+      semi-ouvertes (valide_de inclus, valide_jusqu_a exclu, NULL pour la version courante).
+    tests:
+      - meme_decompte_que_la_source:
+          arguments:
+            compare_model: "{{ ref('int_patients') }}"
+      - unique:
+          arguments:
+            column_name: "n_ipp || '|' || valide_de"
+    columns:
+      - name: n_ipp
+      - name: valide_de
+      - name: valide_jusqu_a
+      - name: est_courante
