@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: int_encaissements
+    description: >
+      source.encaissements typée : les colonnes date/horodatage/booleen/numérique converties
+      par les macros de dbt/macros/conversions.sql, les colonnes code/texte reprises
+      telles quelles.
+    tests:
+      - meme_decompte_que_la_source:
+          arguments:
+            compare_model: "{{ source('source', 'encaissements') }}"
+      - unique:
+          arguments:
+            column_name: "n_encaissement"
+    columns:
+      - name: date_encaissement
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'encaissements') }}"
+                source_column: date_encaissement
+      - name: montant
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'encaissements') }}"
+                source_column: montant
+      - name: billet_sortie_delivre
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'encaissements') }}"
+                source_column: billet_sortie_delivre
+      - name: date_extraction
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'encaissements') }}"
+                source_column: date_extraction
