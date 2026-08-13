@@ -188,12 +188,44 @@ def test_exactitude_verite_terrain_biunivoque(generation: dict) -> None:
     for categorie, n_observe in decompte_surface_observe.items():
         assert decompte_surface_vt[categorie] == n_observe, categorie
 
-    compagnie_par_ipp = {p["n_ipp"]: p["compagnie_assurance"] for p in lignes[TABLE_PAT]}
-    n_couvertes = sum(1 for f in lignes[TABLE_FAC] if compagnie_par_ipp[f["n_ipp"]] != "SANS")
+    # date_facture ancre l'evenement : la couverture applicable a une facture est celle en
+    # vigueur a sa date, pas la derniere version reextraite du patient (mesure et corrige au
+    # lot qui a introduit le changement metier sur compagnie_assurance, voir le rapport).
+    versions_par_ipp_pat: dict[str, list[dict]] = {}
+    for ligne in lignes[TABLE_PAT]:
+        versions_par_ipp_pat.setdefault(ligne["n_ipp"], []).append(ligne)
+
+    def compagnie_en_vigueur(n_ipp: str, jour) -> str:
+        versions_triees = sorted(versions_par_ipp_pat[n_ipp], key=lambda v: v["date_extraction"])
+        candidates = [v for v in versions_triees if v["date_extraction"] <= jour]
+        version = candidates[-1] if candidates else versions_triees[0]
+        return version["compagnie_assurance"]
+
+    # anti-vacuite : au moins une facture doit voir une couverture differente selon qu'on
+    # prenne la derniere version reextraite ou la version en vigueur a sa date -- sans quoi
+    # le controle de taux ci-dessous ne distinguerait pas les deux semantiques.
+    n_cas_discriminants = 0
+    for f in lignes[TABLE_FAC]:
+        versions_ipp = versions_par_ipp_pat.get(f["n_ipp"])
+        if versions_ipp is None or len(versions_ipp) != 2:
+            continue
+        derniere = max(versions_ipp, key=lambda v: v["date_extraction"])
+        if (derniere["compagnie_assurance"] != "SANS") != (
+            compagnie_en_vigueur(f["n_ipp"], f["date_facture"]) != "SANS"
+        ):
+            n_cas_discriminants += 1
+    assert n_cas_discriminants > 0, "aucun cas discriminant : le test serait vrai par vacuité"
+
+    n_couvertes = sum(
+        1
+        for f in lignes[TABLE_FAC]
+        if compagnie_en_vigueur(f["n_ipp"], f["date_facture"]) != "SANS"
+    )
     n_sans_pec_observe = sum(
         1
         for f in lignes[TABLE_FAC]
-        if compagnie_par_ipp[f["n_ipp"]] != "SANS" and f["n_episode"] not in n_episodes_avec_pec
+        if compagnie_en_vigueur(f["n_ipp"], f["date_facture"]) != "SANS"
+        and f["n_episode"] not in n_episodes_avec_pec
     )
     taux_factures_sans_pec = entrees["taux_factures_sans_pec"]["valeur"]
     assert abs(n_sans_pec_observe / n_couvertes - taux_factures_sans_pec) < TOLERANCE_TAUX
