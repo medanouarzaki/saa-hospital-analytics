@@ -1,6 +1,9 @@
 # ADR 0019 — le seed du calendrier marocain est dérivé mécaniquement, testé en équivalence et en synchronisation, `dim_date` couvre à partir d'août 2023
 
-**Statut.** Accepté.
+**Statut.** Accepté. **Amendée** : la borne `dim_date_debut` retenue au point 4 (`2023-08-01`,
+calibrée sur la base complète) s'est révélée trop étroite pour la fenêtre de génération réduite
+utilisée en intégration continue — élargie à `2023-01-01`, justification mesurée dans
+`docs/decisions/0022-...md`.
 
 ---
 
