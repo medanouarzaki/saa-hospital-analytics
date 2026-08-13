@@ -17,7 +17,8 @@ patients_examines_non_constants as (
 ),
 
 decompte_patients_courants as (
-    select count(*) as n from {{ ref('dim_patient') }} where est_courante
+    select count(*) as n from {{ ref('dim_patient') }}
+    where est_courante
 ),
 
 lignes_borne_groupes_violee as (
@@ -39,7 +40,10 @@ lignes_borne_concernes_violee as (
 ),
 
 premiere_ligne as (
-    select patients_examines as n from {{ ref('agg_doublons_identite') }} limit 1
+    select patients_examines as n
+    from {{ ref('agg_doublons_identite') }}
+    order by critere
+    limit 1
 )
 
 select

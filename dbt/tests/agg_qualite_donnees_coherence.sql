@@ -16,21 +16,25 @@ with grain_duplique as (
 lignes_examinees_non_constantes as (
     select count(*) as n
     from (
-        select nom_table, count(distinct lignes_examinees) as n_valeurs_distinctes
+        select
+            nom_table,
+            count(distinct lignes_examinees) as n_valeurs_distinctes
         from {{ ref('agg_qualite_donnees') }}
         group by nom_table
         having count(distinct lignes_examinees) > 1
-    ) t
+    ) as t
 ),
 
 lignes_quarantaine_non_constantes as (
     select count(*) as n
     from (
-        select nom_table, count(distinct lignes_quarantaine) as n_valeurs_distinctes
+        select
+            nom_table,
+            count(distinct lignes_quarantaine) as n_valeurs_distinctes
         from {{ ref('agg_qualite_donnees') }}
         group by nom_table
         having count(distinct lignes_quarantaine) > 1
-    ) t
+    ) as t
 ),
 
 lignes_borne_violee as (
@@ -40,33 +44,68 @@ lignes_borne_violee as (
 ),
 
 lignes_examinees_par_table as (
-    select nom_table, min(lignes_examinees) as lignes_examinees
+    select
+        nom_table,
+        min(lignes_examinees) as lignes_examinees
     from {{ ref('agg_qualite_donnees') }}
     group by nom_table
 ),
 
 decompte_vues as (
-    select 'int_creances' as nom_table, count(*) as n from {{ ref('int_creances') }}
+    select
+        'int_creances' as nom_table,
+        count(*) as n
+    from {{ ref('int_creances') }}
     union all
-    select 'int_encaissements' as nom_table, count(*) from {{ ref('int_encaissements') }}
+    select
+        'int_encaissements' as nom_table,
+        count(*) as n
+    from {{ ref('int_encaissements') }}
     union all
-    select 'int_factures' as nom_table, count(*) from {{ ref('int_factures') }}
+    select
+        'int_factures' as nom_table,
+        count(*) as n
+    from {{ ref('int_factures') }}
     union all
-    select 'int_lignes_facture' as nom_table, count(*) from {{ ref('int_lignes_facture') }}
+    select
+        'int_lignes_facture' as nom_table,
+        count(*) as n
+    from {{ ref('int_lignes_facture') }}
     union all
-    select 'int_mouvements' as nom_table, count(*) from {{ ref('int_mouvements') }}
+    select
+        'int_mouvements' as nom_table,
+        count(*) as n
+    from {{ ref('int_mouvements') }}
     union all
-    select 'int_passages' as nom_table, count(*) from {{ ref('int_passages') }}
+    select
+        'int_passages' as nom_table,
+        count(*) as n
+    from {{ ref('int_passages') }}
     union all
-    select 'int_passages_urgences' as nom_table, count(*) from {{ ref('int_passages_urgences') }}
+    select
+        'int_passages_urgences' as nom_table,
+        count(*) as n
+    from {{ ref('int_passages_urgences') }}
     union all
-    select 'int_patients' as nom_table, count(*) from {{ ref('int_patients') }}
+    select
+        'int_patients' as nom_table,
+        count(*) as n
+    from {{ ref('int_patients') }}
     union all
-    select 'int_prises_en_charge' as nom_table, count(*) from {{ ref('int_prises_en_charge') }}
+    select
+        'int_prises_en_charge' as nom_table,
+        count(*) as n
+    from {{ ref('int_prises_en_charge') }}
     union all
-    select 'int_relances' as nom_table, count(*) from {{ ref('int_relances') }}
+    select
+        'int_relances' as nom_table,
+        count(*) as n
+    from {{ ref('int_relances') }}
     union all
-    select 'int_rendez_vous' as nom_table, count(*) from {{ ref('int_rendez_vous') }}
+    select
+        'int_rendez_vous' as nom_table,
+        count(*) as n
+    from {{ ref('int_rendez_vous') }}
 ),
 
 lignes_examinees_incoherentes_avec_la_vue as (
@@ -77,13 +116,17 @@ lignes_examinees_incoherentes_avec_la_vue as (
 ),
 
 colonnes_par_table_agregat as (
-    select nom_table, count(*) as n_colonnes
+    select
+        nom_table,
+        count(*) as n_colonnes
     from {{ ref('agg_qualite_donnees') }}
     group by nom_table
 ),
 
 colonnes_par_table_catalogue as (
-    select table_name as nom_table, count(*) as n_colonnes
+    select
+        table_name as nom_table,
+        count(*) as n_colonnes
     from information_schema.columns
     where table_schema = 'intermediate'
     group by table_name

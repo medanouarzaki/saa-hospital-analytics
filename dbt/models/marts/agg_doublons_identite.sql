@@ -26,13 +26,19 @@
 #}
 
 with patients_courants as (
-    select * from {{ ref('dim_patient') }} where est_courante
+    select * from {{ ref('dim_patient') }}
+    where est_courante
 ),
 
 groupes_nom as (
     select count(*) as taille
     from patients_courants
-    where nom is not null and nom != '' and nom_famille_1 is not null and nom_famille_1 != '' and date_naissance is not null
+    where
+        nom is not null
+        and nom != ''
+        and nom_famille_1 is not null
+        and nom_famille_1 != ''
+        and date_naissance is not null
     group by nom, nom_famille_1, date_naissance
     having count(*) >= 2
 ),
@@ -40,7 +46,11 @@ groupes_nom as (
 groupes_piece as (
     select count(*) as taille
     from patients_courants
-    where type_piece_identite is not null and type_piece_identite != '' and n_piece_identite is not null and n_piece_identite != ''
+    where
+        type_piece_identite is not null
+        and type_piece_identite != ''
+        and n_piece_identite is not null
+        and n_piece_identite != ''
     group by type_piece_identite, n_piece_identite
     having count(*) >= 2
 ),
@@ -58,19 +68,23 @@ criteres as (
         (select coalesce(max(taille), 0) from groupes_nom) as taille_plus_grand_groupe,
         (select percentile_cont(0.5) within group (order by taille) from groupes_nom) as taille_mediane_groupes
 
-        union all
+    union all
 
-        select
-            'piece_identite' as critere,
-            (select count(*) from patients_courants) as patients_examines,
-            (
-                select count(*) from patients_courants
-                where type_piece_identite is null or type_piece_identite = '' or n_piece_identite is null or n_piece_identite = ''
-            ) as patients_valeur_vide,
-            (select count(*) from groupes_piece) as nombre_groupes,
-            (select coalesce(sum(taille), 0) from groupes_piece) as patients_concernes,
-            (select coalesce(max(taille), 0) from groupes_piece) as taille_plus_grand_groupe,
-            (select percentile_cont(0.5) within group (order by taille) from groupes_piece) as taille_mediane_groupes
+    select
+        'piece_identite' as critere,
+        (select count(*) from patients_courants) as patients_examines,
+        (
+            select count(*) from patients_courants
+            where
+                type_piece_identite is null
+                or type_piece_identite = ''
+                or n_piece_identite is null
+                or n_piece_identite = ''
+        ) as patients_valeur_vide,
+        (select count(*) from groupes_piece) as nombre_groupes,
+        (select coalesce(sum(taille), 0) from groupes_piece) as patients_concernes,
+        (select coalesce(max(taille), 0) from groupes_piece) as taille_plus_grand_groupe,
+        (select percentile_cont(0.5) within group (order by taille) from groupes_piece) as taille_mediane_groupes
 )
 
 select * from criteres
