@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: int_passages
+    description: >
+      source.passages typée : les colonnes date/horodatage/booleen/numérique converties
+      par les macros de dbt/macros/conversions.sql, les colonnes code/texte reprises
+      telles quelles.
+    tests:
+      - meme_decompte_que_la_source:
+          arguments:
+            compare_model: "{{ source('source', 'passages') }}"
+      - unique:
+          arguments:
+            column_name: "n_passage"
+    columns:
+      - name: date_heure_entree
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'passages') }}"
+                source_column: date_heure_entree
+      - name: date_heure_sortie
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'passages') }}"
+                source_column: date_heure_sortie
+      - name: date_creation
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'passages') }}"
+                source_column: date_creation
+      - name: date_extraction
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'passages') }}"
+                source_column: date_extraction
