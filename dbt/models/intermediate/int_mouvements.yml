@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: int_mouvements
+    description: >
+      source.mouvements typée : les colonnes date/horodatage/booleen/numérique converties
+      par les macros de dbt/macros/conversions.sql, les colonnes code/texte reprises
+      telles quelles.
+    tests:
+      - meme_decompte_que_la_source:
+          arguments:
+            compare_model: "{{ source('source', 'mouvements') }}"
+      - unique:
+          arguments:
+            column_name: "n_mutation"
+    columns:
+      - name: date_heure_admission
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'mouvements') }}"
+                source_column: date_heure_admission
+      - name: date_heure_mutation
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'mouvements') }}"
+                source_column: date_heure_mutation
+      - name: date_heure_sortie
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'mouvements') }}"
+                source_column: date_heure_sortie
+      - name: date_extraction
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'mouvements') }}"
+                source_column: date_extraction

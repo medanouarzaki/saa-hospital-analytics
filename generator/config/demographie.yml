@@ -289,6 +289,21 @@ parametres:
     90 jours, posee sans source. Si cette echelle etait fausse, la repartition des modifications dans
     le temps serait plus ou moins concentree pres de la creation, sans effet sur le nombre de fiches modifiees,
     fixe par taux_modification_fiche.
+- nom: repartition_type_modification
+  valeur:
+    demenagement: 0.4
+    telephone: 0.3
+    etat_civil: 0.15
+    couverture: 0.15
+  unite: proportion par type de changement metier, parmi les fiches modifiees
+  provenance: HYP
+  preuve: sans_preuve_externe
+  note: 'Type de changement metier porte par une fiche reextraite, tire independamment du delai de
+    loi_delai_modification, posee sans source. Le demenagement (adresse) est pose majoritaire car
+    c''est le motif de reextraction le plus frequent dans un dossier administratif hospitalier ; les
+    trois autres types se partagent le reste. Somme verifiee a 1 par un test, pas par relecture. Si
+    cette repartition etait fausse, la part de chaque type de changement metier serait faussee, sans
+    effet sur le nombre total de fiches modifiees, fixe par taux_modification_fiche.'
 - nom: distribution_piece_identite
   valeur:
     national:

@@ -3,6 +3,7 @@ dialect = postgres
 templater = jinja
 max_line_length = 120
 large_file_skip_byte_limit = 0
+ignore_paths = .venv/
 
 [sqlfluff:rules:capitalisation.keywords]
 capitalisation_policy = lower

@@ -76,9 +76,9 @@ jobs:
           - nom: invariants-rdv-volumes-et-fichiers-courts
             fichiers: >-
               tests/test_aucune_trace_processus.py
-              tests/test_collecte_ci.py
               tests/test_config_generateur.py
               tests/test_ecriture.py
+              tests/test_generator_cli.py
               tests/test_invariants_tables.py
               tests/test_nomenclatures.py
               tests/test_prises_en_charge.py
@@ -140,3 +140,73 @@ jobs:
       - run: uv run python ingestion/appliquer_ddl.py
 
       - run: uv run pytest tests/test_provenance.py tests/test_quarantaine_schema.py tests/test_chargeur.py -v
+
+  dbt:
+    runs-on: ubuntu-latest
+    # Calque du service du job provenance : même image, mêmes options de santé, aucun mot
+    # de passe puisque le conteneur est éphémère et propre à ce job.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ""
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+
+      - run: uv sync --frozen
+
+      - run: uv run python -m generator "$RUNNER_TEMP/scenario" --date-fin 2024-03-31
+
+      - run: uv run python ingestion/appliquer_ddl.py
+
+      - run: uv run python -m ingestion.chargeur "$RUNNER_TEMP/scenario/scenario_30"
+
+      - run: |
+          mkdir -p "$RUNNER_TEMP/dbt_profiles"
+          cat > "$RUNNER_TEMP/dbt_profiles/profiles.yml" <<'PROFILE'
+          saa_hospital_analytics:
+            target: dev
+            outputs:
+              dev:
+                type: postgres
+                host: "{{ env_var('DBT_POSTGRES_HOST', 'localhost') }}"
+                port: "{{ env_var('DBT_POSTGRES_PORT', '5432') | as_number }}"
+                user: "{{ env_var('DBT_POSTGRES_USER', 'postgres') }}"
+                password: "{{ env_var('DBT_POSTGRES_PASSWORD', '') }}"
+                dbname: "{{ env_var('DBT_POSTGRES_DB', 'postgres') }}"
+                schema: intermediate
+                threads: 4
+          PROFILE
+
+      - run: cd dbt && uv run dbt seed
+        env:
+          DBT_PROFILES_DIR: ${{ runner.temp }}/dbt_profiles
+
+      - run: cd dbt && uv run dbt run
+        env:
+          DBT_PROFILES_DIR: ${{ runner.temp }}/dbt_profiles
+
+      - run: cd dbt && uv run dbt test
+        env:
+          DBT_PROFILES_DIR: ${{ runner.temp }}/dbt_profiles
+
+      - run: uv run pytest tests/test_dim_patient.py -v
+        env:
+          VERITE_TERRAIN_PATIENTS: ${{ runner.temp }}/scenario/scenario_30/verite_terrain.yml

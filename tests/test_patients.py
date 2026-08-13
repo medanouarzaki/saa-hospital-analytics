@@ -408,3 +408,40 @@ def test_tracabilite_repartie(generation: dict) -> None:
         ligne["modifie_par"] for ligne in lignes if ligne["modifie_par"] is not None
     }
     assert len(valeurs_modifie_par) > 1
+
+
+def test_repartition_type_modification_complete(generation: dict) -> None:
+    entrees = generation["entrees"]
+    execution_obj = generation["execution"]
+
+    repartition = entrees["repartition_type_modification"]["valeur"]
+    assert abs(sum(repartition.values()) - 1.0) < 1e-9
+    assert set(repartition) == set(patients.COLONNES_PAR_TYPE_MODIFICATION)
+
+    vt = _charger_verite_terrain(execution_obj)
+    assert vt["fiches_modifiees"]["decompte"] > 0
+    types_presents = {entree["type_modification"] for entree in vt["fiches_modifiees"]["entrees"]}
+    assert types_presents == set(repartition), (
+        "chaque type configuré doit apparaître dans la génération partagée"
+    )
+
+
+def test_version_en_vigueur_cas_aux_bornes() -> None:
+    v1 = {"date_extraction": date(2024, 1, 10), "valeur": "premiere"}
+    v2 = {"date_extraction": date(2024, 3, 1), "valeur": "deuxieme"}
+    versions = [v2, v1]  # ordre volontairement inverse : la fonction doit trier elle-même
+
+    # avant la premiere version : repli sur la premiere (meilleure information disponible)
+    assert patients.version_en_vigueur(versions, date(2023, 6, 1)) is v1
+
+    # exactement a la date_extraction de la premiere : cette version est en vigueur
+    assert patients.version_en_vigueur(versions, date(2024, 1, 10)) is v1
+
+    # entre les deux : la premiere reste en vigueur, la deuxieme n'a pas encore ete extraite
+    assert patients.version_en_vigueur(versions, date(2024, 2, 1)) is v1
+
+    # exactement a la date_extraction de la deuxieme : elle devient en vigueur
+    assert patients.version_en_vigueur(versions, date(2024, 3, 1)) is v2
+
+    # apres la derniere version
+    assert patients.version_en_vigueur(versions, date(2024, 6, 1)) is v2

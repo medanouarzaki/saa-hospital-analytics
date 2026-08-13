@@ -1,0 +1,9 @@
+version: 2
+
+models:
+  - name: dim_agent
+    columns:
+      - name: code_agent
+        tests:
+          - unique
+          - not_null

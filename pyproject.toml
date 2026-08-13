@@ -12,6 +12,7 @@ dependencies = [
     "openpyxl",
     "streamlit",
     "splink",
+    "dbt-postgres>=1.11.0",
 ]
 
 [dependency-groups]

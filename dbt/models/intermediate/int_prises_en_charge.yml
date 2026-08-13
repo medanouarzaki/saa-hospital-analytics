@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: int_prises_en_charge
+    description: >
+      source.prises_en_charge typée : les colonnes date/horodatage/booleen/numérique converties
+      par les macros de dbt/macros/conversions.sql, les colonnes code/texte reprises
+      telles quelles.
+    tests:
+      - meme_decompte_que_la_source:
+          arguments:
+            compare_model: "{{ source('source', 'prises_en_charge') }}"
+      - unique:
+          arguments:
+            column_name: "n_prise_en_charge"
+    columns:
+      - name: date_verification
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'prises_en_charge') }}"
+                source_column: date_verification
+      - name: taux_prise_en_charge
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'prises_en_charge') }}"
+                source_column: taux_prise_en_charge
+      - name: date_extraction
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'prises_en_charge') }}"
+                source_column: date_extraction

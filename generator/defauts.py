@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 
 import numpy as np
 
-from generator import config
+from generator import config, patients
 
 TABLE_PATIENTS = "source.patients"
 TABLE_RDV = "source.rendez_vous"
@@ -260,14 +260,23 @@ def _injecter_factures_sans_pec(
     generateur: np.random.Generator,
 ) -> tuple[list[dict], list[dict]]:
     taux = entrees["taux_factures_sans_pec"]["valeur"]
-    compagnie_par_ipp = {p["n_ipp"]: p["compagnie_assurance"] for p in lignes_patients}
-    n_couvertes = sum(1 for f in lignes_factures if compagnie_par_ipp[f["n_ipp"]] != "SANS")
+    # date_facture ancre l'evenement (meme regle que generator/prises_en_charge.py, dont ce
+    # taux complete la part structurelle, voir la note de generer_lignes) : la couverture
+    # doit etre celle en vigueur a cette date, pas la derniere reextraite.
+    versions_par_ipp = patients.versions_par_ipp(lignes_patients)
+    compagnie_par_facture = {
+        f["n_facture"]: patients.version_en_vigueur(
+            versions_par_ipp[f["n_ipp"]], f["date_facture"]
+        )["compagnie_assurance"]
+        for f in lignes_factures
+    }
+    n_couvertes = sum(1 for f in lignes_factures if compagnie_par_facture[f["n_facture"]] != "SANS")
 
     cles_pec = {pec["n_episode"] for pec in lignes_pec}
     n_deja_sans_pec = sum(
         1
         for f in lignes_factures
-        if compagnie_par_ipp[f["n_ipp"]] != "SANS" and f["n_episode"] not in cles_pec
+        if compagnie_par_facture[f["n_facture"]] != "SANS" and f["n_episode"] not in cles_pec
     )
 
     n_cible_total = round(taux * n_couvertes)

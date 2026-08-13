@@ -131,6 +131,20 @@ def _renseigne(colonne: str, entrees: dict[str, dict], generateur: np.random.Gen
     return bool(generateur.random() < taux)
 
 
+def _tirer_adresse(pool: dict, generateur: np.random.Generator) -> str:
+    voie = _tirage_uniforme_liste(pool["voies"], generateur)
+    borne_min_voie, borne_max_voie = pool["plage_numero_voie"]
+    numero_voie = int(generateur.integers(borne_min_voie, borne_max_voie + 1))
+    return f"{numero_voie} {voie}"
+
+
+def _tirer_telephone(pool: dict, generateur: np.random.Generator) -> str:
+    prefixe = _tirage_uniforme_liste(pool["prefixes_telephone"], generateur)
+    borne_min_tel, borne_max_tel = pool["plage_numero_telephone"]
+    numero_tel = int(generateur.integers(borne_min_tel, borne_max_tel + 1))
+    return f"{prefixe}{numero_tel:06d}"
+
+
 def _tirer_foyer(
     patient_id: int,
     nb_foyers: int,
@@ -140,16 +154,118 @@ def _tirer_foyer(
 ) -> tuple[str, str]:
     foyer_id = patient_id % nb_foyers
     if foyer_id not in foyers:
-        voie = _tirage_uniforme_liste(pool["voies"], generateur)
-        borne_min_voie, borne_max_voie = pool["plage_numero_voie"]
-        numero_voie = int(generateur.integers(borne_min_voie, borne_max_voie + 1))
-        prefixe = _tirage_uniforme_liste(pool["prefixes_telephone"], generateur)
-        borne_min_tel, borne_max_tel = pool["plage_numero_telephone"]
-        numero_tel = int(generateur.integers(borne_min_tel, borne_max_tel + 1))
-        adresse = f"{numero_voie} {voie}"
-        telephone = f"{prefixe}{numero_tel:06d}"
+        adresse = _tirer_adresse(pool, generateur)
+        telephone = _tirer_telephone(pool, generateur)
         foyers[foyer_id] = (adresse, telephone)
     return foyers[foyer_id]
+
+
+# Colonnes que chaque type de changement métier est autorisé à porter (partagé avec les
+# tests : la cohérence du type se vérifie contre cette même définition, pas une copie).
+# `type_patient` n'est modifié qu'en conséquence d'un changement de `compagnie_assurance`
+# qui ferait autrement violer la contrainte d'appartenance déclarée dans
+# generator/config/coherence.yml (compagnie_assurance=SANS => type_patient != AS) ;
+# il reste donc listé comme colonne autorisée de `couverture`, sans être toujours changé.
+COLONNES_PAR_TYPE_MODIFICATION: dict[str, tuple[str, ...]] = {
+    "demenagement": ("adresse",),
+    "telephone": ("telephone_1",),
+    "etat_civil": ("etat_civil",),
+    "couverture": ("compagnie_assurance", "type_patient"),
+}
+
+MAX_ESSAIS_RETIRAGE = 20
+
+
+def _tirer_type_modification(entrees: dict[str, dict], generateur: np.random.Generator) -> str:
+    repartition = entrees["repartition_type_modification"]["valeur"]
+    return _tirage_pondere_dict(repartition, generateur)
+
+
+def _retirer_jusqu_a_different(tirer, valeur_actuelle, generateur: np.random.Generator):
+    for _ in range(MAX_ESSAIS_RETIRAGE):
+        candidat = tirer(generateur)
+        if candidat != valeur_actuelle:
+            return candidat
+    return valeur_actuelle
+
+
+def _appliquer_demenagement(ligne_base: dict, entrees: dict[str, dict], generateur) -> dict:
+    pool_foyers = entrees["pool_foyers"]["valeur"]
+    nouvelle_adresse = _retirer_jusqu_a_different(
+        lambda g: _tirer_adresse(pool_foyers, g), ligne_base["adresse"], generateur
+    )
+    if nouvelle_adresse == ligne_base["adresse"]:
+        return {}
+    return {"adresse": nouvelle_adresse}
+
+
+def _appliquer_telephone(ligne_base: dict, entrees: dict[str, dict], generateur) -> dict:
+    pool_foyers = entrees["pool_foyers"]["valeur"]
+    nouveau_telephone = _retirer_jusqu_a_different(
+        lambda g: _tirer_telephone(pool_foyers, g), ligne_base["telephone_1"], generateur
+    )
+    if nouveau_telephone == ligne_base["telephone_1"]:
+        return {}
+    return {"telephone_1": nouveau_telephone}
+
+
+def _appliquer_etat_civil(ligne_base: dict, entrees: dict[str, dict], generateur) -> dict:
+    age_jours = (ligne_base["date_attribution"] - ligne_base["date_naissance"]).days
+    if age_jours / 365 < AGE_MAJORITE_ANNEES:
+        # domaine a une seule valeur possible ("C", codee en dur a la creation pour un
+        # mineur, jamais tiree d'une distribution) : mesure au rapport, aucun changement
+        # applicable pour cette fiche par ce mécanisme.
+        return {}
+    tranches = entrees["structure_age"]["valeur"]["tranches"]
+    tranche_actuelle = _tranche_depuis_age_jours(age_jours, tranches)
+    distribution = entrees["distribution_etat_civil_adulte"]["valeur"][tranche_actuelle]
+    nouvel_etat_civil = _retirer_jusqu_a_different(
+        lambda g: _tirage_pondere_dict(distribution, g), ligne_base["etat_civil"], generateur
+    )
+    if nouvel_etat_civil == ligne_base["etat_civil"]:
+        return {}
+    return {"etat_civil": nouvel_etat_civil}
+
+
+def _appliquer_couverture(ligne_base: dict, entrees: dict[str, dict], generateur) -> dict:
+    repartition_couverture = entrees["repartition_couverture"]["valeur"]
+    nouvelle_compagnie = _retirer_jusqu_a_different(
+        lambda g: _tirage_pondere_dict(repartition_couverture, g),
+        ligne_base["compagnie_assurance"],
+        generateur,
+    )
+    if nouvelle_compagnie == ligne_base["compagnie_assurance"]:
+        return {}
+    changements = {"compagnie_assurance": nouvelle_compagnie}
+
+    # contrainte d'appartenance declaree dans generator/config/coherence.yml : une fiche
+    # sans compagnie d'assurance ne peut pas rester de type Assure (AS). Recalculee ici
+    # exactement comme a la creation (generator/patients.py::_generer_ligne_patient).
+    if nouvelle_compagnie == "SANS" and ligne_base["type_patient"] == "AS":
+        distribution_type_patient = entrees["distribution_type_patient"]["valeur"]["non_assure"]
+        changements["type_patient"] = _tirage_pondere_dict(distribution_type_patient, generateur)
+
+    return changements
+
+
+_APPLICATEURS_PAR_TYPE = {
+    "demenagement": _appliquer_demenagement,
+    "telephone": _appliquer_telephone,
+    "etat_civil": _appliquer_etat_civil,
+    "couverture": _appliquer_couverture,
+}
+
+
+def _appliquer_changement_metier(
+    ligne_base: dict, entrees: dict[str, dict], generateur: np.random.Generator
+) -> tuple[str, dict]:
+    """Tire un type de changement métier et l'applique sur une copie logique de
+    `ligne_base`. Rend le type tiré et un mapping colonne -> nouvelle valeur, restreint
+    aux colonnes réellement changées (peut être vide si le domaine de la fiche n'admet
+    qu'une valeur, par exemple `etat_civil` sur un mineur — mesuré, pas masqué)."""
+    type_modification = _tirer_type_modification(entrees, generateur)
+    changements = _APPLICATEURS_PAR_TYPE[type_modification](ligne_base, entrees, generateur)
+    return type_modification, changements
 
 
 def _generer_ligne_patient(
@@ -353,6 +469,20 @@ def generer_lignes(
             jour_modification = date_ancrage + timedelta(days=delai)
             if jour_modification <= date_fin:
                 ligne_modification = dict(ligne_base)
+                # spawn() derive un generateur enfant sans consommer le flux du parent (a la
+                # difference de .random()/.integers()/...) : les tirages du changement
+                # metier restent isoles sur cette seule fiche et ne decalent pas la sequence
+                # que les patients suivants de la boucle consomment depuis `generateur` --
+                # mesure avant d'ecrire (voir le rapport) : sans cet isolement, le decalage se
+                # propageait a toutes les fiches suivantes et faisait deriver des statistiques
+                # sans rapport (occupation des lits, generator/mouvements.py) qui ne lisent
+                # pourtant aucune des colonnes que ce lot modifie.
+                generateur_metier = generateur.spawn(1)[0]
+                _, changements = _appliquer_changement_metier(
+                    ligne_base, entrees, generateur_metier
+                )
+                for colonne, valeur in changements.items():
+                    ligne_modification[colonne] = valeur
                 ligne_modification["date_modification"] = _tirer_horodatage_modification(
                     jour_modification, cache_profil_horaire, entrees, generateur
                 )
@@ -363,6 +493,28 @@ def generer_lignes(
                 lignes.append(ligne_modification)
 
     return lignes
+
+
+def versions_par_ipp(lignes_patients: list[dict]) -> dict[str, list[dict]]:
+    """Regroupe les lignes patients par `n_ipp`, une entrée par n_ipp (une ou deux versions,
+    non triées ici — `version_en_vigueur` trie à l'usage). Partagé par tout lecteur aval qui
+    doit choisir la version en vigueur à la date d'un événement plutôt que la dernière
+    réextraite (voir `version_en_vigueur`)."""
+    par_ipp: dict[str, list[dict]] = {}
+    for ligne in lignes_patients:
+        par_ipp.setdefault(ligne["n_ipp"], []).append(ligne)
+    return par_ipp
+
+
+def version_en_vigueur(versions: list[dict], jour: date) -> dict:
+    """Rend la version en vigueur à `jour` : la dernière dont `date_extraction <= jour`, ou
+    la première version si aucune ne satisfait cette condition (l'événement précède toute
+    extraction connue — la première version est la meilleure information disponible)."""
+    versions_triees = sorted(versions, key=lambda v: v["date_extraction"])
+    candidates = [v for v in versions_triees if v["date_extraction"] <= jour]
+    if candidates:
+        return candidates[-1]
+    return versions_triees[0]
 
 
 def ecrire_patients(

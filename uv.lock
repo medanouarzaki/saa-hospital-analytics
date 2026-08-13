@@ -1152,6 +1152,7 @@ name = "saa-hospital-analytics"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "dbt-postgres" },
     { name = "faker" },
     { name = "openpyxl" },
     { name = "pandas" },
@@ -1176,6 +1177,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "dbt-postgres", specifier = ">=1.11.0" },
     { name = "faker" },
     { name = "openpyxl" },
     { name = "pandas" },
