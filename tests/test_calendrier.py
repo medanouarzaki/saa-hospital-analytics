@@ -1,12 +1,22 @@
 """Contrôles bloquants sur le calendrier marocain (generator/config/calendrier.yml)."""
 
+import importlib.util
 from datetime import date, timedelta
 from pathlib import Path
 
 from generator import calendrier, config
 
+RACINE = Path(__file__).resolve().parent.parent
+
 ANNEES = (2024, 2025, 2026)
 GRANDEURS_MOBILES = ("ramadan_debut", "ramadan_fin", "aid_al_fitr", "aid_al_adha")
+
+
+def charger_module(chemin: Path):
+    spec = importlib.util.spec_from_file_location(chemin.stem, chemin)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def entrees_par_nom() -> dict[str, dict]:
@@ -158,6 +168,22 @@ def test_predicat_ramadan_sur_periode() -> None:
             total_independant += (fin_intersect - debut_intersect).days + 1
 
     assert jours_ramadan_mesures == total_independant
+
+
+def test_seed_calendrier_synchronise_avec_la_source(tmp_path: Path) -> None:
+    generer_seed_calendrier = charger_module(
+        RACINE / "docs" / "calendrier" / "generer_seed_calendrier.py"
+    )
+
+    generer_seed_calendrier.generer(tmp_path)
+
+    committe = RACINE / "dbt" / "seeds" / "calendrier_marocain.csv"
+    genere = tmp_path / "dbt" / "seeds" / "calendrier_marocain.csv"
+
+    assert genere.exists(), f"{genere} : non régénéré"
+    assert committe.read_bytes() == genere.read_bytes(), (
+        f"{committe} : divergent de la régénération depuis generator/config/calendrier.yml"
+    )
 
 
 def test_rang_jour_ramadan() -> None:
