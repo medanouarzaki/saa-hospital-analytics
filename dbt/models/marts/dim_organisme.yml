@@ -1,0 +1,9 @@
+version: 2
+
+models:
+  - name: dim_organisme
+    columns:
+      - name: code_organisme
+        tests:
+          - unique
+          - not_null
