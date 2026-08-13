@@ -1,0 +1,52 @@
+version: 2
+
+models:
+  - name: fct_passage
+    tests:
+      - meme_decompte_que_la_source:
+          arguments:
+            compare_model: "{{ ref('int_passages') }}"
+      - version_patient_comptable:
+          arguments:
+            jour_column: "date_entree"
+    columns:
+      - name: n_passage
+        tests:
+          - unique
+          - not_null
+      - name: n_ipp
+        tests:
+          - not_null
+      - name: type_passage
+        tests:
+          - not_null
+      - name: code_service
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_service') }}"
+                field: "code_service"
+      - name: n_rdv_resolu
+        tests:
+          - relationships:
+              arguments:
+                to: "{{ ref('fct_rendez_vous') }}"
+                field: "n_rdv"
+      - name: date_entree
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_date') }}"
+                field: "date_jour"
+      - name: mode_prise_en_charge
+        tests:
+          - not_null
+      - name: agent_creation
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_agent') }}"
+                field: "code_agent"
