@@ -1,0 +1,58 @@
+version: 2
+
+models:
+  - name: int_passages_urgences
+    description: >
+      source.passages_urgences typée : les colonnes date/horodatage/booleen/numérique converties
+      par les macros de dbt/macros/conversions.sql, les colonnes code/texte reprises
+      telles quelles.
+    tests:
+      - meme_decompte_que_la_source:
+          arguments:
+            compare_model: "{{ source('source', 'passages_urgences') }}"
+      - unique:
+          arguments:
+            column_name: "n_passage"
+    columns:
+      - name: date_heure_arrivee
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'passages_urgences') }}"
+                source_column: date_heure_arrivee
+      - name: date_heure_pec_medicale
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'passages_urgences') }}"
+                source_column: date_heure_pec_medicale
+      - name: date_heure_sortie
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'passages_urgences') }}"
+                source_column: date_heure_sortie
+      - name: consentement_transfert
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'passages_urgences') }}"
+                source_column: consentement_transfert
+      - name: famille_informee
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'passages_urgences') }}"
+                source_column: famille_informee
+      - name: inventaire_effets
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'passages_urgences') }}"
+                source_column: inventaire_effets
+      - name: date_extraction
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'passages_urgences') }}"
+                source_column: date_extraction
