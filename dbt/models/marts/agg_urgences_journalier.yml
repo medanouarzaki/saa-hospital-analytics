@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: agg_urgences_journalier
+    columns:
+      - name: jour
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_date') }}"
+                field: "date_jour"
+      - name: niveau_tri
+        tests:
+          - not_null
+      - name: nb_passages
+        tests:
+          - not_null

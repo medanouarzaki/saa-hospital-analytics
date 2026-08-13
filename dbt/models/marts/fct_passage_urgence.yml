@@ -1,0 +1,51 @@
+version: 2
+
+models:
+  - name: fct_passage_urgence
+    tests:
+      - meme_decompte_que_la_source:
+          arguments:
+            compare_model: "{{ ref('int_passages_urgences') }}"
+      - version_patient_comptable:
+          arguments:
+            jour_column: "date_arrivee"
+    columns:
+      - name: n_passage
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: "{{ ref('fct_passage') }}"
+                field: "n_passage"
+      - name: n_ipp
+        tests:
+          - not_null
+      - name: date_arrivee
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_date') }}"
+                field: "date_jour"
+      - name: mode_arrivee
+        tests:
+          - not_null
+      - name: motif_recours
+        tests:
+          - not_null
+      - name: niveau_tri
+        tests:
+          - not_null
+      - name: date_heure_pec_medicale
+        tests:
+          - not_null
+      - name: date_heure_sortie
+        tests:
+          - not_null
+      - name: code_service_orientation
+        tests:
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_service') }}"
+                field: "code_service"

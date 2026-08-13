@@ -1,0 +1,52 @@
+version: 2
+
+models:
+  - name: fct_encaissement
+    description: >
+      n_ipp est dérivé : obtenu via n_facture -> fct_facturation.n_ipp, aucune
+      colonne patient propre à int_encaissements.
+    tests:
+      - meme_decompte_que_la_source:
+          arguments:
+            compare_model: "{{ ref('int_encaissements') }}"
+      - version_patient_comptable:
+          arguments:
+            jour_column: "jour_encaissement"
+    columns:
+      - name: n_encaissement
+        tests:
+          - unique
+          - not_null
+      - name: n_facture
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: "{{ ref('fct_facturation') }}"
+                field: "n_facture"
+      - name: n_ipp
+        tests:
+          - not_null
+      - name: jour_encaissement
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_date') }}"
+                field: "date_jour"
+      - name: mode_reglement
+        tests:
+          - not_null
+      - name: montant
+        tests:
+          - not_null
+      - name: regisseur
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_agent') }}"
+                field: "code_agent"
+      - name: billet_sortie_delivre
+        tests:
+          - not_null

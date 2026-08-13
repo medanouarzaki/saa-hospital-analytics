@@ -1,0 +1,31 @@
+version: 2
+
+models:
+  - name: agg_doublons_identite
+    description: >
+      Une ligne par critère de collision exacte, mesurée sur dim_patient (version
+      courante). Compte et expose des collisions exactes uniquement -- ne réconcilie
+      ni ne fusionne aucun patient. Deux critères retenus après mesure de
+      non-dégénérescence (nom + nom_famille_1 + date_naissance ; type_piece_identite +
+      n_piece_identite) ; le téléphone a été écarté, mesuré dégénéré (95 % des
+      patients concernés).
+    columns:
+      - name: critere
+        tests:
+          - not_null
+          - unique
+      - name: patients_examines
+        tests:
+          - not_null
+      - name: patients_valeur_vide
+        tests:
+          - not_null
+      - name: nombre_groupes
+        tests:
+          - not_null
+      - name: patients_concernes
+        tests:
+          - not_null
+      - name: taille_plus_grand_groupe
+        tests:
+          - not_null

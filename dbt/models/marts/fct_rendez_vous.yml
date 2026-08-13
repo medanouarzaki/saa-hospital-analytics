@@ -1,0 +1,91 @@
+version: 2
+
+models:
+  - name: fct_rendez_vous
+    tests:
+      - meme_decompte_que_la_source:
+          arguments:
+            compare_model: "{{ ref('int_rendez_vous') }}"
+      - version_patient_comptable:
+          arguments:
+            jour_column: "date_rendez_vous"
+    columns:
+      - name: n_rdv
+        tests:
+          - unique
+          - not_null
+      - name: n_ipp
+        tests:
+          - not_null
+      - name: code_activite
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_activite') }}"
+                field: "code_activite"
+      - name: code_agenda
+        tests:
+          - not_null
+      - name: date_rendez_vous
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_date') }}"
+                field: "date_jour"
+      - name: date_prise
+        tests:
+          - not_null
+      - name: delai_obtention_jours
+        tests:
+          - not_null
+      - name: est_jour_meme
+        tests:
+          - not_null
+      - name: etat
+        tests:
+          - not_null
+      - name: est_honore
+        tests:
+          - not_null
+      - name: est_absence
+        tests:
+          - not_null
+      - name: est_annule
+        tests:
+          - not_null
+      - name: duree_minutes
+        tests:
+          - not_null
+      - name: origine
+        tests:
+          - not_null
+      - name: est_patient_adresse
+        tests:
+          - not_null
+      - name: agent_creation
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_agent') }}"
+                field: "code_agent"
+      - name: agent_modification
+        tests:
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_agent') }}"
+                field: "code_agent"
+      - name: agent_confirmation
+        tests:
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_agent') }}"
+                field: "code_agent"
+      - name: agent_annulation
+        tests:
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_agent') }}"
+                field: "code_agent"

@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: agg_activite_journaliere
+    description: >
+      service et activite sont nuls pour les familles qui n'en portent pas (non
+      applicable, pas inconnu) : jamais de service pour RENDEZ_VOUS, jamais
+      d'activité pour ADMISSION_SEJOUR / SORTIE_SEJOUR, et activité non renseignée
+      pour PASSAGE_H / PASSAGE_U.
+    columns:
+      - name: jour
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_date') }}"
+                field: "date_jour"
+      - name: type_evenement
+        tests:
+          - not_null
+      - name: service
+        tests:
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_service') }}"
+                field: "code_service"
+      - name: activite
+        tests:
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_activite') }}"
+                field: "code_activite"
+      - name: nb_evenements
+        tests:
+          - not_null

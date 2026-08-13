@@ -199,7 +199,7 @@ jobs:
         env:
           DBT_PROFILES_DIR: ${{ runner.temp }}/dbt_profiles
 
-      - run: cd dbt && uv run dbt run
+      - run: cd dbt && uv run dbt run --threads 1
         env:
           DBT_PROFILES_DIR: ${{ runner.temp }}/dbt_profiles
 
@@ -210,3 +210,5 @@ jobs:
       - run: uv run pytest tests/test_dim_patient.py -v
         env:
           VERITE_TERRAIN_PATIENTS: ${{ runner.temp }}/scenario/scenario_30/verite_terrain.yml
+
+      - run: uv run pytest tests/test_delai_rendez_vous.py tests/test_indicateurs_sejour.py -v

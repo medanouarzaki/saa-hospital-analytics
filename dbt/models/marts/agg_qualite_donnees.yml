@@ -1,0 +1,31 @@
+version: 2
+
+models:
+  - name: agg_qualite_donnees
+    description: >
+      Une ligne par table intermediate et par colonne (grain colonne, décidé par la
+      mesure du coût de conversion ligne->document sur les onze vues, ~1,78 s au
+      total). lignes_quarantaine et taux_quarantaine sont mesurés au niveau de la
+      table et répétés à l'identique sur chaque ligne de colonne de cette table.
+    columns:
+      - name: nom_table
+        tests:
+          - not_null
+      - name: colonne
+        tests:
+          - not_null
+      - name: lignes_examinees
+        tests:
+          - not_null
+      - name: valeurs_renseignees
+        tests:
+          - not_null
+      - name: taux_completude
+        tests:
+          - not_null
+      - name: lignes_quarantaine
+        tests:
+          - not_null
+      - name: taux_quarantaine
+        tests:
+          - not_null

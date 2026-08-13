@@ -1,0 +1,25 @@
+version: 2
+
+models:
+  - name: agg_delai_rendez_vous
+    columns:
+      - name: code_activite
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_activite') }}"
+                field: "code_activite"
+      - name: n_rendez_vous
+        tests:
+          - not_null
+      - name: n_jour_meme
+        tests:
+          - not_null
+      - name: n_delai_positif
+        tests:
+          - not_null
+      - name: part_jour_meme
+        tests:
+          - not_null

@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: agg_absenteisme
+    columns:
+      - name: code_activite
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: "{{ ref('dim_activite') }}"
+                field: "code_activite"
+      - name: n_rendez_vous
+        tests:
+          - not_null
+      - name: n_honores
+        tests:
+          - not_null
+      - name: n_absences
+        tests:
+          - not_null
+      - name: n_annulations
+        tests:
+          - not_null
+      - name: n_etat_restant
+        tests:
+          - not_null
+      - name: taux_absenteisme
+        tests:
+          - not_null
+      - name: taux_annulation
+        tests:
+          - not_null
