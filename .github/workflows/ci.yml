@@ -176,7 +176,7 @@ jobs:
 
       - run: uv run python ingestion/appliquer_ddl.py
 
-      - run: uv run python -m ingestion.chargeur "$RUNNER_TEMP/scenario"
+      - run: uv run python -m ingestion.chargeur "$RUNNER_TEMP/scenario/scenario_30"
 
       - run: |
           mkdir -p "$RUNNER_TEMP/dbt_profiles"
@@ -209,4 +209,4 @@ jobs:
 
       - run: uv run pytest tests/test_dim_patient.py -v
         env:
-          VERITE_TERRAIN_PATIENTS: ${{ runner.temp }}/scenario/verite_terrain.yml
+          VERITE_TERRAIN_PATIENTS: ${{ runner.temp }}/scenario/scenario_30/verite_terrain.yml
