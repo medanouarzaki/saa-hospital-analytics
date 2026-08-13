@@ -1,0 +1,58 @@
+version: 2
+
+models:
+  - name: int_lignes_facture
+    description: >
+      source.lignes_facture typée : les colonnes date/horodatage/booleen/numérique converties
+      par les macros de dbt/macros/conversions.sql, les colonnes code/texte reprises
+      telles quelles.
+    tests:
+      - meme_decompte_que_la_source:
+          arguments:
+            compare_model: "{{ source('source', 'lignes_facture') }}"
+      - unique:
+          arguments:
+            column_name: "n_facture || '|' || n_ligne"
+    columns:
+      - name: n_ligne
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'lignes_facture') }}"
+                source_column: n_ligne
+      - name: coefficient
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'lignes_facture') }}"
+                source_column: coefficient
+      - name: quantite
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'lignes_facture') }}"
+                source_column: quantite
+      - name: tarif_unitaire
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'lignes_facture') }}"
+                source_column: tarif_unitaire
+      - name: montant
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'lignes_facture') }}"
+                source_column: montant
+      - name: date_acte
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'lignes_facture') }}"
+                source_column: date_acte
+      - name: date_extraction
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'lignes_facture') }}"
+                source_column: date_extraction
