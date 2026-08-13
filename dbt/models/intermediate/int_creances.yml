@@ -1,0 +1,46 @@
+version: 2
+
+models:
+  - name: int_creances
+    description: >
+      source.creances typée : les colonnes date/horodatage/booleen/numérique converties
+      par les macros de dbt/macros/conversions.sql, les colonnes code/texte reprises
+      telles quelles.
+    tests:
+      - meme_decompte_que_la_source:
+          arguments:
+            compare_model: "{{ source('source', 'creances') }}"
+      - unique:
+          arguments:
+            column_name: "n_creance || '|' || date_extraction"
+    columns:
+      - name: date_naissance_creance
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'creances') }}"
+                source_column: date_naissance_creance
+      - name: montant_du
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'creances') }}"
+                source_column: montant_du
+      - name: montant_recouvre
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'creances') }}"
+                source_column: montant_recouvre
+      - name: montant_restant
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'creances') }}"
+                source_column: montant_restant
+      - name: date_extraction
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'creances') }}"
+                source_column: date_extraction
