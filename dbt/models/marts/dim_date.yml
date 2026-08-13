@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: dim_date
+    description: >
+      Dimension calendrier sur [var('dim_date_debut'), var('dim_date_fin')], attributs
+      calculables et jointure sur le seed calendrier_marocain pour est_ferie/est_ramadan.
+    tests:
+      - unique:
+          arguments:
+            column_name: "date_jour"
+    columns:
+      - name: date_jour
