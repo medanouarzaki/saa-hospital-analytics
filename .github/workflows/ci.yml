@@ -187,6 +187,13 @@ jobs:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ""
+      # Chemin de la vérité terrain réellement générée par ce job (sous
+      # $RUNNER_TEMP/scenario/, jamais generator/output/ : voir
+      # linkage/evaluation.py et les fichiers de test linkage qui la lisent).
+      # Au niveau du job, pas d'une seule étape : plusieurs étapes en aval
+      # (modules linkage et leurs tests) en dépendent, pas seulement
+      # test_dim_patient.py.
+      VERITE_TERRAIN_PATIENTS: ${{ runner.temp }}/scenario/scenario_30/verite_terrain.yml
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -234,8 +241,6 @@ jobs:
           DBT_PROFILES_DIR: ${{ runner.temp }}/dbt_profiles
 
       - run: uv run pytest tests/test_dim_patient.py -v
-        env:
-          VERITE_TERRAIN_PATIENTS: ${{ runner.temp }}/scenario/scenario_30/verite_terrain.yml
 
       - run: uv run pytest tests/test_delai_rendez_vous.py tests/test_indicateurs_sejour.py -v
 

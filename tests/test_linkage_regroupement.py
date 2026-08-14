@@ -6,6 +6,7 @@ une. Aucun littéral de volumétrie : chaque grandeur comparée est mesurée
 à l'exécution.
 """
 
+import os
 from pathlib import Path
 
 import yaml
@@ -20,7 +21,10 @@ from linkage.regroupement import (
 )
 
 RACINE = Path(__file__).resolve().parent.parent
-VERITE_TERRAIN = RACINE / "generator" / "output" / "scenario_30" / "verite_terrain.yml"
+VERITE_TERRAIN_DEFAUT = RACINE / "generator" / "output" / "scenario_30" / "verite_terrain.yml"
+# Même convention que tests/test_dim_patient.py (VERITE_TERRAIN_PATIENTS) : voir
+# tests/test_linkage_blocage.py pour la justification complète.
+VERITE_TERRAIN = Path(os.environ.get("VERITE_TERRAIN_PATIENTS", str(VERITE_TERRAIN_DEFAUT)))
 
 
 def _population_synthetique(identifiants: list[str]) -> list[dict]:

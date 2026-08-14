@@ -6,6 +6,7 @@ relance jamais la prédiction, coûteuse, ce fichier lit la table déjà
 comparée est mesurée à l'exécution.
 """
 
+import os
 from pathlib import Path
 
 import pandas as pd
@@ -21,7 +22,10 @@ from linkage.champs import COMPARAISONS
 from linkage.population import _connexion, extraire_population
 
 RACINE = Path(__file__).resolve().parent.parent
-VERITE_TERRAIN = RACINE / "generator" / "output" / "scenario_30" / "verite_terrain.yml"
+VERITE_TERRAIN_DEFAUT = RACINE / "generator" / "output" / "scenario_30" / "verite_terrain.yml"
+# Même convention que tests/test_dim_patient.py (VERITE_TERRAIN_PATIENTS) : voir
+# tests/test_linkage_blocage.py pour la justification complète.
+VERITE_TERRAIN = Path(os.environ.get("VERITE_TERRAIN_PATIENTS", str(VERITE_TERRAIN_DEFAUT)))
 
 
 @pytest.fixture(scope="module")

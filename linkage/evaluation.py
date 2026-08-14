@@ -8,6 +8,7 @@ distribution des scores, marge mesurée dans l'espace des poids de
 correspondance), puis ÉVALUÉ contre la vérité terrain — jamais l'inverse.
 """
 
+import os
 from itertools import combinations
 from pathlib import Path
 
@@ -23,7 +24,14 @@ from linkage.regroupement import (
 )
 
 RACINE = Path(__file__).resolve().parent.parent
-VERITE_TERRAIN = RACINE / "generator" / "output" / "scenario_30" / "verite_terrain.yml"
+VERITE_TERRAIN_DEFAUT = RACINE / "generator" / "output" / "scenario_30" / "verite_terrain.yml"
+# VERITE_TERRAIN_PATIENTS (même variable d'environnement que tests/test_dim_patient.py,
+# même convention) : le générateur écrit sa vérité terrain sous la racine passée en
+# argument, pas toujours sous generator/output/ (voir le job dbt de la CI, qui génère
+# sous $RUNNER_TEMP/scenario/). Un chemin en dur ici lirait silencieusement un fichier
+# d'une autre exécution (un résidu local, ou rien du tout sur un clone neuf) au lieu de
+# la vérité terrain de la population réellement chargée dans ce run.
+VERITE_TERRAIN = Path(os.environ.get("VERITE_TERRAIN_PATIENTS", str(VERITE_TERRAIN_DEFAUT)))
 
 # Seuil retenu (voir le raisonnement complet, sans vérité terrain, en
 # amont) : une probabilité de 0,5 (poids de correspondance 0), nettement

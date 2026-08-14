@@ -5,6 +5,7 @@ Exige une base PostgreSQL chargée avec marts.dim_patient déjà matérialisée
 chaque grandeur comparée est mesurée à l'exécution, jamais recopiée.
 """
 
+import os
 from pathlib import Path
 
 import duckdb
@@ -20,7 +21,13 @@ from linkage.blocage import colonne_blocage, regles_blocage
 from linkage.population import extraire_population
 
 RACINE = Path(__file__).resolve().parent.parent
-VERITE_TERRAIN = RACINE / "generator" / "output" / "scenario_30" / "verite_terrain.yml"
+VERITE_TERRAIN_DEFAUT = RACINE / "generator" / "output" / "scenario_30" / "verite_terrain.yml"
+# Même convention que tests/test_dim_patient.py (VERITE_TERRAIN_PATIENTS) : le
+# générateur écrit sous la racine passée en argument, pas nécessairement
+# generator/output/ (le job dbt de la CI génère sous $RUNNER_TEMP/scenario/) — un
+# chemin en dur lirait la vérité terrain d'une autre exécution, ou aucune sur un
+# clone neuf.
+VERITE_TERRAIN = Path(os.environ.get("VERITE_TERRAIN_PATIENTS", str(VERITE_TERRAIN_DEFAUT)))
 
 _NOMS_CHAMPS_PAR_REGLE = [
     ("type_piece_identite", "n_piece_identite"),
