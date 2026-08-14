@@ -57,6 +57,7 @@ jobs:
           - nom: doublons
             fichiers: >-
               tests/test_doublons.py
+              tests/test_linkage_champs.py
               tests/test_linkage_normalisation.py
 
           - nom: defauts-facturation-mouvements-sources
