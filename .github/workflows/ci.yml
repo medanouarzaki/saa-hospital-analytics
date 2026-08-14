@@ -225,3 +225,7 @@ jobs:
       - run: uv run pytest tests/test_linkage_blocage.py -v
 
       - run: uv run pytest tests/test_linkage_estimation.py -v
+
+      - run: uv run python -m linkage.prediction
+
+      - run: uv run pytest tests/test_linkage_prediction.py -v
