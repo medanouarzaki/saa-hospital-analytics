@@ -196,8 +196,9 @@ jobs:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ""
       # Ce job démarre son propre service postgres, éphémère et propre à cette exécution :
-      # tests/test_idempotence.py et tests/test_rattrapage.py, qui détruisent et rejouent des
-      # partitions, peuvent donc s'exécuter contre lui sans risque.
+      # tests/test_idempotence.py, tests/test_rattrapage.py et tests/test_controle_qualite.py,
+      # qui détruisent, rejouent ou construisent des partitions, peuvent donc s'exécuter contre
+      # lui sans risque.
       SAA_INSTRUMENT_JETABLE: "1"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -218,10 +219,10 @@ jobs:
       # seulement test_dim_patient.py.
       - run: echo "VERITE_TERRAIN_PATIENTS=$RUNNER_TEMP/scenario/scenario_30/verite_terrain.yml" >> "$GITHUB_ENV"
 
-      # Racine du scénario et emplacement du graphe, pour tests/test_idempotence.py et
-      # tests/test_rattrapage.py (exécutés en fin de job, une fois la chaîne complète déjà
-      # rejouée une première fois) : mêmes variables que celles lues par
-      # `airflow/saa_daily.py` en exécution normale. AIRFLOW_HOME sous le répertoire
+      # Racine du scénario et emplacement du graphe, pour tests/test_idempotence.py,
+      # tests/test_rattrapage.py et tests/test_controle_qualite.py (exécutés en fin de job, une
+      # fois la chaîne complète déjà rejouée une première fois) : mêmes variables que celles
+      # lues par `airflow/saa_daily.py` en exécution normale. AIRFLOW_HOME sous le répertoire
       # temporaire de l'exécuteur : métadonnées de l'orchestrateur exclusives à ce job,
       # jamais persistées.
       - run: |
@@ -302,3 +303,5 @@ jobs:
       - run: uv run pytest tests/test_rattrapage.py -v
         env:
           DBT_PROFILES_DIR: ${{ runner.temp }}/dbt_profiles
+
+      - run: uv run pytest tests/test_controle_qualite.py -v
