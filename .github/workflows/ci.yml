@@ -84,6 +84,7 @@ jobs:
             fichiers: >-
               tests/test_doublons.py
               tests/test_linkage_champs.py
+              tests/test_linkage_chemins_sortie.py
               tests/test_linkage_modele.py
               tests/test_linkage_normalisation.py
 

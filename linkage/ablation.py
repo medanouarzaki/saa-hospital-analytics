@@ -34,6 +34,7 @@ justement des champs que la variante A retire des comparaisons.
 """
 
 import csv
+import os
 import time
 from pathlib import Path
 
@@ -70,7 +71,11 @@ from linkage.regroupement import (
 )
 
 RACINE = Path(__file__).resolve().parent.parent
-CHEMIN_CSV = RACINE / "linkage" / "ablation.csv"
+# CHEMIN_CSV_ABLATION (même patron que VERITE_TERRAIN_PATIENTS, linkage/evaluation.py) : une
+# exécution planifiée qui écrirait toujours sous le chemin du dépôt laisserait, à chaque
+# passage, une modification non commise d'un fichier suivi.
+CHEMIN_CSV_DEFAUT = RACINE / "linkage" / "ablation.csv"
+CHEMIN_CSV = Path(os.environ.get("CHEMIN_CSV_ABLATION", str(CHEMIN_CSV_DEFAUT)))
 
 # Les six champs copiés verbatim par le générateur d'un enregistrement à
 # son doublon (mesuré séparément : 100% d'accord sur les paires vraies,
