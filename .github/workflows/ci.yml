@@ -58,6 +58,7 @@ jobs:
             fichiers: >-
               tests/test_doublons.py
               tests/test_linkage_champs.py
+              tests/test_linkage_modele.py
               tests/test_linkage_normalisation.py
 
           - nom: defauts-facturation-mouvements-sources
@@ -220,3 +221,5 @@ jobs:
       - run: uv run pytest tests/test_delai_rendez_vous.py tests/test_indicateurs_sejour.py -v
 
       - run: uv run pytest tests/test_linkage_population.py -v
+
+      - run: uv run pytest tests/test_linkage_blocage.py -v
