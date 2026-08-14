@@ -178,6 +178,10 @@ jobs:
 
       - run: uv run python ingestion/appliquer_ddl.py
 
+      - run: uv run python -m linkage.appliquer_ddl
+
+      - run: uv run pytest tests/test_linkage_schema.py -v
+
       - run: uv run python -m ingestion.chargeur "$RUNNER_TEMP/scenario/scenario_30"
 
       - run: |
