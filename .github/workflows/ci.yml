@@ -229,3 +229,5 @@ jobs:
       - run: uv run python -m linkage.prediction
 
       - run: uv run pytest tests/test_linkage_prediction.py -v
+
+      - run: uv run pytest tests/test_linkage_regroupement.py -v
