@@ -114,6 +114,7 @@ jobs:
               tests/test_prises_en_charge.py
               tests/test_relations_injectees.py
               tests/test_rendez_vous.py
+              tests/test_structure_graphe.py
               tests/test_volumes.py
 
           - nom: coherence-parcours-patients-urgences-et-fichiers-courts
