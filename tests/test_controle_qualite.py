@@ -17,9 +17,6 @@ from ingestion import chargeur, controles
 from ingestion.controle_qualite import decompte_journee, evaluer
 
 RACINE = Path(__file__).resolve().parent.parent
-RACINE_SCENARIO = Path(
-    os.environ.get("SAA_SCENARIO_ROOT", str(RACINE / "generator" / "output" / "scenario_30"))
-)
 
 DATE_NORMALE = "2024-04-15"
 DATE_DEGRADEE = "2024-04-16"
@@ -27,25 +24,33 @@ N_CORROMPUES = 1
 N_LIGNES_MINIMUM = 2
 
 
+def _racine_scenario() -> Path:
+    """Évaluée à l'appel, jamais à l'import : `SAA_SCENARIO_ROOT` n'est pas garantie exportée
+    au seul chargement de ce module (par exemple à la collecte pytest)."""
+    return Path(
+        os.environ.get("SAA_SCENARIO_ROOT", str(RACINE / "generator" / "output" / "scenario_30"))
+    )
+
+
 def _meilleure_partition_reference() -> tuple[Path, int]:
     """La partition `creances` la mieux fournie du scénario actif — le nombre de lignes
     disponibles par date varie avec le sous-ensemble (copié, généré, complet), donc jamais une
-    date ni un décompte fixés d'avance."""
-    dossier = RACINE_SCENARIO / "source.creances"
+    date ni un décompte fixés d'avance. Évaluée à l'appel, jamais à l'import : un scénario n'est
+    pas garanti présent au seul chargement de ce module (par exemple à la collecte pytest)."""
+    racine_scenario = _racine_scenario()
+    dossier = racine_scenario / "source.creances"
     candidats = []
     for chemin in dossier.glob("*/creances.csv"):
         with chemin.open(encoding="utf-8") as f:
             n = sum(1 for _ in f) - 1
         candidats.append((n, chemin))
+    assert candidats, f"aucune partition creances trouvée sous {dossier}"
     n, chemin = max(candidats)
     assert n >= N_LIGNES_MINIMUM, (
-        f"aucune partition creances de {RACINE_SCENARIO} ne porte au moins {N_LIGNES_MINIMUM} "
+        f"aucune partition creances de {racine_scenario} ne porte au moins {N_LIGNES_MINIMUM} "
         f"lignes (meilleure trouvée : {chemin} avec {n})"
     )
     return chemin, n
-
-
-FICHIER_REFERENCE, N_LIGNES = _meilleure_partition_reference()
 
 
 def verifier_base_jetable() -> None:
@@ -57,10 +62,11 @@ def verifier_base_jetable() -> None:
 
 
 def _construire_fichier(chemin_dest: Path, date_us: str, n_corrompues: int) -> None:
-    with FICHIER_REFERENCE.open(newline="", encoding="utf-8") as f:
+    fichier_reference, n_lignes = _meilleure_partition_reference()
+    with fichier_reference.open(newline="", encoding="utf-8") as f:
         lecteur = csv.reader(f)
         entete = next(lecteur)
-        lignes = [next(lecteur) for _ in range(N_LIGNES)]
+        lignes = [next(lecteur) for _ in range(n_lignes)]
 
     idx_date_extraction = entete.index("date_extraction")
     idx_date_naissance = entete.index("date_naissance_creance")
