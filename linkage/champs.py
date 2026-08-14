@@ -7,6 +7,20 @@ justification ancrée sur une grandeur mesurée. Les colonnes écartées sont
 également déclarées, avec le motif mesuré de leur exclusion, pour que
 l'absence d'un champ dans les comparaisons soit une décision documentée et
 non un oubli.
+
+Deux notions distinctes cohabitent ici, et ne dénotent pas la même chose :
+  - une COLONNE COMPARÉE (`CHAMPS_COMPARES`) est une colonne de
+    marts.dim_patient soumise à normalisation avant comparaison ;
+  - une COMPARAISON (`COMPARAISONS`) est une unité du modèle de
+    rapprochement, qui consomme une ou plusieurs colonnes comparées.
+Onze comparaisons consomment chacune une seule colonne. La douzième,
+la comparaison composite pièce d'identité, consomme deux colonnes
+(`type_piece_identite` et `n_piece_identite`) : ces deux colonnes ne
+prennent leur sens qu'ensemble, un même numéro pouvant être porté par des
+pièces de nature différente sans désigner la même identité (voir la
+justification de `COMPARAISONS["piece_identite"]`). D'où treize colonnes
+comparées pour douze comparaisons : les deux nombres sont corrects et
+répondent à des questions différentes.
 """
 
 from enum import Enum
@@ -27,13 +41,28 @@ class ChampCompare(NamedTuple):
     justification: str
 
 
+class Comparaison(NamedTuple):
+    """Une unité du modèle de rapprochement : le nom de la comparaison, les
+    colonnes comparées qu'elle consomme (une, sauf pour la comparaison
+    composite pièce d'identité qui en consomme deux), et la justification de
+    ce regroupement — distincte de la justification de normalisation portée
+    par chaque colonne consommée.
+    """
+
+    nom: str
+    colonnes: tuple[str, ...]
+    justification: str
+
+
 class ColonneEcartee(NamedTuple):
     colonne: str
     motif: str
 
 
-# Les douze champs comparés, dans l'ordre où ils entrent dans le modèle de
-# rapprochement.
+# Les treize colonnes comparées, dans l'ordre où elles entrent dans le
+# modèle de rapprochement. Ce ne sont pas treize comparaisons : voir
+# COMPARAISONS ci-dessous, qui en regroupe deux (type_piece_identite et
+# n_piece_identite) en une seule comparaison composite.
 CHAMPS_COMPARES: dict[str, ChampCompare] = {
     "nom": ChampCompare(
         colonne="nom",
@@ -164,9 +193,77 @@ COLONNES_ECARTEES: dict[str, ColonneEcartee] = {
 }
 
 
+# La comparaison composite pièce d'identité : les deux colonnes qu'elle
+# consomme, et sa justification propre, distincte de la justification de
+# normalisation portée par chacune des deux colonnes dans CHAMPS_COMPARES.
+# Mesure : le numéro seul et le couple (type, numéro) ont le même rappel,
+# mais le couple produit seize paires en moins que le numéro seul — un
+# numéro identique porté par deux types de pièce différents est une
+# coïncidence numérique, pas une identité.
+_COLONNES_COMPARAISON_PIECE_IDENTITE: tuple[str, str] = (
+    "type_piece_identite",
+    "n_piece_identite",
+)
+
+_JUSTIFICATION_COMPARAISON_PIECE_IDENTITE = (
+    "le numéro seul et le couple (type, numéro) ont le même rappel, mais le "
+    "couple produit seize paires en moins qu'une comparaison sur le numéro "
+    "seul : un numéro identique porté par deux types de pièce différents "
+    "est une coïncidence numérique, pas une identité"
+)
+
+
+def _construire_comparaisons() -> dict[str, Comparaison]:
+    """Construit COMPARAISONS à partir de CHAMPS_COMPARES : chaque colonne
+    comparée qui n'entre pas dans la comparaison composite pièce d'identité
+    devient sa propre comparaison à une colonne, avec la justification de sa
+    colonne ; les deux colonnes de la pièce d'identité sont retirées de ce
+    traitement individuel et regroupées en une seule comparaison composite,
+    avec sa justification propre. Rien n'est recompté à la main : le nombre
+    de comparaisons et l'ensemble des colonnes qu'elles consomment découlent
+    entièrement de CHAMPS_COMPARES et de ce regroupement.
+    """
+    colonnes_composite = set(_COLONNES_COMPARAISON_PIECE_IDENTITE)
+    comparaisons: dict[str, Comparaison] = {
+        nom_colonne: Comparaison(
+            nom=nom_colonne,
+            colonnes=(nom_colonne,),
+            justification=champ.justification,
+        )
+        for nom_colonne, champ in CHAMPS_COMPARES.items()
+        if nom_colonne not in colonnes_composite
+    }
+    comparaisons["piece_identite"] = Comparaison(
+        nom="piece_identite",
+        colonnes=_COLONNES_COMPARAISON_PIECE_IDENTITE,
+        justification=_JUSTIFICATION_COMPARAISON_PIECE_IDENTITE,
+    )
+    return comparaisons
+
+
+# Les douze comparaisons du modèle de rapprochement : onze consomment une
+# seule colonne comparée, la douzième (pièce d'identité) en consomme deux.
+COMPARAISONS: dict[str, Comparaison] = _construire_comparaisons()
+
+
 def noms_champs_compares() -> list[str]:
     return list(CHAMPS_COMPARES.keys())
 
 
 def noms_colonnes_ecartees() -> list[str]:
     return list(COLONNES_ECARTEES.keys())
+
+
+def noms_comparaisons() -> list[str]:
+    return list(COMPARAISONS.keys())
+
+
+def colonnes_consommees() -> set[str]:
+    """Union des colonnes comparées consommées par l'ensemble des
+    comparaisons — une colonne par comparaison simple, deux pour la
+    comparaison composite pièce d'identité.
+    """
+    consommees: set[str] = set()
+    for comparaison in COMPARAISONS.values():
+        consommees.update(comparaison.colonnes)
+    return consommees
