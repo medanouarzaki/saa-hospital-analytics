@@ -141,19 +141,27 @@ with DAG(
         ),
     )
 
+    # --threads 1 sur `dbt run` : à la concurrence par défaut du profil (4 fils), le
+    # remplacement d'une vue (création temporaire, renommage, suppression de l'ancienne)
+    # entre en interblocage sur le catalogue système (docs/decisions/
+    # 0027-materialisation-dbt-un-seul-fil.md) — mesuré : reproduit deux fois de suite sur
+    # ce graphe avant que ce paramètre ne soit ajouté. `dbt test`, lecture seule, garde son
+    # parallélisme.
     dbt_intermediaire = BashOperator(
         task_id="dbt_intermediaire",
-        bash_command=f'{CD_DBT}\nuv run dbt run --select "{SELECTEUR_INTERMEDIAIRE}"\n',
+        bash_command=(
+            f'{CD_DBT}\nuv run dbt run --threads 1 --select "{SELECTEUR_INTERMEDIAIRE}"\n'
+        ),
     )
 
     dbt_dimensions = BashOperator(
         task_id="dbt_dimensions",
-        bash_command=f'{CD_DBT}\nuv run dbt run --select "{SELECTEUR_DIMENSIONS}"\n',
+        bash_command=f'{CD_DBT}\nuv run dbt run --threads 1 --select "{SELECTEUR_DIMENSIONS}"\n',
     )
 
     dbt_faits = BashOperator(
         task_id="dbt_faits",
-        bash_command=f'{CD_DBT}\nuv run dbt run --select "{SELECTEUR_FAITS}"\n',
+        bash_command=f'{CD_DBT}\nuv run dbt run --threads 1 --select "{SELECTEUR_FAITS}"\n',
     )
 
     # dbt sélectionne aussi, par défaut, les tests d'un modèle NON sélectionné dès lors
@@ -183,7 +191,7 @@ with DAG(
 
     dbt_agregats = BashOperator(
         task_id="dbt_agregats",
-        bash_command=f'{CD_DBT}\nuv run dbt run --select "{SELECTEUR_AGREGATS}"\n',
+        bash_command=f'{CD_DBT}\nuv run dbt run --threads 1 --select "{SELECTEUR_AGREGATS}"\n',
     )
 
     controle_qualite = BashOperator(
