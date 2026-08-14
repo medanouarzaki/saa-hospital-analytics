@@ -57,6 +57,7 @@ jobs:
           - nom: doublons
             fichiers: >-
               tests/test_doublons.py
+              tests/test_linkage_normalisation.py
 
           - nom: defauts-facturation-mouvements-sources
             fichiers: >-
@@ -212,3 +213,5 @@ jobs:
           VERITE_TERRAIN_PATIENTS: ${{ runner.temp }}/scenario/scenario_30/verite_terrain.yml
 
       - run: uv run pytest tests/test_delai_rendez_vous.py tests/test_indicateurs_sejour.py -v
+
+      - run: uv run pytest tests/test_linkage_population.py -v
