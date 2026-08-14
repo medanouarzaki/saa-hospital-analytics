@@ -21,12 +21,20 @@ Un contrôle de sensibilité positif est inclus : l'état après deux jours char
 l'état après trois jours chargés, sur le même ensemble d'identités. Sans cette preuve, une
 comparaison d'état qui aurait un trou (colonne oubliée, filtre trop large) pourrait toujours
 réussir sans jamais rien vérifier.
+
+Ce test charge lui-même les trois journées dont il a besoin (`_etablir_journees`), plutôt que
+de supposer qu'un autre fichier de test les aurait déjà laissées en base — y compris lorsqu'il
+est exécuté seul, dans une invocation qui n'a jamais fait tourner `test_idempotence.py`.
 """
 
+import os
+import subprocess
 import sys
+from pathlib import Path
 
 import pytest
 
+from ingestion import chargeur
 from tests.test_idempotence import (
     TABLES_SOURCE,
     _date_us,
@@ -35,15 +43,48 @@ from tests.test_idempotence import (
     etat_population,
     executer_graphe,
     n_ipps_de_la_partition,
+    preparer_orchestrateur,
     retirer_partition,
     verifier_base_jetable,
 )
+
+RACINE = Path(__file__).resolve().parent.parent
 
 DATES_CHRONOLOGIQUES = ("2024-01-20", "2024-02-08", "2024-03-05")
 ORDRE_NON_CHRONOLOGIQUE = ("2024-03-05", "2024-01-20", "2024-02-08")
 
 assert sorted(ORDRE_NON_CHRONOLOGIQUE) == sorted(DATES_CHRONOLOGIQUES)
 assert ORDRE_NON_CHRONOLOGIQUE != DATES_CHRONOLOGIQUES
+
+
+def _racine_scenario() -> Path:
+    """Évaluée à l'appel, jamais à l'import : un scénario n'est pas garanti présent au seul
+    chargement de ce module (par exemple à la collecte pytest)."""
+    return Path(
+        os.environ.get("SAA_SCENARIO_ROOT", str(RACINE / "generator" / "output" / "scenario_30"))
+    )
+
+
+def _etablir_journees() -> None:
+    """Charge les trois journées dont ce test a besoin, sur les onze tables, depuis le
+    sous-ensemble actif, puis construit une première fois le rapprochement sur la population
+    ainsi chargée — ce test établit sa propre précondition plutôt que d'en hériter. Sans cette
+    construction initiale, la comparaison entre le premier retrait (avant que le protocole du
+    test n'ait jamais rejoué le graphe) et le second (après ses propres rejeux, qui construisent
+    le rapprochement pour la première fois) porterait sur un rapprochement vide d'un côté et
+    peuplé de l'autre — mesuré : la propriété échoue exactement ainsi sur un instrument où rien
+    n'a jamais construit le rapprochement au préalable."""
+    racine = _racine_scenario()
+    for date_iso in DATES_CHRONOLOGIQUES:
+        chargeur.charger_scenario(racine, date_debut=date_iso, date_fin=date_iso)
+    for module in ("linkage.prediction", "linkage.evaluation"):
+        resultat = subprocess.run(
+            ["uv", "run", "python", "-m", module], cwd=RACINE, capture_output=True, text=True
+        )
+        assert resultat.returncode == 0, (
+            f"construction initiale du rapprochement ({module}) échouée (code "
+            f"{resultat.returncode}) :\n{resultat.stdout[-4000:]}\n{resultat.stderr[-4000:]}"
+        )
 
 
 def _etat_toutes_partitions(cur, n_ipps: list[str]) -> dict:
@@ -82,14 +123,16 @@ def _rejouer_sequence(ordre: tuple[str, ...], libelle: str) -> None:
 
 def test_rattrapage_ordre_indifferent() -> None:
     verifier_base_jetable()
+    preparer_orchestrateur()
+    _etablir_journees()
 
     with connexion() as conn, conn.cursor() as cur:
         n_ipps_par_date = {}
         for date_iso in DATES_CHRONOLOGIQUES:
             n_ipps = n_ipps_de_la_partition(cur, _date_us(date_iso))
             assert n_ipps, (
-                f"aucune fiche patient trouvée pour {date_iso} : ce test exige les trois "
-                "dates déjà chargées sur l'instrument"
+                f"{date_iso} : le chargement établi par ce test lui-même n'a pas produit de "
+                "fiche patient pour cette date"
             )
             n_ipps_par_date[date_iso] = n_ipps
         n_ipps_union = sorted({ipp for ipps in n_ipps_par_date.values() for ipp in ipps})

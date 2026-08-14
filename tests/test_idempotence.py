@@ -13,6 +13,10 @@ Toute propriété vérifiée ici est une égalité entre deux mesures prises par
 métier) est exclue de toute empreinte de contenu ; le test lui-même le prouve avant de s'en
 servir : l'inclure ferait échouer une comparaison entre deux états par ailleurs identiques.
 
+Chaque test établit lui-même ses préconditions : la base de métadonnées de l'orchestrateur
+(`preparer_orchestrateur`) et, dans `tests/test_rattrapage.py`, les journées qu'il traite —
+jamais héritées d'un autre fichier de test ni d'une préparation externe au fichier de workflow.
+
 `tests/test_rattrapage.py` importe les fonctions utilitaires ci-dessous (aucune n'est préfixée
 `test_`, aucune n'est donc collectée comme test par elle-même).
 """
@@ -52,6 +56,40 @@ def verifier_base_jetable() -> None:
             "recharge des partitions de données. Ce n'est jamais un skip silencieux — la "
             "variable atteste explicitement que la cible visée est jetable."
         )
+
+
+def preparer_orchestrateur() -> None:
+    """Établit la base de métadonnées de l'orchestrateur dont `executer_graphe()` a besoin —
+    évaluée ici, à l'exécution du test, jamais au niveau du module. `executer_graphe()` lance
+    `airflow dags test` en sous-processus, qui hérite silencieusement de l'environnement du
+    processus appelant ; sans cette préparation, un `AIRFLOW_HOME` neuf ferait échouer ce
+    sous-processus (base de métadonnées non migrée), et un `AIRFLOW_HOME` absent ferait
+    retomber l'orchestrateur sur le répertoire personnel de l'utilisateur — les deux cas
+    échouent ici bruyamment plutôt que d'être découverts plus tard dans un sous-processus."""
+    airflow_home = os.environ.get("AIRFLOW_HOME")
+    if not airflow_home:
+        pytest.fail(
+            "AIRFLOW_HOME doit être défini pour exécuter ce test : sans cette variable, "
+            "l'orchestrateur retombe silencieusement sur le répertoire personnel de "
+            "l'utilisateur (~/airflow)."
+        )
+    airflow_home_reel = Path(airflow_home).resolve()
+    if airflow_home_reel == RACINE or RACINE in airflow_home_reel.parents:
+        pytest.fail(
+            f"AIRFLOW_HOME ({airflow_home_reel}) désigne un emplacement à l'intérieur du "
+            f"dépôt ({RACINE}) : la base de métadonnées de l'orchestrateur ne doit jamais y "
+            "être écrite."
+        )
+    resultat = subprocess.run(
+        ["uv", "run", "airflow", "db", "migrate"],
+        cwd=RACINE,
+        capture_output=True,
+        text=True,
+    )
+    assert resultat.returncode == 0, (
+        "la préparation de la base de métadonnées de l'orchestrateur a échoué (code "
+        f"{resultat.returncode}) :\n{resultat.stdout[-4000:]}\n{resultat.stderr[-4000:]}"
+    )
 
 
 def connexion() -> psycopg2.extensions.connection:
@@ -195,6 +233,7 @@ def _date_us(date_iso: str) -> str:
 
 def test_chargement_idempotent() -> None:
     verifier_base_jetable()
+    preparer_orchestrateur()
 
     date_iso = "2024-02-08"
     date_us = _date_us(date_iso)
