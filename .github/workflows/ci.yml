@@ -21,7 +21,14 @@ jobs:
       - run: uv run sqlfluff lint --dialect postgres .
 
       - run: |
-          uv run python3 -c '
+          # Un heredoc à délimiteur quotté ("PYEOF" entre apostrophes), pas
+          # `python3 -c '...'` : le corps d'un tel heredoc est repris
+          # littéralement par bash, apostrophe comprise — `python3 -c '...'`
+          # se serait terminé prématurément à la première apostrophe d'un
+          # commentaire français ci-dessous (mesuré : actionlint + shellcheck
+          # signalaient une chaîne bash refermée trop tôt, qui aurait fait
+          # échouer ce job dès son analyse par GitHub Actions).
+          uv run python3 - <<'PYEOF'
           import pathlib
           import re
           import subprocess
@@ -63,7 +70,7 @@ jobs:
               f"controle de collecte : {len(comptes_independants)} fichier(s) de test, "
               "chacun avec au moins son compte independant de fonctions test_ collecte"
           )
-          '
+          PYEOF
 
       - run: uv run pytest tests/test_collecte_ci.py -v
 
@@ -187,13 +194,6 @@ jobs:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ""
-      # Chemin de la vérité terrain réellement générée par ce job (sous
-      # $RUNNER_TEMP/scenario/, jamais generator/output/ : voir
-      # linkage/evaluation.py et les fichiers de test linkage qui la lisent).
-      # Au niveau du job, pas d'une seule étape : plusieurs étapes en aval
-      # (modules linkage et leurs tests) en dépendent, pas seulement
-      # test_dim_patient.py.
-      VERITE_TERRAIN_PATIENTS: ${{ runner.temp }}/scenario/scenario_30/verite_terrain.yml
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -202,6 +202,16 @@ jobs:
       - run: uv sync --frozen
 
       - run: uv run python -m generator "$RUNNER_TEMP/scenario" --date-fin 2024-03-31
+
+      # Chemin de la vérité terrain réellement générée par l'étape ci-dessus
+      # (sous $RUNNER_TEMP/scenario/, jamais generator/output/ : voir
+      # linkage/evaluation.py et les fichiers de test linkage qui la lisent).
+      # Écrit dans GITHUB_ENV, pas dans un bloc "env:" de job (le contexte
+      # "runner" n'y est pas autorisé — seul le contexte "github" et
+      # quelques autres le sont ; "runner" n'existe que dans les étapes) :
+      # ainsi toutes les étapes suivantes de ce job en héritent, pas
+      # seulement test_dim_patient.py.
+      - run: echo "VERITE_TERRAIN_PATIENTS=$RUNNER_TEMP/scenario/scenario_30/verite_terrain.yml" >> "$GITHUB_ENV"
 
       - run: uv run python ingestion/appliquer_ddl.py
 
