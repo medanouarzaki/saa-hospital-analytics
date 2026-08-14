@@ -1,6 +1,29 @@
 # ADR 0040 — Le contrôle de qualité bloque sur le taux de rejet cumulé de la journée
 
-**Statut.** Accepté.
+**Statut.** Accepté. **Amendée** : le contrôle se place immédiatement après le chargement et
+fusionne avec la tâche de vérification des contrôles d'entrée qui s'y trouvait déjà — pas après
+les agrégats, sa position d'origine dans ce graphe. Trois motifs mesurés : (1) ses entrées
+(`source`/`quarantaine` d'une seule date) sont disponibles dès le chargement et ne dépendent
+d'aucune couche aval — vérifié par lecture de `ingestion/controle_qualite.py`, qui ne référence
+ni `marts`, ni `intermediate`, ni `linkage` ; (2) à sa position d'origine il est inatteignable
+dès qu'une dégradation suffisante déclenche `dbt_tests`, dont deux vérifications de portée
+globale (`dbt/tests/fct_facturation_reconciliation.sql`,
+`dbt/tests/fct_passage_rendez_vous_resolus.sql`, sans clause de date dans l'une ni l'autre)
+tombent en amont — le taux journalier maximal atteignable en évitant les tables qu'elles
+couvrent, mesuré sur les 91 dates d'un sous-ensemble généré de trois mois, vaut 3,64 %, sous le
+seuil de 5 % de ce contrôle ; (3) un défaut d'extraction doit arrêter la chaîne avant que
+l'entrepôt (couche dbt, rapprochement) ne soit reconstruit sur des données déjà connues
+défectueuses. Alternative rejetée : exclure ces deux vérifications du sélecteur `dbt_tests` du
+graphe aurait rendu la position d'origine de nouveau atteignable, au prix d'affaiblir une
+vérification réelle pour la rendre aveugle à la dégradation qui la révèle — ajuster le contrôle
+sur la réponse, écarté. Conséquence assumée : quand le contrôle bloque, la journée reste chargée
+en base sans que l'entrepôt soit reconstruit ; l'idempotence du chargement (`docs/decisions/
+0037-idempotence-portee-par-le-chargement.md`) rend le rejeu sûr après correction de
+l'extraction. Écart au cadrage assumé : le document maître place le contrôle bloquant après les
+agrégats — second écart de cet ordre dans ce travail, après celui déjà consigné par l'ADR 0037
+sur la portée de l'idempotence. Ce qui invaliderait cette décision : des vérifications de
+réconciliation restreintes à la date traitée plutôt que globales, qui rendraient la position
+d'origine de nouveau atteignable.
 
 ---
 
