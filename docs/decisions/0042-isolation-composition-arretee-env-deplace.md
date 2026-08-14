@@ -1,6 +1,10 @@
 # ADR 0042 — Isolation d'un instrument jetable : composition arrêtée, `.env` déplacé hors du dépôt
 
-**Statut.** Accepté.
+**Statut.** Accepté. **Amendée** : le second chemin décrit ci-dessous restait ouvert même
+composition arrêtée et `.env` déplacé, par un second fichier de connexion par défaut hors dépôt
+(`~/.dbt/profiles.yml`) — ses cinq valeurs par défaut, toutes celles du projet réel, ont été
+retirées (`env_var(...)` sans second argument lève une erreur plutôt que de retomber dessus),
+constaté par contrôle positif : échec sans les quatre variables `DBT_POSTGRES_*`, succès avec.
 
 ---
 
