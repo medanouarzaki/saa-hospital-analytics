@@ -33,13 +33,19 @@ MOTIF_ARGUMENT_IGNORE = re.compile(r"--ignore=\S+")
 NOM_JOB_MATRICE = "tests-matrice"
 
 
-def _fichiers_de_la_matrice() -> set[str]:
+def _fichiers_par_groupe_de_la_matrice() -> dict[str, set[str]]:
+    """Un emplacement distinct par groupe de la matrice, jamais fusionnés en un
+    seul ensemble : sans cette séparation, un fichier présent dans deux
+    groupes différents ne serait jamais détecté par
+    `test_aucun_fichier_reparti_dans_plus_d_un_emplacement`, puisque `set.update`
+    dédoublonnerait silencieusement avant toute comparaison. Le nom de chaque
+    groupe est lu dans le workflow (`groupe["nom"]`), jamais recopié à la main.
+    """
     contenu = yaml.safe_load(CI.read_text(encoding="utf-8"))
     groupes = contenu["jobs"][NOM_JOB_MATRICE]["strategy"]["matrix"]["groupe"]
-    fichiers: set[str] = set()
-    for groupe in groupes:
-        fichiers.update(groupe["fichiers"].split())
-    return fichiers
+    return {
+        f"{NOM_JOB_MATRICE}:{groupe['nom']}": set(groupe["fichiers"].split()) for groupe in groupes
+    }
 
 
 def _fichiers_par_job_pytest() -> dict[str, set[str]]:
@@ -62,7 +68,7 @@ def _fichiers_par_job_pytest() -> dict[str, set[str]]:
 
 
 def _fichiers_par_emplacement() -> dict[str, set[str]]:
-    emplacements = {"matrice": _fichiers_de_la_matrice()}
+    emplacements = dict(_fichiers_par_groupe_de_la_matrice())
     emplacements.update(_fichiers_par_job_pytest())
     return emplacements
 

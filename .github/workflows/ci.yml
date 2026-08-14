@@ -21,15 +21,23 @@ jobs:
       - run: uv run sqlfluff lint --dialect postgres .
 
       - run: |
-          uv run python3 -c '
+          # Un heredoc à délimiteur quotté ("PYEOF" entre apostrophes), pas
+          # `python3 -c '...'` : le corps d'un tel heredoc est repris
+          # littéralement par bash, apostrophe comprise — `python3 -c '...'`
+          # se serait terminé prématurément à la première apostrophe d'un
+          # commentaire français ci-dessous (mesuré : actionlint + shellcheck
+          # signalaient une chaîne bash refermée trop tôt, qui aurait fait
+          # échouer ce job dès son analyse par GitHub Actions).
+          uv run python3 - <<'PYEOF'
           import pathlib
           import re
           import subprocess
 
           fichiers = [p for p in pathlib.Path("tests").glob("*.py") if p.name != "test_provenance.py"]
-          n_independant = sum(
-              len(re.findall(r"(?m)^def test_", p.read_text(encoding="utf-8"))) for p in fichiers
-          )
+          comptes_independants = {
+              p.name: len(re.findall(r"(?m)^def test_", p.read_text(encoding="utf-8")))
+              for p in fichiers
+          }
 
           resultat = subprocess.run(
               ["uv", "run", "pytest", "tests/", "--ignore=tests/test_provenance.py", "--collect-only", "-q"],
@@ -37,14 +45,32 @@ jobs:
               text=True,
               check=True,
           )
-          n_collecte = int(re.search(r"(\d+) tests? collected", resultat.stdout).group(1))
+          # Compte par fichier, pas un total global : un total global masque
+          # une inégalité par excès dans un fichier compensée par un déficit
+          # dans un autre. La comparaison est >= (pas ==) par fichier : la
+          # paramétrisation (pytest.mark.parametrize) multiplie légitimement
+          # le nombre d'éléments collectés au-delà du nombre de "def test_",
+          # ce n'est jamais le défaut recherché (un fichier mal nommé ou non
+          # découvert donnerait 0 collecté pour un compte independant > 0).
+          comptes_collectes: dict[str, int] = {}
+          for ligne in resultat.stdout.splitlines():
+              prefixe = "tests" + "/"
+              if "::" not in ligne or not ligne.startswith(prefixe):
+                  continue
+              nom = pathlib.Path(ligne.split("::", 1)[0]).name
+              comptes_collectes[nom] = comptes_collectes.get(nom, 0) + 1
 
-          assert n_independant == n_collecte, (
-              f"collecte pytest ({n_collecte}) != fonctions test_ comptees independamment "
-              f"({n_independant}) : un fichier de test est probablement mal nomme"
+          for nom, n_independant in comptes_independants.items():
+              n_collecte = comptes_collectes.get(nom, 0)
+              assert n_collecte >= n_independant, (
+                  f"{nom} : {n_independant} fonction(s) test_ mais seulement {n_collecte} "
+                  "collectee(s) par pytest : le fichier est probablement mal nomme ou non decouvert"
+              )
+          print(
+              f"controle de collecte : {len(comptes_independants)} fichier(s) de test, "
+              "chacun avec au moins son compte independant de fonctions test_ collecte"
           )
-          print(f"controle de collecte : {n_collecte} tests, en accord avec le compte independant")
-          '
+          PYEOF
 
       - run: uv run pytest tests/test_collecte_ci.py -v
 
@@ -57,6 +83,9 @@ jobs:
           - nom: doublons
             fichiers: >-
               tests/test_doublons.py
+              tests/test_linkage_champs.py
+              tests/test_linkage_modele.py
+              tests/test_linkage_normalisation.py
 
           - nom: defauts-facturation-mouvements-sources
             fichiers: >-
@@ -174,7 +203,21 @@ jobs:
 
       - run: uv run python -m generator "$RUNNER_TEMP/scenario" --date-fin 2024-03-31
 
+      # Chemin de la vérité terrain réellement générée par l'étape ci-dessus
+      # (sous $RUNNER_TEMP/scenario/, jamais generator/output/ : voir
+      # linkage/evaluation.py et les fichiers de test linkage qui la lisent).
+      # Écrit dans GITHUB_ENV, pas dans un bloc "env:" de job (le contexte
+      # "runner" n'y est pas autorisé — seul le contexte "github" et
+      # quelques autres le sont ; "runner" n'existe que dans les étapes) :
+      # ainsi toutes les étapes suivantes de ce job en héritent, pas
+      # seulement test_dim_patient.py.
+      - run: echo "VERITE_TERRAIN_PATIENTS=$RUNNER_TEMP/scenario/scenario_30/verite_terrain.yml" >> "$GITHUB_ENV"
+
       - run: uv run python ingestion/appliquer_ddl.py
+
+      - run: uv run python -m linkage.appliquer_ddl
+
+      - run: uv run pytest tests/test_linkage_schema.py -v
 
       - run: uv run python -m ingestion.chargeur "$RUNNER_TEMP/scenario/scenario_30"
 
@@ -208,7 +251,25 @@ jobs:
           DBT_PROFILES_DIR: ${{ runner.temp }}/dbt_profiles
 
       - run: uv run pytest tests/test_dim_patient.py -v
-        env:
-          VERITE_TERRAIN_PATIENTS: ${{ runner.temp }}/scenario/scenario_30/verite_terrain.yml
 
       - run: uv run pytest tests/test_delai_rendez_vous.py tests/test_indicateurs_sejour.py -v
+
+      - run: uv run pytest tests/test_linkage_population.py -v
+
+      - run: uv run pytest tests/test_linkage_blocage.py -v
+
+      - run: uv run pytest tests/test_linkage_estimation.py -v
+
+      - run: uv run python -m linkage.prediction
+
+      - run: uv run pytest tests/test_linkage_prediction.py -v
+
+      - run: uv run pytest tests/test_linkage_regroupement.py -v
+
+      - run: uv run python -m linkage.evaluation
+
+      - run: uv run pytest tests/test_linkage_evaluation.py -v
+
+      - run: uv run python -m linkage.ablation
+
+      - run: uv run pytest tests/test_linkage_ablation.py -v
