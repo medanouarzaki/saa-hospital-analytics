@@ -80,6 +80,67 @@ def test_grappes_taille_deux_egale_paires_verite_terrain_au_seuil_retenu():
     assert nb_grappes_taille2 == len(paires_vt)
 
 
+def test_colonnes_de_portee_grappe_presentes_et_distinctes():
+    """Les deux grandeurs qui comparent à la partition vraie portent chacune
+    une colonne par portée (restreinte, globale), jamais une seule colonne
+    ambiguë — voir linkage/ddl/03_evaluation.sql.
+    """
+    with _connexion() as connexion, connexion.cursor() as curseur:
+        curseur.execute(
+            "select column_name from information_schema.columns "
+            "where table_schema = 'linkage' and table_name = 'evaluation'"
+        )
+        colonnes = {ligne[0] for ligne in curseur.fetchall()}
+    attendues = {
+        "nb_grappes_exactes_restreint",
+        "nb_grappes_exactes_global",
+        "nb_enregistrements_sur_fusionnes_restreint",
+        "nb_enregistrements_sur_fusionnes_global",
+    }
+    assert attendues <= colonnes
+    # aucune ancienne colonne sans suffixe de portée ne doit survivre
+    assert "nb_grappes_exactes" not in colonnes
+    assert "nb_enregistrements_sur_fusionnes" not in colonnes
+
+
+def test_portee_globale_au_moins_egale_a_la_portee_restreinte():
+    """La portée globale inclut les singletons, triviaux à retrouver : elle
+    ne peut donc jamais compter MOINS de grappes exactement retrouvées que
+    la portée restreinte, sur aucun seuil du balayage.
+    """
+    with _connexion() as connexion, connexion.cursor() as curseur:
+        curseur.execute(
+            "select nb_grappes_exactes_restreint, nb_grappes_exactes_global from linkage.evaluation"
+        )
+        lignes = curseur.fetchall()
+    assert lignes
+    for restreint, glob in lignes:
+        assert glob >= restreint
+
+
+def test_grappe_restreinte_exacte_egale_paires_verite_terrain_au_seuil_retenu():
+    """Au seuil retenu, où la séparation est parfaite (991 paires vraies
+    retrouvées, ni faux positif ni faux négatif), la portée RESTREINTE des
+    grappes exactement retrouvées doit égaler le nombre de paires de vérité
+    terrain présentes — pas la portée globale, gonflée par les singletons
+    (mesuré : environ vingt-cinq fois plus grande à ce seuil). Une
+    permutation des deux colonnes rendrait ce test faux.
+    """
+    population = extraire_population()
+    paires_vt = paires_verite_terrain_presentes(population)
+
+    with _connexion() as connexion, connexion.cursor() as curseur:
+        curseur.execute(
+            "select nb_grappes_exactes_restreint, nb_grappes_exactes_global "
+            "from linkage.evaluation where seuil = %s",
+            [SEUIL_PROBABILITE],
+        )
+        (restreint, glob) = curseur.fetchone()
+
+    assert restreint == len(paires_vt)
+    assert glob > restreint, "la portée globale doit être strictement plus grande ici"
+
+
 def test_f_mesure_au_seuil_retenu_au_moins_egale_a_la_reference():
     population = extraire_population()
     paires_vt = paires_verite_terrain_presentes(population)
