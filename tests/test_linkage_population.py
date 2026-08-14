@@ -11,7 +11,11 @@ import pytest
 
 from linkage.champs import CHAMPS_COMPARES, COLONNES_ECARTEES, Normalisation
 from linkage.normalisation import v1, v2
-from linkage.population import _connexion, extraire_population
+from linkage.population import (
+    _colonnes_convertibles_en_manquant,
+    _connexion,
+    extraire_population,
+)
 
 
 @pytest.fixture(scope="module")
@@ -83,3 +87,61 @@ def test_date_naissance_sans_normalisation_textuelle(population):
             assert enregistrement["date_naissance_norm"] == enregistrement["date_naissance"]
         else:
             assert "date_naissance_norm" not in enregistrement
+
+
+# --- conversion des chaînes vides en valeurs manquantes ---------------------
+
+
+def test_aucune_chaine_vide_dans_les_colonnes_comparees(population):
+    assert len(population) > 0
+    colonnes = _colonnes_convertibles_en_manquant()
+    fautifs = [
+        (enregistrement["n_ipp"], colonne)
+        for enregistrement in population
+        for colonne in colonnes
+        if enregistrement.get(colonne) == ""
+    ]
+    assert not fautifs, f"chaînes vides restantes (n_ipp, colonne) : {fautifs[:10]}"
+
+
+def test_nb_valeurs_manquantes_egale_nb_chaines_vides_mesure_en_base(population):
+    """Pour chaque colonne comparée (brute) DE TYPE TEXTE, le nombre de
+    valeurs manquantes après conversion égale le nombre de chaînes vides
+    compté directement en base sur la même population, au même moment —
+    deux grandeurs mesurées à l'exécution, jamais un littéral de volumétrie
+    recopié. Les colonnes non textuelles (ex. date_naissance, de type
+    `date`) ne peuvent jamais porter une chaîne vide en base : mesuré ici
+    par le type de colonne réel, pas supposé.
+    """
+    assert len(population) > 0
+    with _connexion() as connexion, connexion.cursor() as curseur:
+        curseur.execute(
+            "SELECT column_name, data_type FROM information_schema.columns "
+            "WHERE table_schema = 'marts' AND table_name = 'dim_patient'"
+        )
+        types_colonnes = dict(curseur.fetchall())
+
+        for nom_champ in CHAMPS_COMPARES:
+            nb_manquantes_extraction = sum(
+                1 for enregistrement in population if enregistrement[nom_champ] is None
+            )
+            if types_colonnes[nom_champ] != "text":
+                assert nb_manquantes_extraction == 0, (
+                    f"{nom_champ} (type {types_colonnes[nom_champ]}) ne peut jamais être une "
+                    f"chaîne vide en base, mais {nb_manquantes_extraction} valeur(s) manquante(s) "
+                    f"extraite(s)"
+                )
+                continue
+            curseur.execute(
+                f"SELECT count(*) FROM marts.dim_patient WHERE est_courante AND {nom_champ} = ''"
+            )
+            (nb_vides_base,) = curseur.fetchone()
+            assert nb_manquantes_extraction == nb_vides_base, (
+                f"{nom_champ} : {nb_manquantes_extraction} manquantes extraites, "
+                f"{nb_vides_base} chaînes vides mesurées en base"
+            )
+
+
+def test_nombre_de_lignes_inchange_par_la_conversion(population, decompte_base):
+    _, total_lignes_base = decompte_base
+    assert len(population) == total_lignes_base

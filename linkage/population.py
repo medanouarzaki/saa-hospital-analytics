@@ -79,12 +79,44 @@ def _colonnes_select() -> str:
     return ", ".join(colonnes)
 
 
+def _colonnes_convertibles_en_manquant() -> set[str]:
+    """Les colonnes comparées ET leurs colonnes normalisées, jamais
+    l'identifiant n_ipp : ce sont les colonnes dont une chaîne vide doit
+    devenir une valeur manquante (voir `extraire_population`).
+    """
+    colonnes = set(CHAMPS_COMPARES.keys())
+    for nom_champ, champ in CHAMPS_COMPARES.items():
+        if champ.normalisation is not Normalisation.AUCUNE:
+            colonnes.add(f"{nom_champ}_norm")
+    return colonnes
+
+
+def _convertir_vides_en_manquant(enregistrement: dict, colonnes: set[str]) -> None:
+    """Remplace en place, dans les colonnes données, toute chaîne vide par
+    une valeur manquante (None).
+
+    L'égalité SQL est vraie entre deux chaînes vides : bloquer sur une
+    colonne partiellement vide regrouperait tous les enregistrements vides
+    dans un même bloc géant (268 enregistrements pour la pièce d'identité,
+    soit 35 778 paires fantômes). L'égalité SQL n'est en revanche jamais
+    vraie entre deux valeurs manquantes, et c'est la forme que les niveaux
+    "valeur manquante" de splink (`NullLevel`, voir linkage/modele.py)
+    attendent. La conversion est donc une décision de conception du modèle,
+    pas un détail d'implémentation.
+    """
+    for colonne in colonnes:
+        if enregistrement.get(colonne) == "":
+            enregistrement[colonne] = None
+
+
 def extraire_population(environ: dict[str, str] | None = None) -> list[dict]:
     """Retourne la population de rapprochement : une ligne par n_ipp en
     version courante de marts.dim_patient, portant n_ipp, les champs bruts
     du registre et leurs versions normalisées selon la variante déclarée
     (les champs déclarés sans normalisation n'ont pas de colonne normalisée
-    additionnelle).
+    additionnelle). Dans les colonnes comparées et leurs colonnes
+    normalisées (jamais n_ipp), toute chaîne vide est convertie en valeur
+    manquante — voir `_convertir_vides_en_manquant`.
     """
     colonnes = _colonnes_select()
     requete = f"""
@@ -97,6 +129,7 @@ def extraire_population(environ: dict[str, str] | None = None) -> list[dict]:
         noms = [d.name for d in curseur.description]
         lignes = curseur.fetchall()
 
+    colonnes_a_convertir = _colonnes_convertibles_en_manquant()
     resultat = []
     for ligne in lignes:
         enregistrement = dict(zip(noms, ligne, strict=True))
@@ -108,5 +141,6 @@ def extraire_population(environ: dict[str, str] | None = None) -> list[dict]:
                 enregistrement[f"{nom_champ}_norm"] = v1(valeur_brute)
             elif champ.normalisation is Normalisation.V2:
                 enregistrement[f"{nom_champ}_norm"] = v2(valeur_brute)
+        _convertir_vides_en_manquant(enregistrement, colonnes_a_convertir)
         resultat.append(enregistrement)
     return resultat
