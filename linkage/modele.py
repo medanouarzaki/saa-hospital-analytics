@@ -95,24 +95,36 @@ def comparaison_date_naissance(
     )
 
 
-def comparaison_piece_identite() -> CustomComparison:
+def comparaison_piece_identite(neutraliser_absence: bool = False) -> CustomComparison:
     """Comparaison composite sur les deux colonnes de la pièce d'identité
     (type ET numéro) : un seul niveau de correspondance exacte porte sur le
     COUPLE des deux colonnes à la fois (voir linkage.champs.COMPARAISONS,
     la comparaison composite), pas deux comparaisons séparées.
+
+    `neutraliser_absence`, réservé à l'étude d'ablation (linkage.ablation) :
+    si vrai, le niveau d'absence à sens unique — mesuré porteur d'un facteur
+    de Bayes de 20,25, un artefact de la façon dont le générateur injecte
+    cette variation — est marqué `is_null_level=True` via
+    `ComparisonLevelCreator.configure`, le mécanisme que la bibliothèque
+    réserve aux niveaux de valeur manquante : aucun m/u n'y est plus estimé,
+    aucune preuve n'en est plus tirée. Par défaut (faux), le comportement du
+    modèle complet est inchangé.
     """
     type_col = colonne_blocage("type_piece_identite")
     numero_col = colonne_blocage("n_piece_identite")
+    niveau_absence = CustomLevel(
+        sql_condition=(
+            f'"{type_col}_l" is null or "{numero_col}_l" is null '
+            f'or "{type_col}_r" is null or "{numero_col}_r" is null'
+        ),
+        label_for_charts="manquant d'au moins un côté",
+    )
+    if neutraliser_absence:
+        niveau_absence = niveau_absence.configure(is_null_level=True)
     return CustomComparison(
         output_column_name="piece_identite",
         comparison_levels=[
-            CustomLevel(
-                sql_condition=(
-                    f'"{type_col}_l" is null or "{numero_col}_l" is null '
-                    f'or "{type_col}_r" is null or "{numero_col}_r" is null'
-                ),
-                label_for_charts="manquant d'au moins un côté",
-            ),
+            niveau_absence,
             CustomLevel(
                 sql_condition=(
                     f'"{type_col}_l" = "{type_col}_r" and "{numero_col}_l" = "{numero_col}_r"'
@@ -188,10 +200,22 @@ def comparaison_ville() -> CustomComparison:
     )
 
 
-def comparaisons(ordre_niveaux_date: list[str] | None = None) -> list[CustomComparison]:
+def comparaisons(
+    ordre_niveaux_date: list[str] | None = None,
+    exclure: frozenset[str] = frozenset(),
+    neutraliser_absence_piece_identite: bool = False,
+) -> list[CustomComparison]:
     """Les douze comparaisons, dans l'ordre du registre
     (`linkage.champs.COMPARAISONS`) : une fonction par comparaison, jamais
     une liste recopiée séparément du registre.
+
+    `exclure` et `neutraliser_absence_piece_identite`, réservés à l'étude
+    d'ablation (linkage.ablation), permettent de construire un modèle privé
+    d'un sous-ensemble de comparaisons, ou dont le niveau d'absence de la
+    pièce d'identité est neutralisé — SANS DUPLICATION de cette fonction :
+    le modèle complet reste le résultat de cet appel avec les deux
+    paramètres à leur valeur par défaut (voir
+    `test_comparaisons_par_defaut_identiques_au_modele_complet`).
     """
     constructeurs = {
         "nom": comparaison_nom,
@@ -205,9 +229,12 @@ def comparaisons(ordre_niveaux_date: list[str] | None = None) -> list[CustomComp
         "nom_mere": comparaison_nom_mere,
         "quartier": comparaison_quartier,
         "ville": comparaison_ville,
-        "piece_identite": comparaison_piece_identite,
+        "piece_identite": lambda: comparaison_piece_identite(neutraliser_absence_piece_identite),
     }
     assert set(constructeurs.keys()) == set(COMPARAISONS.keys()), (
         "les comparaisons construites ici divergent du registre"
     )
-    return [constructeurs[nom]() for nom in COMPARAISONS]
+    assert exclure <= set(COMPARAISONS.keys()), (
+        f"exclure contient des noms hors du registre : {exclure - set(COMPARAISONS.keys())}"
+    )
+    return [constructeurs[nom]() for nom in COMPARAISONS if nom not in exclure]

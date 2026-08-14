@@ -22,7 +22,7 @@ from splink import Linker, SettingsCreator
 from splink.backends.duckdb import DuckDBAPI
 
 from linkage.blocage import regles_blocage
-from linkage.champs import CHAMPS_COMPARES, Normalisation
+from linkage.champs import CHAMPS_COMPARES, COMPARAISONS, Normalisation
 from linkage.modele import comparaisons
 
 _DATE_GABARIT = datetime.date(1980, 1, 1)
@@ -308,3 +308,58 @@ def test_ville_porte_l_ajustement_de_frequence():
         n for n in niveaux if getattr(n, "term_frequency_adjustments", False) is True
     ]
     assert niveaux_avec_ajustement, "aucun niveau de 'ville' ne porte l'ajustement de fréquence"
+
+
+# --- construction paramétrable, réservée à l'étude d'ablation (linkage.ablation) --
+
+
+def test_comparaisons_par_defaut_identiques_au_modele_complet():
+    """Le chemin paramétrable, appelé sans argument, DOIT rester le modèle
+    complet du dépôt, mot pour mot : mêmes noms de comparaison, dans le même
+    ordre, même compte. Une variante qui modifierait discrètement le modèle
+    de référence serait un défaut sérieux et silencieux.
+    """
+    reference = comparaisons()
+    via_chemin_parametrable = comparaisons(
+        exclure=frozenset(), neutraliser_absence_piece_identite=False
+    )
+    assert [c.create_output_column_name() for c in reference] == [
+        c.create_output_column_name() for c in via_chemin_parametrable
+    ]
+    assert len(reference) == len(via_chemin_parametrable) == len(COMPARAISONS) == 12
+
+
+def test_exclure_retire_exactement_les_comparaisons_demandees():
+    a_exclure = frozenset({"quartier", "ville", "nom_pere"})
+    resultat = comparaisons(exclure=a_exclure)
+    noms_restants = {c.create_output_column_name() for c in resultat}
+    assert noms_restants == set(COMPARAISONS.keys()) - a_exclure
+    assert len(resultat) == len(COMPARAISONS) - len(a_exclure)
+
+
+def test_neutraliser_absence_piece_identite_marque_is_null_level():
+    """Le niveau d'absence à sens unique, neutralisé, doit porter
+    `is_null_level=True` (le mécanisme que la bibliothèque réserve aux
+    niveaux de valeur manquante, sans m/u estimés) ; par défaut, ce même
+    niveau reste un niveau ordinaire (is_null_level=False).
+    """
+    pid_neutralise = next(
+        c
+        for c in comparaisons(neutraliser_absence_piece_identite=True)
+        if c.create_output_column_name() == "piece_identite"
+    )
+    niveaux = pid_neutralise.create_comparison_levels()
+    niveau_absence = next(
+        n for n in niveaux if n.create_label_for_charts() == "manquant d'au moins un côté"
+    )
+    assert niveau_absence.is_null_level is True
+
+    pid_defaut = next(
+        c for c in comparaisons() if c.create_output_column_name() == "piece_identite"
+    )
+    niveau_absence_defaut = next(
+        n
+        for n in pid_defaut.create_comparison_levels()
+        if n.create_label_for_charts() == "manquant d'au moins un côté"
+    )
+    assert niveau_absence_defaut.is_null_level is False
