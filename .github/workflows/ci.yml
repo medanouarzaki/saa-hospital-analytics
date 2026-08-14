@@ -27,9 +27,10 @@ jobs:
           import subprocess
 
           fichiers = [p for p in pathlib.Path("tests").glob("*.py") if p.name != "test_provenance.py"]
-          n_independant = sum(
-              len(re.findall(r"(?m)^def test_", p.read_text(encoding="utf-8"))) for p in fichiers
-          )
+          comptes_independants = {
+              p.name: len(re.findall(r"(?m)^def test_", p.read_text(encoding="utf-8")))
+              for p in fichiers
+          }
 
           resultat = subprocess.run(
               ["uv", "run", "pytest", "tests/", "--ignore=tests/test_provenance.py", "--collect-only", "-q"],
@@ -37,13 +38,31 @@ jobs:
               text=True,
               check=True,
           )
-          n_collecte = int(re.search(r"(\d+) tests? collected", resultat.stdout).group(1))
+          # Compte par fichier, pas un total global : un total global masque
+          # une inégalité par excès dans un fichier compensée par un déficit
+          # dans un autre. La comparaison est >= (pas ==) par fichier : la
+          # paramétrisation (pytest.mark.parametrize) multiplie légitimement
+          # le nombre d'éléments collectés au-delà du nombre de "def test_",
+          # ce n'est jamais le défaut recherché (un fichier mal nommé ou non
+          # découvert donnerait 0 collecté pour un compte independant > 0).
+          comptes_collectes: dict[str, int] = {}
+          for ligne in resultat.stdout.splitlines():
+              prefixe = "tests" + "/"
+              if "::" not in ligne or not ligne.startswith(prefixe):
+                  continue
+              nom = pathlib.Path(ligne.split("::", 1)[0]).name
+              comptes_collectes[nom] = comptes_collectes.get(nom, 0) + 1
 
-          assert n_independant == n_collecte, (
-              f"collecte pytest ({n_collecte}) != fonctions test_ comptees independamment "
-              f"({n_independant}) : un fichier de test est probablement mal nomme"
+          for nom, n_independant in comptes_independants.items():
+              n_collecte = comptes_collectes.get(nom, 0)
+              assert n_collecte >= n_independant, (
+                  f"{nom} : {n_independant} fonction(s) test_ mais seulement {n_collecte} "
+                  "collectee(s) par pytest : le fichier est probablement mal nomme ou non decouvert"
+              )
+          print(
+              f"controle de collecte : {len(comptes_independants)} fichier(s) de test, "
+              "chacun avec au moins son compte independant de fonctions test_ collecte"
           )
-          print(f"controle de collecte : {n_collecte} tests, en accord avec le compte independant")
           '
 
       - run: uv run pytest tests/test_collecte_ci.py -v
@@ -235,3 +254,7 @@ jobs:
       - run: uv run python -m linkage.evaluation
 
       - run: uv run pytest tests/test_linkage_evaluation.py -v
+
+      - run: uv run python -m linkage.ablation
+
+      - run: uv run pytest tests/test_linkage_ablation.py -v
