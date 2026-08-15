@@ -1,8 +1,8 @@
 """Rafraîchissement du schéma d'instantané que lit le tableau de bord.
 
-Le tableau de bord ne lit pas les vues des marchés directement : une reconstruction en cours les
-fait disparaître pendant environ trois dixièmes de seconde, un lecteur concurrent y rencontrant
-une erreur d'objet inexistant et non une attente (`docs/decisions/
+Le tableau de bord ne lit pas les vues de la couche `marts` directement : une reconstruction en
+cours les fait disparaître pendant environ trois dixièmes de seconde, un lecteur concurrent y
+rencontrant une erreur d'objet inexistant et non une attente (`docs/decisions/
 0043-instantane-schema-dedie-du-tableau-de-bord.md`). Ce module construit et rafraîchit le schéma
 de tables que le tableau de bord lit à la place.
 
@@ -138,13 +138,33 @@ def _noms_de_travail(curseur) -> list[str]:
     return [ligne[0] for ligne in curseur.fetchall()]
 
 
-def _tables_presentes(curseur) -> set[str]:
+def echanger_les_noms(conn, curseur, schema: str, noms: list[str]) -> None:
+    """Échange les noms courants et provisoires, TOUS dans une seule transaction.
+
+    L'intention est qu'un lecteur ne puisse jamais voir un ensemble mi-neuf mi-ancien : soit tous
+    les objets sont dans leur génération précédente, soit tous dans la nouvelle.
+
+    Extrait en fonction pour être appelable isolément — sur le schéma d'instantané comme sur un
+    schéma d'essai où la distinction entre deux générations est visible. Le comportement est
+    identique à celui qu'avait ce bloc lorsqu'il était écrit dans le corps du rafraîchissement.
+
+    Un nom sans table courante n'a rien à mettre au rebut : la condition ci-dessous couvre le
+    premier échange, où aucune table courante n'existe encore.
+    """
     curseur.execute(
         "select c.relname from pg_class c join pg_namespace n on n.oid = c.relnamespace "
         "where n.nspname = %s and c.relkind = 'r'",
-        (SCHEMA,),
+        (schema,),
     )
-    return {ligne[0] for ligne in curseur.fetchall()}
+    presentes = {ligne[0] for ligne in curseur.fetchall()}
+
+    conn.autocommit = False
+    for nom in noms:
+        if nom in presentes:
+            curseur.execute(f"alter table {schema}.{nom} rename to {nom}{SUFFIXE_REBUT}")
+        curseur.execute(f"alter table {schema}.{nom}{SUFFIXE_NEUF} rename to {nom}")
+    conn.commit()
+    conn.autocommit = True
 
 
 def rafraichir() -> tuple[bool, str]:
@@ -172,17 +192,8 @@ def rafraichir() -> tuple[bool, str]:
                     f"create table {SCHEMA}.{nom}{SUFFIXE_NEUF} as select * from {schema}.{nom}"
                 )
 
-            # 2. Échanger tous les noms dans UNE SEULE transaction. Au premier rafraîchissement
-            #    aucune table courante n'existe : la boucle de mise au rebut ne parcourt alors
-            #    aucun nom, sans qu'aucune branche particulière soit écrite pour ce cas.
-            presentes = _tables_presentes(cur)
-            conn.autocommit = False
-            for _, nom in objets:
-                if nom in presentes:
-                    cur.execute(f"alter table {SCHEMA}.{nom} rename to {nom}{SUFFIXE_REBUT}")
-                cur.execute(f"alter table {SCHEMA}.{nom}{SUFFIXE_NEUF} rename to {nom}")
-            conn.commit()
-            conn.autocommit = True
+            # 2. Échanger tous les noms dans UNE SEULE transaction.
+            echanger_les_noms(conn, cur, SCHEMA, [nom for _, nom in objets])
 
             # 3. Supprimer les rebuts hors transaction : les tenir dans l'échange allongerait
             #    d'autant la fenêtre pendant laquelle le catalogue est verrouillé.
