@@ -306,3 +306,9 @@ jobs:
           DBT_PROFILES_DIR: ${{ runner.temp }}/dbt_profiles
 
       - run: uv run pytest tests/test_controle_qualite.py -v
+
+      # Le registre des indicateurs confronte les objets qu'il cite au catalogue :
+      # sa place est ici, seul emplacement où la couche marts est construite. Les
+      # sept autres propriétés qu'il vérifie n'exigent que le fichier, et restent au
+      # même endroit pour que le registre ne soit pas contrôlé à deux endroits.
+      - run: uv run pytest tests/test_registre_indicateurs.py -v
