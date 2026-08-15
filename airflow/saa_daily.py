@@ -27,20 +27,29 @@ pourquoi elle est nécessaire à cette position plutôt qu'après les agrégats.
 Toutes les tâches sont des commandes shell : ce fichier n'importe rien d'autre que
 l'orchestrateur et la bibliothèque standard, pour rester analysable sans que les dépendances du
 projet soient installées là où il est lu. Les commandes qu'il déclenche s'exécutent dans
-l'environnement hérité du processus qui a démarré l'orchestrateur — paramètres de connexion et
-racine du dépôt compris. Aucun identifiant, aucun mot de passe et aucune variable de connexion
-ne sont écrits ici.
+l'environnement hérité du processus qui a démarré l'orchestrateur — paramètres de connexion
+compris — mais dans un répertoire de travail que ce fichier fixe lui-même pour chaque tâche
+(`cwd`), dérivé de son propre emplacement (`SAA_REPO_ROOT`, si définie, prévaut toujours) :
+sans un répertoire de travail explicite, l'opérateur shell exécute silencieusement dans un
+répertoire temporaire propre à l'appel, jamais le dépôt (docs/decisions/
+0012-mode-execution-orchestrateur.md, amendé). Aucun identifiant, aucun mot de passe et aucune
+variable de connexion ne sont écrits ici.
 
 Les deux tâches finales (export et rafraîchissement de l'instantané du tableau de bord) sont des
 aboutissements vides, en attente d'un travail ultérieur.
 """
 
+import os
+from pathlib import Path
+
 import pendulum
 from airflow.providers.standard.operators.bash import BashOperator
 from airflow.sdk import DAG
 
-CD_DEPOT = 'cd "${SAA_REPO_ROOT:-.}"'
-CD_DBT = 'cd "${SAA_REPO_ROOT:-.}/dbt"'
+# Dérivée de l'emplacement de ce fichier, à l'analyse du graphe : plus une précondition, son
+# absence ne change plus le comportement. `SAA_REPO_ROOT`, si définie, prévaut toujours.
+RACINE_DEPOT = os.environ.get("SAA_REPO_ROOT", str(Path(__file__).resolve().parent.parent))
+RACINE_DBT = str(Path(RACINE_DEPOT) / "dbt")
 RACINE_SCENARIO = '"${SAA_SCENARIO_ROOT:-generator/output/scenario_30}"'
 DATE_EXTRACTION = "{{ logical_date | ds }}"
 
@@ -79,9 +88,9 @@ with DAG(
     # présence des onze tables, seulement qu'AU MOINS UNE en porte une pour cette date.
     verifier_disponibilite_extraction = BashOperator(
         task_id="verifier_disponibilite_extraction",
+        cwd=RACINE_DEPOT,
         bash_command=(
             f"set -euo pipefail\n"
-            f"{CD_DEPOT}\n"
             f"racine={RACINE_SCENARIO}\n"
             f'date_extraction="{DATE_EXTRACTION}"\n'
             "trouvees=0\n"
@@ -102,9 +111,9 @@ with DAG(
 
     charger_journee = BashOperator(
         task_id="charger_journee",
+        cwd=RACINE_DEPOT,
         bash_command=(
             f"set -euo pipefail\n"
-            f"{CD_DEPOT}\n"
             f"racine={RACINE_SCENARIO}\n"
             f'uv run python -m ingestion.chargeur "$racine" '
             f'--date-debut "{DATE_EXTRACTION}" --date-fin "{DATE_EXTRACTION}"\n'
@@ -120,9 +129,8 @@ with DAG(
     # la chaîne avant que l'entrepôt ne soit reconstruit sur des données déjà défectueuses.
     controle_qualite = BashOperator(
         task_id="controle_qualite",
-        bash_command=(
-            f'{CD_DEPOT}\nuv run python -m ingestion.controle_qualite "{DATE_EXTRACTION}"\n'
-        ),
+        cwd=RACINE_DEPOT,
+        bash_command=f'uv run python -m ingestion.controle_qualite "{DATE_EXTRACTION}"\n',
     )
 
     # --threads 1 sur `dbt run` : à la concurrence par défaut du profil (4 fils), le
@@ -133,19 +141,20 @@ with DAG(
     # parallélisme.
     dbt_intermediaire = BashOperator(
         task_id="dbt_intermediaire",
-        bash_command=(
-            f'{CD_DBT}\nuv run dbt run --threads 1 --select "{SELECTEUR_INTERMEDIAIRE}"\n'
-        ),
+        cwd=RACINE_DBT,
+        bash_command=f'uv run dbt run --threads 1 --select "{SELECTEUR_INTERMEDIAIRE}"\n',
     )
 
     dbt_dimensions = BashOperator(
         task_id="dbt_dimensions",
-        bash_command=f'{CD_DBT}\nuv run dbt run --threads 1 --select "{SELECTEUR_DIMENSIONS}"\n',
+        cwd=RACINE_DBT,
+        bash_command=f'uv run dbt run --threads 1 --select "{SELECTEUR_DIMENSIONS}"\n',
     )
 
     dbt_faits = BashOperator(
         task_id="dbt_faits",
-        bash_command=f'{CD_DBT}\nuv run dbt run --threads 1 --select "{SELECTEUR_FAITS}"\n',
+        cwd=RACINE_DBT,
+        bash_command=f'uv run dbt run --threads 1 --select "{SELECTEUR_FAITS}"\n',
     )
 
     # dbt sélectionne aussi, par défaut, les tests d'un modèle NON sélectionné dès lors
@@ -155,8 +164,8 @@ with DAG(
     # stade du graphe). Exclusion explicite des déclarations de test des agrégats.
     dbt_tests = BashOperator(
         task_id="dbt_tests",
+        cwd=RACINE_DBT,
         bash_command=(
-            f"{CD_DBT}\n"
             f'uv run dbt test --select "{SELECTEUR_INTERMEDIAIRE}" '
             f'"{SELECTEUR_DIMENSIONS}" "{SELECTEUR_FAITS}" '
             f'--exclude "path:models/marts/agg_*.yml"\n'
@@ -165,17 +174,20 @@ with DAG(
 
     rapprochement_prediction = BashOperator(
         task_id="rapprochement_prediction",
-        bash_command=f"{CD_DEPOT}\nuv run python -m linkage.prediction\n",
+        cwd=RACINE_DEPOT,
+        bash_command="uv run python -m linkage.prediction\n",
     )
 
     rapprochement_regroupement_evaluation = BashOperator(
         task_id="rapprochement_regroupement_evaluation",
-        bash_command=f"{CD_DEPOT}\nuv run python -m linkage.evaluation\n",
+        cwd=RACINE_DEPOT,
+        bash_command="uv run python -m linkage.evaluation\n",
     )
 
     dbt_agregats = BashOperator(
         task_id="dbt_agregats",
-        bash_command=f'{CD_DBT}\nuv run dbt run --threads 1 --select "{SELECTEUR_AGREGATS}"\n',
+        cwd=RACINE_DBT,
+        bash_command=f'uv run dbt run --threads 1 --select "{SELECTEUR_AGREGATS}"\n',
     )
 
     exporter = BashOperator(

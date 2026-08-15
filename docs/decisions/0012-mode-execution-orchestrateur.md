@@ -1,6 +1,19 @@
 # ADR 0012 — Mode d'exécution de l'orchestrateur
 
-**Statut.** Accepté.
+**Statut.** Accepté. **Amendée** : le graphe (`airflow/saa_daily.py`) situe le dépôt par
+lui-même, à l'analyse du module, plutôt que d'attendre cette information de qui l'exécute. Motif
+mesuré : sans répertoire de travail explicite (`cwd`) passé à chaque tâche shell, l'opérateur
+exécute dans un répertoire temporaire propre à l'appel, silencieusement ; et le changement de
+répertoire de tête que ces tâches portaient (`cd "${SAA_REPO_ROOT:-.}"`) réussit tout aussi
+silencieusement sur son repli (`.`, ce même répertoire temporaire) quand la variable n'est pas
+définie — ce qui était le cas de chaque exécution du job long de `.github/workflows/ci.yml`,
+qui ne l'exporte nulle part. Alternative rejetée : déclarer `SAA_REPO_ROOT` dans le fichier de
+workflow aurait réparé l'intégration continue sans changer le graphe lui-même, laissant la même
+dépendance implicite partout ailleurs qu'il s'exécute — poste local compris, où seule une
+habitude personnelle, non prescrite par le dépôt, la compensait. Ce qui invaliderait cette
+décision : un exécuteur qui lance chaque tâche dans son propre conteneur (déjà noté ci-dessus
+comme non retenue), où la racine du dépôt cesserait d'être un chemin du système de fichiers
+local pour devenir un point de montage propre à chaque tâche.
 
 ---
 
