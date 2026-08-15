@@ -312,3 +312,9 @@ jobs:
       # sept autres propriétés qu'il vérifie n'exigent que le fichier, et restent au
       # même endroit pour que le registre ne soit pas contrôlé à deux endroits.
       - run: uv run pytest tests/test_registre_indicateurs.py -v
+
+      # Les contrôles de l'instantané exigent que la couche marts soit construite : leur place
+      # est ici, comme ceux du registre. Aucune étape ne rafraîchit l'instantané avant eux —
+      # ils l'établissent eux-mêmes, un test devant poser ses préconditions plutôt que les
+      # hériter de l'ordre des étapes qui le précèdent.
+      - run: uv run pytest tests/test_instantane.py -v
