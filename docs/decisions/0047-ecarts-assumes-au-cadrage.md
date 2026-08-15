@@ -20,15 +20,16 @@ que l'exigence est tenue ; ces trois écarts sont donc écrits.
 
 ## Justification des points non triviaux
 
-### Premier écart — trois indicateurs ne sont pas recalculés depuis les tables de faits
+### Premier écart — six indicateurs ne sont pas recalculés depuis les tables de faits
 
 La règle du cadrage veut que tout indicateur soit recalculé depuis les faits plutôt que repris
-d'une colonne calculée en amont. Trois indicateurs y échappent, pour deux raisons différentes.
+d'une colonne calculée en amont. Six indicateurs y échappent, pour deux raisons différentes.
 
-**Deux parce qu'aucune table de faits ne porte la matière**, et il faut nommer laquelle manque dans
+**Cinq parce qu'aucune table de faits ne porte la matière**, et il faut nommer laquelle manque dans
 chaque cas :
 
-- **le taux de recouvrement et l'aboutissement des relances** lisent la couche intermédiaire.
+- **le taux de recouvrement, l'aboutissement des relances et l'ancienneté des créances** lisent
+  la couche intermédiaire.
   **Il n'existe ni fait des créances ni fait des relances** — les six faits du schéma en étoile
   sont les encaissements, la facturation, les passages, les passages aux urgences, les rendez-vous
   et les séjours, énumérés par le catalogue. Recalculer depuis les faits est ici impossible, non
@@ -128,7 +129,7 @@ absent du système d'information et activité absente de l'établissement.
 ## Ce qui aurait invalidé cette décision
 
 Qu'un fait des créances ou des relances existe dans le schéma en étoile, auquel cas le premier
-écart disparaîtrait pour deux de ses trois indicateurs.
+écart disparaîtrait pour trois de ses six indicateurs.
 
 Que la capacité litière soit chargée quelque part en base — dans une table de référentiel ou une
 variable de l'outil de transformation — auquel cas le deuxième écart n'existerait pas et la table
