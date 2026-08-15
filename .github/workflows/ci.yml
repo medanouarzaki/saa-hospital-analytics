@@ -318,3 +318,9 @@ jobs:
       # ils l'établissent eux-mêmes, un test devant poser ses préconditions plutôt que les
       # hériter de l'ordre des étapes qui le précèdent.
       - run: uv run pytest tests/test_instantane.py -v
+
+      # La transparence du rafraîchissement se mesure sous témoin concurrent : ces contrôles
+      # lancent des rafraîchissements réels et lisent en boucle pendant qu'ils se déroulent.
+      # Ils exigent donc la même base construite que les contrôles d'égalité, et sont placés
+      # au même endroit qu'eux.
+      - run: uv run pytest tests/test_instantane_transparence.py -v
