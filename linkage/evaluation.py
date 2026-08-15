@@ -33,6 +33,12 @@ VERITE_TERRAIN_DEFAUT = RACINE / "generator" / "output" / "scenario_30" / "verit
 # la vérité terrain de la population réellement chargée dans ce run.
 VERITE_TERRAIN = Path(os.environ.get("VERITE_TERRAIN_PATIENTS", str(VERITE_TERRAIN_DEFAUT)))
 
+# CHEMIN_COURBE_PRECISION_RAPPEL (même patron que VERITE_TERRAIN_PATIENTS ci-dessus) : une
+# exécution planifiée qui écrirait toujours sous le chemin du dépôt laisserait, à chaque
+# passage, une modification non commise d'un fichier suivi.
+CHEMIN_COURBE_DEFAUT = RACINE / "linkage" / "courbe_precision_rappel.csv"
+CHEMIN_COURBE = Path(os.environ.get("CHEMIN_COURBE_PRECISION_RAPPEL", str(CHEMIN_COURBE_DEFAUT)))
+
 # Seuil retenu (voir le raisonnement complet, sans vérité terrain, en
 # amont) : une probabilité de 0,5 (poids de correspondance 0), nettement
 # plus proche du mode des paires vraies (17,4 unités de poids) que du mode
@@ -379,9 +385,8 @@ def main() -> None:
     nb_eval = charger_evaluation(lignes)
     print(f"linkage.evaluation : {nb_eval} ligne(s) écrite(s)")
 
-    chemin_csv = RACINE / "linkage" / "courbe_precision_rappel.csv"
-    nb_csv = ecrire_courbe_csv(lignes, chemin_csv)
-    print(f"{chemin_csv} : {nb_csv} ligne(s) écrite(s)")
+    nb_csv = ecrire_courbe_csv(lignes, CHEMIN_COURBE)
+    print(f"{CHEMIN_COURBE} : {nb_csv} ligne(s) écrite(s)")
 
     paires_pour_regroupement = [(n1, n2, proba) for n1, n2, proba, _poids in paires]
     affectation = composantes_connexes(paires_pour_regroupement, SEUIL_PROBABILITE, population)

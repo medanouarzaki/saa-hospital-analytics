@@ -17,6 +17,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "apache-airflow==3.3.0",
     "pytest",
     "ruff",
     "sqlfluff",
