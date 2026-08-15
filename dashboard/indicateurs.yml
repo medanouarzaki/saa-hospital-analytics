@@ -1,0 +1,726 @@
+# Registre des indicateurs — un indicateur par entrée, une entrée par indicateur affiché
+#
+# Règle de preuve. Chaque entrée porte une définition d'UNE SEULE PHRASE, la
+# décision qu'elle sert, les objets qu'elle lit, sa filtrabilité par période et
+# ce dont sa valeur est recalculée. Un indicateur affiché sans entrée ici est un
+# chiffre sans définition ; une entrée sans indicateur affiché est une
+# définition morte. Les deux sont interdits, et le contrôle casse dans les deux
+# sens.
+#
+# `objets_lus` nomme des objets qualifiés par leur schéma, et chacun existe au
+# catalogue de la base — c'est une vérification et non une convention.
+#
+# `filtrabilite` prend trois valeurs et trois seulement :
+#   - `oui` : l'indicateur se restreint à une période sans réserve, et
+#     `colonne_de_date` nomme la colonne qui porte la restriction ;
+#   - `oui_sous_reserve` : il se restreint, mais la date employée n'est pas
+#     celle qu'un lecteur attendrait ; `reserve` dit laquelle et pourquoi ;
+#   - `non` : il ne se restreint pas ; `motif` prend l'une des trois valeurs
+#     ci-dessous, et aucune autre.
+#
+# Les trois motifs de non-filtrabilité, repris sans ajout :
+#   - `objet_sans_colonne_temporelle` : l'objet qui porte l'indicateur n'a
+#     aucune colonne de type date ou horodatage. La grandeur décrit un état, non
+#     un flux.
+#   - `grandeur_annualisee` : la grandeur divise par un nombre de jours puis
+#     multiplie par une année de référence ; la restreindre est possible et
+#     méthodologiquement faux.
+#   - `date_hors_couche_des_faits` : la date existe, mais dans une couche que le
+#     filtre appliqué aux faits n'atteint pas.
+#
+# `recalcule_depuis` dit ce dont la valeur est effectivement dérivée. La règle du
+# cadrage veut `faits` partout ; les entrées qui portent une autre valeur sont
+# les écarts assumés, et ils sont visibles ici plutôt que relégués ailleurs.
+#
+# Éléments examinés qui n'entrent PAS au registre, et pourquoi :
+#   - le coût d'affichage d'une page — mesuré pendant l'examen de filtrabilité
+#     et compté parmi les trente-sept éléments examinés, c'est une mesure de
+#     performance et non une grandeur métier. Aucune décision de gestion n'en
+#     dépend, et aucun lecteur du rapport ne la consulte.
+#
+# Éléments dédoublés par rapport à l'examen initial, et pourquoi :
+#   - le taux de recouvrement, compté une fois à l'examen, recouvre deux
+#     grandeurs distinctes qui reçoivent deux entrées : le recouvrement des
+#     créances nées, et l'encaissement des factures émises. Les deux populations
+#     diffèrent — 5 486 créances contre 21 066 factures — et les deux valeurs
+#     aussi ; les confondre ferait afficher l'une pour l'autre.
+#
+# Réconciliation de composition, calculée et non recopiée :
+#   trente-sept examinés − un exclu + un dédoublé = trente-sept entrées.
+#
+# Réconciliation de filtrabilité : les décomptes par valeur sont calculés depuis
+# les entrées et confrontés au nombre d'entrées. L'écart avec les décomptes de
+# l'examen initial demande TROIS mouvements et non deux, et le troisième est
+# écrit ici plutôt que passé sous silence :
+#   1. l'élément exclu — le coût d'affichage d'une page — était compté parmi les
+#      non filtrables : les non filtrables passent de treize à douze ;
+#   2. l'entrée dédoublée — le taux de recouvrement, devenu recouvrement des
+#      créances et encaissement des factures — ajoute une entrée filtrable sous
+#      réserve : les filtrables passent de vingt-quatre à vingt-cinq ;
+#   3. l'examen initial avait lui-même signalé un cas ambigu, le taux de
+#      recouvrement, et l'avait compté parmi les non filtrables par prudence
+#      tout en le listant comme filtrable sous réserve. La règle de filtrabilité
+#      l'a tranché en filtrable sous réserve, la date disponible étant celle de
+#      naissance de la créance. Les non filtrables passent de douze à onze et les
+#      filtrables de vingt-cinq à vingt-six.
+#   Total : vingt-six filtrables et onze non filtrables, soit trente-sept.
+
+examen_initial:
+  elements_examines: 37
+  filtrables: 24
+  non_filtrables: 13
+
+composition:
+  exclus: 1
+  dedoubles: 1
+  reclasses_filtrables: 1
+  entrees_attendues: 37
+
+filtrabilite_attendue:
+  oui: 21
+  oui_sous_reserve: 5
+  non: 11
+
+pages:
+  - activite
+  - rendez_vous
+  - urgences
+  - sejours
+  - facturation
+  - qualite
+  - rapprochement
+
+indicateurs:
+
+  # ---------------------------------------------------------------- activite
+
+  - identifiant: activite_volume_journalier
+    page: activite
+    libelle: Volume d'événements par jour
+    definition: >-
+      Nombre d'événements enregistrés chaque jour, ventilé par famille
+      d'événement.
+    decision_servie: >-
+      Dimensionner les plages d'ouverture et les effectifs d'accueil sur la
+      charge réellement observée.
+    objets_lus:
+      - marts.fct_rendez_vous
+      - marts.fct_passage
+      - marts.fct_sejour
+    filtrabilite: oui
+    colonne_de_date: date_rendez_vous, date_entree, jour_admission, jour_sortie
+    recalcule_depuis: faits
+
+  - identifiant: activite_patients_distincts
+    page: activite
+    libelle: Patients distincts par jour
+    definition: >-
+      Nombre de patients différents concernés chaque jour, en regard du nombre
+      d'événements de la même famille.
+    decision_servie: >-
+      Distinguer une charge portée par de nombreux patients d'une charge portée
+      par des passages répétés.
+    objets_lus:
+      - marts.fct_rendez_vous
+      - marts.fct_passage
+      - marts.fct_sejour
+    filtrabilite: oui
+    colonne_de_date: date_rendez_vous, date_entree, jour_admission, jour_sortie
+    recalcule_depuis: faits
+
+  - identifiant: activite_profil_semaine
+    page: activite
+    libelle: Profil de jour de semaine
+    definition: >-
+      Volume moyen d'événements pour chaque jour de la semaine sur toute la
+      période chargée.
+    decision_servie: Répartir les effectifs sur les jours de la semaine.
+    objets_lus:
+      - marts.fct_rendez_vous
+      - marts.fct_passage
+      - marts.fct_sejour
+      - marts.dim_date
+    filtrabilite: oui
+    colonne_de_date: date_jour
+    recalcule_depuis: faits
+
+  - identifiant: activite_effet_ramadan
+    page: activite
+    libelle: Effet du Ramadan
+    definition: >-
+      Volume journalier moyen des jours de Ramadan comparé à celui des autres
+      jours, avec le nombre de jours de chaque groupe.
+    decision_servie: >-
+      Adapter les horaires d'ouverture et les effectifs pendant le Ramadan.
+    objets_lus:
+      - marts.fct_rendez_vous
+      - marts.fct_passage
+      - marts.fct_sejour
+      - marts.dim_date
+    filtrabilite: oui
+    colonne_de_date: date_jour
+    recalcule_depuis: faits
+
+  - identifiant: activite_effet_calendaire
+    page: activite
+    libelle: Effet des jours fériés et des week-ends
+    definition: >-
+      Volume journalier moyen des jours fériés et des week-ends comparé à celui
+      des jours ouvrés, séparément pour chacun.
+    decision_servie: Dimensionner les gardes et les permanences.
+    objets_lus:
+      - marts.fct_rendez_vous
+      - marts.fct_passage
+      - marts.fct_sejour
+      - marts.dim_date
+    filtrabilite: oui
+    colonne_de_date: date_jour
+    recalcule_depuis: faits
+
+  - identifiant: activite_profil_horaire
+    page: activite
+    libelle: Profil horaire des arrivées
+    definition: >-
+      Répartition des événements par heure de la journée, pour les
+      consultations, les passages aux urgences et les admissions.
+    decision_servie: Placer les créneaux d'ouverture et l'heure des relèves.
+    objets_lus:
+      - marts.fct_passage
+      - marts.fct_passage_urgence
+      - marts.fct_sejour
+    filtrabilite: oui
+    colonne_de_date: date_heure_entree, date_heure_arrivee, date_heure_admission
+    recalcule_depuis: faits
+    note: >-
+      Les rendez-vous en sont absents : leur fait ne porte aucune colonne
+      horodatée, l'heure ayant été tronquée à sa construction. La facturation et
+      l'encaissement en sont absents pour une autre raison, mesurée sur la
+      distribution : leurs colonnes horodatées ne portent qu'une seule heure
+      distincte chacune, une constante et non une donnée.
+
+  # ------------------------------------------------------------- rendez_vous
+
+  - identifiant: rendez_vous_delai_obtention
+    page: rendez_vous
+    libelle: Délai d'obtention
+    definition: >-
+      Nombre de jours entre la prise et la tenue du rendez-vous, en médiane et
+      au 90e centile, par activité.
+    decision_servie: >-
+      Ouvrir ou fermer des créneaux sur les activités dont le délai s'écarte des
+      autres.
+    objets_lus:
+      - marts.fct_rendez_vous
+    filtrabilite: oui
+    colonne_de_date: date_rendez_vous
+    recalcule_depuis: faits
+
+  - identifiant: rendez_vous_part_jour_meme
+    page: rendez_vous
+    libelle: Part de rendez-vous le jour même
+    definition: >-
+      Proportion des rendez-vous pris et tenus le même jour, par activité.
+    decision_servie: >-
+      Dimensionner la part d'activité non programmée absorbée par la
+      consultation.
+    objets_lus:
+      - marts.fct_rendez_vous
+    filtrabilite: oui
+    colonne_de_date: date_rendez_vous
+    recalcule_depuis: faits
+
+  - identifiant: rendez_vous_taux_absence
+    page: rendez_vous
+    libelle: Taux d'absentéisme
+    definition: >-
+      Proportion des rendez-vous où le patient ne s'est pas présenté, par
+      activité.
+    decision_servie: >-
+      Décider d'un rappel de rendez-vous et choisir les activités à cibler.
+    objets_lus:
+      - marts.fct_rendez_vous
+    filtrabilite: oui
+    colonne_de_date: date_rendez_vous
+    recalcule_depuis: faits
+
+  - identifiant: rendez_vous_taux_annulation
+    page: rendez_vous
+    libelle: Taux d'annulation
+    definition: >-
+      Proportion des rendez-vous annulés avant leur date, par activité.
+    decision_servie: >-
+      Distinguer l'annulation, qui laisse réaffecter le créneau, de l'absence,
+      qui le perd.
+    objets_lus:
+      - marts.fct_rendez_vous
+    filtrabilite: oui
+    colonne_de_date: date_rendez_vous
+    recalcule_depuis: faits
+
+  - identifiant: rendez_vous_delai_et_absence
+    page: rendez_vous
+    libelle: Délai et absentéisme croisés
+    definition: >-
+      Position de chaque activité selon son délai médian d'obtention et son taux
+      d'absentéisme, avec la corrélation entre les deux séries.
+    decision_servie: >-
+      Savoir si raccourcir le délai est un levier sur l'absentéisme, ou s'il
+      faut agir ailleurs.
+    objets_lus:
+      - marts.fct_rendez_vous
+    filtrabilite: oui
+    colonne_de_date: date_rendez_vous
+    recalcule_depuis: faits
+
+  # ---------------------------------------------------------------- urgences
+
+  - identifiant: urgences_passages_par_niveau
+    page: urgences
+    libelle: Passages par niveau de tri
+    definition: >-
+      Nombre de passages aux urgences par jour et par niveau de tri, et total
+      par niveau sur la période.
+    decision_servie: >-
+      Dimensionner l'accueil et le tri selon la composition réelle de la file.
+    objets_lus:
+      - marts.fct_passage_urgence
+    filtrabilite: oui
+    colonne_de_date: date_arrivee
+    recalcule_depuis: faits
+
+  - identifiant: urgences_delai_prise_en_charge
+    page: urgences
+    libelle: Délai de prise en charge médicale
+    definition: >-
+      Temps écoulé entre l'arrivée et la prise en charge médicale, en médiane et
+      au 90e centile, par niveau de tri.
+    decision_servie: >-
+      Vérifier que le tri produit bien une priorisation, et repérer où la file
+      se forme.
+    objets_lus:
+      - marts.fct_passage_urgence
+    filtrabilite: oui
+    colonne_de_date: date_arrivee
+    recalcule_depuis: faits
+
+  - identifiant: urgences_orientation_sortie
+    page: urgences
+    libelle: Orientation de sortie
+    definition: >-
+      Répartition des passages selon leur orientation à la sortie, en effectif
+      et en part.
+    decision_servie: Mesurer le recours au transfert et à l'hospitalisation.
+    objets_lus:
+      - marts.fct_passage_urgence
+    filtrabilite: oui
+    colonne_de_date: date_arrivee
+    recalcule_depuis: faits
+
+  - identifiant: urgences_consultation_ordinaire
+    page: urgences
+    libelle: Part relevant d'une consultation ordinaire
+    definition: >-
+      Proportion des passages classés aux deux niveaux de tri les moins graves,
+      quelle que soit leur orientation de sortie.
+    decision_servie: >-
+      Décider de l'ouverture d'une filière courte ou d'une réorientation en
+      amont.
+    objets_lus:
+      - marts.fct_passage_urgence
+    filtrabilite: oui
+    colonne_de_date: date_arrivee
+    recalcule_depuis: faits
+    note: >-
+      La définition est écrite ici plutôt que laissée implicite, l'éventail des
+      définitions candidates ayant été mesuré à un facteur proche de cinq — de
+      17,10 % à 79,92 % selon le critère retenu. Le critère est le seul niveau de
+      tri, sans conjonction avec l'orientation de sortie : celle-ci est mesurée
+      indépendante du niveau, la part de retour à domicile variant de 78,33 % au
+      niveau le plus grave à 80,14 % au niveau 4, soit 1,81 point d'amplitude
+      autour d'une part globale de 79,92 %. Une conjonction des deux critères
+      multiplierait donc deux parts au lieu de recouper deux signaux, et la
+      mesure le vérifie : la conjonction vaut 50,1572 % là où le produit des deux
+      parts vaut 50,0935 %, à six centièmes de point près. Cette définition doit
+      être affichée à côté de la valeur.
+
+  - identifiant: urgences_duree_passage
+    page: urgences
+    libelle: Durée de passage
+    definition: >-
+      Temps total passé aux urgences, en médiane et au 90e centile, par niveau
+      de tri.
+    decision_servie: Dimensionner les places d'observation.
+    objets_lus:
+      - marts.fct_passage_urgence
+    filtrabilite: oui
+    colonne_de_date: date_arrivee
+    recalcule_depuis: faits
+
+  # ----------------------------------------------------------------- sejours
+
+  - identifiant: sejours_admissions_journees
+    page: sejours
+    libelle: Admissions et journées d'hospitalisation
+    definition: >-
+      Nombre de séjours débutés et nombre de journées d'hospitalisation, par
+      mois.
+    decision_servie: >-
+      Suivre la charge d'hospitalisation mois par mois et repérer les périodes
+      de tension.
+    objets_lus:
+      - marts.fct_sejour
+    filtrabilite: oui_sous_reserve
+    colonne_de_date: jour_admission
+    reserve: >-
+      Les journées d'un séjour se répartissent sur les mois qu'il traverse, et un
+      filtre par mois d'admission ne rend pas la même série qu'un filtre par mois
+      de présence.
+    recalcule_depuis: faits
+
+  - identifiant: sejours_indicateurs_reglementaires
+    page: sejours
+    libelle: Occupation, durée moyenne et rotation
+    definition: >-
+      Taux d'occupation moyen, durée moyenne de séjour, taux de rotation et
+      intervalle de rotation, calculés sur la période complète.
+    decision_servie: >-
+      Remonter à la statistique nationale les quatre indicateurs de séjour
+      attendus d'un hôpital nommé.
+    objets_lus:
+      - marts.fct_sejour
+    filtrabilite: non
+    motif: grandeur_annualisee
+    recalcule_depuis: faits_et_parametre
+    note: >-
+      La capacité litière fonctionnelle n'est lisible dans aucun objet de la
+      base ; elle est portée par la table de paramètres de l'instantané, avec sa
+      provenance.
+
+  - identifiant: sejours_repartition_service
+    page: sejours
+    libelle: Répartition par service d'accueil
+    definition: Nombre et part des séjours par service d'accueil.
+    decision_servie: >-
+      Répartir les lits et les effectifs entre les unités d'hospitalisation.
+    objets_lus:
+      - marts.fct_sejour
+    filtrabilite: oui
+    colonne_de_date: jour_admission
+    recalcule_depuis: faits
+
+  - identifiant: sejours_distribution_duree
+    page: sejours
+    libelle: Distribution de la durée de séjour
+    definition: >-
+      Minimum, quartiles, médiane, 90e centile et maximum de la durée des
+      séjours.
+    decision_servie: >-
+      Voir la dispersion des durées là où une moyenne seule masquerait les
+      séjours longs.
+    objets_lus:
+      - marts.fct_sejour
+    filtrabilite: oui_sous_reserve
+    colonne_de_date: jour_admission
+    reserve: >-
+      Filtrée sur la date d'admission, la distribution exclut les séjours
+      commencés avant la fenêtre et biaise vers les séjours courts.
+    recalcule_depuis: faits
+
+  - identifiant: sejours_non_clos
+    page: sejours
+    libelle: Séjours non clos
+    definition: >-
+      Nombre et part des séjours sans date de sortie à la date de référence des
+      données, et ancienneté du plus ancien.
+    decision_servie: >-
+      Repérer les dossiers de sortie non clôturés avant qu'ils ne faussent les
+      durées.
+    objets_lus:
+      - marts.fct_sejour
+    filtrabilite: non
+    motif: grandeur_annualisee
+    recalcule_depuis: faits
+    note: >-
+      La grandeur est définie par rapport à la dernière extraction chargée :
+      restreindre à une période antérieure changerait la définition et non la
+      population.
+
+  # ------------------------------------------------------------- facturation
+
+  - identifiant: facturation_montants_par_type
+    page: facturation
+    libelle: Montants facturés
+    definition: >-
+      Montant total facturé par type d'épisode et par service émetteur, en
+      valeur et en part.
+    decision_servie: >-
+      Savoir quelle activité porte le montant facturé, indépendamment de son
+      volume.
+    objets_lus:
+      - marts.fct_facturation
+    filtrabilite: oui
+    colonne_de_date: date_facture
+    recalcule_depuis: faits
+
+  - identifiant: facturation_part_organisme_patient
+    page: facturation
+    libelle: Part organisme et part patient
+    definition: >-
+      Répartition du montant facturé entre la part prise en charge par un
+      organisme et la part restant au patient.
+    decision_servie: Mesurer le reste à charge effectif par type d'épisode.
+    objets_lus:
+      - marts.fct_facturation
+    filtrabilite: oui
+    colonne_de_date: date_facture
+    recalcule_depuis: faits
+
+  - identifiant: facturation_ecart_total_lignes
+    page: facturation
+    libelle: Écart entre total déclaré et somme des lignes
+    definition: >-
+      Nombre de factures dont le montant total diffère de la somme de leurs
+      lignes, montant cumulé de l'écart et divergence maximale.
+    decision_servie: >-
+      Détecter les factures dont le total ne s'accorde pas à ses lignes avant
+      qu'elles ne partent au recouvrement.
+    objets_lus:
+      - marts.fct_facturation
+    filtrabilite: oui
+    colonne_de_date: date_facture
+    recalcule_depuis: faits
+
+  - identifiant: facturation_taux_recouvrement
+    page: facturation
+    libelle: Taux de recouvrement des créances
+    definition: >-
+      Part des créances recouvrées rapportée aux créances nées, à la date de
+      référence.
+    decision_servie: >-
+      Décider d'une action de recouvrement et choisir le type de débiteur à
+      cibler.
+    objets_lus:
+      - marts.agg_recouvrement
+    filtrabilite: oui_sous_reserve
+    colonne_de_date: jour
+    reserve: >-
+      La seule date disponible est celle de naissance de la créance, non celle
+      de la facture d'origine ni celle du recouvrement.
+    recalcule_depuis: couche_intermediaire
+    note: >-
+      Il n'existe ni fait des créances ni fait des relances : recalculer depuis
+      les faits est impossible, non par choix mais par absence de la table. La
+      population est de 5 486 créances, distincte des 21 066 factures du taux
+      d'encaissement.
+
+  - identifiant: facturation_taux_encaissement
+    page: facturation
+    libelle: Taux d'encaissement des factures
+    definition: >-
+      Montant encaissé rapporté au montant facturé sur la période.
+    decision_servie: >-
+      Mesurer ce qui rentre effectivement en caisse au regard de ce qui est
+      émis.
+    objets_lus:
+      - marts.fct_facturation
+      - marts.fct_encaissement
+    filtrabilite: oui_sous_reserve
+    colonne_de_date: date_facture, jour_encaissement
+    reserve: >-
+      Le numérateur se date par l'encaissement et le dénominateur par la
+      facture ; un filtre commun compte des encaissements portant sur des
+      factures antérieures.
+    recalcule_depuis: faits
+    note: >-
+      Grandeur distincte du taux de recouvrement, et mesurée comme telle : 84,37
+      % sur 21 066 factures, contre 21,57 % sur 5 486 créances. Les deux sont
+      justes et ne comptent pas la même chose ; les confondre ferait afficher
+      l'une pour l'autre.
+
+  - identifiant: facturation_anciennete_creances
+    page: facturation
+    libelle: Ancienneté des créances
+    definition: >-
+      Répartition des créances non recouvrées par tranche d'ancienneté, comptée
+      depuis la date de référence des données.
+    decision_servie: >-
+      Prioriser le recouvrement sur les créances les plus anciennes.
+    objets_lus:
+      - intermediate.int_creances
+    filtrabilite: non
+    motif: date_hors_couche_des_faits
+    recalcule_depuis: couche_intermediaire
+    note: >-
+      La date de référence est la dernière extraction chargée et non l'horloge
+      du serveur : l'écart entre les deux fait basculer des créances de tranche
+      sans qu'aucune donnée n'ait changé.
+
+  - identifiant: facturation_aboutissement_relances
+    page: facturation
+    libelle: Aboutissement des relances
+    definition: >-
+      Nombre de relances émises, nombre ayant abouti, et leur rapport.
+    decision_servie: >-
+      Mesurer le rendement de la relance avant d'en augmenter le volume.
+    objets_lus:
+      - marts.agg_recouvrement
+    filtrabilite: oui_sous_reserve
+    colonne_de_date: jour
+    reserve: >-
+      La seule date disponible est celle de naissance de la créance, non celle
+      de la relance elle-même.
+    recalcule_depuis: couche_intermediaire
+
+  - identifiant: facturation_episodes_non_factures
+    page: facturation
+    libelle: Épisodes non facturés
+    definition: >-
+      Nombre et part des épisodes de soin sans facture rattachée, par famille
+      d'épisode et par mois.
+    decision_servie: >-
+      Mesurer ce qui échappe à la facturation, et sur quelle famille d'épisode
+      cela se concentre.
+    objets_lus:
+      - marts.fct_passage
+      - marts.fct_facturation
+    filtrabilite: oui
+    colonne_de_date: date_entree
+    recalcule_depuis: faits
+    note: >-
+      Les familles d'épisode sont celles que porte la facturation :
+      consultation, hospitalisation, urgences. Le séjour en est absent, faute de
+      clé de rattachement — son espace de clés est disjoint de celui des
+      passages, aucun séjour ne se rattache à une facture, et son fait ne porte
+      aucune colonne de rattachement.
+
+  # ----------------------------------------------------------------- qualite
+
+  - identifiant: qualite_completude_champs
+    page: qualite
+    libelle: Complétude par champ
+    definition: >-
+      Taux de renseignement de chaque colonne de chaque table, à la date du
+      dernier chargement.
+    decision_servie: >-
+      Cibler l'effort de saisie sur les champs les moins renseignés plutôt que
+      sur tous.
+    objets_lus:
+      - marts.agg_qualite_donnees
+    filtrabilite: non
+    motif: objet_sans_colonne_temporelle
+    recalcule_depuis: couche_intermediaire
+
+  - identifiant: qualite_taux_quarantaine
+    page: qualite
+    libelle: Taux de mise en quarantaine
+    definition: >-
+      Part des lignes rejetées à l'ingestion par table, avec les effectifs bruts
+      en regard des taux.
+    decision_servie: >-
+      Détecter une dégradation d'extraction en amont avant qu'elle ne contamine
+      l'entrepôt.
+    objets_lus:
+      - marts.agg_qualite_donnees
+    filtrabilite: non
+    motif: objet_sans_colonne_temporelle
+    recalcule_depuis: couche_intermediaire
+
+  - identifiant: qualite_provenance_champs
+    page: qualite
+    libelle: Provenance des champs
+    definition: >-
+      Répartition des colonnes du système d'information selon que leur
+      définition est observée, documentée ou hypothétique.
+    decision_servie: >-
+      Savoir quelle part du modèle repose sur l'observation et laquelle sur
+      l'hypothèse.
+    objets_lus:
+      - marts.agg_provenance_champs
+    filtrabilite: non
+    motif: objet_sans_colonne_temporelle
+    recalcule_depuis: catalogue
+
+  # ----------------------------------------------------------- rapprochement
+
+  - identifiant: rapprochement_collisions_exactes
+    page: rapprochement
+    libelle: Doublons par collision exacte
+    definition: >-
+      Nombre de groupes de patients partageant exactement les mêmes valeurs sur
+      un critère d'identité, et nombre de patients concernés, par critère.
+    decision_servie: >-
+      Lancer une campagne de fusion d'identités et choisir le critère à
+      prioriser.
+    objets_lus:
+      - marts.agg_doublons_identite
+    filtrabilite: non
+    motif: objet_sans_colonne_temporelle
+    recalcule_depuis: dimension
+    note: >-
+      Mesuré sur les patients de version courante de la dimension des patients.
+      Recalculé sur les seuls patients vus dans un fait, il porterait sur 25 448
+      patients au lieu de 25 842, soit 394 de moins : l'écart viendrait du
+      périmètre et jamais de la formule.
+
+  - identifiant: rapprochement_grappes
+    page: rapprochement
+    libelle: Grappes d'identité
+    definition: >-
+      Nombre de grappes formées par le rapprochement probabiliste et
+      distribution de leur taille.
+    decision_servie: >-
+      Mesurer l'ampleur du regroupement d'identités avant de l'appliquer.
+    objets_lus:
+      - linkage.grappes_identite
+    filtrabilite: non
+    motif: objet_sans_colonne_temporelle
+    recalcule_depuis: rapprochement
+
+  - identifiant: rapprochement_courbe
+    page: rapprochement
+    libelle: Courbe de précision et de rappel
+    definition: >-
+      Précision, rappel et F-mesure du rapprochement pour chaque seuil de
+      décision balayé.
+    decision_servie: >-
+      Déplacer le seuil de décision en connaissance du compromis entre précision
+      et rappel.
+    objets_lus:
+      - linkage.evaluation
+    filtrabilite: non
+    motif: objet_sans_colonne_temporelle
+    recalcule_depuis: rapprochement
+
+  - identifiant: rapprochement_apport
+    page: rapprochement
+    libelle: Apport du rapprochement probabiliste
+    definition: >-
+      Nombre de paires vraies que le rapprochement retrouve et que la collision
+      exacte manque, et nombre de fausses paires qu'il évite.
+    decision_servie: >-
+      Justifier le coût du rapprochement probabiliste face à une collision
+      exacte, ou y renoncer.
+    objets_lus:
+      - marts.dim_patient
+      - linkage.paires_candidates
+      - linkage.grappes_identite
+      - linkage.evaluation
+    filtrabilite: non
+    motif: objet_sans_colonne_temporelle
+    recalcule_depuis: rapprochement
+
+  - identifiant: rapprochement_seuil
+    page: rapprochement
+    libelle: Seuil de décision retenu
+    definition: >-
+      Valeur du seuil appliqué, lue dans les données, et précision et rappel
+      obtenus à ce seuil.
+    decision_servie: >-
+      Savoir à quel seuil les grappes affichées ont été calculées, sans le
+      supposer.
+    objets_lus:
+      - linkage.grappes_identite
+      - linkage.evaluation
+    filtrabilite: non
+    motif: objet_sans_colonne_temporelle
+    recalcule_depuis: rapprochement
