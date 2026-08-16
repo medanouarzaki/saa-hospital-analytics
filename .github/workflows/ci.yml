@@ -324,3 +324,8 @@ jobs:
       # Ils exigent donc la même base construite que les contrôles d'égalité, et sont placés
       # au même endroit qu'eux.
       - run: uv run pytest tests/test_instantane_transparence.py -v
+
+      # Les contrôles du tableau de bord lisent l'instantané, qui n'existe que là où la couche
+      # marts est construite : leur place est ici. Ils rafraîchissent l'instantané eux-mêmes si
+      # son état ne peut être lu, plutôt que de dépendre de l'ordre des étapes précédentes.
+      - run: uv run pytest tests/test_tableau_de_bord.py -v
