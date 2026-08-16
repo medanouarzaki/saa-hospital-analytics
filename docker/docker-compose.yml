@@ -47,6 +47,18 @@ services:
     build:
       context: ..
       dockerfile: docker/dashboard.Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Le nom d'hote est celui du service dans cette composition, et non une adresse locale : le
+      # port publie sur la machine hote n'a pas cours a l'interieur du reseau de la composition,
+      # ou chaque service est joignable par son nom sur son port interne.
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "${STREAMLIT_PORT}:8501"
     healthcheck:

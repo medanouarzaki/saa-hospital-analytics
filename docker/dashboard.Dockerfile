@@ -11,7 +11,10 @@ ENV UV_PROJECT_ENVIRONMENT=/app/.venv
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev
 
-COPY dashboard/app.py dashboard/app.py
+# Le repertoire d'affichage entier, registre compris, et le module d'ingestion dont le
+# tableau de bord tire son chemin de connexion — il n'en ouvre pas un second.
+COPY dashboard/ dashboard/
+COPY ingestion/ ingestion/
 
 EXPOSE 8501
 
