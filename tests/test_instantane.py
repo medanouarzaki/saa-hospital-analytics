@@ -14,7 +14,7 @@ comparerait qu'une constante à elle-même.
 
 Ces contrôles supposent un instantané rafraîchi. Ils ne l'héritent pas de l'environnement : la
 fixture ci-dessous exécute le rafraîchissement une fois par session, ce qui rend le fichier
-exécutable seul sur une base où seule la couche des marchés est construite.
+exécutable seul sur une base où seule la couche `marts` est construite.
 """
 
 import pytest
