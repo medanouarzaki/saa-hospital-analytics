@@ -41,7 +41,90 @@ ré-agrégation.**
 **Le rafraîchissement construit des tables neuves sous des noms provisoires, puis échange les
 noms, tous les échanges dans une seule transaction.**
 
+**L'échange demande ses verrous d'un seul bloc et renonce plutôt que de disputer**, avec un délai
+d'attente strictement inférieur au délai de détection d'interblocage du serveur, et réessaie.
+
 ## Justification des points non triviaux
+
+### Pourquoi l'échange renonce au lieu de disputer, et pourquoi il verrouille d'un bloc
+
+Un lecteur qui interroge plusieurs tables dans une même requête acquiert ses verrous dans l'ordre
+où sa requête les nomme ; l'échange les acquiert dans l'ordre de sa liste. Les deux ordres se
+croisent, et les deux transactions s'attendent mutuellement. Ce n'était pas un cas rare mais le cas
+ordinaire : **une lecture perdue par rafraîchissement, dix fois sur dix**, et une fois sur cinq
+c'est le rafraîchissement lui-même que le serveur désignait victime.
+
+**Aucune discipline appliquée au seul échange ne peut aligner les deux ordres**, le lecteur n'étant
+pas sous le contrôle de la chaîne : une page lit ses objets dans l'ordre qui lui convient. Il faut
+donc soit renoncer à être victime, soit cesser de disputer ces verrous.
+
+Trois conceptions ont été mesurées et écartées, sur trente exécutions chacune, sous deux charges :
+
+| conception écartée | échecs de lecture | échecs d'échange | pourquoi elle est écartée |
+|---|---|---|---|
+| **renoncer sans verrouiller d'un bloc** | 0 | **30 sur 30** sous forte charge | l'échange n'aboutit jamais : il ne réunit jamais ses vingt-quatre verrous |
+| **verrouiller d'un bloc sans renoncer** | **3 puis 2** | 2 sur 30 | des lectures échouent encore ; raccourcir la fenêtre n'aligne pas les ordres |
+| **déplacer le verrou hors des tables** | — | — | **réfutée par lecture du serveur** : renommer un schéma prend un verrou exclusif sur chacune de ses tables, et remplacer une vue en prend un sur la vue et sur ses tables sous-jacentes |
+
+**La conjonction des deux premières atteint ce qu'aucune n'atteint seule** : zéro échec des deux
+côtés sous les trois charges éprouvées, dont 467 406 lectures sous la charge la plus intense. Les
+deux moitiés sont nécessaires, et un contrôle le vérifie séparément pour chacune.
+
+Le délai retenu est de deux cents millisecondes, contre mille pour la détection d'interblocage lue
+dans le serveur. Il est posé pour la seule durée de la transaction, ce qui a été vérifié plutôt que
+supposé. Aucun échange n'a dépassé six tentatives sur les dix permises, sous une charge plus dure
+que celle du déploiement.
+
+### Pourquoi un échec de lecture et un échec d'échange n'ont pas le même statut
+
+Le critère d'acceptation est **asymétrique**, et c'est délibéré.
+
+**Un échec de lecture est vu par l'utilisateur, sans recours** : il n'a rien demandé d'autre que
+d'afficher une page, et rien ne rattrapera l'erreur pour lui. Il est donc exigé à zéro **sous toute
+charge**, sans classe d'erreur exceptée.
+
+**Un échec d'échange est vu par l'ordonnanceur**, journalisé avec sa cause, et relançable. Surtout,
+**la transaction étant atomique, il ne laisse aucun renommage partiel** : l'instantané demeure dans
+sa génération précédente, cohérente et complète. Il est donc exigé à zéro sous la charge de
+déploiement, et toléré au-delà — mais seulement parce que cette atomicité tient, ce qu'un contrôle
+vérifie en provoquant un renoncement et en confrontant décomptes et empreintes.
+
+### Le modèle de charge sous lequel tout ceci est mesuré
+
+Il distingue ce qui est mesuré de ce qui est assumé.
+
+**Mesuré :** une rafale vaut huit lectures, nombre d'indicateurs de la page la plus lourde, relevé
+au registre des indicateurs ; l'intervalle entre deux rafales vaut le temps d'afficher une page,
+obtenu en divisant par sept la durée mesurée des sept pages contre les tables copiées, soit deux
+cent huit millisecondes — **borne basse volontairement pessimiste**, puisqu'elle suppose un lecteur
+qui change de page sans la lire.
+
+**Assumé :** quatre lecteurs simultanés. Aucune mesure ne peut trancher ce point, le tableau de bord
+n'étant pas en service ; c'est une hypothèse, retenue parce qu'il s'agit d'un outil interne à un
+établissement et non d'une application publique. Pour ne pas la faire porter par l'argument, tout a
+été également mesuré à **quarante** lecteurs.
+
+Chaque lecture interrogeant plusieurs tables dans une même requête — c'est cette forme, et elle
+seule, qui croise les ordres d'acquisition.
+
+### La discipline d'attente, et pourquoi elle est vérifiée par une comparaison et non par un seuil
+
+Ce schéma existe pour qu'un lecteur ne subisse rien pendant la reconstruction. Vérifier qu'il ne
+voit ni objet absent ni état mêlé ne suffit pas : une conception qui recopierait les données en
+tenant les verrous passerait ces deux contrôles **tout en faisant patienter le lecteur dix fois plus
+longtemps** — c'est mesuré, cent quarante-trois millisecondes contre quinze.
+
+Un contrôle borne donc le travail accompli sous verrou. **Il ne porte pas sur l'attente observée**,
+qui ne distingue rien : sous forte charge, cette attente est bornée par le délai au bout duquel
+l'échange renonce, et vaut donc autant pour toutes les conceptions. Il porte sur la durée de la
+phase exclusive, rapportée au nombre d'objets, et la compare à un point calculé à chaque exécution
+comme la moyenne géométrique de deux durées mesurées au même moment : le renommage d'une table, qui
+est une opération de catalogue, et la copie d'une table de taille comparable au plus gros objet
+copié, qui est une opération de données. Ces deux ancres sont séparées de plus d'un ordre de
+grandeur.
+
+La question posée est donc : ce que l'échange fait sous verrou ressemble-t-il à écrire un nom, ou à
+recopier une table ? **Aucun seuil n'est écrit dans le contrôle** ; il est recalculé à chaque fois.
 
 ### Pourquoi le motif n'est pas le coût de lecture
 
@@ -155,7 +238,7 @@ Le motif n'est pas la vitesse mais **l'unicité de la source de lecture**. Une r
 aucune page ne lit en dehors du schéma dédié — est vérifiable par un test qui inspecte les
 requêtes ; une règle à exceptions ne l'est pas, ou seulement au prix d'une liste d'exceptions à
 tenir à jour. La mesure a d'ailleurs établi que **six indicateurs sur trente et un lisent en
-dehors du schéma des marchés** : sans cette copie, la règle aurait six exceptions dès le premier
+dehors du schéma de la couche `marts`** : sans cette copie, la règle aurait six exceptions dès le premier
 jour.
 
 ## Conséquences
