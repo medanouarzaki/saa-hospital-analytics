@@ -28,6 +28,7 @@ import time
 from datetime import UTC, datetime
 from pathlib import Path
 
+import psycopg
 import yaml
 
 from ingestion import chargeur
@@ -43,6 +44,21 @@ TABLE_PARAMETRES = f"{PREFIXE_SERVICE}parametres"
 
 # Noms de travail. Un rafraîchissement interrompu peut en laisser ; le démarrage suivant les
 # efface plutôt que d'échouer dessus.
+# Durée de la dernière phase exclusive, en millisecondes : de la demande des verrous jusqu'à la
+# validation de la transaction qui renomme. C'est la grandeur qu'un lecteur concurrent peut avoir à
+# attendre, et un contrôle la compare à l'attente réellement observée. Remise à None au début de
+# chaque rafraîchissement, pour qu'une valeur périmée ne puisse jamais être lue pour une neuve.
+# Aucune décision du module n'en dépend.
+DERNIERE_FENETRE_MS = None
+
+ATTENTE_VERROU_MS = 200
+TENTATIVES_ECHANGE = 10
+
+
+def TEMPORISATION_S(tentative):
+    return 0.05 * tentative
+
+
 SUFFIXE_NEUF = "__neuf"
 SUFFIXE_REBUT = "__rebut"
 
@@ -61,6 +77,10 @@ where (n.nspname = 'marts' and c.relkind in ('v', 'm'))
    or (n.nspname = 'intermediate' and c.relname = 'int_creances')
 order by 1, 2
 """
+
+
+class EchangeImpossible(RuntimeError):
+    """L'echange n'a pas obtenu ses verrous, toutes tentatives epuisees."""
 
 
 def objets_a_copier(curseur) -> list[tuple[str, str]]:
@@ -138,7 +158,7 @@ def _noms_de_travail(curseur) -> list[str]:
     return [ligne[0] for ligne in curseur.fetchall()]
 
 
-def echanger_les_noms(conn, curseur, schema: str, noms: list[str]) -> None:
+def echanger_les_noms(conn, curseur, schema: str, noms: list[str]) -> int:
     """Échange les noms courants et provisoires, TOUS dans une seule transaction.
 
     L'intention est qu'un lecteur ne puisse jamais voir un ensemble mi-neuf mi-ancien : soit tous
@@ -158,17 +178,42 @@ def echanger_les_noms(conn, curseur, schema: str, noms: list[str]) -> None:
     )
     presentes = {ligne[0] for ligne in curseur.fetchall()}
 
-    conn.autocommit = False
-    for nom in noms:
-        if nom in presentes:
-            curseur.execute(f"alter table {schema}.{nom} rename to {nom}{SUFFIXE_REBUT}")
-        curseur.execute(f"alter table {schema}.{nom}{SUFFIXE_NEUF} rename to {nom}")
-    conn.commit()
-    conn.autocommit = True
+    global DERNIERE_FENETRE_MS
+    cibles = ", ".join(f"{schema}.{nom}" for nom in noms if nom in presentes)
+
+    for tentative in range(1, TENTATIVES_ECHANGE + 1):
+        conn.autocommit = False
+        try:
+            curseur.execute(f"set local lock_timeout = '{ATTENTE_VERROU_MS}ms'")
+            # La phase exclusive commence ici : le chronomètre part juste avant la demande de
+            # verrous et s'arrête à la validation. Il couvre donc l'attente des verrous, bornée
+            # par le délai posé ci-dessus, et toute la durée pendant laquelle ils sont détenus.
+            # C'est exactement ce qu'un lecteur peut avoir à attendre.
+            depart = time.monotonic()
+            if cibles:
+                curseur.execute(f"lock table {cibles} in access exclusive mode")
+            for nom in noms:
+                if nom in presentes:
+                    curseur.execute(f"alter table {schema}.{nom} rename to {nom}{SUFFIXE_REBUT}")
+                curseur.execute(f"alter table {schema}.{nom}{SUFFIXE_NEUF} rename to {nom}")
+            conn.commit()
+            conn.autocommit = True
+            DERNIERE_FENETRE_MS = (time.monotonic() - depart) * 1000
+            return tentative
+        except psycopg.errors.LockNotAvailable:
+            conn.rollback()
+            conn.autocommit = True
+            time.sleep(TEMPORISATION_S(tentative))
+
+    raise EchangeImpossible(
+        f"l'echange n'a pas obtenu ses verrous en {TENTATIVES_ECHANGE} tentatives"
+    )
 
 
 def rafraichir() -> tuple[bool, str]:
     """Renvoie (réussite, message). Cinq temps : construire, échanger, nettoyer, dater, rendre."""
+    global DERNIERE_FENETRE_MS
+    DERNIERE_FENETRE_MS = None
     debut = time.monotonic()
     with chargeur.connexion() as conn:
         conn.autocommit = True
@@ -193,7 +238,21 @@ def rafraichir() -> tuple[bool, str]:
                 )
 
             # 2. Échanger tous les noms dans UNE SEULE transaction.
-            echanger_les_noms(conn, cur, SCHEMA, [nom for _, nom in objets])
+            #
+            #    Si l'échange renonce, il n'a rien renommé : la transaction est annulée en bloc, et
+            #    l'instantané reste dans sa génération précédente, cohérente. Le rafraîchissement
+            #    rend alors un échec plutôt que de lever — c'est ce qui le rend journalisable et
+            #    relançable par l'ordonnanceur, et c'est ce qui rend cet échec acceptable là où un
+            #    échec de lecture ne le serait pas.
+            try:
+                tentatives = echanger_les_noms(conn, cur, SCHEMA, [nom for _, nom in objets])
+            except EchangeImpossible as echec:
+                for _, nom in objets:
+                    cur.execute(f"drop table if exists {SCHEMA}.{nom}{SUFFIXE_NEUF}")
+                return False, (
+                    f"rafraichissement de {SCHEMA} : ECHEC - {echec} ; aucun renommage effectue, "
+                    f"l'instantane reste dans sa generation precedente"
+                )
 
             # 3. Supprimer les rebuts hors transaction : les tenir dans l'échange allongerait
             #    d'autant la fenêtre pendant laquelle le catalogue est verrouillé.
@@ -241,7 +300,8 @@ def rafraichir() -> tuple[bool, str]:
         )
     return True, (
         f"rafraichissement de {SCHEMA} : OK - {len(objets)} objets copies, "
-        f"{len(residus)} residus effaces au demarrage, date de reference {reference}, "
+        f"{len(residus)} residus effaces au demarrage, {tentatives} tentative(s) d'echange, "
+        f"date de reference {reference}, "
         f"duree {duree:.2f}s"
     )
 
