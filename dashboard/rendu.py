@@ -87,6 +87,25 @@ MOTIFS_LISIBLES = {
     ),
 }
 
+# Ce qu'un indicateur lit réellement quand il n'est pas recalculé depuis les tables de faits. Le
+# cadrage veut que tout indicateur le soit ; ceux qui ne le sont pas relèvent d'écarts consignés,
+# faute de table de faits portant la matière. Sans cette mention, un lecteur ne pourrait pas
+# distinguer un chiffre reconstruit d'un chiffre repris, et l'écart consigné resterait une
+# déclaration sans effet visible.
+#
+# La correspondance est tenue ici et nulle part ailleurs ; le comportement se déduit du registre.
+SOURCES_LISIBLES = {
+    "couche_intermediaire": "la couche intermédiaire, aucune table de faits ne portant la matière",
+    "catalogue": "le catalogue des colonnes, aucune table de faits ne portant de métadonnée",
+    "dimension": "la dimension des patients, un recalcul depuis les faits portant sur une "
+    "population strictement plus petite",
+    "rapprochement": "les tables de rapprochement, dont aucune table de faits ne reprend le "
+    "résultat",
+    "faits_et_parametre": "les faits et un paramètre extérieur aux données observées",
+}
+
+MENTION_SOURCE = "Non recalculé depuis les tables de faits"
+
 MENTION_HORS_FILTRE = "Non filtré par la période"
 MENTION_SOUS_RESERVE = "Filtré par la période, sous réserve"
 
@@ -138,6 +157,20 @@ def absence_de_filtre(page: str) -> None:
     )
 
 
+def en_nombres(tableau, *colonnes: str):
+    """Convertit en nombres à virgule les colonnes destinées à un graphique.
+
+    Le serveur rend les grandeurs monétaires et les taux en décimal exact ; la bibliothèque
+    d'affichage ne sait pas en déduire un type d'axe et retombe alors sur un axe catégoriel, ce
+    qu'un avertissement signale. La conversion n'a lieu qu'à l'affichage : les valeurs qui entrent
+    dans un contrôle restent exactes.
+    """
+    for colonne in colonnes:
+        if colonne in tableau.columns:
+            tableau = tableau.assign(**{colonne: tableau[colonne].astype(float)})
+    return tableau
+
+
 def filtre_de_page(page: str, bornes: tuple | None = None) -> tuple | None:
     """Rend le filtre de période de la page, ou dit pourquoi il n'y en a pas.
 
@@ -176,8 +209,22 @@ def clause_periode(identifiant: str, periode: tuple | None) -> str:
     return f"where {colonne} between date '{debut:%Y-%m-%d}' and date '{fin:%Y-%m-%d}'"
 
 
+def source_de_valeur(identifiant: str) -> str:
+    return entree(identifiant)["recalcule_depuis"]
+
+
+def mention_de_source(identifiant: str) -> None:
+    """Marque l'indicateur si, et seulement si, sa valeur ne vient pas des tables de faits."""
+    source = source_de_valeur(identifiant)
+    if source == "faits":
+        return
+    lisible = SOURCES_LISIBLES.get(source, source)
+    st.caption(f"↪ {MENTION_SOURCE} : cette valeur lit {lisible}.")
+
+
 def titre_indicateur(identifiant: str) -> None:
-    """Le libellé de l'indicateur, sa définition, puis sa mention de filtrabilité s'il en a une."""
+    """Le libellé, la définition, puis les deux mentions que l'indicateur mérite s'il y a lieu."""
     st.subheader(libelle(identifiant))
     st.caption(definition(identifiant))
+    mention_de_source(identifiant)
     mention_de_filtrabilite(identifiant)
