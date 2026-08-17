@@ -451,5 +451,12 @@ jobs:
 
       - run: uv run pytest tests/test_tableau_de_bord.py -v
 
+      # Même emplacement que le contrôle précédent, et pour la même précondition — l'instantané,
+      # que les pages lisent. Ce contrôle-ci rend chaque page dans un processus fils dont le chemin
+      # d'import est celui du service, et non celui de pytest : la racine du dépôt n'y figure que
+      # si les fichiers de `docker/` l'y mettent. C'est la seule position de la chaîne où les deux
+      # conditions sont réunies, l'instantané étant absent des autres emplacements.
+      - run: uv run pytest tests/test_tableau_de_bord_contexte_conteneur.py -v
+
       # Les contrôles des livrables produisent l'export puis LISENT les fichiers produits.
       - run: uv run pytest tests/test_exports.py -v
