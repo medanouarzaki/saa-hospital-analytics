@@ -147,57 +147,48 @@ def pages_declarees() -> list[tuple[str, str]]:
 # Le pilote est exécuté par le processus fils. Il fixe lui-même le chemin d'import — le fils étant
 # lancé en mode isolé, rien ne s'y ajoute dans son dos — puis rend la page demandée.
 PILOTE = '''
-import io, json, sys, time
+import json, sys, time
 
 entrees, app, page = json.loads(sys.argv[1]), sys.argv[2], sys.argv[3]
 sys.path[:] = entrees + sys.path
 
+FONCTIONS_DE_GRAPHIQUE = ("area_chart", "bar_chart", "line_chart", "scatter_chart")
+
+
+def compter_les_lignes_transmises(st, journal):
+    """Enregistre, a chaque appel de graphique, le nombre de lignes que la page lui transmet."""
+
+    def enveloppe(nom, original):
+        def appel(data=None, *args, **kwargs):
+            try:
+                lignes = len(data)
+            except TypeError:
+                lignes = -1
+            journal.append({"fonction": nom, "lignes": lignes})
+            return original(data, *args, **kwargs)
+
+        return appel
+
+    for nom in FONCTIONS_DE_GRAPHIQUE:
+        original = getattr(st, nom, None)
+        if original is not None:
+            setattr(st, nom, enveloppe(nom, original))
+
 
 def graphiques(at):
-    """Chaque graphique rendu : sa marque, son jeu de donnees, et le type d'axe de chaque encodage.
+    """Le type d'axe de chaque encodage, lu dans ce que le serveur a emis pour le navigateur.
 
-    Rien n'est deduit de la page : tout est lu dans ce que le serveur a effectivement emis pour le
-    navigateur — la specification vega-lite et le jeu de donnees au format arrow, tous deux portes
-    par le message de l'element.
+    La specification vega-lite est portee par le message de l'element : c'est elle qui decide du
+    trace, et non ce que la page croit transmettre. Le jeu de donnees, lui, voyage a cote sous
+    forme binaire ; il n'est PAS decode ici, sa lecture ayant fait tomber l'interprete sur
+    l'executeur d'integration. Le nombre de lignes est donc releve a l'appel, et le type d'axe
+    dans le message : les deux grandeurs viennent chacune de la source ou elle est fiable.
     """
-    import pyarrow
-    from pandas.api.types import infer_dtype
-
-    numeriques = {"floating", "integer", "mixed-integer-float", "decimal", "complex"}
-
-    def porte_des_nombres(colonne, nature):
-        """La colonne transporte-t-elle des grandeurs, quel que soit le type sous lequel ?
-
-        La nature seule ne suffit pas : quand la bibliotheque replie plusieurs colonnes en une
-        seule serie de valeurs, une colonne de decimal exact melangee a une colonne d'entiers
-        ressort en TEXTE. Les grandeurs sont toujours la, sous forme de chaines, et un axe
-        categoriel les accueille sans rien tracer. Une colonne de texte dont toutes les valeurs
-        se lisent comme des nombres est donc traitee ici comme une colonne de grandeurs.
-        """
-        if nature in numeriques:
-            return True
-        if nature not in {"string", "mixed", "bytes", "unicode"}:
-            return False
-        valeurs = colonne.dropna().tolist()[:200]
-        if not valeurs:
-            return False
-        try:
-            for valeur in valeurs:
-                float(valeur)
-        except (TypeError, ValueError):
-            return False
-        return True
-
     releves = []
     for element in at.main:
         if "vega" not in element.type:
             continue
         specification = json.loads(element.proto.spec)
-        tableau = None
-        for jeu in element.proto.datasets:
-            if jeu.data.data:
-                tableau = pyarrow.ipc.open_stream(io.BytesIO(jeu.data.data)).read_pandas()
-                break
         # Les encodages sont a la racine pour un graphique simple, et sous `layer` des que la
         # bibliotheque en superpose plusieurs — c'est le cas des courbes. Les deux sont lus.
         couches = [specification] + list(specification.get("layer", []))
@@ -212,35 +203,25 @@ def graphiques(at):
             for canal, valeur in (couche.get("encoding") or {}).items():
                 if canal == "tooltip" or not isinstance(valeur, dict) or "field" not in valeur:
                     continue
-                champ = valeur["field"]
-                nature = "ABSENT"
-                nombres = False
-                if tableau is not None and champ in tableau.columns:
-                    nature = infer_dtype(tableau[champ])
-                    nombres = porte_des_nombres(tableau[champ], nature)
                 encodages.append(
                     {
                         "canal": canal,
-                        "champ": champ,
+                        "champ": str(valeur["field"]),
                         "type_axe": valeur.get("type"),
-                        "nature_colonne": nature,
-                        "porte_des_nombres": nombres,
                     }
                 )
-        releves.append(
-            {
-                "marques": sorted(set(marques)),
-                "lignes": -1 if tableau is None else len(tableau),
-                "colonnes": [] if tableau is None else [str(c) for c in tableau.columns],
-                "encodages": encodages,
-            }
-        )
+        releves.append({"marques": sorted(set(marques)), "encodages": encodages})
     return releves
 
 
 resultat = {"chemin_import": sys.path[: len(entrees)]}
 try:
+    import streamlit
+
     from streamlit.testing.v1 import AppTest
+
+    journal = []
+    compter_les_lignes_transmises(streamlit, journal)
 
     at = AppTest.from_file(app, default_timeout=120)
     at.switch_page(page)
@@ -250,10 +231,12 @@ try:
     resultat["exception"] = str(at.exception[0].value) if at.exception else None
     resultat["elements"] = len(at.main)
     resultat["graphiques"] = graphiques(at)
+    resultat["appels"] = journal
 except BaseException as erreur:  # noqa: BLE001
     resultat["exception"] = f"{type(erreur).__name__}: {erreur}"
     resultat["elements"] = 0
     resultat["graphiques"] = []
+    resultat["appels"] = []
 
 print("RESULTAT_JSON:" + json.dumps(resultat))
 '''
@@ -342,49 +325,53 @@ CANAUX_POSITIONNELS = frozenset({"x", "y", "theta", "radius"})
 def test_chaque_graphique_recoit_des_donnees_placables_sur_ses_axes(
     titre: str, page: str, tmp_path: Path
 ) -> None:
-    """Chaque graphique reçoit un jeu de données non vide, et aucun de ses axes ne dégénère.
+    """Chaque graphique reçoit des lignes, et aucun de ses axes de position ne dégénère.
 
     Compter les éléments rendus ne suffit pas : **un graphique vide est un élément rendu**. Cette
-    propriété-ci descend d'un cran et observe ce que le serveur a réellement émis pour chaque
-    graphique — le jeu de données au format arrow et le type d'axe de chaque encodage.
+    propriété-ci descend d'un cran et observe, d'une part le nombre de lignes que la page transmet
+    à chaque appel, d'autre part le type d'axe que le serveur a réellement émis pour le navigateur.
 
-    Elle vérifie deux choses. D'abord qu'un jeu de données non vide accompagne le graphique : sans
-    lignes, il n'y a rien à tracer. Ensuite qu'aucune colonne de valeurs numériques ne se retrouve
-    encodée en axe CATÉGORIEL. C'est la dégénérescence à surveiller : la bibliothèque ne sait pas
-    déduire un type d'axe de certaines natures de colonne — le décimal exact que rend le serveur en
-    est une — et retombe alors silencieusement sur un axe catégoriel, où aucune marque n'est
-    placée. Le graphique conserve son cadre, ses titres et sa légende, et ne trace rien.
+    Sur le second point, la dégénérescence à surveiller est précise. Les fonctions de graphique
+    forcent l'axe ORDONNÉ pour une catégorie portée par un axe de position — le code le fait
+    explicitement pour l'abscisse d'un diagramme en barres verticales et pour l'ordonnée d'un
+    diagramme en barres horizontales. Sur un axe de position, l'axe CATÉGORIEL ne peut donc venir
+    que de la déduction de type, c'est-à-dire d'une colonne dont la nature n'a pas été reconnue :
+    le décimal exact que rend le serveur en est une, et le texte issu du repliement de plusieurs
+    colonnes en est une autre. Dans les deux cas l'axe perd son échelle continue, et le graphique
+    conserve son cadre, ses titres et sa légende sans tracer la moindre marque.
 
-    Un axe catégoriel ou ordonné sur une colonne de texte est légitime et n'est pas signalé ; c'est
-    la conjonction « colonne numérique » et « axe catégoriel » qui ne l'est jamais.
+    Les canaux d'apparence — la couleur au premier chef — sont exclus à dessein : un code
+    d'activité y est légitimement catégoriel, alors même que ses valeurs se lisent comme des
+    nombres.
     """
     resultat = rendre_dans_le_contexte_du_service(page, tmp_path / "pilote.py")
     assert resultat["exception"] is None, (
         f"la page « {titre} » ({page}) ne rend pas : {resultat['exception']}"
     )
 
-    graphiques = resultat["graphiques"]
-    vides = [i for i, g in enumerate(graphiques, 1) if g["lignes"] <= 0]
+    appels = resultat["appels"]
+    assert appels, f"page « {titre} » ({page}) : aucun appel de graphique n'a ete observe"
+    vides = [(rang, appel) for rang, appel in enumerate(appels, 1) if appel["lignes"] <= 0]
     assert not vides, (
-        f"page « {titre} » ({page}) : le ou les graphiques {vides} ne portent aucune ligne de "
-        f"donnees. Detail : {[graphiques[i - 1] for i in vides]}"
+        f"page « {titre} » ({page}) : un graphique ne recoit aucune ligne, il n'y a rien a "
+        f"tracer.\n"
+        + "\n".join(
+            f"  appel {rang} — st.{a['fonction']} : {a['lignes']} ligne(s)" for rang, a in vides
+        )
     )
 
     degeneres = [
         (i, encodage)
-        for i, graphique in enumerate(graphiques, 1)
+        for i, graphique in enumerate(resultat["graphiques"], 1)
         for encodage in graphique["encodages"]
-        if encodage["canal"] in CANAUX_POSITIONNELS
-        and encodage["porte_des_nombres"]
-        and encodage["type_axe"] == "nominal"
+        if encodage["canal"] in CANAUX_POSITIONNELS and encodage["type_axe"] == "nominal"
     ]
     assert not degeneres, (
-        f"page « {titre} » ({page}) : un axe de position portant des grandeurs a degenere en axe "
-        f"categoriel, et le graphique ne tracera aucune marque.\n"
+        f"page « {titre} » ({page}) : un axe de position a degenere en axe categoriel, et le "
+        f"graphique ne tracera aucune marque.\n"
         + "\n".join(
             f"  graphique {i} — canal {e['canal']!r} sur la colonne {e['champ']!r} : "
-            f"colonne de nature {e['nature_colonne']!r} portant des nombres, encodee en axe "
-            f"{e['type_axe']!r}"
+            f"axe {e['type_axe']!r}"
             for i, e in degeneres
         )
     )
