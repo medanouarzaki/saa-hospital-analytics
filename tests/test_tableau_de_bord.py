@@ -188,6 +188,28 @@ def _correspondance_d_une_page(page: str) -> None:
     en_trop = sorted(set(requetes) - attendus)
     assert not en_trop, f"indicateurs rendus par la page {page} et absents du registre : {en_trop}"
 
+    # Citer un identifiant ne suffit pas : la page doit l'AFFICHER. Les appels au rendu du titre
+    # d'indicateur sont relevés dans l'arbre syntaxique, ce qui observe le rendu plutôt que la
+    # simple présence du nom dans le fichier — une mutation retirant un affichage est restée verte
+    # tant que le contrôle se contentait de chercher la chaîne.
+    rendus = set()
+    for noeud in ast.walk(ast.parse(source)):
+        if not isinstance(noeud, ast.Call):
+            continue
+        cible = noeud.func
+        nom = cible.attr if isinstance(cible, ast.Attribute) else getattr(cible, "id", "")
+        if nom == "titre_indicateur" and noeud.args:
+            premier = noeud.args[0]
+            if isinstance(premier, ast.Constant) and isinstance(premier.value, str):
+                rendus.add(premier.value)
+
+    non_rendus = sorted(attendus - rendus)
+    assert not non_rendus, f"indicateurs du registre non affichés par la page {page} : {non_rendus}"
+    rendus_inconnus = sorted(rendus - attendus)
+    assert not rendus_inconnus, (
+        f"indicateurs affichés par la page {page} et absents du registre : {rendus_inconnus}"
+    )
+
 
 def test_chaque_indicateur_egale_sa_seconde_mesure() -> None:
     """Chaque valeur produite est confrontée à un calcul écrit autrement, jamais à un littéral."""
@@ -391,6 +413,155 @@ def test_les_indicateurs_des_trois_pages_egalent_leur_seconde_mesure() -> None:
     assert not ecarts, "valeurs divergentes de leur seconde mesure : " + " | ".join(ecarts)
 
 
+def test_les_indicateurs_de_facturation_et_de_qualite_egalent_leur_seconde_mesure() -> None:
+    """Chaque valeur confrontée à un calcul écrit par un autre chemin."""
+    lecture = _lecture()
+    _instantane_pret(lecture)
+    ecarts = []
+
+    def sans_filtre(page: str, identifiant: str, **parametres) -> str:
+        requete = _requetes_de_page(page)[identifiant]
+        if "{filtre}" in requete:
+            requete = requete.format(filtre="")
+        return requete % parametres if parametres else requete
+
+    # Facturation : les montants, contre un décompte direct de la table de faits.
+    total = lecture.interroger(
+        "select sum(montant_total) as montant, count(*) as factures, "
+        "sum(part_organisme) as organisme, sum(part_patient) as patient from fct_facturation"
+    ).iloc[0]
+
+    montants = lecture.interroger(sans_filtre("facturation", "facturation_montants_par_type"))
+    if abs(float(montants["montant"].astype(float).sum()) - float(total["montant"])) > 1e-6:
+        ecarts.append("montants par type : somme différente du total facturé")
+    if int(montants["factures"].sum()) != int(total["factures"]):
+        ecarts.append("montants par type : décompte différent")
+
+    parts = lecture.interroger(sans_filtre("facturation", "facturation_part_organisme_patient"))
+    for colonne, attendu in (
+        ("part_organisme", total["organisme"]),
+        ("part_patient", total["patient"]),
+    ):
+        if abs(float(parts[colonne].astype(float).sum()) - float(attendu)) > 1e-6:
+            ecarts.append(f"part organisme/patient : {colonne} divergente")
+
+    # Le taux de recouvrement lit l'agrégat ; la seconde mesure repart des créances brutes, en ne
+    # retenant que le dernier instantané de chaque créance — une créance y porte une ligne par
+    # extraction, et les sommer toutes la compterait plusieurs fois.
+    taux = lecture.interroger(sans_filtre("facturation", "facturation_taux_recouvrement")).iloc[0]
+    seconde = lecture.interroger(
+        """with dernier as (
+               select distinct on (n_creance) montant_du, montant_recouvre
+               from int_creances order by n_creance, date_extraction desc)
+           select sum(montant_recouvre) / sum(montant_du) as taux from dernier"""
+    )["taux"][0]
+    if abs(float(taux["taux"]) - float(seconde)) > 1e-9:
+        ecarts.append(f"taux de recouvrement : {taux['taux']} contre {seconde}")
+
+    encaissement = lecture.interroger(
+        sans_filtre("facturation", "facturation_taux_encaissement")
+    ).iloc[0]
+    attendu = lecture.interroger(
+        "select (select sum(montant) from fct_encaissement) "
+        "/ (select sum(montant_total) from fct_facturation) as taux"
+    )["taux"][0]
+    if abs(float(encaissement["taux"]) - float(attendu)) > 1e-12:
+        ecarts.append("taux d'encaissement divergent")
+
+    # Épisodes non facturés : la seconde mesure emploie une sous-requête d'existence plutôt qu'une
+    # jointure à gauche.
+    non_factures = lecture.interroger(
+        sans_filtre("facturation", "facturation_episodes_non_factures")
+    )
+    par_famille = lecture.interroger(
+        """select p.type_passage as famille, count(*) as episodes,
+                  count(*) filter (where not exists (
+                      select 1 from fct_facturation f where f.n_episode = p.n_passage))
+                      as non_factures
+           from fct_passage p group by p.type_passage"""
+    ).set_index("famille")
+    groupes = non_factures.groupby("famille")[["episodes", "non_factures"]].sum()
+    for famille in groupes.index:
+        for colonne in ("episodes", "non_factures"):
+            if int(groupes.loc[famille, colonne]) != int(par_famille.loc[famille, colonne]):
+                ecarts.append(f"épisodes non facturés [{famille}].{colonne} divergent")
+
+    # Qualité : les décomptes de complétude, contre un décompte direct de l'agrégat.
+    completude = lecture.interroger(sans_filtre("qualite", "qualite_completude_champs")).iloc[0]
+    controle = lecture.interroger(
+        "select count(*) as couples, count(*) filter (where taux_completude >= 1) as complets, "
+        "count(distinct nom_table) as tables from agg_qualite_donnees"
+    ).iloc[0]
+    for colonne, attendu in (
+        ("couples_examines", controle["couples"]),
+        ("couples_complets", controle["complets"]),
+        ("tables_examinees", controle["tables"]),
+    ):
+        if int(completude[colonne]) != int(attendu):
+            ecarts.append(f"complétude : {colonne} divergent")
+
+    provenance = lecture.interroger(sans_filtre("qualite", "qualite_provenance_champs"))
+    if abs(float(provenance["part_pourcent"].astype(float).sum()) - 100.0) > 0.2:
+        ecarts.append("provenance : les parts ne somment pas à cent")
+
+    assert not ecarts, "valeurs divergentes de leur seconde mesure : " + " | ".join(ecarts)
+
+
+def test_l_anciennete_des_creances_part_de_la_date_de_reference() -> None:
+    """L'ancienneté se compte depuis la date des données, jamais depuis l'horloge.
+
+    Le contrôle distingue réellement les deux : il vérifie d'abord que les deux dates diffèrent —
+    sans quoi il ne prouverait rien — puis compare l'ancienneté maximale rendue par la page à celle
+    qu'on obtient en partant de la date de référence, et vérifie qu'elle diffère de celle qu'on
+    obtiendrait en partant de la date du jour.
+    """
+    lecture = _lecture()
+    _instantane_pret(lecture)
+
+    ecarts = lecture.interroger(
+        "select max(date_reference_donnees) as reference, current_date as horloge, "
+        "current_date - max(date_reference_donnees) as jours from instantane_etat"
+    ).iloc[0]
+    assert int(ecarts["jours"]) > 0, (
+        f"la date de référence {ecarts['reference']} coïncide avec la date du jour : le contrôle "
+        "ne distinguerait pas les deux origines et ne prouverait rien"
+    )
+
+    tranches = _requetes_de_page("facturation")["facturation_anciennete_creances"]
+    from dashboard.pages import facturation as page_facturation  # noqa: PLC0415
+
+    bornes = page_facturation.TRANCHES_ANCIENNETE
+    rendue = lecture.interroger(
+        tranches
+        % {
+            "borne_a": bornes[0],
+            "borne_b": bornes[1],
+            "borne_c": bornes[2],
+            "borne_d": bornes[3],
+        }
+    )
+    maximum_rendu = int(rendue["anciennete_maximale"].max())
+
+    attendus = lecture.interroger(
+        """with dernier as (
+               select distinct on (n_creance) montant_restant, date_naissance_creance
+               from int_creances order by n_creance, date_extraction desc)
+           select max((select max(date_reference_donnees) from instantane_etat)
+                      - date_naissance_creance) as depuis_reference,
+                  max(current_date - date_naissance_creance) as depuis_horloge
+           from dernier where montant_restant > 0"""
+    ).iloc[0]
+
+    assert maximum_rendu == int(attendus["depuis_reference"]), (
+        f"ancienneté maximale rendue {maximum_rendu}, attendue "
+        f"{int(attendus['depuis_reference'])} depuis la date de référence"
+    )
+    assert maximum_rendu != int(attendus["depuis_horloge"]), (
+        f"ancienneté maximale rendue {maximum_rendu} égale celle qu'on obtiendrait depuis "
+        "l'horloge : l'origine du calcul n'est pas la date de référence"
+    )
+
+
 def test_le_marquage_de_filtrabilite_est_conforme_au_registre() -> None:
     """Ce que l'ÉCRAN marque se déduit du registre, dans les deux sens.
 
@@ -448,12 +619,94 @@ def test_le_marquage_de_filtrabilite_est_conforme_au_registre() -> None:
     assert not fautifs, "marquage non conforme au registre : " + " | ".join(fautifs)
 
 
-def test_une_page_sans_indicateur_filtrable_ne_porte_pas_de_filtre() -> None:
-    """La troisième branche du mécanisme, éprouvée sur les deux cas qui existent.
+def test_la_mention_de_source_est_conforme_au_registre() -> None:
+    """Un indicateur non recalculé depuis les faits le dit, et lui seul.
 
-    Aucune page écrite n'a aujourd'hui tous ses indicateurs hors filtre ; la fonction est donc
-    éprouvée sur ce que le registre porte — au moins une page mixte et aucune page entièrement
-    hors filtre — plutôt que sur un cas construit qui ne prouverait rien du registre réel.
+    Le contrôle observe ce que la fonction de mention ÉMET, en interceptant les appels
+    d'affichage : vérifier la seule lecture du registre reviendrait à comparer un résultat à
+    lui-même, faiblesse déjà mesurée sur le marquage de filtrabilité.
+
+    Le comportement se déduit du registre — toute valeur de recalcul autre que « faits » entraîne
+    une mention. Les indicateurs que l'enregistrement de décision sur les écarts nomme en sont un
+    sous-ensemble strict : la vérification porte donc sur le registre, et l'appartenance des
+    indicateurs nommés est vérifiée en plus.
+    """
+    from dashboard import rendu
+
+    emis: list[str] = []
+    origine = rendu.st.caption
+    rendu.st.caption = lambda message, **_: emis.append(str(message))
+    try:
+        fautifs = []
+        for page in pages_ecrites():
+            for entree in _registre()["indicateurs"]:
+                if entree["page"] != page:
+                    continue
+                identifiant = entree["identifiant"]
+                source = entree["recalcule_depuis"]
+
+                emis.clear()
+                rendu.mention_de_source(identifiant)
+                marque = [message for message in emis if rendu.MENTION_SOURCE in message]
+
+                if source == "faits" and marque:
+                    fautifs.append(f"{identifiant} : recalculé depuis les faits mais marqué")
+                if source != "faits" and not marque:
+                    fautifs.append(f"{identifiant} : recalculé depuis « {source} » mais non marqué")
+                if source != "faits" and marque:
+                    lisible = rendu.SOURCES_LISIBLES.get(source)
+                    if lisible and lisible not in marque[0]:
+                        fautifs.append(
+                            f"{identifiant} : la mention ne dit pas ce que l'indicateur lit"
+                        )
+    finally:
+        rendu.st.caption = origine
+
+    assert not fautifs, "mention de source non conforme au registre : " + " | ".join(fautifs)
+
+
+def test_les_indicateurs_nommes_par_l_enregistrement_portent_une_mention() -> None:
+    """Les indicateurs que l'enregistrement de décision nomme sont bien marqués.
+
+    L'enregistrement en nomme moins que le registre n'en compte : son premier écart ne couvre que
+    les indicateurs lisant une couche amont là où une table de faits pourrait exister. Ce contrôle
+    vérifie l'inclusion, non l'égalité — exiger l'égalité contredirait la règle selon laquelle le
+    comportement se déduit du registre.
+    """
+    from dashboard import rendu
+
+    nommes = {
+        "facturation_taux_recouvrement",
+        "facturation_aboutissement_relances",
+        "facturation_anciennete_creances",
+        "qualite_completude_champs",
+        "qualite_taux_quarantaine",
+        "rapprochement_collisions_exactes",
+    }
+    ecrits = {
+        entree["identifiant"]
+        for entree in _registre()["indicateurs"]
+        if entree["page"] in pages_ecrites()
+    }
+    a_verifier = sorted(nommes & ecrits)
+    assert a_verifier, "aucun des indicateurs nommés n'appartient à une page écrite"
+
+    sans_mention = [
+        identifiant for identifiant in a_verifier if rendu.source_de_valeur(identifiant) == "faits"
+    ]
+    assert not sans_mention, (
+        f"des indicateurs nommés par l'enregistrement seraient marqués comme recalculés depuis "
+        f"les faits : {sans_mention}"
+    )
+
+
+def test_une_page_sans_indicateur_filtrable_affiche_pourquoi() -> None:
+    """La troisième branche du mécanisme : pas de filtre, et le motif AFFICHÉ.
+
+    Vérifier que la page ne porte pas de filtre ne suffit pas : la décision veut qu'elle dise
+    pourquoi, faute de quoi un lecteur chercherait un filtre absent. Le contrôle observe donc ce
+    que la fonction émet, et non seulement ce qu'elle rend comme valeur — une mutation retirant le
+    message est restée verte tant qu'il ne l'observait pas.
     """
     from dashboard import rendu
 
@@ -465,15 +718,36 @@ def test_une_page_sans_indicateur_filtrable_ne_porte_pas_de_filtre() -> None:
             f"pour des filtrabilités {sorted(valeurs)}"
         )
 
+    sans_filtre = [page for page in pages_ecrites() if not rendu.page_porte_un_filtre(page)]
+    assert sans_filtre, (
+        "aucune page écrite n'est dépourvue de filtre : la branche correspondante du mécanisme "
+        "n'est éprouvée sur aucun cas réel"
+    )
+
+    emis: list[str] = []
+    origine = rendu.st.info
+    rendu.st.info = lambda message, **_: emis.append(str(message))
+    try:
+        for page in sans_filtre:
+            emis.clear()
+            resultat = rendu.filtre_de_page(page)
+            assert resultat is None, f"page {page} : un filtre a été rendu malgré tout"
+            assert emis, f"page {page} : aucun motif affiché à la place du filtre"
+            motifs = {
+                rendu.MOTIFS_LISIBLES.get(entree.get("motif"), entree.get("motif", ""))
+                for entree in rendu.indicateurs_de(page)
+            }
+            manquants = [motif for motif in motifs if motif and motif not in emis[0]]
+            assert not manquants, f"page {page} : le motif affiché ne reprend pas {manquants}"
+    finally:
+        rendu.st.info = origine
+
     mixtes = [
         page
         for page in pages_ecrites()
         if len({entree["filtrabilite"] for entree in rendu.indicateurs_de(page)}) > 1
     ]
-    assert mixtes, (
-        "aucune page écrite ne mêle des indicateurs filtrables et non filtrables : le mécanisme "
-        "de marquage n'est éprouvé sur aucun cas réel"
-    )
+    assert mixtes, "aucune page écrite ne mêle des filtrabilités : le cas mixte n'est pas éprouvé"
 
 
 def _module_de_page(nom: str) -> dict:
