@@ -2,8 +2,21 @@ version: 2
 
 models:
   - name: dim_service
+    description: >
+      Dimension des services de l'établissement, à clé naturelle et sans clé de substitution. Une
+      ligne par code distinct, obtenue par union des huit colonnes de service de la couche
+      intermédiaire — accueil, origine et destination des mouvements, service du passage, service
+      d'orientation des urgences, service émetteur de la facture, service exécutant de la ligne de
+      facture, service de la liste d'attente — les valeurs vides étant écartées.
     columns:
       - name: code_service
+        description: >
+          Code du service, repris sans transformation de la colonne source correspondante. Aucune
+          de ces colonnes n'a été relevée à l'écran : elles proviennent de la description
+          documentaire de l'organisation hospitalière (sources S-27 et, pour le service exécutant
+          des lignes de facture, S-09). Les valeurs sont des abréviations que le système
+          n'accompagne d'aucune table de libellés ; le code est donc affiché tel quel et aucun
+          intitulé de service n'est inventé.
         tests:
           - unique
           - not_null
