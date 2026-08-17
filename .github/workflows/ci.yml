@@ -226,18 +226,22 @@ jobs:
       # lues par `airflow/saa_daily.py` en exécution normale. AIRFLOW_HOME sous le répertoire
       # temporaire de l'exécuteur : métadonnées de l'orchestrateur exclusives à ce job,
       # jamais persistées.
-      # Les deux dernières redirigent les artefacts tabulaires du rapprochement hors de l'arbre
-      # de travail. Sans elles, `linkage.evaluation` et `linkage.ablation` réécrivent deux
-      # fichiers SUIVIS (`linkage/courbe_precision_rappel.csv`, `linkage/ablation.csv`) à chaque
-      # exécution — mesuré : 73 lignes sur 74 modifiées, `git status` sale en fin de job. Les deux
-      # variables sont celles que les modules lisent eux-mêmes ; aucune n'est inventée ici.
+      # La dernière redirige la courbe précision/rappel hors de l'arbre de travail : sans elle,
+      # `linkage.evaluation` réécrit un fichier SUIVI à chaque exécution — mesuré : 73 lignes sur
+      # 74 modifiées, `git status` sale en fin de job. La variable est celle que le module lit
+      # lui-même ; aucune n'est inventée ici.
+      #
+      # `linkage/ablation.csv` n'est PAS redirigé, et c'est mesuré : `linkage.ablation` lit bien
+      # `CHEMIN_CSV_ABLATION`, mais tests/test_linkage_ablation.py:22 ouvre le chemin par défaut en
+      # dur. Rediriger le module laisse donc ce contrôle lire le fichier commis, périmé — mesuré :
+      # `assert 991 == 115`, le décompte du fichier versionné contre celui du jeu de ce job. La
+      # dette reste ouverte : elle se solde du côté du contrôle, pas du fichier de workflow.
       - run: |
           {
             echo "SAA_SCENARIO_ROOT=$RUNNER_TEMP/scenario/scenario_30"
             echo "AIRFLOW_HOME=$RUNNER_TEMP/airflow_home"
             echo "AIRFLOW__CORE__DAGS_FOLDER=$GITHUB_WORKSPACE/airflow"
             echo "CHEMIN_COURBE_PRECISION_RAPPEL=$RUNNER_TEMP/courbe_precision_rappel.csv"
-            echo "CHEMIN_CSV_ABLATION=$RUNNER_TEMP/ablation.csv"
           } >> "$GITHUB_ENV"
 
       - run: uv run python ingestion/appliquer_ddl.py
@@ -297,19 +301,23 @@ jobs:
 
       - run: uv run pytest tests/test_linkage_evaluation.py -v
 
-      - run: uv run python -m linkage.ablation
-
-      - run: uv run pytest tests/test_linkage_ablation.py -v
-
       # Aucune étape de chaîne ne doit modifier un fichier SUIVI. `git diff --exit-code` « exits
       # with 1 if there were differences and 0 means no differences » (aide de la version
-      # installée) ; `--stat` nomme le fautif dans le journal du job avant de rendre ce code.
-      # Placée ici : toutes les commandes qui écrivent des artefacts sont au-dessus, et rien de ce
-      # qui suit ne modifie légitimement l'arbre — un rouge désigne donc un artefact échappé.
+      # installée) ; `--stat` nomme le fautif dans le journal du job avant de rendre ce code, et
+      # `git status --porcelain` ajoute ce qu'aucun `diff` ne voit : un fichier non suivi apparu.
+      #
+      # Placée AVANT l'étude d'ablation, et non en fin de chaîne : cette étude écrit un fichier
+      # suivi qu'on ne peut pas rediriger sans aveugler son propre contrôle (voir le motif de la
+      # redirection, plus haut). Le garde couvre donc tout ce qui la précède ; l'écriture de
+      # l'ablation reste la dette consignée, et rien d'autre ne lui échappe.
       - run: |
           git diff --stat --exit-code
           git diff --stat --exit-code --cached
           test -z "$(git status --porcelain)"
+
+      - run: uv run python -m linkage.ablation
+
+      - run: uv run pytest tests/test_linkage_ablation.py -v
 
       # Idempotence et rattrapage : réutilisent le graphe et le jeu de données déjà en place
       # dans ce job plutôt que d'en reconstituer un second — leur place naturelle est ici, pas

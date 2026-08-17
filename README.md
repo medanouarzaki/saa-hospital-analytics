@@ -48,8 +48,9 @@ route de la composition est indispensable, faute de quoi le tableau de bord dém
     `uv run python -m instantane.rafraichir`. Le rapprochement lit la vérité terrain du scénario
     produit par la génération ci-dessus (`VERITE_TERRAIN_PATIENTS`). Ses deux artefacts tabulaires
     (`linkage/courbe_precision_rappel.csv`, `linkage/ablation.csv`) sont versionnés et réécrits à
-    chaque exécution : pour ne pas salir l'arbre de travail, rediriger les chemins avec
-    `CHEMIN_COURBE_PRECISION_RAPPEL` et `CHEMIN_CSV_ABLATION`.
+    chaque exécution : pour ne pas salir l'arbre de travail, rediriger le premier avec
+    `CHEMIN_COURBE_PRECISION_RAPPEL`. Le second se redirige avec `CHEMIN_CSV_ABLATION`, mais son
+    contrôle lit le chemin par défaut : le rediriger lui ferait lire un fichier périmé.
 11. Ouvrir le tableau de bord sur le port déclaré par `STREAMLIT_PORT` dans `.env`.
 
 Le graphe quotidien (`airflow/saa_daily.py`) enchaîne génération, chargement, construction, rapprochement et rafraîchissement pour une date d'extraction
