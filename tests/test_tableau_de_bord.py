@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import ast
 import re
+from datetime import date
 from pathlib import Path
 
 import pytest
@@ -27,8 +28,14 @@ REGISTRE = DASHBOARD / "indicateurs.yml"
 POINT_ENTREE = DASHBOARD / "app.py"
 PAGES = DASHBOARD / "pages"
 
-# La page écrite à ce jour. Ce n'est pas un attendu de volumétrie : c'est le sujet des propriétés
-# qui portent sur les indicateurs, et les autres pages s'y ajouteront à mesure qu'elles existeront.
+
+# Les pages écrites à ce jour. Ce n'est pas un attendu de volumétrie : c'est le sujet des
+# propriétés qui portent sur les indicateurs, et les autres s'y ajouteront à mesure qu'elles
+# existeront. La liste se dérive des fichiers présents plutôt que d'être tenue à la main.
+def pages_ecrites() -> list[str]:
+    return sorted(fichier.stem for fichier in PAGES.glob("*.py"))
+
+
 PAGE_ECRITE = "activite"
 
 MOTIF_PAGE_DECLAREE = re.compile(r"""st\.Page\(\s*["']pages/([a-z_]+)\.py""")
@@ -48,19 +55,22 @@ def _pages_declarees() -> list[str]:
 def _requetes_de_page(nom: str) -> dict[str, str]:
     """Les requêtes d'une page, lues sans exécuter la page.
 
-    Exécuter le module rendrait la page, ce qui exige un contexte d'affichage ; l'analyse
-    syntaxique donne la même valeur sans rien rendre.
+    Exécuter le module rendrait la page, ce qui exige un contexte d'affichage ; n'évaluer que ses
+    affectations de premier niveau donne la même valeur sans rien rendre. Les affectations dont
+    l'évaluation échoue — celles qui dépendent d'un import d'affichage — sont ignorées : seules
+    comptent celles dont `REQUETES` a besoin.
     """
     arbre = ast.parse((PAGES / f"{nom}.py").read_text(encoding="utf-8"))
-    espace: dict = {}
-    for noeud in arbre.body:
-        if isinstance(noeud, ast.Assign) and len(noeud.targets) == 1:
-            cible = noeud.targets[0]
-            if isinstance(cible, ast.Name) and cible.id in _NOEUDS_LUS:
-                espace[cible.id] = noeud
-    module = ast.Module(body=[espace[c] for c in _NOEUDS_LUS], type_ignores=[])
     local: dict = {}
-    exec(compile(module, "page", "exec"), local)
+    for noeud in arbre.body:
+        if not isinstance(noeud, ast.Assign):
+            continue
+        module = ast.Module(body=[noeud], type_ignores=[])
+        try:
+            exec(compile(module, "page", "exec"), local)
+        except Exception:
+            continue
+    assert "REQUETES" in local, f"la page {nom} ne définit pas de requêtes lisibles"
     return local["REQUETES"]
 
 
@@ -141,15 +151,18 @@ def test_aucune_page_n_ouvre_de_connexion() -> None:
     assert not fautifs, "des pages ouvrent leur propre accès à la base : " + " | ".join(fautifs)
 
 
-def test_les_indicateurs_de_la_page_et_du_registre_se_correspondent() -> None:
-    """Correspondance dans les deux sens entre la page écrite et le registre."""
-    source = (PAGES / f"{PAGE_ECRITE}.py").read_text(encoding="utf-8")
+def test_les_indicateurs_des_pages_et_du_registre_se_correspondent() -> None:
+    """Correspondance dans les deux sens, pour chacune des pages écrites."""
+    for page in pages_ecrites():
+        _correspondance_d_une_page(page)
+
+
+def _correspondance_d_une_page(page: str) -> None:
+    source = (PAGES / f"{page}.py").read_text(encoding="utf-8")
     attendus = {
-        entree["identifiant"]
-        for entree in _registre()["indicateurs"]
-        if entree["page"] == PAGE_ECRITE
+        entree["identifiant"] for entree in _registre()["indicateurs"] if entree["page"] == page
     }
-    assert attendus, f"le registre ne déclare aucun indicateur pour la page {PAGE_ECRITE}"
+    assert attendus, f"le registre ne déclare aucun indicateur pour la page {page}"
 
     # Le contrôle textuel est éprouvé contre un cas positif construit AVANT que son silence ne
     # soit cru : un identifiant qui figure certainement dans la source doit être trouvé, et un
@@ -169,11 +182,11 @@ def test_les_indicateurs_de_la_page_et_du_registre_se_correspondent() -> None:
     )
 
     manquants = sorted(identifiant for identifiant in attendus if not cite(identifiant))
-    assert not manquants, f"indicateurs du registre absents de la page : {manquants}"
+    assert not manquants, f"indicateurs du registre absents de la page {page} : {manquants}"
 
-    requetes = _requetes_de_page(PAGE_ECRITE)
+    requetes = _requetes_de_page(page)
     en_trop = sorted(set(requetes) - attendus)
-    assert not en_trop, f"indicateurs rendus par la page et absents du registre : {en_trop}"
+    assert not en_trop, f"indicateurs rendus par la page {page} et absents du registre : {en_trop}"
 
 
 def test_chaque_indicateur_egale_sa_seconde_mesure() -> None:
@@ -262,6 +275,269 @@ def test_chaque_indicateur_egale_sa_seconde_mesure() -> None:
         ecarts.append(f"profil horaire : {int(horaire['evenements'].sum())} contre {total_horaire}")
 
     assert not ecarts, "valeurs divergentes de leur seconde mesure : " + " | ".join(ecarts)
+
+
+def test_les_indicateurs_des_trois_pages_egalent_leur_seconde_mesure() -> None:
+    """Chaque valeur confrontée à un calcul écrit par un autre chemin.
+
+    Les taux des rendez-vous sont recalculés par les pages depuis le code d'état brut ; la seconde
+    mesure vient des agrégats de la chaîne, qui les calculent depuis les colonnes booléennes. Les
+    deux chemins sont donc réellement distincts, et non deux variantes du même.
+    """
+    lecture = _lecture()
+    _instantane_pret(lecture)
+    ecarts = []
+
+    def sans_filtre(page: str, identifiant: str) -> str:
+        requete = _requetes_de_page(page)[identifiant]
+        return requete.format(filtre="") if "{filtre}" in requete else requete
+
+    # Rendez-vous : les taux, contre l'agrégat d'absentéisme de la chaîne.
+    agregat = lecture.interroger(
+        "select code_activite, taux_absenteisme, taux_annulation from agg_absenteisme"
+    ).set_index("code_activite")
+    for identifiant, colonne_page, colonne_agregat in (
+        ("rendez_vous_taux_absence", "taux_absence", "taux_absenteisme"),
+        ("rendez_vous_taux_annulation", "taux_annulation", "taux_annulation"),
+    ):
+        page = lecture.interroger(sans_filtre("rendez_vous", identifiant)).set_index(
+            "code_activite"
+        )
+        for code in page.index:
+            attendu = float(agregat.loc[code, colonne_agregat])
+            obtenu = float(page.loc[code, colonne_page])
+            if abs(obtenu - attendu) > 1e-12:
+                ecarts.append(f"{identifiant}[{code}] : {obtenu} contre {attendu}")
+
+    # Rendez-vous : le délai, contre l'agrégat des délais.
+    delais_agregat = lecture.interroger(
+        "select code_activite, mediane_delai_positif_jours, p90_delai_positif_jours "
+        "from agg_delai_rendez_vous"
+    ).set_index("code_activite")
+    delais = lecture.interroger(
+        sans_filtre("rendez_vous", "rendez_vous_delai_obtention")
+    ).set_index("code_activite")
+    for code in delais.index:
+        for colonne_page, colonne_agregat in (
+            ("mediane_jours", "mediane_delai_positif_jours"),
+            ("p90_jours", "p90_delai_positif_jours"),
+        ):
+            attendu = float(delais_agregat.loc[code, colonne_agregat])
+            obtenu = float(delais.loc[code, colonne_page])
+            if abs(obtenu - attendu) > 1e-12:
+                ecarts.append(f"délai[{code}].{colonne_page} : {obtenu} contre {attendu}")
+
+    # Urgences : les effectifs, contre un décompte direct de la table de faits.
+    passages = int(lecture.interroger("select count(*) as n from fct_passage_urgence")["n"][0])
+    for identifiant, colonne in (
+        ("urgences_passages_par_niveau", "passages"),
+        ("urgences_orientation_sortie", "passages"),
+    ):
+        obtenu = int(lecture.interroger(sans_filtre("urgences", identifiant))[colonne].sum())
+        if obtenu != passages:
+            ecarts.append(f"{identifiant} : {obtenu} contre {passages}")
+
+    # Urgences : la part relevant d'une consultation ordinaire, contre les deux derniers niveaux
+    # de tri déterminés par une requête séparée.
+    ordinaire = lecture.interroger(sans_filtre("urgences", "urgences_consultation_ordinaire")).iloc[
+        0
+    ]
+    seconde = lecture.interroger(
+        """with derniers as (
+               select distinct niveau_tri from fct_passage_urgence where niveau_tri is not null
+               order by niveau_tri desc limit 2
+           )
+           select count(*) filter (where niveau_tri in (select niveau_tri from derniers))::numeric
+                  / count(*) as part
+           from fct_passage_urgence"""
+    )["part"][0]
+    if abs(float(ordinaire["part"]) - float(seconde)) > 1e-12:
+        ecarts.append(f"consultation ordinaire : {ordinaire['part']} contre {seconde}")
+
+    # Séjours : les grandeurs réglementaires, recalculées ici depuis les mêmes ingrédients bruts.
+    capacite = int(
+        lecture.interroger(
+            "select valeur from instantane_parametres where nom = 'capacite_litiere_fonctionnelle'"
+        )["valeur"][0]
+    )
+    reglementaires = lecture.interroger(
+        sans_filtre("sejours", "sejours_indicateurs_reglementaires") % {"capacite": capacite}
+    ).iloc[0]
+    ingredients = lecture.interroger(
+        """select count(*) as sejours, sum(duree_jours) as journees,
+                  max(coalesce(jour_sortie, jour_admission)) - min(jour_admission) + 1 as jours
+           from fct_sejour"""
+    ).iloc[0]
+    attendus = {
+        "taux_occupation": float(ingredients["journees"]) / (int(ingredients["jours"]) * capacite),
+        "duree_moyenne_jours": float(ingredients["journees"]) / int(ingredients["sejours"]),
+        "rotation": int(ingredients["sejours"]) / capacite,
+    }
+    for colonne, attendu in attendus.items():
+        obtenu = float(reglementaires[colonne])
+        if abs(obtenu - attendu) > 1e-9:
+            ecarts.append(f"{colonne} : {obtenu} contre {attendu}")
+
+    # Séjours : les non clos, contre l'absence de date de sortie plutôt que le drapeau.
+    non_clos = lecture.interroger(sans_filtre("sejours", "sejours_non_clos")).iloc[0]
+    seconde_non_clos = int(
+        lecture.interroger("select count(*) as n from fct_sejour where date_heure_sortie is null")[
+            "n"
+        ][0]
+    )
+    if int(non_clos["non_clos"]) != seconde_non_clos:
+        ecarts.append(f"séjours non clos : {int(non_clos['non_clos'])} contre {seconde_non_clos}")
+
+    assert not ecarts, "valeurs divergentes de leur seconde mesure : " + " | ".join(ecarts)
+
+
+def test_le_marquage_de_filtrabilite_est_conforme_au_registre() -> None:
+    """Ce que l'ÉCRAN marque se déduit du registre, dans les deux sens.
+
+    Le contrôle observe ce que la fonction de marquage émet réellement, et non ce que le registre
+    dit : vérifier la seule lecture du registre reviendrait à comparer un résultat à lui-même, et
+    laisserait passer un marquage retiré ou ajouté à tort — c'est ce qu'une mutation a montré.
+
+    La vérification porte aussi sur la clause de période effectivement produite : un indicateur
+    marqué hors filtre ne doit recevoir aucune restriction, sans quoi l'écran et la requête
+    diraient deux choses différentes.
+    """
+    from dashboard import rendu
+
+    periode = (date(2024, 1, 1), date(2024, 12, 31))
+    emis: list[str] = []
+    origine = rendu.st.warning
+    rendu.st.warning = lambda message, **_: emis.append(str(message))
+    try:
+        fautifs = []
+        for page in pages_ecrites():
+            for entree in _registre()["indicateurs"]:
+                if entree["page"] != page:
+                    continue
+                identifiant = entree["identifiant"]
+                attendue = entree["filtrabilite"]
+
+                emis.clear()
+                rendu.mention_de_filtrabilite(identifiant)
+                marque = len(emis)
+
+                if attendue == "oui" and marque:
+                    fautifs.append(f"{identifiant} : filtrable mais marqué « {emis[0][:60]} »")
+                if attendue != "oui" and not marque:
+                    fautifs.append(f"{identifiant} : déclaré {attendue} mais non marqué")
+                if attendue == "non" and marque and rendu.MENTION_HORS_FILTRE not in emis[0]:
+                    fautifs.append(f"{identifiant} : marqué sans la mention hors filtre")
+                if attendue == "oui_sous_reserve" and marque:
+                    if rendu.MENTION_SOUS_RESERVE not in emis[0]:
+                        fautifs.append(f"{identifiant} : marqué sans la mention de réserve")
+                    if " ".join(entree["reserve"].split())[:40] not in emis[0]:
+                        fautifs.append(
+                            f"{identifiant} : la réserve affichée n'est pas celle du registre"
+                        )
+
+                clause = rendu.clause_periode(identifiant, periode)
+                if attendue == "non" and clause:
+                    fautifs.append(
+                        f"{identifiant} : déclaré hors filtre mais restreint par « {clause} »"
+                    )
+                if attendue != "non" and not clause:
+                    fautifs.append(f"{identifiant} : déclaré filtrable mais sans restriction")
+    finally:
+        rendu.st.warning = origine
+
+    assert not fautifs, "marquage non conforme au registre : " + " | ".join(fautifs)
+
+
+def test_une_page_sans_indicateur_filtrable_ne_porte_pas_de_filtre() -> None:
+    """La troisième branche du mécanisme, éprouvée sur les deux cas qui existent.
+
+    Aucune page écrite n'a aujourd'hui tous ses indicateurs hors filtre ; la fonction est donc
+    éprouvée sur ce que le registre porte — au moins une page mixte et aucune page entièrement
+    hors filtre — plutôt que sur un cas construit qui ne prouverait rien du registre réel.
+    """
+    from dashboard import rendu
+
+    for page in pages_ecrites():
+        valeurs = {entree["filtrabilite"] for entree in rendu.indicateurs_de(page)}
+        attendu = valeurs != {"non"}
+        assert rendu.page_porte_un_filtre(page) is attendu, (
+            f"page {page} : filtre {'attendu' if attendu else 'non attendu'} "
+            f"pour des filtrabilités {sorted(valeurs)}"
+        )
+
+    mixtes = [
+        page
+        for page in pages_ecrites()
+        if len({entree["filtrabilite"] for entree in rendu.indicateurs_de(page)}) > 1
+    ]
+    assert mixtes, (
+        "aucune page écrite ne mêle des indicateurs filtrables et non filtrables : le mécanisme "
+        "de marquage n'est éprouvé sur aucun cas réel"
+    )
+
+
+def _module_de_page(nom: str) -> dict:
+    """Le module d'une page, chargé sans être rendu.
+
+    L'appel de rendu final est retiré avant exécution : le module s'évalue alors entièrement —
+    imports, constantes et fonctions — sans exiger de contexte d'affichage. C'est ce qui permet
+    d'éprouver ce que la page FAIT, et non seulement ce qu'elle contient.
+    """
+    source = (PAGES / f"{nom}.py").read_text(encoding="utf-8")
+    source = source.replace("\nrendre()\n", "\n")
+    espace: dict = {}
+    exec(compile(source, f"{nom}.py", "exec"), espace)
+    return espace
+
+
+def test_la_capacite_affichee_egale_celle_de_la_table_de_parametres() -> None:
+    """La valeur et sa provenance, séparément, telles que LA PAGE les obtient.
+
+    Le contrôle appelle la fonction de la page plutôt que d'interroger la table lui-même :
+    interroger la table reviendrait à comparer un résultat à lui-même et laisserait passer une
+    page qui afficherait une provenance inventée — c'est ce qu'une mutation a montré.
+
+    Un taux d'occupation affiché sans dire sur quelle capacité il est calculé n'est pas un
+    indicateur, c'est un nombre ; la provenance doit donc désigner un fichier qui existe et une
+    clé qui nomme ce paramètre.
+    """
+    lecture = _lecture()
+    _instantane_pret(lecture)
+
+    page = _module_de_page("sejours")
+    nom_parametre = page["PARAMETRE_CAPACITE"]
+    obtenu = page["_capacite"]()
+
+    porte = lecture.interroger(
+        "select valeur, provenance_fichier, provenance_cle from instantane_parametres "
+        f"where nom = '{nom_parametre}'"
+    )
+    assert not porte.empty, f"paramètre absent de la table de paramètres : {nom_parametre}"
+    ligne = porte.iloc[0]
+
+    for colonne in ("valeur", "provenance_fichier", "provenance_cle"):
+        assert obtenu[colonne] == ligne[colonne], (
+            f"la page obtient {colonne} = « {obtenu[colonne]} » là où la table de paramètres "
+            f"porte « {ligne[colonne]} »"
+        )
+
+    fichier = RACINE / obtenu["provenance_fichier"]
+    assert fichier.exists(), (
+        f"la provenance affichée désigne {obtenu['provenance_fichier']}, qui n'existe pas"
+    )
+
+    contenu = yaml.safe_load(fichier.read_text(encoding="utf-8"))
+    attendue = {entree["nom"]: entree["valeur"] for entree in contenu["parametres"]}.get(
+        nom_parametre
+    )
+    assert attendue is not None, f"{nom_parametre} absent de {obtenu['provenance_fichier']}"
+    assert str(attendue) == obtenu["valeur"], (
+        f"capacité {obtenu['valeur']} affichée contre {attendue} dans le fichier que sa "
+        "provenance désigne"
+    )
+    assert nom_parametre in obtenu["provenance_cle"], (
+        f"la clé de provenance « {obtenu['provenance_cle']} » ne nomme pas {nom_parametre}"
+    )
 
 
 def test_le_cache_s_invalide_au_rafraichissement() -> None:
