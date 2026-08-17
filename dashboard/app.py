@@ -19,6 +19,9 @@ st.set_page_config(
 
 PAGES = [
     st.Page("pages/activite.py", title="Activité", url_path="activite", default=True),
+    st.Page("pages/rendez_vous.py", title="Rendez-vous", url_path="rendez-vous"),
+    st.Page("pages/urgences.py", title="Urgences", url_path="urgences"),
+    st.Page("pages/sejours.py", title="Séjours", url_path="sejours"),
 ]
 
 st.navigation(PAGES).run()
