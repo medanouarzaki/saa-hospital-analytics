@@ -46,7 +46,10 @@ route de la composition est indispensable, faute de quoi le tableau de bord dém
 10. Rapprocher les identités puis constituer l'instantané que lit le tableau de bord :
     `uv run python -m linkage.prediction`, `uv run python -m linkage.evaluation`,
     `uv run python -m instantane.rafraichir`. Le rapprochement lit la vérité terrain du scénario
-    produit par la génération ci-dessus (`VERITE_TERRAIN_PATIENTS`).
+    produit par la génération ci-dessus (`VERITE_TERRAIN_PATIENTS`). Ses deux artefacts tabulaires
+    (`linkage/courbe_precision_rappel.csv`, `linkage/ablation.csv`) sont versionnés et réécrits à
+    chaque exécution : pour ne pas salir l'arbre de travail, rediriger les chemins avec
+    `CHEMIN_COURBE_PRECISION_RAPPEL` et `CHEMIN_CSV_ABLATION`.
 11. Ouvrir le tableau de bord sur le port déclaré par `STREAMLIT_PORT` dans `.env`.
 
 Le graphe quotidien (`airflow/saa_daily.py`) enchaîne génération, chargement, construction, rapprochement et rafraîchissement pour une date d'extraction
