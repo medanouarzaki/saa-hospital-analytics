@@ -17,8 +17,8 @@ Le jeu de données est entièrement synthétique. Aucune donnée réelle de pati
 
 ## Démarrage
 
-Le dépôt ne contient aucune donnée : elles se produisent en local. Les étapes 4 à 10 sont
-indispensables, faute de quoi le tableau de bord démarre mais ne peut rien afficher — le schéma
+Le dépôt ne contient aucune donnée : elles se produisent en local. Tout ce qui suit la mise en
+route de la composition est indispensable, faute de quoi le tableau de bord démarre mais ne peut rien afficher — le schéma
 `instantane` qu'il interroge n'existe pas encore.
 
 1. Copier `.env.example` vers `.env`, puis renseigner **toutes** ses clés. Aucune n'a de valeur par
@@ -46,10 +46,10 @@ indispensables, faute de quoi le tableau de bord démarre mais ne peut rien affi
 10. Rapprocher les identités puis constituer l'instantané que lit le tableau de bord :
     `uv run python -m linkage.prediction`, `uv run python -m linkage.evaluation`,
     `uv run python -m instantane.rafraichir`. Le rapprochement lit la vérité terrain du scénario
-    produit à l'étape 5 (`VERITE_TERRAIN_PATIENTS`).
+    produit par la génération ci-dessus (`VERITE_TERRAIN_PATIENTS`).
 11. Ouvrir le tableau de bord sur le port déclaré par `STREAMLIT_PORT` dans `.env`.
 
-Le graphe quotidien (`airflow/saa_daily.py`) enchaîne les étapes 5 à 10 pour une date d'extraction
+Le graphe quotidien (`airflow/saa_daily.py`) enchaîne génération, chargement, construction, rapprochement et rafraîchissement pour une date d'extraction
 donnée, une fois les schémas en place.
 
 ## Structure du dépôt
