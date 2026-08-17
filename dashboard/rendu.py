@@ -42,6 +42,13 @@ def definition(identifiant: str) -> str:
     raise KeyError(f"indicateur absent du registre : {identifiant}")
 
 
+def entree(identifiant: str) -> dict:
+    for candidat in registre()["indicateurs"]:
+        if candidat["identifiant"] == identifiant:
+            return candidat
+    raise KeyError(f"indicateur absent du registre : {identifiant}")
+
+
 def libelle(identifiant: str) -> str:
     for entree in registre()["indicateurs"]:
         if entree["identifiant"] == identifiant:
@@ -62,7 +69,115 @@ def en_tete(titre: str) -> dict:
     return etat
 
 
+# Ce qu'affiche un indicateur qui ne répond pas au filtre de période, selon ce que le registre
+# déclare. Le texte est construit à partir de la réserve ou du motif que le registre porte, jamais
+# écrit dans une page : une page qui déciderait elle-même de ce qu'elle marque pourrait diverger du
+# registre sans que rien ne le signale.
+MOTIFS_LISIBLES = {
+    "objet_sans_colonne_temporelle": (
+        "l'objet qui porte cette grandeur ne comporte aucune date : elle décrit un état, "
+        "non un flux"
+    ),
+    "grandeur_annualisee": (
+        "cette grandeur rapporte un volume à une année de référence ; la restreindre à une "
+        "sous-période est possible mais méthodologiquement faux"
+    ),
+    "date_hors_couche_des_faits": (
+        "la date existe, mais dans une couche que le filtre appliqué aux faits n'atteint pas"
+    ),
+}
+
+MENTION_HORS_FILTRE = "Non filtré par la période"
+MENTION_SOUS_RESERVE = "Filtré par la période, sous réserve"
+
+
+def filtrabilite(identifiant: str) -> str:
+    return entree(identifiant)["filtrabilite"]
+
+
+def page_porte_un_filtre(page: str) -> bool:
+    """Une page ne porte un filtre que si au moins un de ses indicateurs y répond."""
+    return any(indicateur["filtrabilite"] != "non" for indicateur in indicateurs_de(page))
+
+
+def mention_de_filtrabilite(identifiant: str) -> None:
+    """Marque l'indicateur si, et seulement si, le registre dit qu'il échappe au filtre.
+
+    Un filtre présent à l'écran et sans effet sur un chiffre ferait lire ce chiffre comme s'il
+    portait sur la période choisie. La mention est donc portée par l'indicateur lui-même, à côté de
+    sa valeur, et non reléguée dans une note de bas de page.
+    """
+    declaration = entree(identifiant)
+    valeur = declaration["filtrabilite"]
+    if valeur == "oui":
+        return
+    if valeur == "oui_sous_reserve":
+        st.warning(
+            f"{MENTION_SOUS_RESERVE} — {' '.join(declaration['reserve'].split())}",
+            icon="⚠️",
+        )
+        return
+    motif = MOTIFS_LISIBLES.get(declaration.get("motif"), declaration.get("motif", ""))
+    st.warning(f"{MENTION_HORS_FILTRE} — {motif}.", icon="⚠️")
+
+
+def absence_de_filtre(page: str) -> None:
+    """Affiché par une page dont aucun indicateur ne répond au filtre : dire pourquoi il n'y en a
+    pas vaut mieux que de laisser un lecteur chercher un filtre absent."""
+    motifs = sorted(
+        {
+            MOTIFS_LISIBLES.get(indicateur.get("motif"), indicateur.get("motif", ""))
+            for indicateur in indicateurs_de(page)
+        }
+    )
+    st.info(
+        "Cette page ne porte pas de filtre de période : aucun de ses indicateurs n'y répond — "
+        + " ; ".join(motifs)
+        + ".",
+        icon="ℹ️",
+    )
+
+
+def filtre_de_page(page: str, bornes: tuple | None = None) -> tuple | None:
+    """Rend le filtre de période de la page, ou dit pourquoi il n'y en a pas.
+
+    Le comportement se déduit du registre : une page dont aucun indicateur ne répond au filtre n'en
+    porte pas, et affiche le motif. Une page qui en porte un le porte pour tous, chaque indicateur
+    qui n'y répond pas étant marqué à côté de sa valeur.
+
+    Les bornes viennent des données quand l'appelant les fournit, jamais d'une constante.
+    """
+    if not page_porte_un_filtre(page):
+        absence_de_filtre(page)
+        return None
+    if bornes is None:
+        return None
+    debut, fin = bornes
+    choix = st.date_input("Période observée", value=(debut, fin), min_value=debut, max_value=fin)
+    if isinstance(choix, tuple) and len(choix) == 2:
+        return choix
+    return debut, fin
+
+
+def clause_periode(identifiant: str, periode: tuple | None) -> str:
+    """La clause de restriction d'un indicateur, vide s'il ne répond pas au filtre.
+
+    C'est ici que la décision se matérialise : un indicateur déclaré non filtrable ne reçoit
+    aucune clause, quelle que soit la période choisie à l'écran. Le marquage affiché et l'absence
+    de clause viennent donc de la même source, et ne peuvent pas diverger.
+    """
+    declaration = entree(identifiant)
+    if periode is None or declaration["filtrabilite"] == "non":
+        return ""
+    colonne = declaration.get("colonne_de_date")
+    if not colonne:
+        return ""
+    debut, fin = periode
+    return f"where {colonne} between date '{debut:%Y-%m-%d}' and date '{fin:%Y-%m-%d}'"
+
+
 def titre_indicateur(identifiant: str) -> None:
-    """Le libellé de l'indicateur, puis sa définition, tous deux lus au registre."""
+    """Le libellé de l'indicateur, sa définition, puis sa mention de filtrabilité s'il en a une."""
     st.subheader(libelle(identifiant))
     st.caption(definition(identifiant))
+    mention_de_filtrabilite(identifiant)
