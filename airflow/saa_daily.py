@@ -35,8 +35,11 @@ répertoire temporaire propre à l'appel, jamais le dépôt (docs/decisions/
 0012-mode-execution-orchestrateur.md, amendé). Aucun identifiant, aucun mot de passe et aucune
 variable de connexion ne sont écrits ici.
 
-Les deux tâches finales (export et rafraîchissement de l'instantané du tableau de bord) sont des
-aboutissements vides, en attente d'un travail ultérieur.
+Les deux tâches finales constituent l'instantané que lit le tableau de bord, puis en tirent les
+livrables. Le rafraîchissement précède l'export : l'export lit l'instantané, et le lire avant qu'il
+ne soit constitué livrerait l'état de la veille. Toutes deux restent en aval du contrôle de qualité,
+qui bloque la chaîne sur dégradation — un livrable produit malgré un contrôle bloqué serait pire
+qu'un livrable absent.
 """
 
 import os
@@ -190,17 +193,24 @@ with DAG(
         bash_command=f'uv run dbt run --threads 1 --select "{SELECTEUR_AGREGATS}"\n',
     )
 
-    exporter = BashOperator(
-        task_id="exporter",
-        bash_command='echo "export : aboutissement vide, contenu a ecrire plus tard"\n',
-    )
-
+    # Le rafraichissement precede l'export : l'export lit l'instantane, et le lire avant qu'il
+    # ne soit constitue livrerait l'etat de la veille. Les deux taches restent terminales et en
+    # aval du controle de qualite, qui bloque la chaine sur degradation ; seul leur ordre relatif
+    # a change.
+    #
+    # Un verrou consultatif interdit deux rafraichissements simultanes : la seconde invocation
+    # renonce avec un code de sortie qui lui est propre. Le recouvrement d'executions est en outre
+    # interdit au niveau du graphe par max_active_runs.
     rafraichir_instantane = BashOperator(
         task_id="rafraichir_instantane",
-        bash_command=(
-            "echo \"rafraichissement de l'instantane : "
-            'aboutissement vide, contenu a ecrire plus tard"\n'
-        ),
+        cwd=RACINE_DEPOT,
+        bash_command="uv run python -m instantane.rafraichir\n",
+    )
+
+    exporter = BashOperator(
+        task_id="exporter",
+        cwd=RACINE_DEPOT,
+        bash_command="uv run python -m livraison.exporter\n",
     )
 
     (
@@ -214,6 +224,6 @@ with DAG(
         >> rapprochement_prediction
         >> rapprochement_regroupement_evaluation
         >> dbt_agregats
-        >> exporter
         >> rafraichir_instantane
+        >> exporter
     )

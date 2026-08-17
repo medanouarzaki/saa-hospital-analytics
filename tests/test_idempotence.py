@@ -231,14 +231,49 @@ def _date_us(date_iso: str) -> str:
     return f"{mois}/{jour}/{annee}"
 
 
+def date_eprouvant_l_horodatage(cur) -> str:
+    """La date de chargement sur laquelle cette propriété a un sens : la plus ancienne dont la
+    quarantaine porte au moins une ligne, et dont `source.patients` porte au moins une fiche.
+
+    Cette date était écrite en littéral, et c'est ce qui rendait la propriété fausse hors du jeu
+    pour lequel elle avait été choisie : mesuré, la date retenue ne portait aucun rejet sur le
+    scénario du dépôt, si bien que l'exclusion de l'horodatage n'était pas mise à l'épreuve et
+    que le contrôle rougissait sans qu'aucune régression n'ait eu lieu. Elle se mesure donc
+    contre la base réellement chargée.
+
+    `order by … limit 1` rend le choix déterministe : deux exécutions sur le même jeu retiennent
+    la même date. L'ordre porte sur la date convertie et non sur son texte, `rejet_partition`
+    étant une colonne textuelle.
+    """
+    union = " union all ".join(
+        f'select rejet_partition from quarantaine."{table}"' for table in TABLES_SOURCE
+    )
+    cur.execute(
+        f"select q.rejet_partition from ({union}) q "
+        "where q.rejet_partition is not null "
+        "  and exists (select 1 from source.patients p "
+        "              where p.date_extraction = to_char(q.rejet_partition::date, 'MM/DD/YYYY')) "
+        "order by q.rejet_partition::date "
+        "limit 1"
+    )
+    ligne = cur.fetchone()
+    if ligne is None:
+        pytest.fail(
+            "aucune date de chargement ne porte à la fois une ligne de quarantaine et une fiche "
+            "patient sur cet instrument : l'exclusion de l'horodatage ne peut pas y être mise à "
+            "l'épreuve, et cette propriété n'a pas de sens sur ce jeu — charger un scénario dont "
+            "au moins une partition produit un rejet"
+        )
+    return ligne[0]
+
+
 def test_chargement_idempotent() -> None:
     verifier_base_jetable()
     preparer_orchestrateur()
 
-    date_iso = "2024-02-08"
-    date_us = _date_us(date_iso)
-
     with connexion() as conn, conn.cursor() as cur:
+        date_iso = date_eprouvant_l_horodatage(cur)
+        date_us = _date_us(date_iso)
         n_ipps = n_ipps_de_la_partition(cur, date_us)
         assert n_ipps, (
             f"aucune fiche patient trouvée pour {date_iso} : ce test exige une date déjà "
@@ -258,8 +293,8 @@ def test_chargement_idempotent() -> None:
         conn.commit()
         etat_apres_retrait = etat_partition(cur, date_us, date_iso)
         assert etat_apres_retrait != reference_partition, (
-            "le retrait de la partition n'a rien changé à l'état mesuré : ce test ne "
-            "mesurerait rien — la sélection de table/colonnes est probablement erronée"
+            f"le retrait de la partition {date_iso} n'a rien changé à l'état mesuré : ce test "
+            "ne mesurerait rien — la sélection de table/colonnes est probablement erronée"
         )
         for table in TABLES_SOURCE:
             assert etat_apres_retrait[f"source.{table}"][0] == 0
@@ -282,12 +317,12 @@ def test_chargement_idempotent() -> None:
 
     divergentes = [k for k in etat_apres_rejeu if etat_apres_rejeu[k] != reference_partition.get(k)]
     assert etat_apres_rejeu == reference_partition, (
-        "l'état après rejeu du graphe diverge de l'état de référence (hors horodatage de "
-        f"quarantaine), clés divergentes : {divergentes}"
+        f"l'état après rejeu du graphe pour {date_iso} diverge de l'état de référence (hors "
+        f"horodatage de quarantaine), clés divergentes : {divergentes}"
     )
     assert population_apres_rejeu == reference_population, (
-        "la couche dimensionnelle ou le rapprochement, restreints à cette population, "
-        "divergent de l'état de référence après rejeu"
+        "la couche dimensionnelle ou le rapprochement, restreints à la population de "
+        f"{date_iso}, divergent de l'état de référence après rejeu"
     )
 
     # 4. Second rejeu, sans rien changer : idempotence.
@@ -306,7 +341,7 @@ def test_chargement_idempotent() -> None:
         population_apres_second_rejeu = etat_population(cur, n_ipps)
 
     assert etat_apres_second_rejeu == etat_apres_rejeu, (
-        "un second rejeu de la même journée change l'état mesuré (hors horodatage) : "
+        f"un second rejeu de la journée {date_iso} change l'état mesuré (hors horodatage) : "
         "la chaîne n'est pas idempotente"
     )
     assert population_apres_second_rejeu == population_apres_rejeu
@@ -322,9 +357,9 @@ def test_chargement_idempotent() -> None:
         != etat_apres_rejeu_avec_horodatage[table]
     ]
     assert divergences_avec_horodatage, (
-        "aucune table de quarantaine avec horodatage inclus n'a divergé entre les deux "
-        "rejeux : l'exclusion de l'horodatage n'a pas été mise à l'épreuve sur ce jeu — "
-        "choisir une date dont la quarantaine porte au moins une ligne"
+        f"aucune table de quarantaine avec horodatage inclus n'a divergé entre les deux rejeux "
+        f"de {date_iso} : l'exclusion de l'horodatage n'a pas été mise à l'épreuve, alors que "
+        "cette date a été retenue précisément parce que sa quarantaine porte une ligne"
     )
 
 

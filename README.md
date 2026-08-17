@@ -17,9 +17,44 @@ Le jeu de données est entièrement synthétique. Aucune donnée réelle de pati
 
 ## Démarrage
 
-1. Copier `.env.example` vers `.env`, puis renseigner les valeurs locales (ports, mot de passe PostgreSQL, clés Airflow).
-2. Lancer `docker compose -f docker/docker-compose.yml --env-file .env up --wait`.
-3. Ouvrir le tableau de bord sur le port déclaré par `STREAMLIT_PORT` dans `.env`.
+Le dépôt ne contient aucune donnée : elles se produisent en local. Tout ce qui suit la mise en
+route de la composition est indispensable, faute de quoi le tableau de bord démarre mais ne peut rien afficher — le schéma
+`instantane` qu'il interroge n'existe pas encore.
+
+1. Copier `.env.example` vers `.env`, puis renseigner **toutes** ses clés. Aucune n'a de valeur par
+   défaut : nom de projet Docker Compose, hôte, port, base, utilisateur et mot de passe PostgreSQL,
+   identifiant d'utilisateur du système pour Airflow (`AIRFLOW_UID`, la valeur de `id -u`), ports
+   publiés d'Airflow et de Streamlit, clé Fernet et clé d'API d'Airflow, identifiants de son
+   administrateur. La clé Fernet est une clé de 32 octets encodée en base64 URL :
+   `python -c "import base64, secrets; print(base64.urlsafe_b64encode(secrets.token_bytes(32)).decode())"`.
+2. Installer l'environnement Python : `uv sync --frozen`.
+3. Lancer `docker compose -f docker/docker-compose.yml --env-file .env up --wait`.
+4. Exporter les variables de connexion dans le shell, en plus du fichier : `set -a; . ./.env; set +a`.
+   Les modules d'ingestion lisent `.env` mais ceux de rapprochement attendent les variables dans
+   l'environnement.
+5. Produire le jeu de données : `uv run python -m generator generator/output`.
+6. Appliquer les schémas : `uv run python ingestion/appliquer_ddl.py` puis
+   `uv run python -m linkage.appliquer_ddl`. Ces commandes s'exécutent sur une base vide ; les
+   rejouer sur une base déjà pourvue échoue.
+7. Charger les données : `uv run python -m ingestion.chargeur generator/output/scenario_30`.
+8. Déclarer le profil de connexion de dbt. Il ne figure pas dans le dépôt : écrire un
+   `profiles.yml` sous `~/.dbt/` ou pointer `DBT_PROFILES_DIR` sur un répertoire qui en contient un,
+   avec les variables `DBT_POSTGRES_HOST`, `DBT_POSTGRES_PORT`, `DBT_POSTGRES_USER`,
+   `DBT_POSTGRES_PASSWORD` et `DBT_POSTGRES_DB` renseignées. Le fichier de workflow d'intégration
+   continue en donne un exemple complet.
+9. Construire l'entrepôt : `cd dbt && uv run dbt seed && uv run dbt run --threads 1`.
+10. Rapprocher les identités puis constituer l'instantané que lit le tableau de bord :
+    `uv run python -m linkage.prediction`, `uv run python -m linkage.evaluation`,
+    `uv run python -m instantane.rafraichir`. Le rapprochement lit la vérité terrain du scénario
+    produit par la génération ci-dessus (`VERITE_TERRAIN_PATIENTS`). Ses deux artefacts tabulaires
+    (`linkage/courbe_precision_rappel.csv`, `linkage/ablation.csv`) sont versionnés et réécrits à
+    chaque exécution : pour ne pas salir l'arbre de travail, rediriger le premier avec
+    `CHEMIN_COURBE_PRECISION_RAPPEL`. Le second se redirige avec `CHEMIN_CSV_ABLATION`, mais son
+    contrôle lit le chemin par défaut : le rediriger lui ferait lire un fichier périmé.
+11. Ouvrir le tableau de bord sur le port déclaré par `STREAMLIT_PORT` dans `.env`.
+
+Le graphe quotidien (`airflow/saa_daily.py`) enchaîne génération, chargement, construction, rapprochement et rafraîchissement pour une date d'extraction
+donnée, une fois les schémas en place.
 
 ## Structure du dépôt
 

@@ -57,7 +57,11 @@ def _fichiers_par_job_pytest() -> dict[str, set[str]]:
             continue
         fichiers: set[str] = set()
         for etape in job.get("steps", []):
-            commande = etape.get("run", "")
+            # `str(...)` et non la valeur brute : YAML rend `run: true` comme un booléen, et
+            # `"pytest" not in True` lève un TypeError au lieu de laisser l'assertion parler.
+            # Mesuré en tentant de faire rougir ce contrôle par le retrait d'un fichier — il
+            # rougissait par plantage, ce qui ne prouvait pas la propriété visée.
+            commande = str(etape.get("run", ""))
             if "pytest" not in commande:
                 continue
             sans_ignores = MOTIF_ARGUMENT_IGNORE.sub("", commande)
