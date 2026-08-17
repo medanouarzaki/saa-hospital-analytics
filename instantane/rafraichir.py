@@ -79,6 +79,35 @@ order by 1, 2
 """
 
 
+# Clé du verrou consultatif qui interdit deux rafraîchissements simultanés. Deux invocations
+# concurrentes se heurtaient sur la création de leurs tables provisoires — mesuré : une exception
+# non traitée sur trois paires lancées sur trois, avec pour message une violation d'unicité du
+# catalogue système. L'instantané y survivait, mais l'exécution échouait obscurément.
+#
+# Le mécanisme a été lu dans le serveur avant d'être employé : `pg_try_advisory_lock` « obtain
+# exclusive advisory lock if available » rend immédiatement, sans attendre, et sa portée est la
+# SESSION — le verrou se relâche à la fermeture de la connexion, y compris si le processus meurt,
+# de sorte qu'aucun verrou périmé ne peut bloquer un rafraîchissement ultérieur. Vérifié : une
+# seconde session obtient bien le verrou dès que la première ferme la sienne.
+#
+# La valeur n'a pas de sens en soi ; seule compte son unicité parmi les usages du même serveur.
+CLE_VERROU = 8_294_513_027
+
+# Code de sortie propre au renoncement, distinct de celui d'un échec. Un ordonnanceur peut ainsi
+# distinguer « un autre rafraîchissement était en cours » — situation normale, sans conséquence sur
+# l'instantané — d'une défaillance qui demande examen. Les deux sont non nuls : dans les deux cas
+# le rafraîchissement n'a pas eu lieu.
+CODE_RENONCEMENT = 3
+CODE_ECHEC = 1
+
+# Marque portée par le message d'un renoncement, et lue pour choisir le code de sortie.
+MARQUE_RENONCEMENT = "RENONCE"
+
+
+class RafraichissementDejaEnCours(RuntimeError):
+    """Un autre rafraîchissement détient le verrou ; celui-ci renonce sans rien toucher."""
+
+
 class EchangeImpossible(RuntimeError):
     """L'echange n'a pas obtenu ses verrous, toutes tentatives epuisees."""
 
@@ -211,13 +240,33 @@ def echanger_les_noms(conn, curseur, schema: str, noms: list[str]) -> int:
 
 
 def rafraichir() -> tuple[bool, str]:
-    """Renvoie (réussite, message). Cinq temps : construire, échanger, nettoyer, dater, rendre."""
+    """Renvoie (réussite, message). Cinq temps : construire, échanger, nettoyer, dater, rendre.
+
+    Un verrou consultatif interdit deux exécutions simultanées : la seconde renonce proprement,
+    sans rien modifier, et le message le dit.
+    """
+    try:
+        return _rafraichir_sous_verrou()
+    except RafraichissementDejaEnCours as renoncement:
+        return False, f"rafraichissement de {SCHEMA} : {MARQUE_RENONCEMENT} - {renoncement}"
+
+
+def _rafraichir_sous_verrou() -> tuple[bool, str]:
     global DERNIERE_FENETRE_MS
     DERNIERE_FENETRE_MS = None
     debut = time.monotonic()
     with chargeur.connexion() as conn:
         conn.autocommit = True
         with conn.cursor() as cur:
+            # Le verrou est pris avant toute écriture, et il ne fait jamais attendre : une seconde
+            # invocation, d'où qu'elle vienne — graphe, ligne de commande, contrôle — renonce
+            # immédiatement plutôt que de se heurter à la première.
+            cur.execute("select pg_try_advisory_lock(%s)", (CLE_VERROU,))
+            if not cur.fetchone()[0]:
+                raise RafraichissementDejaEnCours(
+                    "un autre rafraichissement est en cours ; celui-ci renonce sans rien modifier"
+                )
+
             cur.execute(f"create schema if not exists {SCHEMA}")
 
             # Résidus d'un rafraîchissement interrompu : effacés au démarrage plutôt que
@@ -316,7 +365,7 @@ def main() -> None:
     reussite, message = rafraichir()
     print(message)
     if not reussite:
-        sys.exit(1)
+        sys.exit(CODE_RENONCEMENT if MARQUE_RENONCEMENT in message else CODE_ECHEC)
 
 
 if __name__ == "__main__":

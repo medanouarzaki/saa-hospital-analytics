@@ -17,10 +17,14 @@ fixture ci-dessous exécute le rafraîchissement une fois par session, ce qui re
 exécutable seul sur une base où seule la couche `marts` est construite.
 """
 
+from pathlib import Path
+
 import pytest
 
 from ingestion import chargeur
 from instantane import rafraichir
+
+RACINE = Path(__file__).resolve().parent.parent
 
 # L'empreinte de contenu, en une expression.
 #
@@ -40,6 +44,28 @@ from instantane import rafraichir
 EMPREINTE = "sum(('x' || substr(md5(t::text), 1, 8))::bit(32)::bigint)"
 
 FUSEAU = "UTC"
+
+
+def _empreintes() -> dict:
+    """Décompte et empreinte de chaque objet copié, sous fuseau fixé.
+
+    Même forme d'empreinte que celle employée pour l'égalité de l'instantané : indépendante de
+    l'ordre parce que l'addition est commutative, et évaluée sous fuseau fixé parce que six des
+    objets portent des horodatages avec fuseau.
+    """
+    conn = _connexion()
+    try:
+        with conn.cursor() as curseur:
+            curseur.execute("set time zone 'UTC'")
+            curseur.execute(rafraichir.REQUETE_OBJETS)
+            noms = [nom for _, nom in curseur.fetchall()]
+            mesures = {}
+            for nom in noms:
+                curseur.execute(f"select count(*), {EMPREINTE} from {rafraichir.SCHEMA}.{nom} t")
+                mesures[nom] = curseur.fetchone()
+            return mesures
+    finally:
+        conn.close()
 
 
 def _connexion():
@@ -243,6 +269,107 @@ def test_le_parametre_egale_la_valeur_du_fichier_que_sa_provenance_designe(
             ecarts.append(f"{nom} : la clé de provenance '{cle}' ne désigne pas ce paramètre")
 
     assert not ecarts, "provenance non vérifiée : " + " | ".join(ecarts)
+
+
+def test_deux_rafraichissements_concurrents_laissent_l_instantane_coherent() -> None:
+    """Deux invocations simultanées : la seconde renonce, l'instantané reste cohérent.
+
+    Sans verrou, les deux se heurtaient sur la création de leurs tables provisoires et l'une levait
+    une exception non traitée — mesuré sur trois paires lancées sur trois. La tâche étant désormais
+    branchée à une chaîne quotidienne, deux exécutions peuvent se recouvrir, et le défaut cesse
+    d'être théorique.
+
+    Le contrôle vérifie trois choses : aucune des deux invocations ne lève, exactement une renonce,
+    et l'instantané est intact après — décomptes et empreintes de ses objets inchangés.
+    """
+    import threading
+
+    from instantane import rafraichir
+
+    avant = _empreintes()
+
+    resultats: dict[str, tuple] = {}
+
+    def lancer(nom: str) -> None:
+        try:
+            resultats[nom] = rafraichir.rafraichir()
+        except Exception as echec:  # une exception non traitée est précisément le défaut
+            resultats[nom] = ("exception", f"{type(echec).__name__}: {echec}")
+
+    fils = [threading.Thread(target=lancer, args=(nom,)) for nom in ("premier", "second")]
+    for fil in fils:
+        fil.start()
+    for fil in fils:
+        fil.join(timeout=300)
+
+    exceptions = [message for issue, message in resultats.values() if issue == "exception"]
+    assert not exceptions, f"une invocation a levé au lieu de renoncer : {exceptions}"
+
+    renoncements = [
+        message
+        for issue, message in resultats.values()
+        if issue is False and rafraichir.MARQUE_RENONCEMENT in message
+    ]
+    reussites = [message for issue, message in resultats.values() if issue is True]
+    assert len(renoncements) == 1, (
+        f"{len(renoncements)} renoncement(s) pour deux invocations concurrentes : "
+        f"{list(resultats.values())}"
+    )
+    assert len(reussites) == 1, (
+        f"{len(reussites)} réussite(s) pour deux invocations concurrentes : "
+        f"{list(resultats.values())}"
+    )
+
+    assert _empreintes() == avant, "deux invocations concurrentes ont modifié l'instantané"
+
+
+def test_le_renoncement_rend_un_code_de_sortie_distinct_de_l_echec() -> None:
+    """Le code de sortie sépare « un autre était en cours » d'une défaillance.
+
+    Un ordonnanceur qui ne verrait qu'un code non nul confondrait les deux. Le contrôle tient le
+    verrou depuis une session tierce, puis invoque le module en ligne de commande.
+    """
+    import subprocess
+    import sys
+
+    from ingestion import chargeur
+    from instantane import rafraichir
+
+    conn = chargeur.connexion()
+    conn.autocommit = True
+    try:
+        with conn.cursor() as curseur:
+            curseur.execute("select pg_try_advisory_lock(%s)", (rafraichir.CLE_VERROU,))
+            assert curseur.fetchone()[0], (
+                "le verrou est déjà détenu : le contrôle ne prouverait rien"
+            )
+
+        empeche = subprocess.run(
+            [sys.executable, "-m", "instantane.rafraichir"],
+            capture_output=True,
+            text=True,
+            cwd=RACINE,
+            check=False,
+        )
+    finally:
+        conn.close()
+
+    assert empeche.returncode == rafraichir.CODE_RENONCEMENT, (
+        f"code {empeche.returncode} pour un renoncement, "
+        f"{rafraichir.CODE_RENONCEMENT} attendu : {empeche.stdout.strip()}"
+    )
+    assert rafraichir.MARQUE_RENONCEMENT in empeche.stdout, empeche.stdout
+
+    libre = subprocess.run(
+        [sys.executable, "-m", "instantane.rafraichir"],
+        capture_output=True,
+        text=True,
+        cwd=RACINE,
+        check=False,
+    )
+    assert libre.returncode == 0, (
+        f"le verrou étant libre, le rafraîchissement devait aboutir : {libre.stdout.strip()}"
+    )
 
 
 def test_deux_rafraichissements_consecutifs_laissent_le_meme_etat(instantane_rafraichi) -> None:
