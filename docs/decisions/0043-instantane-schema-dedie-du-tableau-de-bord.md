@@ -277,3 +277,31 @@ et l'interblocage sur le catalogue système qui l'a motivée.
 existent en aboutissement vide, leur contenu étant renvoyé à un travail ultérieur.
 Code de la matérialisation en vue de l'outil de transformation, version installée, et ses macros
 de renommage et de suppression pour PostgreSQL.
+
+## Amendement — la concurrence du rafraîchissement, et l'emplacement de ses contrôles
+
+Le rafraîchissement effaçait ses résidus au démarrage, ce qui le protégeait d'une exécution
+**interrompue** mais non d'une exécution **concurrente**. Défaut mesuré : trois paires
+d'invocations simultanées sur trois donnaient une exception non traitée — une violation d'unicité
+du catalogue système sur la création des tables provisoires. L'instantané y survivait (aucun
+résidu, vingt-six tables, contrôles d'égalité verts) ; le dommage était l'échec obscur.
+
+**Deux remèdes sont retenus, à deux portées différentes.** `max_active_runs=1` sur le graphe
+empêche le recouvrement avant qu'il ne commence — sans lui la configuration de l'orchestrateur en
+autoriserait seize, et `catchup=True` en produirait lors d'un rattrapage — mais ne couvre que les
+exécutions du graphe. Un **verrou consultatif** dans le module couvre toute invocation, d'où
+qu'elle vienne : la seconde renonce sans rien modifier, avec un **code de sortie qui lui est
+propre** (3), distinct de celui d'un échec (1), afin qu'un ordonnanceur sépare « un autre
+rafraîchissement était en cours » d'une défaillance à examiner. Mécanisme lu dans le serveur avant
+emploi : `pg_try_advisory_lock` rend immédiatement, sa portée est la session — ce qu'il faut, le
+rafraîchissement s'étendant sur plusieurs transactions — et il se relâche à la fermeture de la
+connexion, y compris si le processus meurt, de sorte qu'aucun verrou périmé ne peut bloquer un
+rafraîchissement ultérieur. Critère : trente paires, trente renoncements propres, zéro exception.
+
+**Les contrôles de l'instantané ont quitté l'emplacement `dbt` de l'intégration continue** pour un
+emplacement propre. Le point de coupe vient de la mesure : ces quatre fichiers partagent une
+précondition qu'aucun autre n'a — l'instantané, qu'ils rafraîchissent eux-mêmes — et la marge de
+l'emplacement d'origine jusqu'au plus court groupe de la matrice était tombée à 17 s (544 s contre
+561 s). Le nouvel emplacement reconstruit ses préconditions au lieu de les hériter, et ne reprend
+que ce que l'instantané copie : construction dbt, prédiction, évaluation — ni les contrôles dbt, ni
+l'ablation, qui n'écrit aucune des trois tables de `linkage`.

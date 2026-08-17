@@ -307,30 +307,108 @@ jobs:
 
       - run: uv run pytest tests/test_controle_qualite.py -v
 
-      # Le registre des indicateurs confronte les objets qu'il cite au catalogue :
-      # sa place est ici, seul emplacement où la couche marts est construite. Les
-      # sept autres propriétés qu'il vérifie n'exigent que le fichier, et restent au
-      # même endroit pour que le registre ne soit pas contrôlé à deux endroits.
+      # Le registre des indicateurs confronte les objets qu'il cite au catalogue : sa place est
+      # dans un emplacement où la couche marts est construite, et celui-ci en est un. Les sept
+      # autres propriétés qu'il vérifie n'exigent que le fichier, et restent au même endroit pour
+      # que le registre ne soit pas contrôlé à deux endroits.
       - run: uv run pytest tests/test_registre_indicateurs.py -v
 
-      # Les contrôles de l'instantané exigent que la couche marts soit construite : leur place
-      # est ici, comme ceux du registre. Aucune étape ne rafraîchit l'instantané avant eux —
-      # ils l'établissent eux-mêmes, un test devant poser ses préconditions plutôt que les
-      # hériter de l'ordre des étapes qui le précèdent.
+  # Quatrième emplacement, détaché de `dbt` par la mesure et non par intuition. Les quatre
+  # fichiers de contrôle qu'il porte partagent une précondition que les autres n'ont pas :
+  # l'instantané, qu'ils rafraîchissent eux-mêmes. Leur durée propre mesurée les classe aux
+  # premiers rangs de l'emplacement d'origine, dont la marge jusqu'au plus court groupe de la
+  # matrice était tombée à 17 s (544 s contre 561 s, mesurés sur la dernière exécution). Les
+  # laisser là aurait fait dépasser cette marge, et chaque contrôle d'instantané, de tableau de
+  # bord ou de livrable ajouté ensuite l'aurait creusée davantage.
+  #
+  # Cet emplacement reconstruit ses préconditions au lieu de les hériter : il ne rejoue ni les
+  # contrôles dbt, ni le rapprochement au complet — seulement ce que l'instantané copie
+  # (`marts`, les trois tables de `linkage`, `intermediate.int_creances`), soit la construction
+  # dbt, la prédiction et l'évaluation. L'ablation n'écrit aucune table que l'instantané reprenne
+  # et n'y figure donc pas.
+  instantane:
+    runs-on: ubuntu-latest
+    # Calque du service des jobs provenance et dbt : même image, mêmes options de santé, aucun
+    # mot de passe puisque le conteneur est éphémère et propre à ce job.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ""
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+
+      - run: uv sync --frozen
+
+      - run: uv run python -m generator "$RUNNER_TEMP/scenario" --date-fin 2024-03-31
+
+      # L'évaluation du rapprochement lit la vérité terrain réellement générée ci-dessus, sous
+      # $RUNNER_TEMP/scenario/ et jamais generator/output/ — même raison que dans le job dbt.
+      - run: echo "VERITE_TERRAIN_PATIENTS=$RUNNER_TEMP/scenario/scenario_30/verite_terrain.yml" >> "$GITHUB_ENV"
+
+      - run: uv run python ingestion/appliquer_ddl.py
+
+      - run: uv run python -m linkage.appliquer_ddl
+
+      - run: uv run python -m ingestion.chargeur "$RUNNER_TEMP/scenario/scenario_30"
+
+      - run: |
+          mkdir -p "$RUNNER_TEMP/dbt_profiles"
+          cat > "$RUNNER_TEMP/dbt_profiles/profiles.yml" <<'PROFILE'
+          saa_hospital_analytics:
+            target: dev
+            outputs:
+              dev:
+                type: postgres
+                host: "{{ env_var('DBT_POSTGRES_HOST', 'localhost') }}"
+                port: "{{ env_var('DBT_POSTGRES_PORT', '5432') | as_number }}"
+                user: "{{ env_var('DBT_POSTGRES_USER', 'postgres') }}"
+                password: "{{ env_var('DBT_POSTGRES_PASSWORD', '') }}"
+                dbname: "{{ env_var('DBT_POSTGRES_DB', 'postgres') }}"
+                schema: intermediate
+                threads: 4
+          PROFILE
+
+      - run: cd dbt && uv run dbt seed
+        env:
+          DBT_PROFILES_DIR: ${{ runner.temp }}/dbt_profiles
+
+      - run: cd dbt && uv run dbt run --threads 1
+        env:
+          DBT_PROFILES_DIR: ${{ runner.temp }}/dbt_profiles
+
+      - run: uv run python -m linkage.prediction
+
+      - run: uv run python -m linkage.evaluation
+
+      # Aucune étape ne rafraîchit l'instantané avant les contrôles : ils l'établissent
+      # eux-mêmes, un test devant poser ses préconditions plutôt que les hériter de l'ordre des
+      # étapes qui le précèdent. Les quatre fichiers restent en étapes séparées, comme dans le
+      # job dbt : une exécution en échec nomme alors le fichier fautif dans le nom de l'étape.
       - run: uv run pytest tests/test_instantane.py -v
 
       # La transparence du rafraîchissement se mesure sous témoin concurrent : ces contrôles
       # lancent des rafraîchissements réels et lisent en boucle pendant qu'ils se déroulent.
-      # Ils exigent donc la même base construite que les contrôles d'égalité, et sont placés
-      # au même endroit qu'eux.
       - run: uv run pytest tests/test_instantane_transparence.py -v
 
-      # Les contrôles du tableau de bord lisent l'instantané, qui n'existe que là où la couche
-      # marts est construite : leur place est ici. Ils rafraîchissent l'instantané eux-mêmes si
-      # son état ne peut être lu, plutôt que de dépendre de l'ordre des étapes précédentes.
       - run: uv run pytest tests/test_tableau_de_bord.py -v
 
-      # Les contrôles des livrables produisent l'export puis LISENT les fichiers produits : ils
-      # exigent la même base construite que les contrôles du tableau de bord, et rafraîchissent
-      # l'instantané eux-mêmes si son état ne peut être lu.
+      # Les contrôles des livrables produisent l'export puis LISENT les fichiers produits.
       - run: uv run pytest tests/test_exports.py -v
