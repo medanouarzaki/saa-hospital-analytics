@@ -17,7 +17,12 @@ FICHIER_GRAPHE = RACINE / "airflow" / "saa_daily.py"
 
 MODULES_PROJET = {"ingestion", "linkage", "generator", "dashboard", "dbt"}
 
-_MOTIF_ABOUTISSEMENT_VIDE = re.compile(r'^echo "[^"\n]*"\n$')
+# Les modules que les deux tâches terminales doivent invoquer. La correspondance est portée ici et
+# nulle part ailleurs : c'est elle que le contrôle confronte à ce que le graphe déclare.
+MODULES_TERMINAUX = {
+    "rafraichir_instantane": "instantane.rafraichir",
+    "exporter": "livraison.exporter",
+}
 _MOTIF_CREDENTIAL_LITTERAL = re.compile(r'(?i)(password|secret|token)\s*[:=]\s*["\'][^"\']{4,}')
 
 
@@ -56,16 +61,81 @@ def test_rapprochement_apres_faits_et_avant_agregats() -> None:
     assert agregats.task_id in evaluation.downstream_task_ids
 
 
-def test_taches_terminales_aboutissement_vide() -> None:
-    """Critère explicite, pas une inspection approximative : la commande de chaque tâche
-    terminale ne contient rien d'autre qu'un unique `echo` sur une seule ligne."""
+def test_taches_terminales_invoquent_leur_module() -> None:
+    """Chaque tâche terminale invoque bien le module attendu.
+
+    Cette propriété a remplacé son inverse : les deux tâches étaient des aboutissements vides, et
+    un contrôle vérifiait qu'elles ne faisaient rien. Elles font désormais quelque chose, et c'est
+    ce quelque chose qui est vérifié — nommément, non par une inspection approximative.
+    """
     dag = _charger_dag()
-    for task_id in ("exporter", "rafraichir_instantane"):
-        tache = dag.get_task(task_id)
-        assert _MOTIF_ABOUTISSEMENT_VIDE.match(tache.bash_command), (
-            f"{task_id} : commande non reconnue comme un aboutissement vide : "
-            f"{tache.bash_command!r}"
-        )
+    fautifs = []
+    for task_id, module in MODULES_TERMINAUX.items():
+        commande = dag.get_task(task_id).bash_command
+        if f"-m {module}" not in commande:
+            fautifs.append(f"{task_id} : n'invoque pas {module} — {commande.strip()!r}")
+    assert not fautifs, "tâches terminales mal branchées : " + " | ".join(fautifs)
+
+
+def test_taches_terminales_ont_un_repertoire_de_travail() -> None:
+    """Sans répertoire de travail, l'opérateur exécute dans un répertoire temporaire propre à
+    l'appel, jamais le dépôt — la commande échouerait sans que le graphe soit en cause.
+
+    Le répertoire attendu est celui que les autres tâches du dépôt emploient déjà : le contrôle le
+    relève sur elles plutôt que de l'écrire, de sorte qu'un changement de convention ne le laisse
+    pas vérifier une valeur périmée.
+    """
+    dag = _charger_dag()
+    references = {
+        tache.cwd for tache in dag.tasks if tache.task_id not in MODULES_TERMINAUX and tache.cwd
+    }
+    assert references, "aucune tâche de référence ne porte de répertoire de travail"
+
+    fautifs = []
+    for task_id in MODULES_TERMINAUX:
+        cwd = dag.get_task(task_id).cwd
+        if not cwd:
+            fautifs.append(f"{task_id} : aucun répertoire de travail")
+        elif cwd not in references:
+            fautifs.append(f"{task_id} : répertoire {cwd!r} hors de ceux des autres tâches")
+    assert not fautifs, "répertoires de travail manquants ou inattendus : " + " | ".join(fautifs)
+
+
+def test_le_rafraichissement_precede_l_export() -> None:
+    """L'export lit l'instantané : le lire avant qu'il ne soit constitué livrerait l'état de la
+    veille, sans qu'aucune tâche n'échoue."""
+    dag = _charger_dag()
+    rafraichissement = dag.get_task("rafraichir_instantane")
+    export = dag.get_task("exporter")
+    assert export.task_id in rafraichissement.downstream_task_ids, (
+        f"l'export n'est pas en aval du rafraîchissement : aval du rafraîchissement = "
+        f"{sorted(rafraichissement.downstream_task_ids)}"
+    )
+    assert rafraichissement.task_id in export.upstream_task_ids
+
+
+def test_les_taches_terminales_suivent_le_controle_de_qualite() -> None:
+    """Un livrable produit malgré un contrôle de qualité bloqué serait pire qu'un livrable absent.
+
+    La vérification porte sur l'amont TRANSITIF : une dépendance directe n'est pas exigée, seule
+    compte l'impossibilité qu'une tâche terminale s'exécute sans que le contrôle ait réussi.
+    """
+    dag = _charger_dag()
+
+    def amont_transitif(task_id: str, vus: set[str] | None = None) -> set[str]:
+        vus = set() if vus is None else vus
+        for amont in dag.get_task(task_id).upstream_task_ids:
+            if amont not in vus:
+                vus.add(amont)
+                amont_transitif(amont, vus)
+        return vus
+
+    fautifs = [
+        task_id
+        for task_id in MODULES_TERMINAUX
+        if "controle_qualite" not in amont_transitif(task_id)
+    ]
+    assert not fautifs, f"tâches terminales sans contrôle de qualité en amont : {fautifs}"
 
 
 def test_aucun_import_de_module_du_projet() -> None:

@@ -43,3 +43,23 @@ ultérieur.
 
 Cadrage du projet (enchaînement complet du graphe, étapes d'export et de rafraîchissement de
 l'instantané).
+
+## Amendement — les deux tâches sont remplies
+
+L'aboutissement vide est levé : la tâche de rafraîchissement invoque `instantane.rafraichir`, la
+tâche d'export `livraison.exporter`, toutes deux avec le répertoire de travail du dépôt.
+
+**L'ordre a dû être corrigé.** Le graphe plaçait l'export AVANT le rafraîchissement. L'export lit
+l'instantané ; le lire avant qu'il ne soit constitué livrerait l'état de la veille. C'est le seul
+défaut réel que l'aboutissement vide masquait, et l'inclusion des deux tâches dans leur forme
+complète — motif de cette décision — est ce qui a permis de le voir avant qu'il n'opère.
+
+Le second point que la vacuité masquait était l'absence de `cwd` : ces deux tâches étaient les
+seules des douze sans répertoire de travail, alors que l'opérateur shell exécute sinon dans un
+répertoire temporaire où `uv run` ne trouverait pas le projet.
+
+Le contrôle qui interdisait qu'une tâche reste vide par inadvertance devenait faux par
+construction ; il est **remplacé par quatre propriétés, non supprimé** : chaque tâche invoque le
+module qui lui revient, chacune porte un répertoire de travail (attendu **dérivé des autres
+tâches**, jamais recopié), le rafraîchissement précède l'export, et les deux restent en aval du
+contrôle de qualité par remontée transitive des dépendances.
