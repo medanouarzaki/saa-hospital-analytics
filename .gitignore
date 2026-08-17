@@ -9,6 +9,10 @@ __pycache__/
 generator/output/*
 !generator/output/.gitkeep
 
+# Exports produits par la chaîne : le contenu ne se suit pas, le répertoire si
+exports/*
+!exports/.gitkeep
+
 # Configuration locale
 .env
 
