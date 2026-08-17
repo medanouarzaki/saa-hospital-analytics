@@ -194,7 +194,7 @@ with DAG(
     )
 
     # Le rafraichissement precede l'export : l'export lit l'instantane, et le lire avant qu'il
-    # ne soit constitue livrerait l'etat de la veille. Les deux tachent restent terminales et en
+    # ne soit constitue livrerait l'etat de la veille. Les deux taches restent terminales et en
     # aval du controle de qualite, qui bloque la chaine sur degradation ; seul leur ordre relatif
     # a change.
     #
