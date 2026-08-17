@@ -74,6 +74,26 @@ def _requetes_de_page(nom: str) -> dict[str, str]:
     return local["REQUETES"]
 
 
+def _constantes_de_page(nom: str) -> dict:
+    """Les affectations de premier niveau d'une page, sans l'exécuter.
+
+    Même mécanisme que `_requetes_de_page`, mais rend l'espace de noms entier : un contrôle qui a
+    besoin d'un code d'état ou d'un seuil déclaré par une page le lit ici, plutôt que de le
+    recopier et de diverger d'elle en silence.
+    """
+    arbre = ast.parse((PAGES / f"{nom}.py").read_text(encoding="utf-8"))
+    local: dict = {}
+    for noeud in arbre.body:
+        if not isinstance(noeud, ast.Assign):
+            continue
+        module = ast.Module(body=[noeud], type_ignores=[])
+        try:
+            exec(compile(module, "page", "exec"), local)
+        except Exception:
+            continue
+    return local
+
+
 def _lecture():
     """Importé à l'appel, jamais à l'import : le module ouvre des connexions."""
     from dashboard import lecture
@@ -1040,4 +1060,145 @@ def test_la_date_de_reference_est_celle_des_donnees() -> None:
 
     assert portee == attendue, (
         f"date de référence affichée {portee}, dernière extraction chargée {attendue}"
+    )
+
+
+def test_la_mesure_intra_activite_egale_sa_seconde_mesure() -> None:
+    """Les deux grandeurs de l'écart intra-activité, confrontées à un calcul écrit autrement.
+
+    La page fait calculer les médianes et les corrélations PAR LE SERVEUR, en une passe groupée.
+    La seconde mesure les recalcule ICI, en Python, depuis les lignes brutes : médiane par
+    `statistics.median` sur la liste des délais, corrélation par la formule de Pearson appliquée
+    aux valeurs centrées par activité. Les deux chemins ne partagent que les données ; ni la
+    fonction d'agrégat, ni le moteur qui l'exécute.
+
+    La population est écrite deux fois de deux façons également : la page retient
+    `est_honore`/`est_absence`, colonnes booléennes de la couche des faits ; la seconde mesure
+    repart du code d'état brut, `etat`, dont ces booléens sont dérivés.
+    """
+    import statistics  # noqa: PLC0415
+
+    lecture = _lecture()
+    _instantane_pret(lecture)
+    requetes = _requetes_de_page("rendez_vous")
+    # Le code d'absence est LU dans la page, jamais recopié ici. Le code d'honoré, lui, n'est pas
+    # déclaré par la page : il est DÉDUIT des données, en relevant le code d'état que portent les
+    # lignes honorées. Aucun des deux n'est écrit en littéral dans ce fichier.
+    code_absence = _constantes_de_page("rendez_vous")["ETAT_ABSENCE"]
+
+    intra = lecture.interroger(
+        requetes["rendez_vous_delai_et_absence_intra_activite"].format(filtre="")
+    )
+    agrege = lecture.interroger(
+        _constantes_de_page("rendez_vous")["REQUETE_INTRA_AGREGEE"].format(filtre="")
+    )
+
+    # Les lignes brutes, lues une seule fois, sur lesquelles la seconde mesure est construite.
+    brutes = lecture.interroger(
+        """
+        select code_activite, delai_obtention_jours as delai, etat, est_honore, est_absence
+        from fct_rendez_vous
+        """
+    )
+
+    ecarts = []
+
+    codes_honores = {ligne.etat for ligne in brutes.itertuples(index=False) if ligne.est_honore}
+    assert len(codes_honores) == 1, (
+        f"les lignes honorées portent plusieurs codes d'état : {sorted(codes_honores)}"
+    )
+    code_honore = codes_honores.pop()
+    assert code_honore != code_absence, "le code d'honoré et celui d'absence se confondent"
+
+    par_activite: dict[str, dict[str, list[int]]] = {}
+    for ligne in brutes.itertuples(index=False):
+        seau = par_activite.setdefault(ligne.code_activite, {"honores": [], "absences": []})
+        if ligne.delai is None or ligne.delai <= 0:
+            continue
+        # Repart du code d'état brut, jamais des booléens que la page emploie pour filtrer.
+        if ligne.etat == code_absence:
+            seau["absences"].append(int(ligne.delai))
+        elif ligne.etat == code_honore:
+            seau["honores"].append(int(ligne.delai))
+
+    for ligne in intra.itertuples(index=False):
+        seau = par_activite.get(ligne.code_activite, {"honores": [], "absences": []})
+        for nom, colonne in (
+            ("honores", ligne.mediane_honores),
+            ("absences", ligne.mediane_absences),
+        ):
+            if not seau[nom]:
+                continue
+            seconde = statistics.median(seau[nom])
+            if abs(float(colonne) - float(seconde)) > 1e-9:
+                ecarts.append(
+                    f"médiane {nom} de l'activité {ligne.code_activite} : "
+                    f"{float(colonne)} affiché contre {float(seconde)} recalculé"
+                )
+
+    # Corrélation intra-activité : centrage par activité, puis Pearson écrit à la main.
+    couples = []
+    for seau in par_activite.values():
+        valeurs = [(d, 0.0) for d in seau["honores"]] + [(d, 1.0) for d in seau["absences"]]
+        if not valeurs:
+            continue
+        m_delai = statistics.fmean(v[0] for v in valeurs)
+        m_absence = statistics.fmean(v[1] for v in valeurs)
+        couples.extend((d - m_delai, a - m_absence) for d, a in valeurs)
+
+    numerateur = sum(x * y for x, y in couples)
+    denominateur = (sum(x * x for x, _ in couples) * sum(y * y for _, y in couples)) ** 0.5
+    seconde_correlation = numerateur / denominateur
+
+    affichee = float(agrege["correlation_intra"][0])
+    if abs(affichee - seconde_correlation) > 1e-6:
+        ecarts.append(
+            f"corrélation intra-activité : {affichee} affichée contre "
+            f"{seconde_correlation} recalculée"
+        )
+
+    effectif_affiche = int(agrege["n_rendez_vous"][0])
+    if effectif_affiche != len(couples):
+        ecarts.append(f"effectif : {effectif_affiche} affiché contre {len(couples)} recalculé")
+
+    assert not ecarts, "valeurs divergentes de leur seconde mesure : " + " | ".join(ecarts)
+
+
+def test_le_signe_de_la_mesure_intra_activite_est_celui_du_parametre_injecte() -> None:
+    """L'écart intra-activité est positif, activité par activité et en agrégat.
+
+    C'est la propriété qui distingue la grandeur affichée de la relation réellement injectée : le
+    paramètre du générateur allonge le délai des seules lignes d'absence, à l'intérieur de chaque
+    spécialité. Si cette propriété cessait d'être vraie, la grandeur inter-activités resterait la
+    seule affichée et le registre des relations en serait démenti.
+    """
+    lecture = _lecture()
+    _instantane_pret(lecture)
+    requetes = _requetes_de_page("rendez_vous")
+
+    intra = lecture.interroger(
+        requetes["rendez_vous_delai_et_absence_intra_activite"].format(filtre="")
+    )
+    agrege = lecture.interroger(
+        _constantes_de_page("rendez_vous")["REQUETE_INTRA_AGREGEE"].format(filtre="")
+    )
+
+    negatives = [
+        f"{ligne.code_activite} : {float(ligne.mediane_absences)} contre "
+        f"{float(ligne.mediane_honores)}"
+        for ligne in intra.itertuples(index=False)
+        if ligne.mediane_absences is not None
+        and ligne.mediane_honores is not None
+        and float(ligne.mediane_absences) <= float(ligne.mediane_honores)
+    ]
+    assert not negatives, (
+        "activités où les absents n'attendent pas plus longtemps que les honorés : "
+        + " | ".join(negatives)
+    )
+
+    correlation_intra = float(agrege["correlation_intra"][0])
+    assert correlation_intra > 0, (
+        f"la corrélation intra-activité vaut {correlation_intra}, alors que le paramètre injecté "
+        "allonge le délai des lignes d'absence : une valeur nulle ou négative signifierait que ce "
+        "paramètre est sans effet observable"
     )
