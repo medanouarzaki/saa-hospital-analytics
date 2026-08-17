@@ -98,11 +98,11 @@ def _instantane_pret(lecture) -> dict:
 
 
 def test_la_navigation_ne_declare_que_des_pages_du_registre() -> None:
-    """Toute page déclarée existe au registre et possède son fichier.
+    """La navigation et le registre déclarent exactement les mêmes pages.
 
-    Le sens réciproque — toute page du registre est déclarée — n'est pas asserté ici : il ne
-    pourra l'être qu'une fois les sept pages écrites, et l'asserter maintenant reviendrait à
-    exiger la déclaration de pages sans fichier, qui échoueraient à l'affichage.
+    La correspondance est vérifiée dans les DEUX sens, et leurs décomptes sont comparés : chaque
+    membre est calculé de son côté — les pages déclarées lues dans le point d'entrée, les pages
+    distinctes lues dans le registre — et jamais comparé à un littéral.
     """
     declarees = _pages_declarees()
     connues = set(_registre()["pages"])
@@ -112,6 +112,13 @@ def test_la_navigation_ne_declare_que_des_pages_du_registre() -> None:
 
     inconnues = sorted(set(declarees) - connues)
     assert not inconnues, f"pages déclarées mais absentes du registre : {inconnues}"
+
+    non_declarees = sorted(connues - set(declarees))
+    assert not non_declarees, f"pages du registre non déclarées à la navigation : {non_declarees}"
+
+    assert len(set(declarees)) == len(connues), (
+        f"{len(set(declarees))} pages déclarées contre {len(connues)} pages distinctes au registre"
+    )
 
     sans_fichier = [nom for nom in declarees if not (PAGES / f"{nom}.py").exists()]
     assert not sans_fichier, f"pages déclarées sans fichier : {sans_fichier}"
@@ -562,6 +569,113 @@ def test_l_anciennete_des_creances_part_de_la_date_de_reference() -> None:
     )
 
 
+def test_les_indicateurs_du_rapprochement_egalent_leur_seconde_mesure() -> None:
+    """Les cinq valeurs de la page, confrontées à des calculs écrits autrement.
+
+    Le croisement des deux méthodes est reconstruit ici **en dehors du serveur**, à partir des
+    deux ensembles de paires obtenus séparément : c'est un chemin réellement distinct de la
+    jointure externe que la page emploie.
+    """
+    lecture = _lecture()
+    _instantane_pret(lecture)
+    requetes = _requetes_de_page("rapprochement")
+    ecarts = []
+
+    seuil = lecture.interroger(requetes["rapprochement_seuil"]).iloc[0]
+    porte = lecture.interroger("select distinct seuil from grappes_identite")["seuil"][0]
+    if abs(float(seuil["seuil_applique"]) - float(porte)) > 1e-12:
+        ecarts.append(f"seuil : {seuil['seuil_applique']} contre {porte}")
+
+    grappes = lecture.interroger(requetes["rapprochement_grappes"])
+    compte = lecture.interroger(
+        "select count(distinct grappe_id) as grappes, count(*) as enregistrements "
+        "from grappes_identite"
+    ).iloc[0]
+    for colonne in ("grappes", "enregistrements"):
+        if int(grappes[colonne].sum()) != int(compte[colonne]):
+            ecarts.append(
+                f"grappes.{colonne} : {int(grappes[colonne].sum())} contre {int(compte[colonne])}"
+            )
+
+    courbe = lecture.interroger(requetes["rapprochement_courbe"])
+    seuils = int(lecture.interroger("select count(*) as n from evaluation")["n"][0])
+    if len(courbe) != seuils:
+        ecarts.append(f"courbe : {len(courbe)} points contre {seuils}")
+
+    collisions = lecture.interroger(requetes["rapprochement_collisions_exactes"])
+    agregat = lecture.interroger(
+        "select critere, nombre_groupes, patients_concernes from agg_doublons_identite"
+    )
+    if int(collisions["nombre_groupes"].sum()) != int(agregat["nombre_groupes"].sum()):
+        ecarts.append("collisions : décompte de groupes divergent")
+
+    apport = lecture.interroger(requetes["rapprochement_apport"]).iloc[0]
+    probabiliste = lecture.interroger(
+        "select a.n_ipp as x, b.n_ipp as y from grappes_identite a "
+        "join grappes_identite b on a.grappe_id = b.grappe_id and a.n_ipp < b.n_ipp"
+    )
+    collision = lecture.interroger(
+        """with courants as (select * from dim_patient where est_courante)
+           select a.n_ipp as x, b.n_ipp as y from courants a
+           join courants b on a.n_ipp < b.n_ipp and a.nom = b.nom
+              and a.nom_famille_1 = b.nom_famille_1 and a.date_naissance = b.date_naissance
+           where a.nom <> '' and a.nom_famille_1 <> '' and a.date_naissance is not null
+           union
+           select a.n_ipp, b.n_ipp from courants a
+           join courants b on a.n_ipp < b.n_ipp
+              and a.type_piece_identite = b.type_piece_identite
+              and a.n_piece_identite = b.n_piece_identite
+           where a.type_piece_identite <> '' and a.n_piece_identite <> ''"""
+    )
+    ensemble_p = set(zip(probabiliste["x"], probabiliste["y"], strict=True))
+    ensemble_c = set(zip(collision["x"], collision["y"], strict=True))
+    attendus = {
+        "paires_communes": len(ensemble_p & ensemble_c),
+        "regroupees_par_le_probabiliste_seul": len(ensemble_p - ensemble_c),
+        "reunies_par_la_collision_seule": len(ensemble_c - ensemble_p),
+        "paires_distinctes": len(ensemble_p | ensemble_c),
+    }
+    for colonne, attendu in attendus.items():
+        if int(apport[colonne]) != attendu:
+            ecarts.append(f"apport.{colonne} : {int(apport[colonne])} contre {attendu}")
+
+    assert not ecarts, "valeurs divergentes de leur seconde mesure : " + " | ".join(ecarts)
+
+
+def test_les_quatre_effectifs_du_croisement_sont_coherents() -> None:
+    """La somme des trois parts égale le cardinal de l'union, calculé indépendamment.
+
+    Sans cette égalité, les trois effectifs pourraient être justes séparément et décrire des
+    ensembles qui ne se recouvrent pas comme ils le prétendent.
+    """
+    lecture = _lecture()
+    _instantane_pret(lecture)
+    apport = lecture.interroger(_requetes_de_page("rapprochement")["rapprochement_apport"]).iloc[0]
+
+    somme = (
+        int(apport["paires_communes"])
+        + int(apport["regroupees_par_le_probabiliste_seul"])
+        + int(apport["reunies_par_la_collision_seule"])
+    )
+    assert somme == int(apport["paires_distinctes"]), (
+        f"la somme des trois effectifs vaut {somme} pour une union de "
+        f"{int(apport['paires_distinctes'])}"
+    )
+
+    # Et chaque total partiel se retrouve de son côté : les paires du rapprochement d'une part,
+    # celles de la collision d'autre part.
+    total_probabiliste = int(
+        lecture.interroger(
+            "select count(*) as n from grappes_identite a "
+            "join grappes_identite b on a.grappe_id = b.grappe_id and a.n_ipp < b.n_ipp"
+        )["n"][0]
+    )
+    attendu = int(apport["paires_communes"]) + int(apport["regroupees_par_le_probabiliste_seul"])
+    assert attendu == total_probabiliste, (
+        f"{attendu} paires attribuées au rapprochement contre {total_probabiliste} mesurées"
+    )
+
+
 def test_le_marquage_de_filtrabilite_est_conforme_au_registre() -> None:
     """Ce que l'ÉCRAN marque se déduit du registre, dans les deux sens.
 
@@ -748,6 +862,43 @@ def test_une_page_sans_indicateur_filtrable_affiche_pourquoi() -> None:
         if len({entree["filtrabilite"] for entree in rendu.indicateurs_de(page)}) > 1
     ]
     assert mixtes, "aucune page écrite ne mêle des filtrabilités : le cas mixte n'est pas éprouvé"
+
+    # Chaque page doit demander SON PROPRE filtre. Vérifier le seul comportement de la fonction
+    # partagée laisserait passer une page qui l'appellerait avec le nom d'une autre — elle
+    # afficherait alors le filtre d'autrui, ou le tairait à tort.
+    fautifs = []
+    for page in pages_ecrites():
+        arbre = ast.parse((PAGES / f"{page}.py").read_text(encoding="utf-8"))
+        constantes = {
+            cible.id: noeud.value.value
+            for noeud in arbre.body
+            if isinstance(noeud, ast.Assign) and isinstance(noeud.value, ast.Constant)
+            for cible in noeud.targets
+            if isinstance(cible, ast.Name)
+        }
+        appels = [
+            noeud
+            for noeud in ast.walk(arbre)
+            if isinstance(noeud, ast.Call)
+            and getattr(noeud.func, "attr", getattr(noeud.func, "id", "")) == "filtre_de_page"
+        ]
+        if not appels:
+            # La page d'activité porte son propre filtre, écrit avant que le mécanisme partagé
+            # n'existe. Ce n'est pas une faute de conformité — tous ses indicateurs sont
+            # filtrables, et elle n'a donc rien à marquer — mais une divergence à résorber quand
+            # ce fichier sera rouvert. L'absence d'appel est donc relevée sans être assertée.
+            continue
+        for appel in appels:
+            argument = appel.args[0] if appel.args else None
+            if isinstance(argument, ast.Constant):
+                demandee = argument.value
+            elif isinstance(argument, ast.Name):
+                demandee = constantes.get(argument.id)
+            else:
+                demandee = None
+            if demandee != page:
+                fautifs.append(f"{page} : demande le filtre de « {demandee} »")
+    assert not fautifs, "pages demandant le filtre d'une autre : " + " | ".join(fautifs)
 
 
 def _module_de_page(nom: str) -> dict:
