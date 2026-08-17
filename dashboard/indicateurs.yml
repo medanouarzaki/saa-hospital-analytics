@@ -695,16 +695,15 @@ indicateurs:
     page: rapprochement
     libelle: Apport du rapprochement probabiliste
     definition: >-
-      Nombre de paires vraies que le rapprochement retrouve et que la collision
-      exacte manque, et nombre de fausses paires qu'il évite.
+      Nombre de paires de patients que le rapprochement probabiliste regroupe et
+      que la collision exacte ne réunit pas, et nombre de paires que la collision
+      exacte réunit sans que le rapprochement les regroupe.
     decision_servie: >-
       Justifier le coût du rapprochement probabiliste face à une collision
       exacte, ou y renoncer.
     objets_lus:
       - marts.dim_patient
-      - linkage.paires_candidates
       - linkage.grappes_identite
-      - linkage.evaluation
     filtrabilite: non
     motif: objet_sans_colonne_temporelle
     recalcule_depuis: rapprochement
