@@ -131,7 +131,7 @@ def rendre() -> None:
     rendu.titre_indicateur("rendez_vous_part_jour_meme")
     jour_meme = q("rendez_vous_part_jour_meme")
     st.bar_chart(
-        jour_meme,
+        rendu.en_nombres(jour_meme, "part_jour_meme"),
         x="code_activite",
         y="part_jour_meme",
         x_label="Code d'activité",
@@ -143,7 +143,7 @@ def rendre() -> None:
         rendu.titre_indicateur("rendez_vous_taux_absence")
         absences = q("rendez_vous_taux_absence")
         st.bar_chart(
-            absences,
+            rendu.en_nombres(absences, "taux_absence"),
             x="code_activite",
             y="taux_absence",
             x_label="Code d'activité",
@@ -153,7 +153,7 @@ def rendre() -> None:
         rendu.titre_indicateur("rendez_vous_taux_annulation")
         annulations = q("rendez_vous_taux_annulation")
         st.bar_chart(
-            annulations,
+            rendu.en_nombres(annulations, "taux_annulation"),
             x="code_activite",
             y="taux_annulation",
             x_label="Code d'activité",
@@ -177,7 +177,7 @@ def rendre() -> None:
     if correlation is not None:
         st.metric("Corrélation délai médian / taux d'absentéisme", f"{float(correlation):.3f}")
     st.scatter_chart(
-        croise,
+        rendu.en_nombres(croise, "taux_absence"),
         x="mediane_jours",
         y="taux_absence",
         color="code_activite",
