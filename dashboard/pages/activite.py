@@ -183,7 +183,9 @@ def rendre() -> None:
 
     rendu.titre_indicateur("activite_profil_semaine")
     st.bar_chart(
-        lecture.interroger(REQUETES["activite_profil_semaine"]),
+        rendu.en_nombres(
+            lecture.interroger(REQUETES["activite_profil_semaine"]), "moyenne_journaliere"
+        ),
         x="jour_semaine_iso",
         y="moyenne_journaliere",
         color="famille",
