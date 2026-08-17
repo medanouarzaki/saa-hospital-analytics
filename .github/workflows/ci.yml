@@ -329,3 +329,8 @@ jobs:
       # marts est construite : leur place est ici. Ils rafraîchissent l'instantané eux-mêmes si
       # son état ne peut être lu, plutôt que de dépendre de l'ordre des étapes précédentes.
       - run: uv run pytest tests/test_tableau_de_bord.py -v
+
+      # Les contrôles des livrables produisent l'export puis LISENT les fichiers produits : ils
+      # exigent la même base construite que les contrôles du tableau de bord, et rafraîchissent
+      # l'instantané eux-mêmes si son état ne peut être lu.
+      - run: uv run pytest tests/test_exports.py -v
