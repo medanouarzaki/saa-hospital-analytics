@@ -85,6 +85,28 @@ n'aurait pas dû être consigné comme une décision acceptée. Que les décompt
 remise de `.env` et redémarrage, diffèrent de ceux d'avant l'arrêt — auquel cas l'opération de
 remise elle-même serait en cause.
 
+## Amendement — la redirection du répertoire de base de l'orchestrateur est lacunaire
+
+La variable qui fixe le répertoire de base de l'orchestrateur (`AIRFLOW_HOME`) couvre la base de
+métadonnées et les journaux, **mais pas le fichier de configuration** : un démarrage groupé de
+l'orchestrateur écrit un `airflow.cfg` dans le répertoire personnel de l'utilisateur alors même que
+la variable est exportée vers un répertoire éphémère.
+
+**Mesuré en conditions réelles.** Le répertoire personnel portait zéro fichier avant le travail, et
+la vérification faite juste après la migration de la base de métadonnées le montrait encore vide —
+celle-ci s'était bien écrite sous le répertoire éphémère. Le fichier de configuration y est apparu
+ensuite, daté de huit secondes avant le démarrage groupé :
+
+```
+-rw-------  120309  17 aout 14:05  ~/airflow/airflow.cfg
+demarrage groupe de l'orchestrateur : 14:05:46 (heure locale)
+```
+
+**Ce que le protocole exige en conséquence :** relever le listing complet du répertoire de base
+d'orchestrateur du répertoire personnel **avant** le travail, et le confronter **après**, au lieu de
+se fier à la redirection seule. Le critère de contrôle porte sur trois absences et non deux : aucun
+fichier de données, aucune base de métadonnées, **et aucun fichier de configuration**.
+
 ## Sources
 
 `ingestion/appliquer_ddl.py:29-38` (`charger_environnement`), `ingestion/chargeur.py`
