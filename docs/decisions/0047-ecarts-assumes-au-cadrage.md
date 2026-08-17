@@ -39,6 +39,20 @@ chaque cas :
   colonne, et sept des onze tables intermédiaires n'ont aucune contrepartie directe parmi les six
   faits.
 
+**Ce que cette énumération couvre, et ce qu'elle ne couvre pas.** Elle nomme les indicateurs qui
+lisent une couche amont **là où une table de faits pourrait exister** — c'est ce qui en fait des
+écarts au cadrage. Le registre des indicateurs porte en outre des indicateurs qui lisent le
+catalogue des colonnes, la couche de rapprochement ou la table de paramètres ; aucune table de
+faits ne peut porter ces matières, et ils ne constituent donc pas des écarts au même titre.
+
+**Six indicateurs sont nommés ici ; douze portent au registre une valeur de recalcul autre que les
+tables de faits**, les six premiers étant un sous-ensemble strict des seconds.
+
+C'est **le registre qui pilote l'affichage** : le tableau de bord marque tout indicateur dont la
+valeur n'est pas recalculée depuis les faits, en disant ce qu'il lit réellement. Un lecteur peut
+ainsi distinguer un chiffre reconstruit d'un chiffre repris, quelle que soit la raison de la
+reprise, sans avoir à savoir laquelle relève d'un écart consigné.
+
 **Un parce que le recalcul changerait sa valeur.** Le décompte des collisions d'identité est
 mesuré sur les patients de version courante de la dimension des patients. Recalculé sur les
 patients vus dans un fait, il porterait sur une population **strictement plus petite** :
