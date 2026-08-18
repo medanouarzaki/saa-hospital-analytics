@@ -170,7 +170,11 @@ jobs:
 
       - run: uv run python ingestion/appliquer_ddl.py
 
-      - run: uv run pytest tests/test_provenance.py tests/test_quarantaine_schema.py tests/test_chargeur.py -v
+      # test_ddl_idempotent.py siège ici et nulle part ailleurs : c'est le seul job qui
+      # dispose à la fois d'une base et de l'étape qui applique la définition de schéma.
+      # Il n'exige pas cette étape — il se crée sa propre base jetable et applique la
+      # définition dessus — mais il exige un serveur, que seuls les jobs à service en ont.
+      - run: uv run pytest tests/test_provenance.py tests/test_quarantaine_schema.py tests/test_chargeur.py tests/test_ddl_idempotent.py -v
 
   dbt:
     runs-on: ubuntu-latest
