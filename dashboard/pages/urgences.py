@@ -10,6 +10,10 @@ le registre porte, affichée à côté de la valeur, et elle n'est pas réécrit
 Les niveaux de tri sont du texte ; aucun libellé n'est documenté pour eux et aucun n'est inventé.
 Le tri se fait sur la valeur textuelle, qui est ici l'ordre numérique parce que tous les niveaux
 tiennent sur un seul caractère.
+
+Les orientations de sortie, elles, portent leur libellé : le règlement intérieur des hôpitaux nomme
+les cinq issues du passage, et les données en portent exactement cinq. Le code reste en tête du
+libellé, de sorte que l'ordre d'affichage et le lien avec les exports ne changent pas.
 """
 
 from __future__ import annotations
@@ -128,18 +132,18 @@ def rendre() -> None:
 
     rendu.titre_indicateur("urgences_orientation_sortie")
     orientation = q("urgences_orientation_sortie")
+    orientation_lisible = rendu.avec_libelles(
+        orientation, "orientation_sortie", "orientation_sortie"
+    )
     st.bar_chart(
-        orientation,
+        orientation_lisible,
         x="orientation_sortie",
         y="passages",
         x_label="Orientation de sortie",
         y_label="Passages",
     )
-    st.dataframe(orientation, hide_index=True)
-    st.caption(
-        "Les codes d'orientation sont affichés tels quels : aucun libellé n'est documenté pour "
-        "eux, et aucun n'est inventé ici."
-    )
+    st.dataframe(orientation_lisible, hide_index=True)
+    rendu.mention_source_libelles("orientation_sortie")
 
     rendu.titre_indicateur("urgences_consultation_ordinaire")
     ordinaire = q("urgences_consultation_ordinaire")

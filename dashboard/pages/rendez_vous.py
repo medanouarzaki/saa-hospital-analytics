@@ -10,7 +10,9 @@ C'est la convention de la chaîne de transformation, et s'en écarter ici rendra
 même dépôt incomparables. Sa conséquence est écrite à l'écran : un code d'activité comptant
 beaucoup de rendez-vous en instance porte des taux mécaniquement plus bas.
 
-Les codes d'activité sont de type texte et n'ont aucun libellé documenté ; aucun n'est inventé.
+Les codes d'activité sont de type texte. Chacun porte désormais le libellé que la nomenclature
+nationale des spécialités médicales lui donne, le code restant en tête : il conserve l'ordre de
+tri des axes, qui est lexicographique, et le lien avec les exports, où seul le code figure.
 """
 
 from __future__ import annotations
@@ -177,9 +179,9 @@ def rendre() -> None:
         "construction. La médiane seule masquerait la queue de distribution, qui commande le "
         "dimensionnement ; le 90ᵉ centile est donc affiché à côté."
     )
-    st.dataframe(delais, hide_index=True)
+    st.dataframe(rendu.avec_libelles(delais, "code_activite", "activite"), hide_index=True)
     st.bar_chart(
-        delais,
+        rendu.avec_libelles(delais, "code_activite", "activite"),
         x="code_activite",
         y=["mediane_jours", "p90_jours"],
         x_label="Code d'activité",
@@ -189,7 +191,9 @@ def rendre() -> None:
     rendu.titre_indicateur("rendez_vous_part_jour_meme")
     jour_meme = q("rendez_vous_part_jour_meme")
     st.bar_chart(
-        rendu.en_nombres(jour_meme, "part_jour_meme"),
+        rendu.avec_libelles(
+            rendu.en_nombres(jour_meme, "part_jour_meme"), "code_activite", "activite"
+        ),
         x="code_activite",
         y="part_jour_meme",
         x_label="Code d'activité",
@@ -201,7 +205,9 @@ def rendre() -> None:
         rendu.titre_indicateur("rendez_vous_taux_absence")
         absences = q("rendez_vous_taux_absence")
         st.bar_chart(
-            rendu.en_nombres(absences, "taux_absence"),
+            rendu.avec_libelles(
+                rendu.en_nombres(absences, "taux_absence"), "code_activite", "activite"
+            ),
             x="code_activite",
             y="taux_absence",
             x_label="Code d'activité",
@@ -211,7 +217,9 @@ def rendre() -> None:
         rendu.titre_indicateur("rendez_vous_taux_annulation")
         annulations = q("rendez_vous_taux_annulation")
         st.bar_chart(
-            rendu.en_nombres(annulations, "taux_annulation"),
+            rendu.avec_libelles(
+                rendu.en_nombres(annulations, "taux_annulation"), "code_activite", "activite"
+            ),
             x="code_activite",
             y="taux_annulation",
             x_label="Code d'activité",
@@ -233,18 +241,24 @@ def rendre() -> None:
         "sur un grand nombre d'observations : elle indique une tendance, elle ne l'établit pas."
     )
     st.scatter_chart(
-        rendu.en_nombres(croise, "taux_absence"),
+        rendu.avec_libelles(rendu.en_nombres(croise, "taux_absence"), "code_activite", "activite"),
         x="mediane_jours",
         y="taux_absence",
         color="code_activite",
         x_label="Délai médian d'obtention (jours)",
         y_label="Taux d'absentéisme",
     )
-    st.dataframe(croise[["code_activite", "mediane_jours", "taux_absence"]], hide_index=True)
+    st.dataframe(
+        rendu.avec_libelles(
+            croise[["code_activite", "mediane_jours", "taux_absence"]], "code_activite", "activite"
+        ),
+        hide_index=True,
+    )
     st.caption(
         "Les codes d'activité sont du texte contenant des entiers : ils se trient donc dans "
-        "l'ordre lexicographique, où « 4 » vient après « 30 ». Aucun libellé n'est documenté pour "
-        "ces codes, et aucun n'est inventé ici."
+        "l'ordre lexicographique, où « 4 » vient après « 30 ». Le libellé qui suit chaque code "
+        "ne change pas cet ordre, puisque le code reste en tête ; aucun libellé n'est inventé, "
+        "chacun vient de la nomenclature nationale des spécialités médicales."
     )
 
     rendu.titre_indicateur("rendez_vous_delai_et_absence_intra_activite")
@@ -299,25 +313,30 @@ def rendre() -> None:
     )
 
     st.dataframe(
-        intra[
-            [
-                "code_activite",
-                "n_honores",
-                "n_absences",
-                "mediane_honores",
-                "mediane_absences",
-                "ecart_jours",
-            ]
-        ],
+        rendu.avec_libelles(
+            intra[
+                [
+                    "code_activite",
+                    "n_honores",
+                    "n_absences",
+                    "mediane_honores",
+                    "mediane_absences",
+                    "ecart_jours",
+                ]
+            ],
+            "code_activite",
+            "activite",
+        ),
         hide_index=True,
     )
     st.bar_chart(
-        rendu.en_nombres(intra, "ecart_jours"),
+        rendu.avec_libelles(rendu.en_nombres(intra, "ecart_jours"), "code_activite", "activite"),
         x="code_activite",
         y="ecart_jours",
         x_label="Code d'activité",
         y_label="Jours de délai en plus pour les absents",
     )
+    rendu.mention_source_libelles("activite")
 
 
 rendre()
