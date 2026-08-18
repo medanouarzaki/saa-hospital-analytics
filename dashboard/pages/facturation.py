@@ -67,11 +67,19 @@ REQUETES = {
         from agg_recouvrement
         {filtre}
     """,
+    # Deux restrictions et non une : le dénominateur se date par la facture, le numérateur par
+    # l'encaissement. C'est exactement la réserve que le registre déclare pour cet indicateur, et
+    # c'est pourquoi la clause générique ne peut pas s'appliquer ici — elle ne sait porter qu'une
+    # seule colonne de date, alors que les deux membres du rapport n'ont pas la même.
     "facturation_taux_encaissement": """
-        select (select sum(montant_total) from fct_facturation) as montant_facture,
-               (select sum(montant) from fct_encaissement) as montant_encaisse,
-               (select sum(montant) from fct_encaissement)
-                   / nullif((select sum(montant_total) from fct_facturation), 0) as taux
+        select (select sum(montant_total) from fct_facturation {filtre_facture})
+                   as montant_facture,
+               (select sum(montant) from fct_encaissement {filtre_encaissement})
+                   as montant_encaisse,
+               (select sum(montant) from fct_encaissement {filtre_encaissement})
+                   / nullif(
+                       (select sum(montant_total) from fct_facturation {filtre_facture}), 0
+                     ) as taux
     """,
     # L'ancienneté se compte depuis la date de référence des données, lue dans la table d'état.
     "facturation_anciennete_creances": """
@@ -152,10 +160,27 @@ def rendre() -> None:
     )
     periode = rendu.filtre_de_page(PAGE, (bornes["debut"][0], bornes["fin"][0]))
 
+    def _clause(colonne: str) -> str:
+        """La restriction sur une colonne nommée ici, la période venant du filtre de la page.
+
+        `rendu.clause_periode` ne convient pas au taux d'encaissement : elle lit la colonne de date
+        déclarée au registre, et cette entrée-là en déclare deux — une par membre du rapport. La
+        période reste celle du filtre de page, jamais une constante.
+        """
+        if periode is None:
+            return ""
+        debut, fin = periode
+        return f"where {colonne} between date '{debut:%Y-%m-%d}' and date '{fin:%Y-%m-%d}'"
+
     def q(identifiant: str, **parametres):
         requete = REQUETES[identifiant]
         if "{filtre}" in requete:
             requete = requete.format(filtre=rendu.clause_periode(identifiant, periode))
+        if "{filtre_facture}" in requete:
+            requete = requete.format(
+                filtre_facture=_clause("date_facture"),
+                filtre_encaissement=_clause("jour_encaissement"),
+            )
         return lecture.interroger(requete % parametres if parametres else requete)
 
     rendu.titre_indicateur("facturation_montants_par_type")
@@ -209,7 +234,7 @@ def rendre() -> None:
         st.metric("Taux d'encaissement", _pourcentage(ligne["taux"]))
         st.caption(
             f"{_montant(ligne['montant_encaisse'])} encaissés sur "
-            f"{_montant(ligne['montant_facture'])} facturés."
+            f"{_montant(ligne['montant_facture'])} facturés, sur la période retenue."
         )
     st.divider()
 
