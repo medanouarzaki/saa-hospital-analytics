@@ -75,6 +75,8 @@ donnée, une fois les schémas en place.
 | `airflow/` | Orchestration des traitements |
 | `dashboard/` | Tableau de bord de restitution |
 | `exports/` | Exports produits par la chaîne |
+| `echantillon/` | Extrait de chaque table, versé au dépôt, chaque ligne portant la mention qui dit que les données sont synthétiques |
+| `extraction/` | Engendrement de cet extrait |
 | `docker/` | Socle de conteneurisation |
 | `tests/` | Tests automatisés |
 | `report/` | Rapport et figures associées |
