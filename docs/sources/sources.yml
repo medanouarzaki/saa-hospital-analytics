@@ -374,7 +374,7 @@
   date_consultation: "2026-08-08"
   fiabilite: officielle
   verification: contenu_lu
-  utilise_pour: "Volumétrie relevée par établissement. Tableau 76 page 102, tableau 77 page 105, tableau 78 page 109, tableau 79 page 113. Inventaire exhaustif des 84 tableaux du document, dont quatre seulement descendent à l'établissement."
+  utilise_pour: "Volumétrie relevée par établissement. Tableau 76 page 102, tableau 77 page 105, tableau 78 page 109, tableau 79 page 113. Inventaire exhaustif des 84 tableaux du document, dont quatre seulement descendent à l'établissement. Nomenclature nationale des spécialités médicales, tableau 38 pages 63-64 : codes et libellés des activités, affichés par le tableau de bord."
   note: "Empreinte SHA-256 du fichier consulté : f9cebbb62fe1b3cfff3f8e1dd0890f827e786e9cc91809b5b464b9c46addfa05. Le domaine refuse l'accès automatisé ; le fichier a été téléchargé directement."
 
 - id: S-31
