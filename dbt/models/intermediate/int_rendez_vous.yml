@@ -3,9 +3,10 @@ version: 2
 models:
   - name: int_rendez_vous
     description: >
-      source.rendez_vous typée : les colonnes date/horodatage/booleen/numérique converties
-      par les macros de dbt/macros/conversions.sql, les colonnes code/texte reprises
-      telles quelles.
+      Une ligne par rendez-vous, identifiée par n_rdv. C'est la table dont les colonnes ont été le
+      plus largement relevées au poste : vingt-sept de ses vingt-huit colonnes portent un libellé
+      observé à l'écran. Couche de nettoyage sans destruction : codes et textes repris tels quels,
+      horodatages, date, durée et booléens typés.
     tests:
       - meme_decompte_que_la_source:
           arguments:
@@ -14,61 +15,210 @@ models:
           arguments:
             column_name: "n_rdv"
     columns:
+      - name: n_rdv
+        description: >
+          Identifiant du rendez-vous, clé de la table. Colonne non relevée à l'écran et posée sans
+          preuve externe.
+      - name: n_ipp
+        description: >
+          Identifiant du patient. Le champ est relevé au poste sous le libellé « N° IPP » (relevé
+          REL-RDV.I01).
+      - name: agenda
+        description: >
+          Code de l'agenda sur lequel le rendez-vous est posé, c'est-à-dire le carnet propre à une
+          activité. Le champ est relevé au poste sous le libellé « Agenda » (relevé REL-RDV.R01).
+      - name: activite
+        description: >
+          Code de l'activité pour laquelle le rendez-vous est pris. Le champ est relevé au poste
+          sous le libellé « Activité » (relevé REL-RDV.R02).
+      - name: origine
+        description: >
+          Code de l'origine de la demande, qui dit d'où vient le patient. Le champ est relevé au
+          poste sous le libellé « Origine » (relevé REL-RDV.R03).
+      - name: hopital_cs
+        description: >
+          Code de l'établissement d'origine lorsque le patient est adressé. Renseigné pour les
+          seuls rendez-vous d'origine externe, et vide sinon. Le champ est relevé au poste sous le
+          libellé « Hôpital/C.S. » (relevé REL-RDV.R04).
+      - name: medecin_ext
+        description: >
+          Nom du médecin extérieur ayant adressé le patient, en texte libre. Ce N'EST PAS un
+          identifiant de compte utilisateur : la colonne a été mesurée intégralement étrangère au
+          référentiel des comptes, parce qu'elle nomme un praticien extérieur à l'établissement.
+          Le champ est relevé au poste sous le libellé « Médecin ext. » (relevé REL-RDV.R05).
+      - name: service_ext
+        description: >
+          Nom du service d'origine lorsque le patient est adressé, en texte libre et sans
+          nomenclature. Le champ est relevé au poste sous le libellé « Service ext. » (relevé
+          REL-RDV.R06).
+      - name: observations
+        description: >
+          Champ libre du bloc de prise de rendez-vous. Colonne entièrement vide sur toute la
+          période : aucune valeur n'a été relevée au poste pour elle, et rien ne décrit comment le
+          système la renseignerait. Sa vacuité est déclarée et non accidentelle. Le champ est
+          relevé au poste sous le libellé « Observations » (relevé REL-RDV.R07).
       - name: date_rendez_vous
+        description: >
+          Horodatage du rendez-vous lui-même. Le champ est relevé au poste sous le libellé « Date
+          rendez-vous » (relevé REL-RDV.R08). La couche source la stocke en texte, au format
+          d'affichage du système observé — mois, jour, année, puis heure sur douze heures ; elle
+          est ici convertie en HORODATAGE, la chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'rendez_vous') }}"
                 source_column: date_rendez_vous
       - name: rdv_supplementaire
+        description: >
+          Indique que le rendez-vous a été ajouté en surnombre sur l'agenda. Le champ est relevé
+          au poste sous le libellé « Rendez-vous supplémentaire » (relevé REL-RDV.R09). La couche
+          source la stocke en texte, sur un domaine réduit à « 1 », « 0 » et la chaîne vide ; elle
+          est ici convertie en BOOLÉEN, la chaîne vide comme toute autre valeur devenant une
+          valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'rendez_vous') }}"
                 source_column: rdv_supplementaire
+      - name: type_attention
+        description: >
+          Code du type de consultation — première consultation ou consultation de suivi. Le champ
+          est relevé au poste sous le libellé « Type d'attention » (relevé REL-RDV.R10).
+      - name: etat
+        description: >
+          Code de l'état du rendez-vous : honoré, confirmé, annulé ou en instance. La valeur «
+          confirmé » désigne en pratique une absence, la nomenclature ne portant aucun code dédié
+          ; c'est en aval que cette signification est explicitée par un drapeau. Le champ est
+          relevé au poste sous le libellé « État » (relevé REL-RDV.R11).
       - name: duree
+        description: >
+          Durée prévue du rendez-vous, en minutes selon le registre des champs. Valeur relevée au
+          poste toujours nulle : c'est l'unique donnée réelle disponible sur cette colonne,
+          reprise telle quelle plutôt que remplacée par une valeur inventée. Le champ est relevé
+          au poste sous le libellé « Durée » (relevé REL-RDV.R12). La couche source la stocke en
+          texte ; elle est ici convertie en NUMÉRIQUE exact, la chaîne vide devenant une valeur
+          absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'rendez_vous') }}"
                 source_column: duree
       - name: date_reception
+        description: >
+          Horodatage de réception de la demande de rendez-vous. Le champ est relevé au poste sous
+          le libellé « Date réception » (relevé REL-RDV.R13). La couche source la stocke en texte,
+          au format d'affichage du système observé — mois, jour, année, puis heure sur douze
+          heures ; elle est ici convertie en HORODATAGE, la chaîne vide devenant une valeur
+          absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'rendez_vous') }}"
                 source_column: date_reception
       - name: imprimer_donnees
+        description: >
+          Indique que les données du rendez-vous doivent être imprimées pour le patient. Le champ
+          est relevé au poste sous le libellé « Imprimer données » (relevé REL-RDV.R14). La couche
+          source la stocke en texte, sur un domaine réduit à « 1 », « 0 » et la chaîne vide ; elle
+          est ici convertie en BOOLÉEN, la chaîne vide comme toute autre valeur devenant une
+          valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'rendez_vous') }}"
                 source_column: imprimer_donnees
+      - name: cree_par
+        description: >
+          Identifiant du compte utilisateur ayant créé le rendez-vous. Le champ est relevé au
+          poste sous le libellé « Créé par » (relevé REL-RDV.C01).
       - name: date_creation
+        description: >
+          Horodatage de création du rendez-vous. C'est de sa différence avec l'horodatage du
+          rendez-vous que découle, en aval, le délai d'obtention. Le champ est relevé au poste
+          sous le libellé « Date création » (relevé REL-RDV.C02). La couche source la stocke en
+          texte, au format d'affichage du système observé — mois, jour, année, puis heure sur
+          douze heures ; elle est ici convertie en HORODATAGE, la chaîne vide devenant une valeur
+          absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'rendez_vous') }}"
                 source_column: date_creation
+      - name: modifie_par
+        description: >
+          Identifiant du compte utilisateur ayant modifié le rendez-vous en dernier. Colonne
+          facultative, souvent vide. Le champ est relevé au poste sous le libellé « Modifié par »
+          (relevé REL-RDV.C03).
       - name: date_mod
+        description: >
+          Horodatage de la dernière modification. Vide lorsque le rendez-vous n'a pas été modifié.
+          Le champ est relevé au poste sous le libellé « Date mod. » (relevé REL-RDV.C04). La
+          couche source la stocke en texte, au format d'affichage du système observé — mois, jour,
+          année, puis heure sur douze heures ; elle est ici convertie en HORODATAGE, la chaîne
+          vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'rendez_vous') }}"
                 source_column: date_mod
+      - name: confirme_par
+        description: >
+          Identifiant du compte utilisateur ayant confirmé le rendez-vous. Le champ est relevé au
+          poste sous le libellé « Confirmé par » (relevé REL-RDV.C05).
       - name: date_conf
+        description: >
+          Horodatage de la confirmation. Vide lorsque le rendez-vous n'a pas été confirmé. Le
+          champ est relevé au poste sous le libellé « Date conf. » (relevé REL-RDV.C06). La couche
+          source la stocke en texte, au format d'affichage du système observé — mois, jour, année,
+          puis heure sur douze heures ; elle est ici convertie en HORODATAGE, la chaîne vide
+          devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'rendez_vous') }}"
                 source_column: date_conf
+      - name: annule_par
+        description: >
+          Identifiant du compte utilisateur ayant annulé le rendez-vous. Vide lorsque le
+          rendez-vous n'a pas été annulé. Le champ est relevé au poste sous le libellé « Annulé
+          par » (relevé REL-RDV.C07).
       - name: date_annul
+        description: >
+          Horodatage de l'annulation. Vide lorsque le rendez-vous n'a pas été annulé. Le champ est
+          relevé au poste sous le libellé « Date annul. » (relevé REL-RDV.C08). La couche source
+          la stocke en texte, au format d'affichage du système observé — mois, jour, année, puis
+          heure sur douze heures ; elle est ici convertie en HORODATAGE, la chaîne vide devenant
+          une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'rendez_vous') }}"
                 source_column: date_annul
+      - name: liste_attente_service
+        description: >
+          Code du service porté par l'inscription en liste d'attente. Renseigné pour les seuls
+          rendez-vous inscrits en liste d'attente. Cette colonne NE REMONTE dans aucune couche
+          aval sous cette forme : elle alimente la dimension des services par union, sans qu'aucun
+          fait ne l'expose. Le champ est relevé au poste sous le libellé « Service » (relevé
+          REL-RDV.L01).
+      - name: liste_attente_agenda
+        description: >
+          Code de l'agenda porté par l'inscription en liste d'attente. Comme les deux autres
+          colonnes de liste d'attente, elle ne remonte dans aucun fait. Le champ est relevé au poste sous
+          le libellé « Agenda » (relevé REL-RDV.L02).
+      - name: liste_attente_activite
+        description: >
+          Code de l'activité portée par l'inscription en liste d'attente. Elle alimente la
+          dimension des activités par union, sans qu'aucun fait ne l'expose. Le champ est relevé
+          au poste sous le libellé « Activité » (relevé REL-RDV.L03).
       - name: date_extraction
+        description: >
+          Date de l'extraction dont la ligne provient. Colonne TECHNIQUE de la zone
+          d'atterrissage, absente du système observé : elle partitionne le chargement et le rend
+          rejouable, une même partition pouvant être rechargée sans doublon. Colonne non relevée à
+          l'écran et posée sans preuve externe. La couche source la stocke en texte, au format
+          d'affichage du système observé — mois, jour, année ; elle est ici convertie en DATE, la
+          chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
