@@ -125,10 +125,20 @@ def mention_de_filtrabilite(identifiant: str) -> None:
     Un filtre présent à l'écran et sans effet sur un chiffre ferait lire ce chiffre comme s'il
     portait sur la période choisie. La mention est donc portée par l'indicateur lui-même, à côté de
     sa valeur, et non reléguée dans une note de bas de page.
+
+    **Sauf sur une page qui ne porte aucun filtre.** Une telle page affiche déjà en tête, par
+    `absence_de_filtre`, que rien chez elle ne répond au filtre ; le répéter sous chaque indicateur
+    n'apprend rien et noie l'écran sous des bandeaux identiques. La condition se déduit du
+    registre, comme le reste : si aucun indicateur de la page n'est filtrable, il n'y a pas de
+    filtre à l'écran, donc aucun chiffre qu'un lecteur puisse croire restreint. Sur une page mixte,
+    au contraire, le marquage par indicateur est ce qui distingue les chiffres restreints des
+    autres, et il est conservé.
     """
     declaration = entree(identifiant)
     valeur = declaration["filtrabilite"]
     if valeur == "oui":
+        return
+    if not page_porte_un_filtre(declaration["page"]):
         return
     if valeur == "oui_sous_reserve":
         st.warning(
