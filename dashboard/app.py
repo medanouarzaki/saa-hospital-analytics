@@ -25,6 +25,7 @@ PAGES = [
     st.Page("pages/facturation.py", title="Facturation", url_path="facturation"),
     st.Page("pages/qualite.py", title="Qualité des données", url_path="qualite"),
     st.Page("pages/rapprochement.py", title="Rapprochement d'identités", url_path="rapprochement"),
+    st.Page("pages/donnees.py", title="Données", url_path="donnees"),
 ]
 
 st.navigation(PAGES).run()
