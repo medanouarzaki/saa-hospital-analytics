@@ -44,6 +44,23 @@ MOTIF_PAGE_DECLAREE = re.compile(r"""st\.Page\(\s*["']pages/([a-z_]+)\.py""")
 _NOEUDS_LUS = ("FAMILLES", "_UNION_JOURS", "REQUETES")
 
 
+def _rendre_page(nom: str):
+    """Rend une page par l'instrument du cadriciel, et rend l'application obtenue.
+
+    UNE SEULE page est rendue par processus dans ce fichier, et ce n'est pas un détail de
+    commodité : un second rendu en processus se termine par un signal de segmentation sur cette
+    machine, mesuré à plusieurs reprises. Les contrôles qui rendent TOUTES les pages vivent donc
+    dans `tests/test_tableau_de_bord_contexte_conteneur.py`, qui isole chaque rendu dans un enfant.
+    """
+    from streamlit.testing.v1 import AppTest  # noqa: PLC0415
+
+    application = AppTest.from_file(str(PAGES / f"{nom}.py"), default_timeout=300).run()
+    assert not list(application.exception), (
+        f"la page « {nom} » a levé : {list(application.exception)[0].value[:300]}"
+    )
+    return application
+
+
 def _registre() -> dict:
     return yaml.safe_load(REGISTRE.read_text(encoding="utf-8"))
 
@@ -450,6 +467,11 @@ def test_les_indicateurs_de_facturation_et_de_qualite_egalent_leur_seconde_mesur
         requete = _requetes_de_page(page)[identifiant]
         if "{filtre}" in requete:
             requete = requete.format(filtre="")
+        # Le taux d'encaissement porte DEUX restrictions, une par membre du rapport : son
+        # dénominateur se date par la facture et son numérateur par l'encaissement. Les deux se
+        # neutralisent ici, la seconde mesure portant sur la période entière.
+        if "{filtre_facture}" in requete:
+            requete = requete.format(filtre_facture="", filtre_encaissement="")
         return requete % parametres if parametres else requete
 
     # Facturation : les montants, contre un décompte direct de la table de faits.
@@ -726,10 +748,20 @@ def test_le_marquage_de_filtrabilite_est_conforme_au_registre() -> None:
                 rendu.mention_de_filtrabilite(identifiant)
                 marque = len(emis)
 
+                # Sur une page dont aucun indicateur n'est filtrable, le bandeau de tête l'a déjà
+                # dit pour la page entière : le marquage par indicateur y est attendu ABSENT, et
+                # sa présence serait la répétition que la page n'a pas à porter.
+                page_filtrable = rendu.page_porte_un_filtre(page)
+
                 if attendue == "oui" and marque:
                     fautifs.append(f"{identifiant} : filtrable mais marqué « {emis[0][:60]} »")
-                if attendue != "oui" and not marque:
+                if attendue != "oui" and page_filtrable and not marque:
                     fautifs.append(f"{identifiant} : déclaré {attendue} mais non marqué")
+                if attendue != "oui" and not page_filtrable and marque:
+                    fautifs.append(
+                        f"{identifiant} : page entièrement non filtrable, le bandeau de tête "
+                        f"suffit, et pourtant marqué « {emis[0][:60]} »"
+                    )
                 if attendue == "non" and marque and rendu.MENTION_HORS_FILTRE not in emis[0]:
                     fautifs.append(f"{identifiant} : marqué sans la mention hors filtre")
                 if attendue == "oui_sous_reserve" and marque:
@@ -751,6 +783,192 @@ def test_le_marquage_de_filtrabilite_est_conforme_au_registre() -> None:
         rendu.st.warning = origine
 
     assert not fautifs, "marquage non conforme au registre : " + " | ".join(fautifs)
+
+
+def test_une_page_qui_restreint_en_sql_le_fait_pour_tous_ses_indicateurs_filtrables() -> None:
+    """Sur une page qui restreint ses requêtes, aucun indicateur filtrable n'échappe à la
+    restriction.
+
+    POURQUOI CETTE PROPRIÉTÉ EXISTE. Le marquage affiché vient du registre ; la restriction vient de
+    la requête. Rien ne les reliait : une requête sans motif de restriction s'exécutait telle quelle
+    sur la totalité du jeu pendant que l'écran affichait « Filtré par la période ». Un lecteur
+    voyait alors une valeur de période entière sous une mention de période choisie, et aucun
+    contrôle ne le voyait.
+
+    POURQUOI LA CONDITION PORTE SUR LA PAGE ET NON SUR L'INDICATEUR. Deux mécanismes de restriction
+    coexistent légitimement dans ce tableau de bord : la restriction en SQL, par un motif que la
+    page substitue, et la restriction après la requête, sur le tableau rendu — c'est ce que fait la
+    page d'activité, qui interroge une fois puis découpe. Exiger un motif SQL de tout indicateur
+    filtrable ferait rougir cette page à tort. La propriété se rabat donc sur la cohérence INTERNE
+    d'une page : dès qu'une page en restreint UN en SQL, elle les restreint TOUS ainsi, faute de
+    quoi un indicateur passe entre les deux mécanismes — exactement ce qui s'était produit.
+
+    CE QU'ELLE NE COUVRE PAS : une page qui ne restreindrait aucune de ses requêtes en SQL et
+    oublierait le découpage après coup sur l'un de ses indicateurs. Ce cas-là échappe encore, et
+    seule la confrontation de chaque valeur à sa seconde mesure, sur une période restreinte,
+    l'attraperait.
+    """
+    motif = re.compile(r"\{filtre[a-z_]*\}")
+
+    fautifs = []
+    for page in pages_ecrites():
+        requetes = _requetes_de_page(page)
+        declarees = {
+            entree["identifiant"]: entree["filtrabilite"]
+            for entree in _registre()["indicateurs"]
+            if entree["page"] == page and entree["identifiant"] in requetes
+        }
+        filtrables = {i for i, valeur in declarees.items() if valeur != "non"}
+        restreintes = {i for i in declarees if motif.search(requetes[i])}
+
+        if not restreintes:
+            continue  # page qui restreint après la requête, ou page sans indicateur filtrable
+
+        for identifiant in sorted(filtrables - restreintes):
+            fautifs.append(
+                f"{identifiant} : la page « {page} » restreint ses requêtes en SQL "
+                f"({len(restreintes)} le font), mais celle-ci n'a aucun motif de restriction "
+                f"alors que le registre la déclare « {declarees[identifiant]} » — l'écran porte "
+                "la mention de filtrage et la valeur porte sur la totalité du jeu"
+            )
+        for identifiant in sorted(restreintes - filtrables):
+            fautifs.append(
+                f"{identifiant} : déclaré « non » au registre mais sa requête porte un motif de "
+                "restriction"
+            )
+
+    assert not fautifs, "mention de filtrage et requête en désaccord : " + " | ".join(fautifs)
+
+
+def test_la_courbe_de_rapprochement_repere_le_seuil_retenu() -> None:
+    """Le nuage précision/rappel porte un repère qui distingue le seuil retenu des autres.
+
+    CE QUE CETTE PROPRIÉTÉ COUVRE : que la page passe bien au graphique une colonne de repérage,
+    que cette colonne ne prenne que deux valeurs, qu'une seule ligne porte la valeur « retenue », et
+    que le seuil de cette ligne soit celui que les grappes portent réellement — lu dans les données,
+    jamais écrit ici. Elle couvre aussi les deux champs de position, qui doivent être le rappel et
+    la précision et non le seuil.
+
+    CE QU'ELLE NE COUVRE PAS : la lisibilité du nuage. Elle ne dit rien du nombre de points
+    visibles, de leur superposition, ni de la couleur effectivement rendue — un repère présent mais
+    invisible à l'œil la passerait. C'est la limite qui a laissé passer le tracé illisible que ce
+    contrôle remplace, et elle est réduite, non supprimée.
+    """
+    import streamlit as st
+
+    from dashboard import lecture as module_lecture
+
+    captures: list[tuple] = []
+    origine = st.scatter_chart
+    st.scatter_chart = lambda data=None, **k: captures.append((data, k))
+    try:
+        _rendre_page("rapprochement")
+    finally:
+        st.scatter_chart = origine
+
+    assert len(captures) == 1, (
+        f"la page devrait tracer un nuage et un seul, {len(captures)} tracé(s)"
+    )
+    plan, options = captures[0]
+
+    assert options.get("x") == "rappel", f"abscisse attendue « rappel », reçue {options.get('x')!r}"
+    assert options.get("y") == "precision_valeur", (
+        f"ordonnée attendue « precision_valeur », reçue {options.get('y')!r}"
+    )
+
+    colonne = options.get("color")
+    assert colonne, (
+        "le nuage ne porte aucun canal de couleur : le seuil retenu n'y est repéré d'aucune façon, "
+        "et un lecteur ne peut pas savoir lequel des points il a choisi"
+    )
+    assert colonne in plan.columns, f"la couleur nomme « {colonne} », absente des colonnes tracées"
+
+    valeurs = sorted(set(plan[colonne]))
+    assert len(valeurs) == 2, (
+        f"le repère devrait prendre exactement deux valeurs — retenu et non retenu — il en prend "
+        f"{len(valeurs)} : {valeurs}"
+    )
+
+    seuil_reel = float(
+        module_lecture.interroger("select distinct seuil from grappes_identite").iloc[0]["seuil"]
+    )
+    marquees = plan[plan[colonne].str.contains("retenu", case=False)]
+    assert len(marquees) == 1, (
+        f"une seule ligne devrait porter le repère du seuil retenu, {len(marquees)} en portent"
+    )
+    assert float(marquees.iloc[0]["seuil"]) == seuil_reel, (
+        f"le point repéré porte le seuil {float(marquees.iloc[0]['seuil'])!r}, alors que les "
+        f"grappes ont été formées au seuil {seuil_reel!r}"
+    )
+
+
+def test_le_bandeau_de_non_filtrabilite_n_est_porte_qu_une_fois_par_page_entiere() -> None:
+    """Une page entièrement non filtrable porte le bandeau UNE fois ; une page mixte le porte par
+    indicateur.
+
+    CE QUE CETTE PROPRIÉTÉ COUVRE : le NOMBRE de bandeaux qu'une page émet réellement, compté en
+    interceptant les deux fonctions d'affichage qui les produisent — celle du bandeau de tête et
+    celle du marquage par indicateur. Les deux catégories de page sont dérivées du registre, jamais
+    recopiées : une page est « entière » si aucun de ses indicateurs n'est filtrable, « mixte »
+    sinon. Le contrôle exige qu'au moins une page de chaque catégorie existe, sans quoi il ne
+    prouverait rien de la moitié de la règle.
+
+    CE QU'ELLE NE COUVRE PAS : le contenu des bandeaux, vérifié par la propriété de conformité au
+    registre ; leur position à l'écran ; et l'encombrement visuel qu'ils produisent, qu'aucun
+    contrôle de ce dépôt ne mesure.
+    """
+    from dashboard import rendu
+
+    emis_tete: list[str] = []
+    emis_indicateur: list[str] = []
+    origine_info, origine_warning = rendu.st.info, rendu.st.warning
+    rendu.st.info = lambda message, **_: emis_tete.append(str(message))
+    rendu.st.warning = lambda message, **_: emis_indicateur.append(str(message))
+
+    entieres: list[str] = []
+    mixtes: list[str] = []
+    fautifs: list[str] = []
+    try:
+        for page in pages_ecrites():
+            indicateurs = [e for e in _registre()["indicateurs"] if e["page"] == page]
+            entiere = not rendu.page_porte_un_filtre(page)
+            (entieres if entiere else mixtes).append(page)
+
+            emis_tete.clear()
+            emis_indicateur.clear()
+            rendu.filtre_de_page(page)
+            for entree in indicateurs:
+                rendu.mention_de_filtrabilite(entree["identifiant"])
+            tete, par_indicateur = len(emis_tete), len(emis_indicateur)
+
+            if entiere:
+                attendus = sum(1 for e in indicateurs if e["filtrabilite"] != "oui")
+                if tete != 1:
+                    fautifs.append(f"{page} : entièrement non filtrable, {tete} bandeau de tête")
+                if par_indicateur:
+                    fautifs.append(
+                        f"{page} : entièrement non filtrable, le bandeau de tête suffit, et "
+                        f"pourtant {par_indicateur} bandeau(x) par indicateur sur {attendus} "
+                        "indicateurs concernés"
+                    )
+            else:
+                attendus = sum(1 for e in indicateurs if e["filtrabilite"] != "oui")
+                if tete:
+                    fautifs.append(f"{page} : page mixte, et pourtant {tete} bandeau de tête")
+                if par_indicateur != attendus:
+                    fautifs.append(
+                        f"{page} : page mixte, {attendus} indicateur(s) échappant au filtre mais "
+                        f"{par_indicateur} bandeau(x) par indicateur — le marquage qui distingue "
+                        "les chiffres restreints des autres a bougé"
+                    )
+    finally:
+        rendu.st.info, rendu.st.warning = origine_info, origine_warning
+
+    assert entieres, (
+        "aucune page entièrement non filtrable : la première moitié de la règle n'est pas éprouvée"
+    )
+    assert mixtes, "aucune page mixte : la seconde moitié de la règle n'est pas éprouvée"
+    assert not fautifs, "bandeaux de non-filtrabilité mal répartis : " + " | ".join(fautifs)
 
 
 def test_la_mention_de_source_est_conforme_au_registre() -> None:
