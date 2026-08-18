@@ -460,7 +460,10 @@ jobs:
       # lancent des rafraîchissements réels et lisent en boucle pendant qu'ils se déroulent.
       - run: uv run pytest tests/test_instantane_transparence.py -v
 
-      - run: uv run pytest tests/test_tableau_de_bord.py -v
+      # test_libelles_dimensions.py siège ici : il rend des pages et interroge le schéma
+      # d'instantané, que ce job est le seul à rafraîchir. Il n'a pas de dépendance à
+      # l'ordre des fichiers de cette commande.
+      - run: uv run pytest tests/test_tableau_de_bord.py tests/test_libelles_dimensions.py -v
 
       # Même emplacement que le contrôle précédent, et pour la même précondition — l'instantané,
       # que les pages lisent. Ce contrôle-ci rend chaque page dans un processus fils dont le chemin
