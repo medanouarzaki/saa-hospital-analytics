@@ -1389,9 +1389,43 @@ def test_le_signe_de_la_mesure_intra_activite_est_celui_du_parametre_injecte() -
     paramètre du générateur allonge le délai des seules lignes d'absence, à l'intérieur de chaque
     spécialité. Si cette propriété cessait d'être vraie, la grandeur inter-activités resterait la
     seule affichée et le registre des relations en serait démenti.
+
+    GARDE D'APPLICABILITÉ. Le paramètre injecté est de faible amplitude — il biaise par
+    échantillonnage par rejet le seul délai des lignes d'absence — et sa trace ne se lit que sur une
+    population suffisante. Sur une fenêtre partielle, chaque activité ne porte que quelques dizaines
+    d'absences, dont la médiane est dominée par le bruit d'échantillonnage : mesuré sur une
+    génération de trois mois, quatre activités sur huit portent un écart nul ou négatif et la
+    corrélation agrégée elle-même passe sous zéro, alors que le paramètre est inchangé. Le test
+    s'abstient donc, avec un motif explicite, lorsque la date de rendez-vous maximale présente ne
+    coïncide pas avec la date de fin de période lue dans la configuration — une égalité mesurée en
+    base et en configuration, jamais une marge arbitraire, et le même mécanisme que la garde
+    d'applicabilité des indicateurs de séjour.
+
+    Aucun skip silencieux hors de cette garde : une base manquante fait échouer le test.
     """
+    from datetime import date as _date  # noqa: PLC0415
+
+    from generator import config  # noqa: PLC0415
+
     lecture = _lecture()
     _instantane_pret(lecture)
+
+    # `date_prise` et non `date_rendez_vous` : un rendez-vous se prend DANS la période et se tient
+    # parfois APRÈS elle, si bien que la date de rendez-vous maximale dépasse la fin de période même
+    # sur une génération complète — mesuré à 2026-11-11 contre une fin de période au 2026-06-30, ce
+    # qui rendrait cette garde toujours vraie et neutraliserait la propriété par construction. La
+    # date de prise, elle, est bornée par la période : elle en atteint la fin exactement sur une
+    # génération complète.
+    jour_max = lecture.interroger("select max(date_prise) as jour from fct_rendez_vous")["jour"][0]
+    date_fin = _date.fromisoformat(config.valeur("date_fin"))
+    if jour_max != date_fin:
+        pytest.skip(
+            f"fenêtre chargée partielle : date de prise maximale de fct_rendez_vous ({jour_max}) "
+            f"!= date de fin de période configurée ({date_fin}) — le paramètre injecté est de "
+            "faible amplitude et sa trace n'est mesurable que sur une génération couvrant la "
+            "période dans son entier"
+        )
+
     requetes = _requetes_de_page("rendez_vous")
 
     intra = lecture.interroger(
