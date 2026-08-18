@@ -2,8 +2,17 @@ version: 2
 
 models:
   - name: agg_absenteisme
+    description: >
+      Une ligne par code d'activité — huit lignes — agrégée depuis fct_rendez_vous. Grain déclaré
+      par l'enregistrement de décision 0028. Les quatre états possibles d'un rendez-vous sont
+      décomptés séparément et leur somme égale le nombre total : l'état restant, celui des
+      rendez-vous en instance, n'est fondu dans aucune des trois autres catégories mais exposé
+      pour lui-même, de sorte que la ligne reste exhaustive sans rien attribuer par défaut.
     columns:
       - name: code_activite
+        description: >
+          Code de l'activité sur lequel la ligne est groupée, clé de rattachement à dim_activite.
+          Repris de fct_rendez_vous sans transformation.
         tests:
           - unique
           - not_null
@@ -12,23 +21,61 @@ models:
                 to: "{{ ref('dim_activite') }}"
                 field: "code_activite"
       - name: n_rendez_vous
+        description: >
+          Nombre total de rendez-vous de l'activité, tous états confondus. Décompte des lignes de
+          fct_rendez_vous du groupe. C'est le DÉNOMINATEUR des deux taux de cette table, et ce
+          choix a des conséquences que leurs descriptions énoncent.
         tests:
           - not_null
       - name: n_honores
+        description: >
+          Nombre de rendez-vous honorés. Décompte des lignes du groupe filtré sur le drapeau
+          est_honore.
         tests:
           - not_null
       - name: n_absences
+        description: >
+          Nombre de rendez-vous manqués sans annulation préalable. Décompte des lignes du groupe
+          filtré sur le drapeau est_absence.
         tests:
           - not_null
       - name: n_annulations
+        description: >
+          Nombre de rendez-vous annulés. Décompte des lignes du groupe filtré sur le drapeau
+          est_annule. L'annulation est distincte de l'absence : le patient a prévenu.
         tests:
           - not_null
       - name: n_etat_restant
+        description: >
+          Nombre de rendez-vous qui ne sont ni honorés, ni manqués, ni annulés — c'est-à-dire les
+          rendez-vous en instance, programmés au-delà de la date d'extraction et dont l'issue
+          n'est pas encore connue. Décompte des lignes du groupe filtré sur la négation simultanée
+          des trois drapeaux. Avec les trois décomptes précédents, il recompose exactement
+          n_rendez_vous.
         tests:
           - not_null
       - name: taux_absenteisme
+        description: >
+          Taux d'absentéisme de l'activité. NUMÉRATEUR : le nombre de rendez-vous manqués.
+          DÉNOMINATEUR : le nombre TOTAL de rendez-vous, et non le nombre de rendez-vous résolus.
+          Les rendez-vous en instance sont donc exclus du numérateur sans l'être du dénominateur :
+          une activité comptant beaucoup de rendez-vous encore en instance porte un taux
+          mécaniquement plus bas. C'est la convention de la chaîne, et s'en écarter ici rendrait
+          deux chiffres du même dépôt incomparables.
         tests:
           - not_null
       - name: taux_annulation
+        description: >
+          Taux d'annulation de l'activité. NUMÉRATEUR : le nombre de rendez-vous annulés.
+          DÉNOMINATEUR : le nombre TOTAL de rendez-vous, avec la même conséquence que pour le taux
+          d'absentéisme — les rendez-vous en instance pèsent au dénominateur sans jamais pouvoir
+          peser au numérateur.
         tests:
           - not_null
+      - name: mediane_delai_positif_jours
+        description: >
+          Médiane du délai d'obtention, en jours, sur les seuls rendez-vous à délai strictement
+          positif. Calculée par percentile continu d'ordre 0,5 sur delai_obtention_jours. Elle
+          reprend exactement la définition de population de agg_delai_rendez_vous, et figure ici
+          pour que la relation entre délai et absentéisme se lise sur une seule ligne, sans
+          jointure entre les deux agrégats.

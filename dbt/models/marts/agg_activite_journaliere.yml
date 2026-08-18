@@ -3,12 +3,19 @@ version: 2
 models:
   - name: agg_activite_journaliere
     description: >
-      service et activite sont nuls pour les familles qui n'en portent pas (non
-      applicable, pas inconnu) : jamais de service pour RENDEZ_VOUS, jamais
-      d'activité pour ADMISSION_SEJOUR / SORTIE_SEJOUR, et activité non renseignée
-      pour PASSAGE_H / PASSAGE_U.
+      Une ligne par jour, type d'événement, service et activité — grain déclaré par
+      l'enregistrement de décision 0028. L'agrégat réunit QUATRE familles d'événements venues de
+      trois faits différents, sans chevauchement possible : chaque ligne d'un fait alimente
+      exactement une famille. Une valeur absente en service ou en activité signifie « non
+      applicable » — le fait d'origine ne porte aucune colonne de cette nature — et jamais «
+      inconnu » ; les deux cas seraient indiscernables ici, et il a été mesuré qu'aucune des
+      quatre familles ne présente le second.
     columns:
       - name: jour
+        description: >
+          Jour de l'événement, clé de rattachement à dim_date. Sa signification dépend de la
+          famille : jour du rendez-vous pour les rendez-vous, jour d'entrée pour les passages,
+          jour d'admission ou jour de sortie pour les séjours selon la famille.
         tests:
           - not_null
           - relationships:
@@ -16,20 +23,44 @@ models:
                 to: "{{ ref('dim_date') }}"
                 field: "date_jour"
       - name: type_evenement
+        description: >
+          Famille de l'événement, CALCULÉE et propre à cet agrégat. Cinq valeurs : les rendez-vous
+          ; les passages, ventilés en trois par concaténation du type de passage — consultation,
+          hospitalisation, urgence ; les admissions de séjour ; les sorties de séjour. Les sorties
+          ne comptent que les séjours clos, un séjour non clos n'ayant pas de jour de sortie.
         tests:
           - not_null
       - name: service
+        description: >
+          Code du service, clé de rattachement à dim_service. Repris du fait d'origine : service
+          du passage, service d'accueil pour une admission, service de sortie pour une sortie.
+          ABSENT pour les rendez-vous, qui ne portent aucune colonne de service — absence qui
+          signifie non applicable et non inconnu.
         tests:
           - relationships:
               arguments:
                 to: "{{ ref('dim_service') }}"
                 field: "code_service"
       - name: activite
+        description: >
+          Code de l'activité, clé de rattachement à dim_activite. Repris du fait d'origine pour
+          les rendez-vous et les passages. ABSENT pour les séjours, qui ne portent aucune colonne
+          d'activité, et absent pour les passages d'hospitalisation et d'urgence, l'activité
+          n'étant renseignée que sur les consultations.
         tests:
           - relationships:
               arguments:
                 to: "{{ ref('dim_activite') }}"
                 field: "code_activite"
       - name: nb_evenements
+        description: >
+          Nombre d'événements du groupe. Décompte des lignes réunies par l'union des quatre
+          familles, groupées par jour, type, service et activité.
         tests:
           - not_null
+      - name: nb_patients_distincts
+        description: >
+          Nombre de patients DIFFÉRENTS concernés par ces événements. Décompte des valeurs
+          distinctes de n_ipp sur le même groupe. Il est inférieur ou égal à nb_evenements, et
+          leur écart mesure la répétition : une charge portée par de nombreux patients ne se
+          pilote pas comme une charge portée par des passages répétés.

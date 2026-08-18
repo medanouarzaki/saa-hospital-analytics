@@ -2,8 +2,19 @@ version: 2
 
 models:
   - name: agg_delai_rendez_vous
+    description: >
+      Une ligne par code d'activité — huit lignes — agrégée depuis fct_rendez_vous. Grain déclaré
+      par l'enregistrement de décision 0028. La population de référence est celle des rendez-vous
+      à délai STRICTEMENT POSITIF, et non l'ensemble : un rendez-vous pris pour le jour même porte
+      un délai nul par décision de construction et non par tirage, et le mêler à la population
+      tirerait la médiane vers le bas sans rapport avec la grandeur mesurée. Les deux catégories,
+      jour même et délai positif, sont exhaustives et disjointes, ce qui permet d'exposer côte à
+      côte les statistiques calculées sur l'une et sur l'ensemble.
     columns:
       - name: code_activite
+        description: >
+          Code de l'activité sur lequel la ligne est groupée, clé de rattachement à dim_activite.
+          Repris de fct_rendez_vous sans transformation.
         tests:
           - unique
           - not_null
@@ -12,14 +23,66 @@ models:
                 to: "{{ ref('dim_activite') }}"
                 field: "code_activite"
       - name: n_rendez_vous
+        description: >
+          Nombre total de rendez-vous de l'activité, tous états et tous délais confondus. Décompte
+          des lignes de fct_rendez_vous du groupe. C'est le dénominateur de part_jour_meme.
         tests:
           - not_null
       - name: n_jour_meme
+        description: >
+          Nombre de rendez-vous pris pour le jour même. Décompte des lignes du groupe filtré sur
+          le drapeau est_jour_meme.
         tests:
           - not_null
       - name: n_delai_positif
+        description: >
+          Nombre de rendez-vous dont le délai est strictement positif. Décompte des lignes du
+          groupe filtré sur la négation de est_jour_meme. Avec n_jour_meme, il recompose
+          n_rendez_vous : les deux catégories sont exhaustives et disjointes.
         tests:
           - not_null
       - name: part_jour_meme
+        description: >
+          Part des rendez-vous pris pour le jour même. NUMÉRATEUR : le nombre de rendez-vous du
+          jour même. DÉNOMINATEUR : le nombre TOTAL de rendez-vous de l'activité, en instance et
+          annulés compris.
         tests:
           - not_null
+      - name: mediane_delai_positif_jours
+        description: >
+          Médiane du délai d'obtention, en jours, sur les seuls rendez-vous à délai strictement
+          positif. Calculée par percentile continu d'ordre 0,5 sur delai_obtention_jours, avec
+          interpolation linéaire entre les deux valeurs encadrantes — et non par percentile
+          discret, qui rendrait une valeur réellement présente dans l'ensemble. La population de
+          référence est celle des rendez-vous à délai STRICTEMENT POSITIF, et non l'ensemble : un
+          rendez-vous pris pour le jour même porte un délai nul par décision de construction et
+          non par tirage, et le mêler à la population tirerait la médiane vers le bas sans rapport
+          avec la grandeur mesurée.
+      - name: p90_delai_positif_jours
+        description: >
+          Neuvième décile du délai d'obtention, en jours, sur les seuls rendez-vous à délai
+          strictement positif. Calculé par percentile continu d'ordre 0,9 sur
+          delai_obtention_jours. Il décrit la queue de distribution, que la médiane seule masque
+          et qui commande le dimensionnement.
+      - name: moyenne_delai_positif_jours
+        description: >
+          Moyenne arithmétique du délai d'obtention, en jours, sur les seuls rendez-vous à délai
+          strictement positif. À lire à côté de la médiane : leur écart mesure l'asymétrie de la
+          distribution.
+      - name: ecart_type_log_delai_positif
+        description: >
+          Écart-type du LOGARITHME NÉPÉRIEN du délai d'obtention, sur les seuls rendez-vous à
+          délai strictement positif. C'est le logarithme du délai qui est agrégé, et non le délai
+          lui-même : la grandeur ainsi obtenue se compare directement au paramètre d'étalement
+          d'une loi log-normale, dont le second paramètre est précisément l'écart-type du
+          logarithme.
+      - name: mediane_delai_tous
+        description: >
+          Médiane du délai d'obtention, en jours, sur TOUS les rendez-vous du groupe, jour même
+          compris. Calculée par percentile continu d'ordre 0,5, sans filtre. Elle diffère de
+          mediane_delai_positif_jours par sa seule population, et les deux coexistent pour que ce
+          choix de population soit lisible plutôt que caché.
+      - name: p90_delai_tous
+        description: >
+          Neuvième décile du délai d'obtention, en jours, sur TOUS les rendez-vous du groupe, jour
+          même compris. Pendant de mediane_delai_tous pour la queue de distribution.
