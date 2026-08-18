@@ -1,0 +1,201 @@
+﻿donnees_synthetiques,n_facture,n_ligne,code_acte,libelle_acte,lettre_cle,coefficient,quantite,tarif_unitaire,montant,service_executant,date_acte,date_extraction
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000000,1,HOSP-J,Journée d'hospitalisation,J,1.00,1,180.00,180.00,HGO,01/02/2024,01/02/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000024,1,HOSP-J,Journée d'hospitalisation,J,1.00,1,180.00,180.00,HGO,01/09/2024,01/09/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000050,51,LAB-HT-04,Temps de céphaline activée,B,15.00,1,0.90,13.50,LAB,01/18/2024,01/18/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000072,6,LAB-CB-02,Créatininémie,B,8.00,1,0.90,7.20,LAB,01/27/2024,01/27/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000100,30,LAB-CB-05,Bilan lipidique,B,12.00,1,0.90,10.80,LAB,02/06/2024,02/06/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000133,31,LAB-CB-03,Ionogramme sanguin,B,15.00,1,0.90,13.50,LAB,02/14/2024,02/14/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000157,9,HOSP-J,Journée d'hospitalisation,J,1.00,1,180.00,180.00,HM,02/28/2024,02/28/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000188,10,LAB-CB-03,Ionogramme sanguin,B,15.00,1,0.90,13.50,LAB,03/02/2024,03/02/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000214,60,LAB-CB-01,Glycémie,B,6.00,1,0.90,5.40,LAB,03/16/2024,03/16/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000239,21,LAB-CB-05,Bilan lipidique,B,12.00,1,0.90,10.80,LAB,03/19/2024,03/19/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000265,15,LAB-CB-05,Bilan lipidique,B,12.00,1,0.90,10.80,LAB,04/02/2024,04/02/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000294,3,HOSP-J,Journée d'hospitalisation,J,1.00,1,180.00,180.00,HM,04/14/2024,04/14/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000319,10,LAB-CB-05,Bilan lipidique,B,12.00,1,0.90,10.80,LAB,04/19/2024,04/19/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000347,5,HOSP-J,Journée d'hospitalisation,J,1.00,1,180.00,180.00,HPED,05/03/2024,05/03/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000374,4,HOSP-J,Journée d'hospitalisation,J,1.00,1,180.00,180.00,HM,05/11/2024,05/11/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000402,29,LAB-IS-03,Sérologie VIH,B,20.00,1,0.90,18.00,LAB,05/25/2024,05/25/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000430,31,LAB-CB-06,Urée sanguine,B,6.00,1,0.90,5.40,LAB,05/31/2024,05/31/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000459,20,LAB-CB-01,Glycémie,B,6.00,1,0.90,5.40,LAB,06/09/2024,06/09/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000483,3,HOSP-J,Journée d'hospitalisation,J,1.00,1,180.00,180.00,HM,06/14/2024,06/14/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000508,1,HOSP-J,Journée d'hospitalisation,J,1.00,1,180.00,180.00,HM,06/25/2024,06/25/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000530,14,LAB-HT-04,Temps de céphaline activée,B,15.00,1,0.90,13.50,LAB,07/04/2024,07/04/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000560,9,LAB-HT-06,Vitesse de sédimentation,B,8.00,1,0.90,7.20,LAB,07/18/2024,07/18/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000582,43,LAB-HT-01,Numération formule sanguine,B,25.00,1,0.90,22.50,LAB,07/31/2024,07/31/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000607,7,LAB-CB-03,Ionogramme sanguin,B,15.00,1,0.90,13.50,LAB,07/31/2024,07/31/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000638,30,LAB-HT-01,Numération formule sanguine,B,25.00,1,0.90,22.50,LAB,08/10/2024,08/10/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000661,13,LAB-CB-06,Urée sanguine,B,6.00,1,0.90,5.40,LAB,08/24/2024,08/24/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000689,45,LAB-CB-06,Urée sanguine,B,6.00,1,0.90,5.40,LAB,09/15/2024,09/15/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000713,27,LAB-IS-02,Sérologie hépatite C,B,15.00,1,0.90,13.50,LAB,09/14/2024,09/14/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000741,27,LAB-CB-06,Urée sanguine,B,6.00,1,0.90,5.40,LAB,09/24/2024,09/24/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000768,17,LAB-CB-02,Créatininémie,B,8.00,1,0.90,7.20,LAB,10/06/2024,10/06/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000798,11,LAB-IS-04,Sérologie toxoplasmose,B,20.00,1,0.90,18.00,LAB,10/09/2024,10/09/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000823,37,LAB-CB-01,Glycémie,B,6.00,1,0.90,5.40,LAB,10/18/2024,10/18/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000851,26,LAB-HT-05,Recherche d'agglutinines irrégulières,B,20.00,1,0.90,18.00,LAB,11/02/2024,11/02/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000881,10,LAB-CB-02,Créatininémie,B,8.00,1,0.90,7.20,LAB,11/08/2024,11/08/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000911,7,LAB-CB-03,Ionogramme sanguin,B,15.00,2,0.90,27.00,LAB,11/25/2024,11/25/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000940,8,LAB-HT-05,Recherche d'agglutinines irrégulières,B,20.00,1,0.90,18.00,LAB,11/29/2024,11/29/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000967,11,LAB-IS-02,Sérologie hépatite C,B,15.00,1,0.90,13.50,LAB,12/08/2024,12/08/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0000994,1,HOSP-J,Journée d'hospitalisation,J,1.00,1,180.00,180.00,HGO,12/16/2024,12/16/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001017,79,LAB-HT-06,Vitesse de sédimentation,B,8.00,1,0.90,7.20,LAB,12/24/2024,12/24/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001045,70,LAB-CB-03,Ionogramme sanguin,B,15.00,1,0.90,13.50,LAB,01/06/2025,01/06/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001071,25,LAB-CB-01,Glycémie,B,6.00,1,0.90,5.40,LAB,01/15/2025,01/15/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001096,35,LAB-CB-05,Bilan lipidique,B,12.00,1,0.90,10.80,LAB,01/22/2025,01/22/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001121,1,HOSP-J,Journée d'hospitalisation,J,1.00,1,180.00,180.00,HM,01/27/2025,01/27/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001145,1,HOSP-J,Journée d'hospitalisation,J,1.00,1,180.00,180.00,HM,02/03/2025,02/03/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001176,19,LAB-CB-01,Glycémie,B,6.00,1,0.90,5.40,LAB,02/14/2025,02/14/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001209,23,LAB-IS-06,Dosage de la protéine C réactive,B,10.00,1,0.90,9.00,LAB,02/26/2025,02/26/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001236,2,HOSP-J,Journée d'hospitalisation,J,1.00,1,180.00,180.00,HM,03/06/2025,03/06/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001265,4,HOSP-J,Journée d'hospitalisation,J,1.00,1,180.00,180.00,HM,03/21/2025,03/21/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001286,7,HOSP-J,Journée d'hospitalisation,J,1.00,1,180.00,180.00,HM,04/01/2025,04/01/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001310,19,LAB-HT-06,Vitesse de sédimentation,B,8.00,1,0.90,7.20,LAB,04/09/2025,04/09/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001340,15,LAB-CB-03,Ionogramme sanguin,B,15.00,1,0.90,13.50,LAB,04/15/2025,04/15/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001369,10,LAB-CB-03,Ionogramme sanguin,B,15.00,1,0.90,13.50,LAB,04/23/2025,04/23/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001394,20,LAB-HT-03,Taux de prothrombine,B,15.00,2,0.90,27.00,LAB,05/03/2025,05/03/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001424,21,LAB-IS-04,Sérologie toxoplasmose,B,20.00,1,0.90,18.00,LAB,05/19/2025,05/19/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001453,65,LAB-IS-04,Sérologie toxoplasmose,B,20.00,1,0.90,18.00,LAB,06/05/2025,06/05/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001482,3,HOSP-J,Journée d'hospitalisation,J,1.00,1,180.00,180.00,HM,06/01/2025,06/01/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001512,6,HOSP-J,Journée d'hospitalisation,J,1.00,1,180.00,180.00,HM,06/15/2025,06/15/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001543,2,HOSP-J,Journée d'hospitalisation,J,1.00,1,180.00,180.00,HM,06/21/2025,06/21/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001569,8,LAB-IS-01,Sérologie hépatite B,B,15.00,1,0.90,13.50,LAB,07/03/2025,07/03/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001598,12,LAB-CB-06,Urée sanguine,B,6.00,1,0.90,5.40,LAB,07/11/2025,07/11/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001620,46,LAB-IS-01,Sérologie hépatite B,B,15.00,2,0.90,27.00,LAB,07/25/2025,07/25/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001645,13,LAB-IS-04,Sérologie toxoplasmose,B,20.00,1,0.90,18.00,LAB,07/31/2025,07/31/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001670,14,LAB-HT-06,Vitesse de sédimentation,B,8.00,1,0.90,7.20,LAB,08/07/2025,08/07/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001695,16,LAB-IS-02,Sérologie hépatite C,B,15.00,1,0.90,13.50,LAB,08/18/2025,08/18/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001720,39,LAB-IS-03,Sérologie VIH,B,20.00,1,0.90,18.00,LAB,09/05/2025,09/05/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001744,31,LAB-IS-05,Sérologie rubéole,B,20.00,1,0.90,18.00,LAB,09/13/2025,09/13/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001774,13,LAB-CB-06,Urée sanguine,B,6.00,1,0.90,5.40,LAB,09/20/2025,09/20/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001803,25,LAB-HT-06,Vitesse de sédimentation,B,8.00,1,0.90,7.20,LAB,09/27/2025,09/27/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001826,8,LAB-CB-01,Glycémie,B,6.00,1,0.90,5.40,LAB,10/06/2025,10/06/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001848,3,HOSP-J,Journée d'hospitalisation,J,1.00,1,180.00,180.00,HM,10/15/2025,10/15/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001874,18,LAB-CB-06,Urée sanguine,B,6.00,1,0.90,5.40,LAB,10/27/2025,10/27/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001903,22,LAB-CB-03,Ionogramme sanguin,B,15.00,1,0.90,13.50,LAB,11/01/2025,11/01/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001929,14,LAB-CB-04,Bilan hépatique,B,12.00,1,0.90,10.80,LAB,11/14/2025,11/14/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001957,75,LAB-HT-01,Numération formule sanguine,B,25.00,1,0.90,22.50,LAB,11/28/2025,11/28/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0001988,43,LAB-CB-05,Bilan lipidique,B,12.00,1,0.90,10.80,LAB,12/13/2025,12/13/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0002012,25,LAB-CB-03,Ionogramme sanguin,B,15.00,1,0.90,13.50,LAB,12/14/2025,12/14/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0002040,38,LAB-HT-01,Numération formule sanguine,B,25.00,1,0.90,22.50,LAB,12/25/2025,12/25/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0002075,11,LAB-CB-04,Bilan hépatique,B,12.00,1,0.90,10.80,LAB,01/07/2026,01/07/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0002097,75,LAB-CB-05,Bilan lipidique,B,12.00,1,0.90,10.80,LAB,01/17/2026,01/17/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0002126,5,HOSP-J,Journée d'hospitalisation,J,1.00,1,180.00,180.00,HM,01/26/2026,01/26/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0002155,25,LAB-IS-03,Sérologie VIH,B,20.00,1,0.90,18.00,LAB,02/03/2026,02/03/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0002181,44,LAB-HT-02,Groupage sanguin ABO Rhésus,B,15.00,2,0.90,27.00,LAB,02/12/2026,02/12/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0002209,5,HOSP-J,Journée d'hospitalisation,J,1.00,1,180.00,180.00,HM,02/22/2026,02/22/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0002235,5,HOSP-J,Journée d'hospitalisation,J,1.00,1,180.00,180.00,HM,03/06/2026,03/06/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0002267,18,LAB-CB-05,Bilan lipidique,B,12.00,1,0.90,10.80,LAB,03/16/2026,03/16/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0002299,2,HOSP-J,Journée d'hospitalisation,J,1.00,1,180.00,180.00,HGO,03/29/2026,03/29/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0002325,21,LAB-CB-01,Glycémie,B,6.00,1,0.90,5.40,LAB,04/13/2026,04/13/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0002358,42,LAB-CB-01,Glycémie,B,6.00,1,0.90,5.40,LAB,04/26/2026,04/26/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0002385,36,LAB-CB-03,Ionogramme sanguin,B,15.00,1,0.90,13.50,LAB,04/30/2026,04/30/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0002415,40,LAB-CB-05,Bilan lipidique,B,12.00,1,0.90,10.80,LAB,05/11/2026,05/11/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0002435,4,HOSP-J,Journée d'hospitalisation,J,1.00,1,180.00,180.00,HM,05/18/2026,05/18/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0002463,45,LAB-CB-03,Ionogramme sanguin,B,15.00,1,0.90,13.50,LAB,06/03/2026,06/03/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0002486,49,LAB-HT-06,Vitesse de sédimentation,B,8.00,1,0.90,7.20,LAB,06/16/2026,06/16/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0002510,49,LAB-CB-06,Urée sanguine,B,6.00,1,0.90,5.40,LAB,06/14/2026,06/14/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0002540,15,LAB-CB-06,Urée sanguine,B,6.00,1,0.90,5.40,LAB,06/24/2026,06/24/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0002662,1,CONS-21,Consultation de médecine interne,Cs,1.00,1,75.00,75.00,CE,01/12/2024,01/12/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0002840,2,LAB-CB-05,Bilan lipidique,B,12.00,1,0.90,10.80,LAB,01/31/2024,01/31/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0003013,2,LAB-HT-01,Numération formule sanguine,B,25.00,1,0.90,22.50,LAB,02/19/2024,02/19/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0003203,1,CONS-14,Consultation de gynécologie-obstétrique,Cs,1.00,1,75.00,75.00,CE,03/07/2024,03/07/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0003363,7,LAB-CB-01,Glycémie,B,6.00,1,0.90,5.40,LAB,03/28/2024,03/28/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0003554,1,CONS-20,Consultation de médecine générale,C,1.00,1,50.00,50.00,CE,04/23/2024,04/23/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0003720,9,LAB-CB-06,Urée sanguine,B,6.00,1,0.90,5.40,LAB,05/09/2024,05/09/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0003881,5,LAB-CB-01,Glycémie,B,6.00,1,0.90,5.40,LAB,05/24/2024,05/24/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0004052,2,LAB-HT-03,Taux de prothrombine,B,15.00,1,0.90,13.50,LAB,06/10/2024,06/10/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0004213,4,LAB-CB-06,Urée sanguine,B,6.00,1,0.90,5.40,LAB,06/28/2024,06/28/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0004393,1,CONS-04,Consultation de cardiologie,Cs,1.00,1,75.00,75.00,CE,07/16/2024,07/16/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0004569,1,CONS-20,Consultation de médecine générale,C,1.00,1,50.00,50.00,CE,08/07/2024,08/07/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0004745,4,LAB-CB-03,Ionogramme sanguin,B,15.00,1,0.90,13.50,LAB,09/02/2024,09/02/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0004928,1,CONS-30,Consultation de pédiatrie,Cp,1.00,1,120.00,120.00,CE,09/19/2024,09/19/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0005096,4,LAB-CB-04,Bilan hépatique,B,12.00,1,0.90,10.80,LAB,10/08/2024,10/08/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0005278,4,LAB-CB-02,Créatininémie,B,8.00,1,0.90,7.20,LAB,10/26/2024,10/26/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0005457,4,LAB-IS-02,Sérologie hépatite C,B,15.00,1,0.90,13.50,LAB,11/15/2024,11/15/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0005638,1,CONS-30,Consultation de pédiatrie,Cp,1.00,1,120.00,120.00,CE,12/05/2024,12/05/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0005823,4,LAB-CB-05,Bilan lipidique,B,12.00,1,0.90,10.80,LAB,12/24/2024,12/24/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0005983,2,LAB-IS-03,Sérologie VIH,B,20.00,1,0.90,18.00,LAB,01/10/2025,01/10/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0006154,5,LAB-CB-01,Glycémie,B,6.00,1,0.90,5.40,LAB,01/30/2025,01/30/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0006336,6,LAB-CB-03,Ionogramme sanguin,B,15.00,1,0.90,13.50,LAB,02/18/2025,02/18/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0006501,6,LAB-HT-04,Temps de céphaline activée,B,15.00,1,0.90,13.50,LAB,03/07/2025,03/07/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0006682,1,CONS-29,Consultation d'oto-rhino-laryngologie,Cs,1.00,1,75.00,75.00,CE,04/04/2025,04/04/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0006866,7,LAB-CB-05,Bilan lipidique,B,12.00,1,0.90,10.80,LAB,04/24/2025,04/24/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0007041,7,LAB-CB-03,Ionogramme sanguin,B,15.00,1,0.90,13.50,LAB,05/14/2025,05/14/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0007216,4,LAB-CB-01,Glycémie,B,6.00,1,0.90,5.40,LAB,05/30/2025,05/30/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0007402,2,LAB-CB-05,Bilan lipidique,B,12.00,1,0.90,10.80,LAB,06/19/2025,06/19/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0007582,3,LAB-CB-05,Bilan lipidique,B,12.00,1,0.90,10.80,LAB,07/08/2025,07/08/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0007751,2,LAB-CB-02,Créatininémie,B,8.00,1,0.90,7.20,LAB,07/24/2025,07/24/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0007922,2,LAB-CB-03,Ionogramme sanguin,B,15.00,1,0.90,13.50,LAB,08/16/2025,08/16/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0008096,3,LAB-CB-06,Urée sanguine,B,6.00,2,0.90,10.80,LAB,09/08/2025,09/08/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0008270,6,LAB-HT-05,Recherche d'agglutinines irrégulières,B,20.00,1,0.90,18.00,LAB,09/25/2025,09/25/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0008441,1,CONS-28,Consultation d'ophtalmologie,Cs,1.00,1,75.00,75.00,CE,10/13/2025,10/13/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0008619,1,CONS-29,Consultation d'oto-rhino-laryngologie,Cs,1.00,1,75.00,75.00,CE,10/31/2025,10/31/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0008793,2,LAB-CB-02,Créatininémie,B,8.00,1,0.90,7.20,LAB,11/20/2025,11/20/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0008969,7,LAB-CB-04,Bilan hépatique,B,12.00,1,0.90,10.80,LAB,12/09/2025,12/09/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0009144,1,CONS-28,Consultation d'ophtalmologie,Cs,1.00,1,75.00,75.00,CE,12/27/2025,12/27/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0009311,1,CONS-20,Consultation de médecine générale,C,1.00,1,50.00,50.00,CE,01/16/2026,01/16/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0009477,4,LAB-IS-04,Sérologie toxoplasmose,B,20.00,1,0.90,18.00,LAB,02/03/2026,02/03/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0009649,1,CONS-30,Consultation de pédiatrie,Cp,1.00,1,120.00,120.00,CE,02/23/2026,02/23/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0009828,3,LAB-CB-05,Bilan lipidique,B,12.00,1,0.90,10.80,LAB,03/19/2026,03/19/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0009994,1,CONS-30,Consultation de pédiatrie,Cp,1.00,1,120.00,120.00,CE,04/07/2026,04/07/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0010174,1,CONS-29,Consultation d'oto-rhino-laryngologie,Cs,1.00,1,75.00,75.00,CE,04/24/2026,04/24/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0010345,7,LAB-HT-03,Taux de prothrombine,B,15.00,1,0.90,13.50,LAB,05/13/2026,05/13/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0010514,6,LAB-CB-05,Bilan lipidique,B,12.00,1,0.90,10.80,LAB,06/02/2026,06/02/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0010690,2,LAB-CB-04,Bilan hépatique,B,12.00,1,0.90,10.80,LAB,06/20/2026,06/20/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0010848,8,LAB-CB-02,Créatininémie,B,8.00,1,0.90,7.20,LAB,01/07/2024,01/07/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0011043,1,CONS-UR,Consultation aux urgences,Cs,1.50,1,75.00,112.50,UR,01/25/2024,01/25/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0011216,4,LAB-CB-02,Créatininémie,B,8.00,1,0.90,7.20,LAB,02/08/2024,02/08/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0011396,1,CONS-UR,Consultation aux urgences,Cs,1.50,1,75.00,112.50,UR,02/22/2024,02/22/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0011567,5,LAB-HT-05,Recherche d'agglutinines irrégulières,B,20.00,1,0.90,18.00,LAB,03/11/2024,03/11/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0011739,1,CONS-UR,Consultation aux urgences,Cs,1.50,1,75.00,112.50,UR,03/25/2024,03/25/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0011910,2,LAB-CB-01,Glycémie,B,6.00,1,0.90,5.40,LAB,04/12/2024,04/12/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0012089,3,LAB-HT-03,Taux de prothrombine,B,15.00,1,0.90,13.50,LAB,04/27/2024,04/27/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0012258,7,LAB-CB-06,Urée sanguine,B,6.00,1,0.90,5.40,LAB,05/13/2024,05/13/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0012452,3,LAB-HT-04,Temps de céphaline activée,B,15.00,1,0.90,13.50,LAB,05/30/2024,05/30/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0012648,7,LAB-HT-02,Groupage sanguin ABO Rhésus,B,15.00,1,0.90,13.50,LAB,06/16/2024,06/16/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0012829,1,CONS-UR,Consultation aux urgences,Cs,1.50,1,75.00,112.50,UR,07/01/2024,07/01/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0013013,3,LAB-HT-05,Recherche d'agglutinines irrégulières,B,20.00,1,0.90,18.00,LAB,07/19/2024,07/19/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0013180,4,LAB-CB-06,Urée sanguine,B,6.00,1,0.90,5.40,LAB,08/03/2024,08/03/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0013349,8,IMG-KE-02,Électrocardiogramme,KE,8.00,1,10.00,80.00,RAD,08/18/2024,08/18/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0013527,5,LAB-HT-01,Numération formule sanguine,B,25.00,1,0.90,22.50,LAB,09/03/2024,09/03/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0013691,7,LAB-CB-05,Bilan lipidique,B,12.00,1,0.90,10.80,LAB,09/17/2024,09/17/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0013858,3,LAB-CB-01,Glycémie,B,6.00,1,0.90,5.40,LAB,10/02/2024,10/02/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0014023,9,LAB-CB-03,Ionogramme sanguin,B,15.00,1,0.90,13.50,LAB,10/17/2024,10/17/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0014204,3,LAB-CB-06,Urée sanguine,B,6.00,1,0.90,5.40,LAB,11/03/2024,11/03/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0014388,6,LAB-CB-03,Ionogramme sanguin,B,15.00,1,0.90,13.50,LAB,11/20/2024,11/20/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0014567,5,LAB-CB-01,Glycémie,B,6.00,1,0.90,5.40,LAB,12/05/2024,12/05/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0014737,2,LAB-CB-05,Bilan lipidique,B,12.00,1,0.90,10.80,LAB,12/20/2024,12/20/2024
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0014918,5,LAB-IS-06,Dosage de la protéine C réactive,B,10.00,1,0.90,9.00,LAB,01/05/2025,01/05/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0015091,5,LAB-IS-04,Sérologie toxoplasmose,B,20.00,1,0.90,18.00,LAB,01/19/2025,01/19/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0015263,5,LAB-CB-05,Bilan lipidique,B,12.00,2,0.90,21.60,LAB,02/04/2025,02/04/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0015438,5,LAB-HT-06,Vitesse de sédimentation,B,8.00,1,0.90,7.20,LAB,02/20/2025,02/20/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0015613,1,CONS-UR,Consultation aux urgences,Cs,1.50,1,75.00,112.50,UR,03/09/2025,03/09/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0015793,3,LAB-HT-05,Recherche d'agglutinines irrégulières,B,20.00,1,0.90,18.00,LAB,03/25/2025,03/25/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0015960,6,LAB-IS-03,Sérologie VIH,B,20.00,1,0.90,18.00,LAB,04/09/2025,04/09/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0016137,3,LAB-CB-01,Glycémie,B,6.00,1,0.90,5.40,LAB,04/25/2025,04/25/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0016310,2,LAB-CB-06,Urée sanguine,B,6.00,1,0.90,5.40,LAB,05/09/2025,05/09/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0016481,1,CONS-UR,Consultation aux urgences,Cs,1.50,1,75.00,112.50,UR,05/24/2025,05/24/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0016648,1,CONS-UR,Consultation aux urgences,Cs,1.50,1,75.00,112.50,UR,06/06/2025,06/06/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0016812,3,LAB-IS-02,Sérologie hépatite C,B,15.00,1,0.90,13.50,LAB,06/18/2025,06/18/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0016991,3,LAB-CB-02,Créatininémie,B,8.00,1,0.90,7.20,LAB,07/04/2025,07/04/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0017156,1,CONS-UR,Consultation aux urgences,Cs,1.50,1,75.00,112.50,UR,07/18/2025,07/18/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0017341,4,LAB-CB-02,Créatininémie,B,8.00,1,0.90,7.20,LAB,08/05/2025,08/05/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0017514,1,CONS-UR,Consultation aux urgences,Cs,1.50,1,75.00,112.50,UR,08/22/2025,08/22/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0017695,1,CONS-UR,Consultation aux urgences,Cs,1.50,1,75.00,112.50,UR,09/06/2025,09/06/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0017876,1,CONS-UR,Consultation aux urgences,Cs,1.50,1,75.00,112.50,UR,09/24/2025,09/24/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0018052,7,LAB-CB-02,Créatininémie,B,8.00,1,0.90,7.20,LAB,10/09/2025,10/09/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0018232,4,IMG-Z-04,Radiographie du rachis,Z,14.00,1,9.00,126.00,RAD,10/26/2025,10/26/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0018400,4,LAB-CB-04,Bilan hépatique,B,12.00,1,0.90,10.80,LAB,11/09/2025,11/09/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0018565,3,LAB-CB-03,Ionogramme sanguin,B,15.00,1,0.90,13.50,LAB,11/23/2025,11/23/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0018756,1,CONS-UR,Consultation aux urgences,Cs,1.50,1,75.00,112.50,UR,12/09/2025,12/09/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0018938,5,LAB-IS-01,Sérologie hépatite B,B,15.00,2,0.90,27.00,LAB,12/26/2025,12/26/2025
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0019115,7,LAB-CB-03,Ionogramme sanguin,B,15.00,1,0.90,13.50,LAB,01/11/2026,01/11/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0019287,9,LAB-CB-03,Ionogramme sanguin,B,15.00,1,0.90,13.50,LAB,01/25/2026,01/25/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0019460,8,LAB-CB-02,Créatininémie,B,8.00,2,0.90,14.40,LAB,02/09/2026,02/09/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0019629,2,LAB-HT-03,Taux de prothrombine,B,15.00,1,0.90,13.50,LAB,02/24/2026,02/24/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0019813,4,LAB-CB-03,Ionogramme sanguin,B,15.00,1,0.90,13.50,LAB,03/13/2026,03/13/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0019992,6,LAB-CB-01,Glycémie,B,6.00,1,0.90,5.40,LAB,03/30/2026,03/30/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0020151,4,LAB-CB-02,Créatininémie,B,8.00,1,0.90,7.20,LAB,04/12/2026,04/12/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0020331,5,LAB-CB-01,Glycémie,B,6.00,1,0.90,5.40,LAB,04/29/2026,04/29/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0020503,3,LAB-HT-05,Recherche d'agglutinines irrégulières,B,20.00,1,0.90,18.00,LAB,05/14/2026,05/14/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0020675,8,LAB-HT-01,Numération formule sanguine,B,25.00,2,0.90,45.00,LAB,05/28/2026,05/28/2026
+Donnees synthetiques simulees a partir de statistiques publiques ; aucun patient reel,FAC-0020855,4,LAB-CB-03,Ionogramme sanguin,B,15.00,1,0.90,13.50,LAB,06/12/2026,06/12/2026
