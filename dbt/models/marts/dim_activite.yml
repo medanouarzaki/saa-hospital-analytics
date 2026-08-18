@@ -2,8 +2,21 @@ version: 2
 
 models:
   - name: dim_activite
+    description: >
+      Dimension des codes d'activité, à clé naturelle et sans clé de substitution. Une ligne par
+      code distinct, obtenue par union des colonnes d'activité de la couche intermédiaire
+      (int_passages.activite, int_rendez_vous.activite, int_rendez_vous.liste_attente_activite),
+      les valeurs vides étant écartées.
     columns:
       - name: code_activite
+        description: >
+          Code d'activité tel que le système observé l'enregistre, repris sans transformation.
+          Le champ est relevé au poste sous le libellé « Activité » (relevé REL-RDV.R02, et
+          REL-RDV.L03 pour la variante de liste d'attente). Aucune nomenclature associant ces
+          codes à un intitulé de spécialité n'est fournie par le système ni documentée par une
+          source : le code est donc affiché tel quel partout, et aucun libellé n'est inventé.
+          Le type est textuel bien que les valeurs s'écrivent en chiffres, ce qui les fait trier
+          dans l'ordre lexicographique — « 4 » vient après « 30 ».
         tests:
           - unique
           - not_null

@@ -3,9 +3,12 @@ version: 2
 models:
   - name: int_mouvements
     description: >
-      source.mouvements typée : les colonnes date/horodatage/booleen/numérique converties
-      par les macros de dbt/macros/conversions.sql, les colonnes code/texte reprises
-      telles quelles.
+      Une ligne par MOUVEMENT et non par séjour : un séjour est décrit par une ligne d'admission,
+      au plus une ligne de mutation et au plus une ligne de sortie. Les colonnes ne sont donc
+      renseignées que sur la ligne qui les concerne — le service d'accueil sur l'admission, les
+      services d'origine et de destination sur la mutation, le mode de sortie sur la sortie. C'est
+      la couche aval qui replie ces lignes en un séjour par ligne. Couche de nettoyage sans
+      destruction : codes et textes repris tels quels, horodatages et date typés.
     tests:
       - meme_decompte_que_la_source:
           arguments:
@@ -14,25 +17,95 @@ models:
           arguments:
             column_name: "n_mutation"
     columns:
+      - name: n_sejour
+        description: >
+          Identifiant du séjour auquel le mouvement appartient. Il ne suffit pas à identifier une
+          ligne : plusieurs mouvements partagent le même séjour. Colonne non relevée à l'écran,
+          dont l'existence est documentée par une source (S-27).
+      - name: n_ipp
+        description: >
+          Identifiant du patient hospitalisé. Constant sur tous les mouvements d'un même séjour.
+          Le champ est relevé au poste sous le libellé « N° IPP » (relevé REL-PAT.D01).
       - name: date_heure_admission
+        description: >
+          Horodatage de l'admission. Renseigné sur la SEULE ligne d'admission. Colonne non relevée
+          à l'écran, dont l'existence est documentée par une source (S-27). La couche source la
+          stocke en texte, au format d'affichage du système observé — mois, jour, année, puis
+          heure sur douze heures ; elle est ici convertie en HORODATAGE, la chaîne vide devenant
+          une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'mouvements') }}"
                 source_column: date_heure_admission
+      - name: mode_admission
+        description: >
+          Code du mode d'admission — programmée, par les urgences, par transfert. Renseigné sur la
+          seule ligne d'admission. Colonne non relevée à l'écran, dont l'existence est documentée
+          par une source (S-27).
+      - name: service_accueil
+        description: >
+          Code du service ayant accueilli le patient. Renseigné sur la seule ligne d'admission ;
+          c'est cette propriété qui permet, en aval, d'isoler le lit d'admission du lit de
+          mutation. Colonne non relevée à l'écran, dont l'existence est documentée par une source
+          (S-27).
+      - name: lit
+        description: >
+          Identifiant du lit occupé. Renseigné À LA FOIS sur la ligne d'admission et sur celle de
+          mutation, avec deux valeurs différentes — un simple maximum ne suffirait donc pas à
+          retrouver le lit d'admission. Seule colonne de cette table posée sans preuve externe.
+          Colonne non relevée à l'écran et posée sans preuve externe.
+      - name: n_mutation
+        description: >
+          Identifiant de la mutation. Renseigné sur la seule ligne de mutation, et vide pour les
+          séjours sans changement de service. Colonne non relevée à l'écran, dont l'existence est
+          documentée par une source (S-27).
+      - name: service_origine
+        description: >
+          Code du service quitté lors de la mutation. Renseigné sur la seule ligne de mutation ;
+          sa présence est le signal, en aval, qu'un séjour a comporté une mutation. Colonne non
+          relevée à l'écran, dont l'existence est documentée par une source (S-27).
+      - name: service_destination
+        description: >
+          Code du service rejoint lors de la mutation. Renseigné sur la seule ligne de mutation.
+          Colonne non relevée à l'écran, dont l'existence est documentée par une source (S-27).
       - name: date_heure_mutation
+        description: >
+          Horodatage de la mutation. Renseigné sur la seule ligne de mutation. Colonne non relevée
+          à l'écran, dont l'existence est documentée par une source (S-27). La couche source la
+          stocke en texte, au format d'affichage du système observé — mois, jour, année, puis
+          heure sur douze heures ; elle est ici convertie en HORODATAGE, la chaîne vide devenant
+          une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'mouvements') }}"
                 source_column: date_heure_mutation
       - name: date_heure_sortie
+        description: >
+          Horodatage de la sortie. Renseigné sur la seule ligne de sortie, et absent tant que le
+          séjour n'est pas clos. Colonne non relevée à l'écran, dont l'existence est documentée
+          par une source (S-27). La couche source la stocke en texte, au format d'affichage du
+          système observé — mois, jour, année, puis heure sur douze heures ; elle est ici
+          convertie en HORODATAGE, la chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'mouvements') }}"
                 source_column: date_heure_sortie
+      - name: mode_sortie
+        description: >
+          Code du mode de sortie — domicile, transfert, décès. Renseigné sur la seule ligne de
+          sortie. Colonne non relevée à l'écran, dont l'existence est documentée par une source
+          (S-27).
       - name: date_extraction
+        description: >
+          Date de l'extraction dont la ligne provient. Colonne TECHNIQUE de la zone
+          d'atterrissage, absente du système observé : elle partitionne le chargement et le rend
+          rejouable, une même partition pouvant être rechargée sans doublon. Colonne non relevée à
+          l'écran et posée sans preuve externe. La couche source la stocke en texte, au format
+          d'affichage du système observé — mois, jour, année ; elle est ici convertie en DATE, la
+          chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:

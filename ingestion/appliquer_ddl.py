@@ -6,8 +6,17 @@ absentes, il ne prend jamais le pas sur l'environnement du processus. C'est
 ce qui permet à la même logique de servir localement, avec .env, et en
 intégration continue, où seules les variables d'environnement du job
 existent. Aucune valeur de connexion n'est jamais imprimée.
+
+Ce module porte un analyseur d'arguments, et il en porte un pour une raison
+précise : sans lui, TOUT argument -- y compris une demande d'aide -- déclenche
+l'application intégrale de la définition de schéma, dont vingt-deux fichiers
+commencent par supprimer leur table. Un appel destiné à se renseigner
+détruirait la base. L'analyseur rend cet appel inoffensif : il imprime l'aide
+et s'arrête, et il refuse tout argument qu'il ne connaît pas plutôt que de
+l'ignorer.
 """
 
+import argparse
 import os
 import sys
 from pathlib import Path
@@ -84,7 +93,37 @@ def est_vide(instruction: str) -> bool:
     return not lignes_utiles
 
 
-def main() -> None:
+def analyser_arguments(arguments: list[str] | None = None) -> argparse.Namespace:
+    """Sans cet analyseur, `main()` s'exécuterait quel que soit l'argument reçu.
+
+    `argparse` traite `-h`/`--help` en imprimant l'aide et en sortant, et rejette
+    tout argument inconnu : dans les deux cas, aucune instruction n'atteint la base.
+    """
+    analyseur = argparse.ArgumentParser(
+        prog="python -m ingestion.appliquer_ddl",
+        description=(
+            "Applique les fichiers .sql de ingestion/ddl/ à la base désignée par "
+            "l'environnement, dans l'ordre alphabétique. Les fichiers appliqués "
+            "suppriment puis recréent leurs objets : l'application est rejouable, et "
+            "elle est destructrice pour les données de la couche source."
+        ),
+    )
+    analyseur.add_argument(
+        "--lister",
+        action="store_true",
+        help="imprimer les fichiers qui seraient appliqués, dans l'ordre, sans se connecter",
+    )
+    return analyseur.parse_args(arguments)
+
+
+def main(arguments: list[str] | None = None) -> None:
+    options = analyser_arguments(arguments)
+
+    if options.lister:
+        for fichier in sorted(DOSSIER_DDL.glob("*.sql")):
+            print(fichier.name)
+        return
+
     variables = charger_environnement()
     manquantes = [cle for cle in CLES_OBLIGATOIRES if not variables.get(cle)]
     if manquantes:

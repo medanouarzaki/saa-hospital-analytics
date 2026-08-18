@@ -167,21 +167,54 @@ def rendre() -> None:
 
     rendu.titre_indicateur("rapprochement_courbe")
     courbe = lecture.interroger(REQUETES["rapprochement_courbe"])
-    st.caption(
-        f"Courbe balayée sur {len(courbe)} seuils. Le seuil retenu, "
-        f"{float(seuil['seuil_applique']):.2f}".replace(".", ",")
-        + ", est repéré par la ligne du tableau ci-dessous."
+    seuil_applique = float(seuil["seuil_applique"])
+    seuil_lisible = f"{seuil_applique:.2f}".replace(".", ",")
+
+    # Précision contre rappel, et non les trois grandeurs contre le seuil. Portée en abscisse, la
+    # valeur du seuil écrase le tracé : le balayage est logarithmique aux deux extrémités, si bien
+    # que la plupart des points se pressent contre les bords du cadre et que le segment central,
+    # à une précision et un rappel de 1, se confond avec la bordure supérieure.
+    plan = rendu.en_nombres(courbe, "precision_valeur", "rappel").assign(
+        repere=lambda t: [
+            f"Seuil retenu ({seuil_lisible})"
+            if valeur == seuil_applique
+            else "Autres seuils balayés"
+            for valeur in t["seuil"]
+        ]
     )
-    st.line_chart(
-        courbe,
-        x="seuil",
-        y=["precision_valeur", "rappel", "f_mesure"],
-        x_label="Seuil de décision",
-        y_label="Valeur",
+    # Le point du seuil retenu est tracé en dernier pour n'être caché par aucun autre : les
+    # marques sont dessinées dans l'ordre des lignes, et il partage sa position avec beaucoup.
+    plan = plan.sort_values("repere", ascending=False, kind="stable")
+
+    positions_distinctes = len(
+        plan.groupby([plan["rappel"].round(6), plan["precision_valeur"].round(6)])
+    )
+    parfaits = int(((plan["rappel"] == 1.0) & (plan["precision_valeur"] == 1.0)).sum())
+
+    st.scatter_chart(
+        plan,
+        x="rappel",
+        y="precision_valeur",
+        color="repere",
+        x_label="Rappel",
+        y_label="Précision",
+    )
+    st.caption(
+        f"Un point par seuil balayé, {len(courbe)} au total, dont {parfaits} atteignent à la fois "
+        f"une précision et un rappel de 1 et se superposent donc au coin supérieur droit — "
+        f"{positions_distinctes} positions distinctes seulement. **C'est un résultat et non un "
+        "défaut d'affichage** : le modèle sépare les deux populations si nettement que déplacer le "
+        f"seuil ne change rien au résultat sur presque tout son domaine. Le seuil retenu, "
+        f"{seuil_lisible}, est repéré par sa couleur et nommé en légende."
+    )
+    st.caption(
+        "Le tableau ci-dessous ne porte **qu'une seule ligne**, celle du seuil retenu : les "
+        f"{len(courbe)} seuils balayés sont dans le graphique, pas dans ce tableau."
     )
     st.dataframe(
         courbe[courbe["seuil"] == seuil["seuil_applique"]],
         hide_index=True,
+        height="content",
     )
 
     rendu.titre_indicateur("rapprochement_grappes")
@@ -203,7 +236,12 @@ def rendre() -> None:
     collisions = collisions.assign(
         critere=collisions["critere"].map(lambda code: CRITERES_LISIBLES.get(code, code))
     )
-    st.dataframe(collisions, hide_index=True)
+    # `height="content"` et non la valeur par défaut : la documentation de la version installée dit
+    # que `"auto"` dimensionne le cadre pour « au plus dix lignes », d'après une hauteur de ligne
+    # nominale. Les libellés de critère et les en-têtes de colonne de ce tableau se replient sur
+    # deux lignes, si bien que ses deux lignes réelles dépassent ce cadre et que la seconde
+    # n'apparaît qu'après défilement. `"content"` fait épouser au cadre la hauteur de son contenu.
+    st.dataframe(collisions, hide_index=True, height="content")
 
 
 rendre()

@@ -3,29 +3,59 @@ version: 2
 models:
   - name: agg_qualite_donnees
     description: >
-      Une ligne par table intermediate et par colonne (grain colonne, décidé par la
-      mesure du coût de conversion ligne->document sur les onze vues, ~1,78 s au
-      total). lignes_quarantaine et taux_quarantaine sont mesurés au niveau de la
-      table et répétés à l'identique sur chaque ligne de colonne de cette table.
+      Une ligne par table de la couche intermédiaire et par colonne — grain déclaré par
+      l'enregistrement de décision 0028, retenu après mesure du coût de la conversion ligne vers
+      document sur les onze vues. Une valeur est tenue pour renseignée si elle n'est ni absente ni
+      la chaîne vide : la couche source ne porte jamais de valeur absente, seulement la chaîne
+      vide, ce qui a été vérifié avant d'être codé.
     columns:
       - name: nom_table
+        description: >
+          Nom de la table de la couche intermédiaire à laquelle la ligne se rapporte, premier axe
+          de groupement.
         tests:
           - not_null
       - name: colonne
+        description: >
+          Nom de la colonne examinée, second axe de groupement. C'est le grain fin de cet agrégat
+          : une ligne par couple table-colonne.
         tests:
           - not_null
       - name: lignes_examinees
+        description: >
+          Nombre de lignes de la table qui ont été examinées pour cette colonne. C'est le
+          DÉNOMINATEUR du taux de complétude, et l'une des deux composantes de celui du taux de
+          mise en quarantaine.
         tests:
           - not_null
       - name: valeurs_renseignees
-        tests:
-          - not_null
-      - name: taux_completude
+        description: >
+          Nombre de lignes où la colonne porte une valeur ni absente ni vide. C'est le NUMÉRATEUR
+          du taux de complétude.
         tests:
           - not_null
       - name: lignes_quarantaine
+        description: >
+          Nombre de lignes de la table écartées au chargement et déposées en quarantaine. Cette
+          grandeur est mesurée au niveau de la TABLE et non de la colonne — la quarantaine ne met
+          en cause aucune colonne individuelle — puis répétée à l'identique sur chaque ligne de
+          colonne de cette table. Cette dénormalisation est délibérée et vérifiée constante par un
+          contrôle de cohérence.
+        tests:
+          - not_null
+      - name: taux_completude
+        description: >
+          Part des lignes où la colonne est renseignée. NUMÉRATEUR : valeurs_renseignees.
+          DÉNOMINATEUR : lignes_examinees, c'est-à-dire les lignes effectivement chargées — les
+          lignes mises en quarantaine n'y figurent pas, n'ayant jamais atteint la table.
         tests:
           - not_null
       - name: taux_quarantaine
+        description: >
+          Part des lignes écartées au chargement. NUMÉRATEUR : lignes_quarantaine. DÉNOMINATEUR :
+          la SOMME des lignes examinées et des lignes en quarantaine, c'est-à-dire le total des
+          lignes présentées au chargement. Le dénominateur n'est donc pas le même que celui du
+          taux de complétude, et c'est voulu : un taux de rejet se rapporte à ce qui a été
+          présenté, une complétude à ce qui a été retenu.
         tests:
           - not_null

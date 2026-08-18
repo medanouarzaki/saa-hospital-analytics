@@ -3,9 +3,12 @@ version: 2
 models:
   - name: int_creances
     description: >
-      source.creances typée : les colonnes date/horodatage/booleen/numérique converties
-      par les macros de dbt/macros/conversions.sql, les colonnes code/texte reprises
-      telles quelles.
+      Une ligne par créance ET PAR DATE D'EXTRACTION, et non une ligne par créance : une même
+      créance est vue par plusieurs extractions successives, son montant dû restant constant
+      tandis que le recouvré et le restant évoluent. Sommer toutes les lignes surcompterait donc
+      le montant dû, ce dont les agrégats aval tiennent compte en ne retenant que l'instantané le
+      plus récent. Couche de nettoyage sans destruction : codes repris tels quels, dates et
+      montants typés.
     tests:
       - meme_decompte_que_la_source:
           arguments:
@@ -14,31 +17,79 @@ models:
           arguments:
             column_name: "n_creance || '|' || date_extraction"
     columns:
+      - name: n_creance
+        description: >
+          Identifiant de la créance, qui ne suffit pas à identifier une ligne : il faut lui
+          adjoindre la date d'extraction. Colonne non relevée à l'écran, dont l'existence est
+          documentée par une source (S-27).
+      - name: n_facture
+        description: >
+          Identifiant de la facture dont la créance est issue. Colonne non relevée à l'écran, dont
+          l'existence est documentée par une source (S-27).
       - name: date_naissance_creance
+        description: >
+          Date à laquelle la dette est née. Elle ne change pas d'une extraction à l'autre,
+          contrairement aux montants recouvré et restant. Colonne non relevée à l'écran, dont
+          l'existence est documentée par une source (S-27). La couche source la stocke en texte,
+          au format d'affichage du système observé — mois, jour, année ; elle est ici convertie en
+          DATE, la chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'creances') }}"
                 source_column: date_naissance_creance
       - name: montant_du
+        description: >
+          Montant total dû au titre de la créance, en dirhams. Constant d'une extraction à l'autre
+          pour une même créance. Colonne non relevée à l'écran, dont l'existence est documentée
+          par une source (S-20). La couche source la stocke en texte ; elle est ici convertie en
+          NUMÉRIQUE exact, la chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'creances') }}"
                 source_column: montant_du
       - name: montant_recouvre
+        description: >
+          Montant déjà recouvré, en dirhams. Il croît d'une extraction à l'autre à mesure des
+          règlements. Colonne non relevée à l'écran, dont l'existence est documentée par une
+          source (S-20). La couche source la stocke en texte ; elle est ici convertie en NUMÉRIQUE
+          exact, la chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'creances') }}"
                 source_column: montant_recouvre
       - name: montant_restant
+        description: >
+          Montant restant à recouvrer, en dirhams. Il décroît d'une extraction à l'autre ; avec le
+          montant recouvré, il décompose le montant dû. Colonne non relevée à l'écran, dont
+          l'existence est documentée par une source (S-20). La couche source la stocke en texte ;
+          elle est ici convertie en NUMÉRIQUE exact, la chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'creances') }}"
                 source_column: montant_restant
+      - name: type_debiteur
+        description: >
+          Code du type de débiteur, qui distingue une dette portée par un organisme d'une dette
+          portée par un patient. Colonne non relevée à l'écran, dont l'existence est documentée
+          par une source (S-09).
+      - name: motif_non_recouvrement
+        description: >
+          Code du motif pour lequel la créance n'a pas été recouvrée. Aucune table de libellés
+          n'accompagne ce code, et aucun n'est inventé. Colonne non relevée à l'écran, dont
+          l'existence est documentée par une source (S-20).
       - name: date_extraction
+        description: >
+          Date de l'extraction dont la ligne provient. Colonne TECHNIQUE de la zone
+          d'atterrissage, absente du système observé : elle partitionne le chargement et le rend
+          rejouable, une même partition pouvant être rechargée sans doublon. Sur cette table, elle
+          fait partie de la clé : une créance porte une ligne par extraction. Colonne non relevée
+          à l'écran et posée sans preuve externe. La couche source la stocke en texte, au format
+          d'affichage du système observé — mois, jour, année ; elle est ici convertie en DATE, la
+          chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:

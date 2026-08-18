@@ -2,8 +2,23 @@ version: 2
 
 models:
   - name: dim_agent
+    description: >
+      Dimension des comptes utilisateurs, à clé naturelle et sans clé de substitution. Une ligne
+      par compte distinct, obtenue par union des neuf colonnes d'auteur de la couche intermédiaire
+      — création, modification, confirmation et annulation sur les patients, les rendez-vous, les
+      passages et les factures, plus le régisseur des encaissements — les valeurs vides étant
+      écartées.
     columns:
       - name: code_agent
+        description: >
+          Identifiant du compte utilisateur ayant effectué une action, repris sans transformation
+          de la colonne source correspondante. Le champ est relevé au poste sous les libellés
+          « Créé par » et « Modifié par » de la fiche patient (relevés REL-PAT.D15 et REL-PAT.D14)
+          et « Confirmé par » du bloc de contrôle des rendez-vous (REL-RDV.C05) ; la colonne
+          régisseur des encaissements n'a pas été relevée à l'écran et provient de la description
+          documentaire du circuit de régie (source S-20). C'est un identifiant de compte, non un
+          nom de personne, et aucun annuaire ne permet de lui associer une identité ou une
+          fonction : rien n'est inventé ici.
         tests:
           - unique
           - not_null

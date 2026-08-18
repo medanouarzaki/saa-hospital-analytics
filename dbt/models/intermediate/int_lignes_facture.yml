@@ -3,9 +3,10 @@ version: 2
 models:
   - name: int_lignes_facture
     description: >
-      source.lignes_facture typée : les colonnes date/horodatage/booleen/numérique converties
-      par les macros de dbt/macros/conversions.sql, les colonnes code/texte reprises
-      telles quelles.
+      Une ligne par ligne de détail de facture, identifiée par le couple facture et numéro de
+      ligne. C'est la table la plus volumineuse de la couche : chaque facture porte plusieurs
+      actes. Couche de nettoyage sans destruction : codes et textes repris tels quels, date,
+      entiers et montants typés.
     tests:
       - meme_decompte_que_la_source:
           arguments:
@@ -14,43 +15,105 @@ models:
           arguments:
             column_name: "n_facture || '|' || n_ligne"
     columns:
+      - name: n_facture
+        description: >
+          Identifiant de la facture à laquelle la ligne appartient. Avec n_ligne, il forme la clé.
+          Colonne non relevée à l'écran, dont l'existence est documentée par une source (S-09).
       - name: n_ligne
+        description: >
+          Rang de la ligne au sein de la facture. Avec n_facture, il forme la clé. Colonne non
+          relevée à l'écran, dont l'existence est documentée par une source (S-09). La couche
+          source la stocke en texte ; elle est ici convertie en NUMÉRIQUE exact, la chaîne vide
+          devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'lignes_facture') }}"
                 source_column: n_ligne
+      - name: code_acte
+        description: >
+          Code de l'acte facturé. Aucune table de libellés n'accompagne ce code dans le système,
+          mais la colonne libelle_acte porte l'intitulé saisi à côté de lui. Colonne non relevée à
+          l'écran, dont l'existence est documentée par une source (S-27).
+      - name: libelle_acte
+        description: >
+          Intitulé de l'acte facturé, en texte libre. Il accompagne code_acte sans en constituer
+          une nomenclature : rien ne garantit qu'un même code porte toujours le même intitulé.
+          Colonne non relevée à l'écran, dont l'existence est documentée par une source (S-17).
+      - name: lettre_cle
+        description: >
+          Code de la lettre-clé de tarification, qui désigne la famille d'actes à laquelle le
+          tarif s'applique. Aucun libellé documenté. Colonne non relevée à l'écran, dont
+          l'existence est documentée par une source (S-17).
       - name: coefficient
+        description: >
+          Coefficient multiplicateur appliqué à la lettre-clé pour cet acte. Avec le tarif
+          unitaire et la quantité, il entre dans le calcul du montant. Colonne non relevée à
+          l'écran, dont l'existence est documentée par une source (S-17). La couche source la
+          stocke en texte ; elle est ici convertie en NUMÉRIQUE exact, la chaîne vide devenant une
+          valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'lignes_facture') }}"
                 source_column: coefficient
       - name: quantite
+        description: >
+          Nombre d'unités de l'acte facturées sur cette ligne. Seule colonne de cette table posée
+          sans preuve externe. Colonne non relevée à l'écran et posée sans preuve externe. La
+          couche source la stocke en texte ; elle est ici convertie en NUMÉRIQUE exact, la chaîne
+          vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'lignes_facture') }}"
                 source_column: quantite
       - name: tarif_unitaire
+        description: >
+          Tarif unitaire appliqué, en dirhams. Colonne non relevée à l'écran, dont l'existence est
+          documentée par une source (S-17). La couche source la stocke en texte ; elle est ici
+          convertie en NUMÉRIQUE exact, la chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'lignes_facture') }}"
                 source_column: tarif_unitaire
       - name: montant
+        description: >
+          Montant de la ligne, en dirhams. C'est la somme de ces montants, sur toutes les lignes
+          d'une facture, que les couches aval confrontent au montant total déclaré par l'en-tête.
+          Colonne non relevée à l'écran, dont l'existence est documentée par une source (S-17). La
+          couche source la stocke en texte ; elle est ici convertie en NUMÉRIQUE exact, la chaîne
+          vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'lignes_facture') }}"
                 source_column: montant
+      - name: service_executant
+        description: >
+          Code du service ayant exécuté l'acte. Il peut différer du service émetteur porté par
+          l'en-tête de la facture. Colonne non relevée à l'écran, dont l'existence est documentée
+          par une source (S-09).
       - name: date_acte
+        description: >
+          Date d'exécution de l'acte, qui peut précéder la date d'émission de la facture. Colonne
+          non relevée à l'écran, dont l'existence est documentée par une source (S-27). La couche
+          source la stocke en texte, au format d'affichage du système observé — mois, jour, année
+          ; elle est ici convertie en DATE, la chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'lignes_facture') }}"
                 source_column: date_acte
       - name: date_extraction
+        description: >
+          Date de l'extraction dont la ligne provient. Colonne TECHNIQUE de la zone
+          d'atterrissage, absente du système observé : elle partitionne le chargement et le rend
+          rejouable, une même partition pouvant être rechargée sans doublon. Colonne non relevée à
+          l'écran et posée sans preuve externe. La couche source la stocke en texte, au format
+          d'affichage du système observé — mois, jour, année ; elle est ici convertie en DATE, la
+          chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:

@@ -2,6 +2,12 @@ version: 2
 
 models:
   - name: fct_rendez_vous
+    description: >
+      Un rendez-vous par ligne, identifié par n_rdv. Trois drapeaux d'état — honoré, absence,
+      annulé — explicitent les significations de la colonne etat établies par la nomenclature des
+      états de rendez-vous. Le quatrième état, en instance, ne correspond à aucun des trois et
+      reste identifiable par la seule colonne etat, sans drapeau propre : un rendez-vous programmé
+      au-delà de la date d'extraction n'est ni honoré, ni manqué, ni annulé.
     tests:
       - meme_decompte_que_la_source:
           arguments:
@@ -11,23 +17,43 @@ models:
             jour_column: "date_rendez_vous"
     columns:
       - name: n_rdv
+        description: >
+          Identifiant du rendez-vous, clé de la table. Repris sans transformation de la colonne
+          source du même nom, colonne posée sans preuve externe et non relevée à l'écran.
         tests:
           - unique
           - not_null
       - name: n_ipp
+        description: >
+          Identifiant du patient. Repris sans transformation ; le champ est relevé au poste sous
+          le libellé « N° IPP » du bloc d'identification du rendez-vous (relevé REL-RDV.I01).
         tests:
           - not_null
+      - name: patient_valide_de
+        description: >
+          Version de la fiche patient en vigueur au jour du rendez-vous, exprimée par sa borne
+          basse de validité. Elle complète n_ipp pour désigner une ligne unique de dim_patient :
+          un patient dont la fiche a changé porte plusieurs versions, et c'est celle qui était en
+          vigueur ce jour-là qui est rattachée ici. Obtenue par jointure sur dim_patient avec la
+          condition de bornes semi-ouvertes, la borne haute étant exclue.
       - name: code_activite
+        description: >
+          Code de l'activité pour laquelle le rendez-vous est pris, clé de rattachement à
+          dim_activite. Repris de la colonne source activite, relevée au poste sous le libellé «
+          Activité » (relevé REL-RDV.R02), le nom étant préfixé pour marquer le rattachement à la
+          dimension.
         tests:
           - not_null
           - relationships:
               arguments:
                 to: "{{ ref('dim_activite') }}"
                 field: "code_activite"
-      - name: code_agenda
-        tests:
-          - not_null
       - name: date_rendez_vous
+        description: >
+          Jour du rendez-vous, obtenu en tronquant à la date la colonne source du même nom,
+          relevée au poste sous le libellé « Date rendez-vous » (relevé REL-RDV.R08) et convertie
+          du texte en horodatage par la couche intermédiaire. C'est cette colonne qui sert de clé
+          de rattachement à dim_date.
         tests:
           - not_null
           - relationships:
@@ -35,36 +61,98 @@ models:
                 to: "{{ ref('dim_date') }}"
                 field: "date_jour"
       - name: date_prise
+        description: >
+          Jour où le rendez-vous a été pris, obtenu en tronquant à la date la colonne source
+          date_creation, relevée au poste sous le libellé « Date création » (relevé REL-RDV.C02).
+          C'est la date de l'acte administratif, à distinguer de celle du rendez-vous lui-même.
         tests:
           - not_null
-      - name: delai_obtention_jours
-        tests:
-          - not_null
-      - name: est_jour_meme
-        tests:
-          - not_null
+      - name: date_confirmation
+        description: >
+          Jour de confirmation du rendez-vous, obtenu en tronquant à la date la colonne source
+          date_conf, relevée au poste sous le libellé « Date conf. » (relevé REL-RDV.C06). Vide
+          lorsque le rendez-vous n'a pas été confirmé.
+      - name: date_annulation
+        description: >
+          Jour d'annulation du rendez-vous, obtenu en tronquant à la date la colonne source
+          date_annul, relevée au poste sous le libellé « Date annul. » (relevé REL-RDV.C08). Vide
+          lorsque le rendez-vous n'a pas été annulé.
       - name: etat
-        tests:
-          - not_null
-      - name: est_honore
-        tests:
-          - not_null
-      - name: est_absence
-        tests:
-          - not_null
-      - name: est_annule
+        description: >
+          Code de l'état du rendez-vous, repris sans transformation de la colonne source du même
+          nom, relevée au poste sous le libellé « État » (relevé REL-RDV.R11). Quatre valeurs
+          existent : honoré, confirmé, annulé et en instance. La valeur « confirmé » désigne en
+          pratique une absence — un rendez-vous resté confirmé dont la date est passée n'a pas été
+          honoré — ce que le drapeau est_absence explicite.
         tests:
           - not_null
       - name: duree_minutes
+        description: >
+          Durée prévue du rendez-vous, en minutes. Reprise de la colonne source duree, relevée au
+          poste sous le libellé « Durée » (relevé REL-RDV.R12), dont le registre des champs
+          précise qu'elle est exprimée en minutes.
+        tests:
+          - not_null
+      - name: code_agenda
+        description: >
+          Code de l'agenda sur lequel le rendez-vous est posé, c'est-à-dire le carnet propre à une
+          activité. Repris de la colonne source agenda, relevée au poste sous le libellé « Agenda
+          » (relevé REL-RDV.R01), la chaîne vide étant convertie en valeur absente.
+        tests:
+          - not_null
+      - name: delai_obtention_jours
+        description: >
+          Délai d'obtention du rendez-vous, en jours, CALCULÉ : différence entre le jour du
+          rendez-vous et le jour de sa prise. Il vaut zéro pour un rendez-vous pris pour le jour
+          même, ce que le drapeau est_jour_meme explicite.
+        tests:
+          - not_null
+      - name: est_jour_meme
+        description: >
+          Vrai lorsque le rendez-vous a été pris pour le jour même. CALCULÉ comme l'égalité à zéro
+          du délai d'obtention. Le distinguer importe pour les analyses de délai : un délai nul
+          relève d'une décision de construction et non d'une attente observée.
+        tests:
+          - not_null
+      - name: est_honore
+        description: >
+          Vrai lorsque le patient s'est présenté. CALCULÉ comme l'égalité de la colonne etat au
+          code d'honoré de la nomenclature des états de rendez-vous.
+        tests:
+          - not_null
+      - name: est_absence
+        description: >
+          Vrai lorsque le patient ne s'est pas présenté. CALCULÉ comme l'égalité de la colonne
+          etat au code de confirmation : la nomenclature ne porte aucun code propre à l'absence,
+          et un rendez-vous resté confirmé dont la date est passée est un rendez-vous manqué.
+          C'est la correspondance qu'établit la configuration de génération.
+        tests:
+          - not_null
+      - name: est_annule
+        description: >
+          Vrai lorsque le rendez-vous a été annulé. CALCULÉ comme l'égalité de la colonne etat au
+          code d'annulation. L'annulation est distincte de l'absence : le patient a prévenu.
         tests:
           - not_null
       - name: origine
+        description: >
+          Code de l'origine du rendez-vous, qui dit d'où vient la demande. Repris de la colonne
+          source du même nom, relevée au poste sous le libellé « Origine » (relevé REL-RDV.R03),
+          la chaîne vide étant convertie en valeur absente.
         tests:
           - not_null
       - name: est_patient_adresse
+        description: >
+          Vrai lorsque le patient est adressé par une autre structure. CALCULÉ comme l'égalité de
+          la colonne origine au code des autres hôpitaux, seul code d'adressage effectivement
+          écrit dans ce jeu de données.
         tests:
           - not_null
       - name: agent_creation
+        description: >
+          Identifiant du compte utilisateur ayant créé le rendez-vous, clé de rattachement à
+          dim_agent. Repris de la colonne source cree_par, relevée au poste sous le libellé « Créé
+          par » (relevé REL-RDV.C01), la chaîne vide étant convertie en valeur absente.
         tests:
           - not_null
           - relationships:
@@ -72,20 +160,41 @@ models:
                 to: "{{ ref('dim_agent') }}"
                 field: "code_agent"
       - name: agent_modification
+        description: >
+          Identifiant du compte utilisateur ayant modifié le rendez-vous en dernier, clé de
+          rattachement à dim_agent. Repris de la colonne source modifie_par, relevée au poste sous
+          le libellé « Modifié par » (relevé REL-RDV.C03). Colonne facultative, souvent vide.
         tests:
           - relationships:
               arguments:
                 to: "{{ ref('dim_agent') }}"
                 field: "code_agent"
       - name: agent_confirmation
+        description: >
+          Identifiant du compte utilisateur ayant confirmé le rendez-vous, clé de rattachement à
+          dim_agent. Repris de la colonne source confirme_par, relevée au poste sous le libellé «
+          Confirmé par » (relevé REL-RDV.C05).
         tests:
           - relationships:
               arguments:
                 to: "{{ ref('dim_agent') }}"
                 field: "code_agent"
       - name: agent_annulation
+        description: >
+          Identifiant du compte utilisateur ayant annulé le rendez-vous, clé de rattachement à
+          dim_agent. Repris de la colonne source annule_par, relevée au poste sous le libellé «
+          Annulé par » (relevé REL-RDV.C07). Vide lorsque le rendez-vous n'a pas été annulé.
         tests:
           - relationships:
               arguments:
                 to: "{{ ref('dim_agent') }}"
                 field: "code_agent"
+      - name: medecin_ext
+        description: >
+          Nom du médecin extérieur ayant adressé le patient, en texte libre. Repris de la colonne
+          source du même nom, relevée au poste sous le libellé « Médecin ext. » (relevé
+          REL-RDV.R05), la chaîne vide étant convertie en valeur absente. Cette colonne ressemble
+          à une clé d'agent mais N'EN EST PAS UNE : elle a été mesurée intégralement orpheline de
+          dim_agent — aucune de ses valeurs n'y figure — parce qu'elle nomme un praticien
+          extérieur à l'établissement et non un compte utilisateur. Elle est donc conservée comme
+          attribut libre, sans relation ni contrôle relationnel.

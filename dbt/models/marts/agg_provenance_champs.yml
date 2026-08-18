@@ -1,0 +1,36 @@
+version: 2
+
+models:
+  - name: agg_provenance_champs
+    description: >
+      Une ligne par étiquette de provenance des colonnes de la couche source — trois lignes.
+      CET OBJET EST MAINTENU HORS DE L'OUTIL DE TRANSFORMATION : sa vue n'est pas un modèle de ce
+      projet mais est posée par un fichier de définition de schéma écrit à la main,
+      ingestion/ddl/20_marts_agg_provenance.sql, appliqué en préalable d'initialisation. Ce fichier
+      de propriétés le documente sans le construire, et l'outil signale d'ailleurs à l'analyse qu'il
+      ne trouve pas de modèle correspondant — c'est attendu, et c'est le prix de la documentation
+      d'un objet qu'il ne gouverne pas. La raison de ce maintien hors du projet est consignée par
+      l'enregistrement de décision 0028.
+      Son contenu ne vient d'aucune donnée métier : il est lu dans le CATALOGUE SYSTÈME, sur les
+      commentaires portés par les colonnes du schéma source, dont l'étiquette de provenance est
+      extraite par expression régulière. C'est une vue et non une table alimentée, précisément pour
+      qu'elle ne puisse pas diverger du catalogue qu'elle décrit : elle est recalculée à chaque
+      lecture.
+    columns:
+      - name: provenance
+        description: >
+          Étiquette de provenance de la colonne source, extraite du commentaire que porte chaque
+          colonne du schéma source dans le catalogue système. Trois valeurs : observée au poste,
+          documentée par une source, ou posée sans preuve externe. C'est l'axe de groupement de la
+          vue.
+      - name: nb_colonnes
+        description: >
+          Nombre de colonnes de la couche source portant cette étiquette. Décompte des commentaires
+          de colonne du schéma source groupés par étiquette. La somme des trois lignes vaut le
+          nombre total de colonnes documentées de la couche source.
+      - name: part_pourcent
+        description: >
+          Part que représente l'étiquette, en pourcentage arrondi à une décimale. NUMÉRATEUR : le
+          nombre de colonnes portant l'étiquette. DÉNOMINATEUR : le total de la colonne nb_colonnes
+          sur l'ensemble des lignes de la vue, obtenu par fonction de fenêtre. Les trois parts
+          somment donc à cent, aux arrondis près.

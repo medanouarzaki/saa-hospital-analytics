@@ -3,24 +3,49 @@ version: 2
 models:
   - name: fct_sejour
     description: >
-      service_sortie est une colonne dérivée : service_destination de la ligne de
-      mutation quand le séjour en porte une, service_accueil sinon.
+      Un séjour d'hospitalisation par ligne, identifié par n_sejour. Contrairement aux autres
+      faits, cette table n'est pas une reprise ligne à ligne : elle AGRÈGE la couche intermédiaire
+      des mouvements, qui porte une ligne par mouvement — une admission, au plus une mutation, au
+      plus une sortie. La structure a été mesurée entièrement déterministe, ce qui permet de
+      replier chaque séjour en une ligne par un simple maximum colonne par colonne.
     tests:
       - version_patient_comptable:
           arguments:
             jour_column: "jour_admission"
     columns:
       - name: n_sejour
+        description: >
+          Identifiant du séjour, clé de la table. Repris sans transformation de la colonne source
+          du même nom, documentée par la description de l'organisation hospitalière (source S-27).
         tests:
           - unique
           - not_null
       - name: n_ipp
+        description: >
+          Identifiant du patient hospitalisé. Obtenu comme le minimum des n_ipp des mouvements du
+          séjour — un séjour n'en portant qu'un seul, le minimum ne fait que replier une valeur
+          constante. Le champ est relevé au poste sous le libellé « N° IPP » (relevé REL-PAT.D01).
         tests:
           - not_null
+      - name: patient_valide_de
+        description: >
+          Version de la fiche patient en vigueur au moment de l'événement, exprimée par sa borne
+          basse de validité. Elle complète n_ipp pour désigner une ligne unique de dim_patient :
+          un patient dont la fiche a changé porte plusieurs versions, et c'est celle qui était en
+          vigueur ce jour-là qui est rattachée ici. Obtenue par jointure sur dim_patient avec la
+          condition de bornes semi-ouvertes, la borne haute étant exclue.
       - name: date_heure_admission
+        description: >
+          Horodatage de l'admission. Obtenu comme le maximum de la colonne du même nom sur les
+          mouvements du séjour : elle n'est renseignée que sur la ligne d'admission, si bien que
+          le maximum l'isole. Colonne convertie du texte en horodatage par la couche
+          intermédiaire.
         tests:
           - not_null
       - name: jour_admission
+        description: >
+          Jour d'admission, obtenu en tronquant date_heure_admission à la date. C'est cette
+          colonne qui sert de clé de rattachement à dim_date.
         tests:
           - not_null
           - relationships:
@@ -28,9 +53,19 @@ models:
                 to: "{{ ref('dim_date') }}"
                 field: "date_jour"
       - name: mode_admission
+        description: >
+          Code du mode d'admission — programmée, par les urgences, par transfert. Obtenu comme le
+          maximum de la colonne du même nom sur les mouvements, la chaîne vide étant convertie en
+          valeur absente. Colonne documentée par la description de l'organisation hospitalière
+          (source S-27).
         tests:
           - not_null
       - name: service_accueil
+        description: >
+          Code du service ayant accueilli le patient, clé de rattachement à dim_service. Obtenu
+          comme le maximum de la colonne du même nom sur les mouvements : elle n'est renseignée
+          que sur la ligne d'admission. Aucun séjour ne porte deux services d'accueil distincts,
+          ce qui a été mesuré.
         tests:
           - not_null
           - relationships:
@@ -38,33 +73,89 @@ models:
                 to: "{{ ref('dim_service') }}"
                 field: "code_service"
       - name: lit_admission
+        description: >
+          Identifiant du lit occupé à l'admission. Il ne peut pas être obtenu par un simple
+          maximum comme les autres colonnes : le lit est renseigné À LA FOIS sur la ligne
+          d'admission et sur celle de mutation, avec deux valeurs différentes. Il est donc isolé
+          par un filtre sur la présence du service d'accueil, qui ne caractérise que la ligne
+          d'admission. Colonne posée sans preuve externe.
         tests:
           - not_null
-      - name: a_une_mutation
-        tests:
-          - not_null
+      - name: date_heure_mutation
+        description: >
+          Horodatage de la mutation interne, lorsqu'elle existe. Obtenu comme le maximum de la
+          colonne du même nom sur les mouvements : elle n'est renseignée que sur la ligne de
+          mutation, et reste vide pour un séjour sans mutation.
       - name: service_origine
+        description: >
+          Code du service quitté lors de la mutation, clé de rattachement à dim_service. Obtenu
+          comme le maximum de la colonne du même nom sur les mouvements ; vide en l'absence de
+          mutation.
         tests:
           - relationships:
               arguments:
                 to: "{{ ref('dim_service') }}"
                 field: "code_service"
       - name: service_destination
+        description: >
+          Code du service rejoint lors de la mutation, clé de rattachement à dim_service. Obtenu
+          comme le maximum de la colonne du même nom sur les mouvements ; vide en l'absence de
+          mutation.
         tests:
           - relationships:
               arguments:
                 to: "{{ ref('dim_service') }}"
                 field: "code_service"
+      - name: date_heure_sortie
+        description: >
+          Horodatage de la sortie, lorsqu'elle a eu lieu. Obtenu comme le maximum de la colonne du
+          même nom sur les mouvements : elle n'est renseignée que sur la ligne de sortie, et reste
+          vide pour un séjour non clos à la date d'extraction.
+      - name: jour_sortie
+        description: >
+          Jour de sortie, obtenu en tronquant date_heure_sortie à la date ; vide pour un séjour
+          non clos.
+      - name: mode_sortie
+        description: >
+          Code du mode de sortie — domicile, transfert, décès. Obtenu comme le maximum de la
+          colonne du même nom sur les mouvements, la chaîne vide étant convertie en valeur absente
+          ; vide pour un séjour non clos.
+      - name: nb_lignes_mouvement
+        description: >
+          Nombre de mouvements composant le séjour, CALCULÉ par décompte des lignes de la couche
+          intermédiaire des mouvements groupées par n_sejour. Il vaut un pour un séjour réduit à
+          son admission, et croît d'une unité par mutation et par sortie enregistrées.
+        tests:
+          - not_null
+      - name: a_une_mutation
+        description: >
+          Vrai lorsque le séjour comporte une mutation interne. CALCULÉ comme la présence d'un
+          service d'origine, celui-ci n'étant renseigné que par une ligne de mutation.
+        tests:
+          - not_null
       - name: est_clos
+        description: >
+          Vrai lorsque le séjour est terminé à la date d'extraction. CALCULÉ comme la présence
+          d'un horodatage de sortie. Un séjour non clos n'a ni jour de sortie, ni mode de sortie,
+          ni durée.
         tests:
           - not_null
       - name: service_sortie
+        description: >
+          Code du service d'où le patient sort, DÉRIVÉ et non repris : c'est le service de
+          destination de la mutation lorsqu'il y en a une, et le service d'accueil sinon — sans
+          mutation, le patient sort du service qui l'a accueilli. Clé de rattachement à
+          dim_service.
         tests:
           - not_null
           - relationships:
               arguments:
                 to: "{{ ref('dim_service') }}"
                 field: "code_service"
-      - name: nb_lignes_mouvement
-        tests:
-          - not_null
+      - name: duree_jours
+        description: >
+          Durée du séjour en jours, CALCULÉE pour les seuls séjours clos : différence entre
+          date_heure_sortie et date_heure_admission, exprimée en secondes puis divisée par 86 400.
+          Vide pour un séjour non clos. L'unité est le jour afin que la durée moyenne recalculée
+          depuis ce fait soit directement comparable au paramètre de durée moyenne de séjour
+          publié.

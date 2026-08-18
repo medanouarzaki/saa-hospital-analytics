@@ -44,6 +44,23 @@ MOTIF_PAGE_DECLAREE = re.compile(r"""st\.Page\(\s*["']pages/([a-z_]+)\.py""")
 _NOEUDS_LUS = ("FAMILLES", "_UNION_JOURS", "REQUETES")
 
 
+def _rendre_page(nom: str):
+    """Rend une page par l'instrument du cadriciel, et rend l'application obtenue.
+
+    UNE SEULE page est rendue par processus dans ce fichier, et ce n'est pas un détail de
+    commodité : un second rendu en processus se termine par un signal de segmentation sur cette
+    machine, mesuré à plusieurs reprises. Les contrôles qui rendent TOUTES les pages vivent donc
+    dans `tests/test_tableau_de_bord_contexte_conteneur.py`, qui isole chaque rendu dans un enfant.
+    """
+    from streamlit.testing.v1 import AppTest  # noqa: PLC0415
+
+    application = AppTest.from_file(str(PAGES / f"{nom}.py"), default_timeout=300).run()
+    assert not list(application.exception), (
+        f"la page « {nom} » a levé : {list(application.exception)[0].value[:300]}"
+    )
+    return application
+
+
 def _registre() -> dict:
     return yaml.safe_load(REGISTRE.read_text(encoding="utf-8"))
 
@@ -72,6 +89,26 @@ def _requetes_de_page(nom: str) -> dict[str, str]:
             continue
     assert "REQUETES" in local, f"la page {nom} ne définit pas de requêtes lisibles"
     return local["REQUETES"]
+
+
+def _constantes_de_page(nom: str) -> dict:
+    """Les affectations de premier niveau d'une page, sans l'exécuter.
+
+    Même mécanisme que `_requetes_de_page`, mais rend l'espace de noms entier : un contrôle qui a
+    besoin d'un code d'état ou d'un seuil déclaré par une page le lit ici, plutôt que de le
+    recopier et de diverger d'elle en silence.
+    """
+    arbre = ast.parse((PAGES / f"{nom}.py").read_text(encoding="utf-8"))
+    local: dict = {}
+    for noeud in arbre.body:
+        if not isinstance(noeud, ast.Assign):
+            continue
+        module = ast.Module(body=[noeud], type_ignores=[])
+        try:
+            exec(compile(module, "page", "exec"), local)
+        except Exception:
+            continue
+    return local
 
 
 def _lecture():
@@ -430,6 +467,11 @@ def test_les_indicateurs_de_facturation_et_de_qualite_egalent_leur_seconde_mesur
         requete = _requetes_de_page(page)[identifiant]
         if "{filtre}" in requete:
             requete = requete.format(filtre="")
+        # Le taux d'encaissement porte DEUX restrictions, une par membre du rapport : son
+        # dénominateur se date par la facture et son numérateur par l'encaissement. Les deux se
+        # neutralisent ici, la seconde mesure portant sur la période entière.
+        if "{filtre_facture}" in requete:
+            requete = requete.format(filtre_facture="", filtre_encaissement="")
         return requete % parametres if parametres else requete
 
     # Facturation : les montants, contre un décompte direct de la table de faits.
@@ -706,10 +748,20 @@ def test_le_marquage_de_filtrabilite_est_conforme_au_registre() -> None:
                 rendu.mention_de_filtrabilite(identifiant)
                 marque = len(emis)
 
+                # Sur une page dont aucun indicateur n'est filtrable, le bandeau de tête l'a déjà
+                # dit pour la page entière : le marquage par indicateur y est attendu ABSENT, et
+                # sa présence serait la répétition que la page n'a pas à porter.
+                page_filtrable = rendu.page_porte_un_filtre(page)
+
                 if attendue == "oui" and marque:
                     fautifs.append(f"{identifiant} : filtrable mais marqué « {emis[0][:60]} »")
-                if attendue != "oui" and not marque:
+                if attendue != "oui" and page_filtrable and not marque:
                     fautifs.append(f"{identifiant} : déclaré {attendue} mais non marqué")
+                if attendue != "oui" and not page_filtrable and marque:
+                    fautifs.append(
+                        f"{identifiant} : page entièrement non filtrable, le bandeau de tête "
+                        f"suffit, et pourtant marqué « {emis[0][:60]} »"
+                    )
                 if attendue == "non" and marque and rendu.MENTION_HORS_FILTRE not in emis[0]:
                     fautifs.append(f"{identifiant} : marqué sans la mention hors filtre")
                 if attendue == "oui_sous_reserve" and marque:
@@ -731,6 +783,192 @@ def test_le_marquage_de_filtrabilite_est_conforme_au_registre() -> None:
         rendu.st.warning = origine
 
     assert not fautifs, "marquage non conforme au registre : " + " | ".join(fautifs)
+
+
+def test_une_page_qui_restreint_en_sql_le_fait_pour_tous_ses_indicateurs_filtrables() -> None:
+    """Sur une page qui restreint ses requêtes, aucun indicateur filtrable n'échappe à la
+    restriction.
+
+    POURQUOI CETTE PROPRIÉTÉ EXISTE. Le marquage affiché vient du registre ; la restriction vient de
+    la requête. Rien ne les reliait : une requête sans motif de restriction s'exécutait telle quelle
+    sur la totalité du jeu pendant que l'écran affichait « Filtré par la période ». Un lecteur
+    voyait alors une valeur de période entière sous une mention de période choisie, et aucun
+    contrôle ne le voyait.
+
+    POURQUOI LA CONDITION PORTE SUR LA PAGE ET NON SUR L'INDICATEUR. Deux mécanismes de restriction
+    coexistent légitimement dans ce tableau de bord : la restriction en SQL, par un motif que la
+    page substitue, et la restriction après la requête, sur le tableau rendu — c'est ce que fait la
+    page d'activité, qui interroge une fois puis découpe. Exiger un motif SQL de tout indicateur
+    filtrable ferait rougir cette page à tort. La propriété se rabat donc sur la cohérence INTERNE
+    d'une page : dès qu'une page en restreint UN en SQL, elle les restreint TOUS ainsi, faute de
+    quoi un indicateur passe entre les deux mécanismes — exactement ce qui s'était produit.
+
+    CE QU'ELLE NE COUVRE PAS : une page qui ne restreindrait aucune de ses requêtes en SQL et
+    oublierait le découpage après coup sur l'un de ses indicateurs. Ce cas-là échappe encore, et
+    seule la confrontation de chaque valeur à sa seconde mesure, sur une période restreinte,
+    l'attraperait.
+    """
+    motif = re.compile(r"\{filtre[a-z_]*\}")
+
+    fautifs = []
+    for page in pages_ecrites():
+        requetes = _requetes_de_page(page)
+        declarees = {
+            entree["identifiant"]: entree["filtrabilite"]
+            for entree in _registre()["indicateurs"]
+            if entree["page"] == page and entree["identifiant"] in requetes
+        }
+        filtrables = {i for i, valeur in declarees.items() if valeur != "non"}
+        restreintes = {i for i in declarees if motif.search(requetes[i])}
+
+        if not restreintes:
+            continue  # page qui restreint après la requête, ou page sans indicateur filtrable
+
+        for identifiant in sorted(filtrables - restreintes):
+            fautifs.append(
+                f"{identifiant} : la page « {page} » restreint ses requêtes en SQL "
+                f"({len(restreintes)} le font), mais celle-ci n'a aucun motif de restriction "
+                f"alors que le registre la déclare « {declarees[identifiant]} » — l'écran porte "
+                "la mention de filtrage et la valeur porte sur la totalité du jeu"
+            )
+        for identifiant in sorted(restreintes - filtrables):
+            fautifs.append(
+                f"{identifiant} : déclaré « non » au registre mais sa requête porte un motif de "
+                "restriction"
+            )
+
+    assert not fautifs, "mention de filtrage et requête en désaccord : " + " | ".join(fautifs)
+
+
+def test_la_courbe_de_rapprochement_repere_le_seuil_retenu() -> None:
+    """Le nuage précision/rappel porte un repère qui distingue le seuil retenu des autres.
+
+    CE QUE CETTE PROPRIÉTÉ COUVRE : que la page passe bien au graphique une colonne de repérage,
+    que cette colonne ne prenne que deux valeurs, qu'une seule ligne porte la valeur « retenue », et
+    que le seuil de cette ligne soit celui que les grappes portent réellement — lu dans les données,
+    jamais écrit ici. Elle couvre aussi les deux champs de position, qui doivent être le rappel et
+    la précision et non le seuil.
+
+    CE QU'ELLE NE COUVRE PAS : la lisibilité du nuage. Elle ne dit rien du nombre de points
+    visibles, de leur superposition, ni de la couleur effectivement rendue — un repère présent mais
+    invisible à l'œil la passerait. C'est la limite qui a laissé passer le tracé illisible que ce
+    contrôle remplace, et elle est réduite, non supprimée.
+    """
+    import streamlit as st
+
+    from dashboard import lecture as module_lecture
+
+    captures: list[tuple] = []
+    origine = st.scatter_chart
+    st.scatter_chart = lambda data=None, **k: captures.append((data, k))
+    try:
+        _rendre_page("rapprochement")
+    finally:
+        st.scatter_chart = origine
+
+    assert len(captures) == 1, (
+        f"la page devrait tracer un nuage et un seul, {len(captures)} tracé(s)"
+    )
+    plan, options = captures[0]
+
+    assert options.get("x") == "rappel", f"abscisse attendue « rappel », reçue {options.get('x')!r}"
+    assert options.get("y") == "precision_valeur", (
+        f"ordonnée attendue « precision_valeur », reçue {options.get('y')!r}"
+    )
+
+    colonne = options.get("color")
+    assert colonne, (
+        "le nuage ne porte aucun canal de couleur : le seuil retenu n'y est repéré d'aucune façon, "
+        "et un lecteur ne peut pas savoir lequel des points il a choisi"
+    )
+    assert colonne in plan.columns, f"la couleur nomme « {colonne} », absente des colonnes tracées"
+
+    valeurs = sorted(set(plan[colonne]))
+    assert len(valeurs) == 2, (
+        f"le repère devrait prendre exactement deux valeurs — retenu et non retenu — il en prend "
+        f"{len(valeurs)} : {valeurs}"
+    )
+
+    seuil_reel = float(
+        module_lecture.interroger("select distinct seuil from grappes_identite").iloc[0]["seuil"]
+    )
+    marquees = plan[plan[colonne].str.contains("retenu", case=False)]
+    assert len(marquees) == 1, (
+        f"une seule ligne devrait porter le repère du seuil retenu, {len(marquees)} en portent"
+    )
+    assert float(marquees.iloc[0]["seuil"]) == seuil_reel, (
+        f"le point repéré porte le seuil {float(marquees.iloc[0]['seuil'])!r}, alors que les "
+        f"grappes ont été formées au seuil {seuil_reel!r}"
+    )
+
+
+def test_le_bandeau_de_non_filtrabilite_n_est_porte_qu_une_fois_par_page_entiere() -> None:
+    """Une page entièrement non filtrable porte le bandeau UNE fois ; une page mixte le porte par
+    indicateur.
+
+    CE QUE CETTE PROPRIÉTÉ COUVRE : le NOMBRE de bandeaux qu'une page émet réellement, compté en
+    interceptant les deux fonctions d'affichage qui les produisent — celle du bandeau de tête et
+    celle du marquage par indicateur. Les deux catégories de page sont dérivées du registre, jamais
+    recopiées : une page est « entière » si aucun de ses indicateurs n'est filtrable, « mixte »
+    sinon. Le contrôle exige qu'au moins une page de chaque catégorie existe, sans quoi il ne
+    prouverait rien de la moitié de la règle.
+
+    CE QU'ELLE NE COUVRE PAS : le contenu des bandeaux, vérifié par la propriété de conformité au
+    registre ; leur position à l'écran ; et l'encombrement visuel qu'ils produisent, qu'aucun
+    contrôle de ce dépôt ne mesure.
+    """
+    from dashboard import rendu
+
+    emis_tete: list[str] = []
+    emis_indicateur: list[str] = []
+    origine_info, origine_warning = rendu.st.info, rendu.st.warning
+    rendu.st.info = lambda message, **_: emis_tete.append(str(message))
+    rendu.st.warning = lambda message, **_: emis_indicateur.append(str(message))
+
+    entieres: list[str] = []
+    mixtes: list[str] = []
+    fautifs: list[str] = []
+    try:
+        for page in pages_ecrites():
+            indicateurs = [e for e in _registre()["indicateurs"] if e["page"] == page]
+            entiere = not rendu.page_porte_un_filtre(page)
+            (entieres if entiere else mixtes).append(page)
+
+            emis_tete.clear()
+            emis_indicateur.clear()
+            rendu.filtre_de_page(page)
+            for entree in indicateurs:
+                rendu.mention_de_filtrabilite(entree["identifiant"])
+            tete, par_indicateur = len(emis_tete), len(emis_indicateur)
+
+            if entiere:
+                attendus = sum(1 for e in indicateurs if e["filtrabilite"] != "oui")
+                if tete != 1:
+                    fautifs.append(f"{page} : entièrement non filtrable, {tete} bandeau de tête")
+                if par_indicateur:
+                    fautifs.append(
+                        f"{page} : entièrement non filtrable, le bandeau de tête suffit, et "
+                        f"pourtant {par_indicateur} bandeau(x) par indicateur sur {attendus} "
+                        "indicateurs concernés"
+                    )
+            else:
+                attendus = sum(1 for e in indicateurs if e["filtrabilite"] != "oui")
+                if tete:
+                    fautifs.append(f"{page} : page mixte, et pourtant {tete} bandeau de tête")
+                if par_indicateur != attendus:
+                    fautifs.append(
+                        f"{page} : page mixte, {attendus} indicateur(s) échappant au filtre mais "
+                        f"{par_indicateur} bandeau(x) par indicateur — le marquage qui distingue "
+                        "les chiffres restreints des autres a bougé"
+                    )
+    finally:
+        rendu.st.info, rendu.st.warning = origine_info, origine_warning
+
+    assert entieres, (
+        "aucune page entièrement non filtrable : la première moitié de la règle n'est pas éprouvée"
+    )
+    assert mixtes, "aucune page mixte : la seconde moitié de la règle n'est pas éprouvée"
+    assert not fautifs, "bandeaux de non-filtrabilité mal répartis : " + " | ".join(fautifs)
 
 
 def test_la_mention_de_source_est_conforme_au_registre() -> None:
@@ -1040,4 +1278,179 @@ def test_la_date_de_reference_est_celle_des_donnees() -> None:
 
     assert portee == attendue, (
         f"date de référence affichée {portee}, dernière extraction chargée {attendue}"
+    )
+
+
+def test_la_mesure_intra_activite_egale_sa_seconde_mesure() -> None:
+    """Les deux grandeurs de l'écart intra-activité, confrontées à un calcul écrit autrement.
+
+    La page fait calculer les médianes et les corrélations PAR LE SERVEUR, en une passe groupée.
+    La seconde mesure les recalcule ICI, en Python, depuis les lignes brutes : médiane par
+    `statistics.median` sur la liste des délais, corrélation par la formule de Pearson appliquée
+    aux valeurs centrées par activité. Les deux chemins ne partagent que les données ; ni la
+    fonction d'agrégat, ni le moteur qui l'exécute.
+
+    La population est écrite deux fois de deux façons également : la page retient
+    `est_honore`/`est_absence`, colonnes booléennes de la couche des faits ; la seconde mesure
+    repart du code d'état brut, `etat`, dont ces booléens sont dérivés.
+    """
+    import statistics  # noqa: PLC0415
+
+    lecture = _lecture()
+    _instantane_pret(lecture)
+    requetes = _requetes_de_page("rendez_vous")
+    # Le code d'absence est LU dans la page, jamais recopié ici. Le code d'honoré, lui, n'est pas
+    # déclaré par la page : il est DÉDUIT des données, en relevant le code d'état que portent les
+    # lignes honorées. Aucun des deux n'est écrit en littéral dans ce fichier.
+    code_absence = _constantes_de_page("rendez_vous")["ETAT_ABSENCE"]
+
+    intra = lecture.interroger(
+        requetes["rendez_vous_delai_et_absence_intra_activite"].format(filtre="")
+    )
+    agrege = lecture.interroger(
+        _constantes_de_page("rendez_vous")["REQUETE_INTRA_AGREGEE"].format(filtre="")
+    )
+
+    # Les lignes brutes, lues une seule fois, sur lesquelles la seconde mesure est construite.
+    brutes = lecture.interroger(
+        """
+        select code_activite, delai_obtention_jours as delai, etat, est_honore, est_absence
+        from fct_rendez_vous
+        """
+    )
+
+    ecarts = []
+
+    codes_honores = {ligne.etat for ligne in brutes.itertuples(index=False) if ligne.est_honore}
+    assert len(codes_honores) == 1, (
+        f"les lignes honorées portent plusieurs codes d'état : {sorted(codes_honores)}"
+    )
+    code_honore = codes_honores.pop()
+    assert code_honore != code_absence, "le code d'honoré et celui d'absence se confondent"
+
+    par_activite: dict[str, dict[str, list[int]]] = {}
+    for ligne in brutes.itertuples(index=False):
+        seau = par_activite.setdefault(ligne.code_activite, {"honores": [], "absences": []})
+        if ligne.delai is None or ligne.delai <= 0:
+            continue
+        # Repart du code d'état brut, jamais des booléens que la page emploie pour filtrer.
+        if ligne.etat == code_absence:
+            seau["absences"].append(int(ligne.delai))
+        elif ligne.etat == code_honore:
+            seau["honores"].append(int(ligne.delai))
+
+    for ligne in intra.itertuples(index=False):
+        seau = par_activite.get(ligne.code_activite, {"honores": [], "absences": []})
+        for nom, colonne in (
+            ("honores", ligne.mediane_honores),
+            ("absences", ligne.mediane_absences),
+        ):
+            if not seau[nom]:
+                continue
+            seconde = statistics.median(seau[nom])
+            if abs(float(colonne) - float(seconde)) > 1e-9:
+                ecarts.append(
+                    f"médiane {nom} de l'activité {ligne.code_activite} : "
+                    f"{float(colonne)} affiché contre {float(seconde)} recalculé"
+                )
+
+    # Corrélation intra-activité : centrage par activité, puis Pearson écrit à la main.
+    couples = []
+    for seau in par_activite.values():
+        valeurs = [(d, 0.0) for d in seau["honores"]] + [(d, 1.0) for d in seau["absences"]]
+        if not valeurs:
+            continue
+        m_delai = statistics.fmean(v[0] for v in valeurs)
+        m_absence = statistics.fmean(v[1] for v in valeurs)
+        couples.extend((d - m_delai, a - m_absence) for d, a in valeurs)
+
+    numerateur = sum(x * y for x, y in couples)
+    denominateur = (sum(x * x for x, _ in couples) * sum(y * y for _, y in couples)) ** 0.5
+    seconde_correlation = numerateur / denominateur
+
+    affichee = float(agrege["correlation_intra"][0])
+    if abs(affichee - seconde_correlation) > 1e-6:
+        ecarts.append(
+            f"corrélation intra-activité : {affichee} affichée contre "
+            f"{seconde_correlation} recalculée"
+        )
+
+    effectif_affiche = int(agrege["n_rendez_vous"][0])
+    if effectif_affiche != len(couples):
+        ecarts.append(f"effectif : {effectif_affiche} affiché contre {len(couples)} recalculé")
+
+    assert not ecarts, "valeurs divergentes de leur seconde mesure : " + " | ".join(ecarts)
+
+
+def test_le_signe_de_la_mesure_intra_activite_est_celui_du_parametre_injecte() -> None:
+    """L'écart intra-activité est positif, activité par activité et en agrégat.
+
+    C'est la propriété qui distingue la grandeur affichée de la relation réellement injectée : le
+    paramètre du générateur allonge le délai des seules lignes d'absence, à l'intérieur de chaque
+    spécialité. Si cette propriété cessait d'être vraie, la grandeur inter-activités resterait la
+    seule affichée et le registre des relations en serait démenti.
+
+    GARDE D'APPLICABILITÉ. Le paramètre injecté est de faible amplitude — il biaise par
+    échantillonnage par rejet le seul délai des lignes d'absence — et sa trace ne se lit que sur une
+    population suffisante. Sur une fenêtre partielle, chaque activité ne porte que quelques dizaines
+    d'absences, dont la médiane est dominée par le bruit d'échantillonnage : mesuré sur une
+    génération de trois mois, quatre activités sur huit portent un écart nul ou négatif et la
+    corrélation agrégée elle-même passe sous zéro, alors que le paramètre est inchangé. Le test
+    s'abstient donc, avec un motif explicite, lorsque la date de rendez-vous maximale présente ne
+    coïncide pas avec la date de fin de période lue dans la configuration — une égalité mesurée en
+    base et en configuration, jamais une marge arbitraire, et le même mécanisme que la garde
+    d'applicabilité des indicateurs de séjour.
+
+    Aucun skip silencieux hors de cette garde : une base manquante fait échouer le test.
+    """
+    from datetime import date as _date  # noqa: PLC0415
+
+    from generator import config  # noqa: PLC0415
+
+    lecture = _lecture()
+    _instantane_pret(lecture)
+
+    # `date_prise` et non `date_rendez_vous` : un rendez-vous se prend DANS la période et se tient
+    # parfois APRÈS elle, si bien que la date de rendez-vous maximale dépasse la fin de période même
+    # sur une génération complète — mesuré à 2026-11-11 contre une fin de période au 2026-06-30, ce
+    # qui rendrait cette garde toujours vraie et neutraliserait la propriété par construction. La
+    # date de prise, elle, est bornée par la période : elle en atteint la fin exactement sur une
+    # génération complète.
+    jour_max = lecture.interroger("select max(date_prise) as jour from fct_rendez_vous")["jour"][0]
+    date_fin = _date.fromisoformat(config.valeur("date_fin"))
+    if jour_max != date_fin:
+        pytest.skip(
+            f"fenêtre chargée partielle : date de prise maximale de fct_rendez_vous ({jour_max}) "
+            f"!= date de fin de période configurée ({date_fin}) — le paramètre injecté est de "
+            "faible amplitude et sa trace n'est mesurable que sur une génération couvrant la "
+            "période dans son entier"
+        )
+
+    requetes = _requetes_de_page("rendez_vous")
+
+    intra = lecture.interroger(
+        requetes["rendez_vous_delai_et_absence_intra_activite"].format(filtre="")
+    )
+    agrege = lecture.interroger(
+        _constantes_de_page("rendez_vous")["REQUETE_INTRA_AGREGEE"].format(filtre="")
+    )
+
+    negatives = [
+        f"{ligne.code_activite} : {float(ligne.mediane_absences)} contre "
+        f"{float(ligne.mediane_honores)}"
+        for ligne in intra.itertuples(index=False)
+        if ligne.mediane_absences is not None
+        and ligne.mediane_honores is not None
+        and float(ligne.mediane_absences) <= float(ligne.mediane_honores)
+    ]
+    assert not negatives, (
+        "activités où les absents n'attendent pas plus longtemps que les honorés : "
+        + " | ".join(negatives)
+    )
+
+    correlation_intra = float(agrege["correlation_intra"][0])
+    assert correlation_intra > 0, (
+        f"la corrélation intra-activité vaut {correlation_intra}, alors que le paramètre injecté "
+        "allonge le délai des lignes d'absence : une valeur nulle ou négative signifierait que ce "
+        "paramètre est sans effet observable"
     )

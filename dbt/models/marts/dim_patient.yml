@@ -5,6 +5,9 @@ models:
     description: >
       Dimension patient en SCD type 2 : une ligne par version de fiche, bornes de validité
       semi-ouvertes (valide_de inclus, valide_jusqu_a exclu, NULL pour la version courante).
+      Les quarante-six premières colonnes reprennent la fiche patient du système observé, telle
+      que la couche intermédiaire la type ; les trois dernières sont la mécanique d'historisation
+      ajoutée par le projet.
     tests:
       - meme_decompte_que_la_source:
           arguments:
@@ -14,6 +17,241 @@ models:
             column_name: "n_ipp || '|' || valide_de"
     columns:
       - name: n_ipp
+        description: >
+          Identifiant permanent du patient, clé qui relie la fiche à tous les événements le
+          concernant. Une même personne enregistrée deux fois porte deux identifiants distincts,
+          ce que le rapprochement d'identités cherche précisément à retrouver. Le champ est relevé
+          au poste sous le libellé « N° IPP » (relevé REL-PAT.D01).
+      - name: nom
+        description: >
+          Prénom du patient, tel qu'il est saisi à l'accueil. Le champ est relevé au poste sous le
+          libellé « Nom » (relevé REL-PAT.D02).
+      - name: nom_famille_1
+        description: >
+          Premier nom de famille. Le système en prévoit deux, sans imposer lequel est le nom
+          d'usage. Le champ est relevé au poste sous le libellé « Nom de famille 1 » (relevé
+          REL-PAT.D03).
+      - name: nom_famille_2
+        description: >
+          Second nom de famille, souvent vide. Le champ est relevé au poste sous le libellé « Nom
+          de famille 2 » (relevé REL-PAT.D04).
+      - name: sexe
+        description: >
+          Code du sexe du patient. Le système ne fournit aucune table de libellés pour ce code,
+          qui est donc conservé tel quel. Le champ est relevé au poste sous le libellé « Sexe »
+          (relevé REL-PAT.D05).
+      - name: date_naissance
+        description: >
+          Date de naissance du patient. Le champ est relevé au poste sous le libellé « D. Nai »
+          (relevé REL-PAT.D06). La couche source stocke cette valeur en texte, au format
+          d'affichage du système observé — mois, jour, année ; la couche intermédiaire la
+          convertit en date, et c'est cette valeur typée qui est reprise ici.
+      - name: type_piece_identite
+        description: >
+          Code du type de pièce d'identité présentée. Aucune table de correspondance entre ces
+          codes et un intitulé n'est fournie par le système. Le champ est relevé au poste sous le
+          libellé « Type pièce d'identité » (relevé REL-PAT.D09).
+      - name: n_piece_identite
+        description: >
+          Numéro de la pièce d'identité présentée. Champ souvent vide, ce qui pèse sur le
+          rapprochement d'identités : l'absence des deux côtés d'une paire ne prouve rien. Le
+          champ est relevé au poste sous le libellé « N° pièce d'identité » (relevé REL-PAT.D10).
+      - name: etat_civil
+        description: >
+          Code de la situation matrimoniale. Aucune table de libellés n'accompagne ce code. Le
+          champ est relevé au poste sous le libellé « E. Civil » (relevé REL-PAT.D11).
+      - name: type_patient
+        description: >
+          Code du type de patient, qui distingue les régimes de prise en charge administrative.
+          Aucun libellé documenté. Le champ est relevé au poste sous le libellé « Type patient »
+          (relevé REL-PAT.D12).
+      - name: date_photo
+        description: >
+          Date de la photographie versée au dossier, quand elle existe. Le champ est relevé au
+          poste sous le libellé « Date photo » (relevé REL-PAT.D13). La couche source stocke cette
+          valeur en texte, au format d'affichage du système observé — mois, jour, année ; la
+          couche intermédiaire la convertit en date, et c'est cette valeur typée qui est reprise
+          ici.
+      - name: modifie_par
+        description: >
+          Identifiant du compte utilisateur ayant modifié la fiche en dernier. C'est un compte,
+          non un nom de personne. Le champ est relevé au poste sous le libellé « Modifié par »
+          (relevé REL-PAT.D14).
+      - name: cree_par
+        description: >
+          Identifiant du compte utilisateur ayant créé la fiche. Le champ est relevé au poste sous
+          le libellé « Créé par » (relevé REL-PAT.D15).
+      - name: date_attribution
+        description: >
+          Date d'attribution de l'identifiant permanent au patient. Le champ est relevé au poste
+          sous le libellé « Date d'attribution » (relevé REL-PAT.D16). La couche source stocke
+          cette valeur en texte, au format d'affichage du système observé — mois, jour, année ; la
+          couche intermédiaire la convertit en date, et c'est cette valeur typée qui est reprise
+          ici.
+      - name: compagnie_assurance
+        description: >
+          Code de l'organisme couvrant les frais du patient. Les valeurs mêlent sigles de régime
+          et identifiants numériques d'organisme, sans table de libellés. Le champ est relevé au
+          poste sous le libellé « Compagnie d'assur. » (relevé REL-PAT.A01).
+      - name: police
+        description: >
+          Numéro de police d'assurance du patient auprès de son organisme. Le champ est relevé au
+          poste sous le libellé « Police » (relevé REL-PAT.A02).
+      - name: n_assure
+        description: >
+          Numéro d'assuré du patient, distinct du numéro de police : il identifie la personne, là
+          où la police identifie le contrat. Le champ est relevé au poste sous le libellé « N°
+          Assu » (relevé REL-PAT.A03).
+      - name: profession
+        description: >
+          Profession déclarée par le patient, en texte libre. Le champ est relevé au poste sous le
+          libellé « Profession » (relevé REL-PAT.A04).
+      - name: num_inscription
+        description: >
+          Numéro d'inscription du patient auprès de son organisme de couverture. Le champ est
+          relevé au poste sous le libellé « Num. inscription » (relevé REL-PAT.A05).
+      - name: date_inscription
+        description: >
+          Date d'inscription du patient auprès de son organisme de couverture. Le champ est relevé
+          au poste sous le libellé « Date inscription » (relevé REL-PAT.A06). La couche source
+          stocke cette valeur en texte, au format d'affichage du système observé — mois, jour,
+          année ; la couche intermédiaire la convertit en date, et c'est cette valeur typée qui
+          est reprise ici.
+      - name: type_domicile
+        description: >
+          Code du type de domicile. Aucun libellé documenté. Le champ est relevé au poste sous le
+          libellé « Type » (relevé REL-PAT.H01).
+      - name: adresse
+        description: >
+          Adresse du domicile, en texte libre. C'est l'une des colonnes qui changent d'une version
+          de fiche à l'autre lors d'un déménagement. Le champ est relevé au poste sous le libellé
+          « Adresse » (relevé REL-PAT.H02).
+      - name: code_postal
+        description: >
+          Code postal du domicile. Le champ est relevé au poste sous le libellé « Code postal »
+          (relevé REL-PAT.H03).
+      - name: etat
+        description: >
+          Code de la région ou de l'état administratif du domicile. À ne pas confondre avec un
+          état civil ou un statut de dossier : la colonne appartient au bloc Domicile de la fiche.
+          Le champ est relevé au poste sous le libellé « État » (relevé REL-PAT.H04).
+      - name: ville
+        description: >
+          Code de la ville du domicile. Aucune table de libellés n'accompagne ce code. Le champ
+          est relevé au poste sous le libellé « Ville » (relevé REL-PAT.H05).
+      - name: quartier
+        description: >
+          Quartier du domicile, en texte libre. Le champ est relevé au poste sous le libellé «
+          Quartier » (relevé REL-PAT.H06).
+      - name: nationalite
+        description: >
+          Code de la nationalité du patient. Aucun libellé documenté. Le champ est relevé au poste
+          sous le libellé « Nationalité » (relevé REL-PAT.H07).
+      - name: telephone_1
+        description: >
+          Premier numéro de téléphone. C'est le numéro principal, et l'une des colonnes qui
+          changent d'une version de fiche à l'autre. Le champ est relevé au poste sous le libellé
+          « Téléphone 1 » (relevé REL-PAT.H08).
+      - name: telephone_2
+        description: >
+          Deuxième numéro de téléphone, souvent vide. Le champ est relevé au poste sous le libellé
+          « Téléphone 2 » (relevé REL-PAT.H09).
+      - name: telephone_3
+        description: >
+          Troisième numéro de téléphone, souvent vide. Le champ est relevé au poste sous le
+          libellé « Téléphone 3 » (relevé REL-PAT.H10).
+      - name: telephone_4
+        description: >
+          Quatrième numéro de téléphone, souvent vide. Le champ est relevé au poste sous le
+          libellé « Téléphone 4 » (relevé REL-PAT.H11).
+      - name: avertissements_sms
+        description: >
+          Indique si le patient accepte d'être averti par message court. Le champ est relevé au
+          poste sous le libellé « Avertissements SMS » (relevé REL-PAT.H12). La couche source
+          stocke cette valeur en texte ; la couche intermédiaire la convertit en booléen, et c'est
+          cette valeur typée qui est reprise ici.
+      - name: email
+        description: >
+          Adresse de courrier électronique du patient. Le champ est relevé au poste sous le
+          libellé « E-mail » (relevé REL-PAT.H13).
+      - name: avertissements_email
+        description: >
+          Indique si le patient accepte d'être averti par courrier électronique. Le champ est
+          relevé au poste sous le libellé « Avertissements e-mail » (relevé REL-PAT.H14). La
+          couche source stocke cette valeur en texte ; la couche intermédiaire la convertit en
+          booléen, et c'est cette valeur typée qui est reprise ici.
+      - name: environnement
+        description: >
+          Code décrivant l'environnement de résidence, urbain ou rural. Aucun libellé documenté.
+          Le champ est relevé au poste sous le libellé « Environnement » (relevé REL-PAT.H15).
+      - name: nom_pere
+        description: >
+          Nom du père du patient, employé comme élément d'identification. Le champ est relevé au
+          poste sous le libellé « Nom. Père » (relevé REL-PAT.N01).
+      - name: nom_mere
+        description: >
+          Nom de la mère du patient, employé comme élément d'identification. Le champ est relevé
+          au poste sous le libellé « Nom. Mère » (relevé REL-PAT.N02).
+      - name: etat_naissance
+        description: >
+          Code de la région ou de l'état administratif du lieu de naissance. Le champ est relevé
+          au poste sous le libellé « Lieu de naissance - État » (relevé REL-PAT.N03).
+      - name: ville_naissance
+        description: >
+          Code de la ville de naissance. Aucune table de libellés n'accompagne ce code. Le champ
+          est relevé au poste sous le libellé « Ville » (relevé REL-PAT.N04).
+      - name: pays_naissance
+        description: >
+          Code du pays de naissance. Aucun libellé documenté. Le champ est relevé au poste sous le
+          libellé « Pays » (relevé REL-PAT.N05).
+      - name: quartier_naissance
+        description: >
+          Quartier du lieu de naissance, en texte libre. Le champ est relevé au poste sous le
+          libellé « Quartier » (relevé REL-PAT.N06).
+      - name: commentaire
+        description: >
+          Commentaire libre porté sur la fiche par l'accueil. Le champ est relevé au poste sous le
+          libellé « Commentaire » (relevé REL-PAT.K01).
+      - name: province
+        description: >
+          Code de la province de rattachement du patient. Le champ est relevé au poste sous le
+          libellé « Province » (relevé REL-IPP.R09).
+      - name: exitus
+        description: >
+          Indique que le patient est décédé. Le champ est relevé au poste sous le libellé « Exitus
+          » (relevé REL-IPP.F04). La couche source stocke cette valeur en texte ; la couche
+          intermédiaire la convertit en booléen, et c'est cette valeur typée qui est reprise ici.
+      - name: date_modification
+        description: >
+          Horodatage de la dernière modification de la fiche. Ce champ n'a pas été relevé à
+          l'écran : c'est une colonne technique de la zone d'atterrissage, absente de la fiche
+          telle que le poste l'affiche. La couche source stocke cette valeur en texte ; la couche
+          intermédiaire la convertit en horodatage, et c'est cette valeur typée qui est reprise
+          ici.
+      - name: date_extraction
+        description: >
+          Date de l'extraction dont la ligne provient. Elle rend le rechargement d'une partition
+          idempotent, et sert de borne basse de validité à l'historisation. Ce champ n'a pas été
+          relevé à l'écran : c'est une colonne technique de la zone d'atterrissage, absente de la
+          fiche telle que le poste l'affiche. La couche source stocke cette valeur en texte, au
+          format d'affichage du système observé — mois, jour, année ; la couche intermédiaire la
+          convertit en date, et c'est cette valeur typée qui est reprise ici.
       - name: valide_de
+        description: >
+          Borne basse de validité de la version, incluse. Elle vaut la date d'extraction de la
+          ligne : une version entre en vigueur le jour où l'extraction qui la porte a été
+          produite. Colonne de la mécanique d'historisation, sans équivalent dans le système
+          observé.
       - name: valide_jusqu_a
+        description: >
+          Borne haute de validité de la version, exclue. Elle vaut la borne basse de la version
+          suivante du même patient, obtenue par la fonction de fenêtre lead(valide_de)
+          partitionnée par n_ipp et ordonnée par valide_de, et reste vide pour la version la plus
+          récente. Deux versions consécutives se touchent donc sans se chevaucher ni laisser de
+          trou.
       - name: est_courante
+        description: >
+          Vrai pour la version la plus récente de la fiche d'un patient. Calculée comme l'absence
+          de version suivante, c'est-à-dire lead(valide_de) partitionnée par n_ipp et ordonnée par
+          valide_de valant NULL. Un patient porte donc exactement une version courante, ce qu'un
+          contrôle de la couche vérifie.

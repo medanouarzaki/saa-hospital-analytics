@@ -44,9 +44,17 @@
 #     créances nées, et l'encaissement des factures émises. Les deux populations
 #     diffèrent — 5 486 créances contre 21 066 factures — et les deux valeurs
 #     aussi ; les confondre ferait afficher l'une pour l'autre.
+#   - le croisement du délai et de l'absentéisme, compté une fois à l'examen,
+#     recouvre lui aussi deux grandeurs distinctes qui reçoivent deux entrées :
+#     la comparaison des activités ENTRE ELLES, qui porte sur huit points et
+#     ressort négative, et l'écart mesuré À L'INTÉRIEUR de chaque activité entre
+#     les absents et les honorés, qui porte sur 11 870 rendez-vous et ressort
+#     positif. Les deux grandeurs sont de signes opposés parce qu'elles ne
+#     comparent pas les mêmes populations ; les confondre ferait lire un effet
+#     de composition comme une relation entre le délai et l'absence.
 #
 # Réconciliation de composition, calculée et non recopiée :
-#   trente-sept examinés − un exclu + un dédoublé = trente-sept entrées.
+#   trente-sept examinés − un exclu + deux dédoublés = trente-huit entrées.
 #
 # Réconciliation de filtrabilité : les décomptes par valeur sont calculés depuis
 # les entrées et confrontés au nombre d'entrées. L'écart avec les décomptes de
@@ -54,16 +62,19 @@
 # écrit ici plutôt que passé sous silence :
 #   1. l'élément exclu — le coût d'affichage d'une page — était compté parmi les
 #      non filtrables : les non filtrables passent de treize à douze ;
-#   2. l'entrée dédoublée — le taux de recouvrement, devenu recouvrement des
-#      créances et encaissement des factures — ajoute une entrée filtrable sous
-#      réserve : les filtrables passent de vingt-quatre à vingt-cinq ;
+#   2. les deux entrées dédoublées ajoutent chacune une entrée filtrable : le
+#      taux de recouvrement, devenu recouvrement des créances et encaissement
+#      des factures, ajoute une filtrable sous réserve ; le croisement délai et
+#      absentéisme, dédoublé en comparaison entre activités et écart à
+#      l'intérieur de chaque activité, ajoute une filtrable sans réserve. Les
+#      filtrables passent de vingt-quatre à vingt-six ;
 #   3. l'examen initial avait lui-même signalé un cas ambigu, le taux de
 #      recouvrement, et l'avait compté parmi les non filtrables par prudence
 #      tout en le listant comme filtrable sous réserve. La règle de filtrabilité
 #      l'a tranché en filtrable sous réserve, la date disponible étant celle de
 #      naissance de la créance. Les non filtrables passent de douze à onze et les
-#      filtrables de vingt-cinq à vingt-six.
-#   Total : vingt-six filtrables et onze non filtrables, soit trente-sept.
+#      filtrables de vingt-six à vingt-sept.
+#   Total : vingt-sept filtrables et onze non filtrables, soit trente-huit.
 
 examen_initial:
   elements_examines: 37
@@ -72,12 +83,12 @@ examen_initial:
 
 composition:
   exclus: 1
-  dedoubles: 1
+  dedoubles: 2
   reclasses_filtrables: 1
-  entrees_attendues: 37
+  entrees_attendues: 38
 
 filtrabilite_attendue:
-  oui: 21
+  oui: 22
   oui_sous_reserve: 5
   non: 11
 
@@ -259,13 +270,33 @@ indicateurs:
 
   - identifiant: rendez_vous_delai_et_absence
     page: rendez_vous
-    libelle: Délai et absentéisme croisés
+    libelle: Comparaison des activités entre elles — délai médian et absentéisme
     definition: >-
-      Position de chaque activité selon son délai médian d'obtention et son taux
-      d'absentéisme, avec la corrélation entre les deux séries.
+      Corrélation entre le délai médian d'obtention et le taux d'absentéisme
+      mesurés sur les huit activités prises comme huit points, soit une
+      comparaison des activités entre elles et non une mesure faite à
+      l'intérieur d'une activité.
     decision_servie: >-
-      Savoir si raccourcir le délai est un levier sur l'absentéisme, ou s'il
-      faut agir ailleurs.
+      Situer les activités les unes par rapport aux autres sur ces deux
+      grandeurs, en sachant que leur rangement conjoint est fixé par deux
+      tables de paramètres posées séparément.
+    objets_lus:
+      - marts.fct_rendez_vous
+    filtrabilite: oui
+    colonne_de_date: date_rendez_vous
+    recalcule_depuis: faits
+
+  - identifiant: rendez_vous_delai_et_absence_intra_activite
+    page: rendez_vous
+    libelle: Écart à l'intérieur de chaque activité — absents contre honorés
+    definition: >-
+      Écart entre le délai médian des rendez-vous non honorés pour absence et
+      celui des rendez-vous honorés, mesuré activité par activité, et
+      corrélation d'ensemble entre le délai et l'absence une fois l'activité
+      retirée des deux grandeurs par centrage.
+    decision_servie: >-
+      Savoir si, à activité donnée, les rendez-vous obtenus de longue date sont
+      davantage manqués que ceux obtenus rapidement.
     objets_lus:
       - marts.fct_rendez_vous
     filtrabilite: oui
@@ -680,8 +711,8 @@ indicateurs:
     page: rapprochement
     libelle: Courbe de précision et de rappel
     definition: >-
-      Précision, rappel et F-mesure du rapprochement pour chaque seuil de
-      décision balayé.
+      Précision du rapprochement en fonction de son rappel, un point par seuil de
+      décision balayé, le seuil retenu étant repéré.
     decision_servie: >-
       Déplacer le seuil de décision en connaissance du compromis entre précision
       et rappel.

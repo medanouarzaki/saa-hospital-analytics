@@ -3,9 +3,10 @@ version: 2
 models:
   - name: int_prises_en_charge
     description: >
-      source.prises_en_charge typée : les colonnes date/horodatage/booleen/numérique converties
-      par les macros de dbt/macros/conversions.sql, les colonnes code/texte reprises
-      telles quelles.
+      Une ligne par prise en charge par un organisme, identifiée par n_prise_en_charge. Une prise
+      en charge est l'accord donné par un organisme payeur pour couvrir tout ou partie d'un
+      épisode de soins. Couche de nettoyage sans destruction : codes et textes repris tels quels,
+      horodatage, date et taux typés.
     tests:
       - meme_decompte_que_la_source:
           arguments:
@@ -14,19 +15,70 @@ models:
           arguments:
             column_name: "n_prise_en_charge"
     columns:
+      - name: n_prise_en_charge
+        description: >
+          Identifiant de la prise en charge, clé de la table. Colonne non relevée à l'écran, dont
+          l'existence est documentée par une source (S-27).
+      - name: n_ipp
+        description: >
+          Identifiant du patient couvert. Le champ est relevé au poste sous le libellé « N° IPP »
+          (relevé REL-PAT.D01).
+      - name: n_episode
+        description: >
+          Identifiant de l'épisode de soins couvert. Il se raccorde en aval au passage
+          correspondant. Colonne non relevée à l'écran, dont l'existence est documentée par une
+          source (S-27).
+      - name: type_episode
+        description: >
+          Code du type d'épisode couvert — consultation externe, hospitalisation ou urgence.
+          Colonne non relevée à l'écran, dont l'existence est documentée par une source (S-27).
+      - name: organisme
+        description: >
+          Code de l'organisme accordant la prise en charge. Aucune table de libellés n'accompagne
+          ce code, et aucun n'est inventé. Colonne non relevée à l'écran, dont l'existence est
+          documentée par une source (S-15).
+      - name: n_assure
+        description: >
+          Numéro d'assuré du patient auprès de l'organisme, distinct du numéro de police : il
+          identifie la personne et non le contrat. Le champ est relevé au poste sous le libellé «
+          N° Assu » (relevé REL-PAT.A03).
       - name: date_verification
+        description: >
+          Horodatage de la vérification des droits auprès de l'organisme. Colonne non relevée à
+          l'écran, dont l'existence est documentée par une source (S-27). La couche source la
+          stocke en texte, au format d'affichage du système observé — mois, jour, année, puis
+          heure sur douze heures ; elle est ici convertie en HORODATAGE, la chaîne vide devenant
+          une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'prises_en_charge') }}"
                 source_column: date_verification
+      - name: etat
+        description: >
+          Code de l'état de la prise en charge — accordée, refusée, en attente. Aucun libellé
+          documenté. Colonne non relevée à l'écran, dont l'existence est documentée par une source
+          (S-19).
       - name: taux_prise_en_charge
+        description: >
+          Part des frais couverte par l'organisme, exprimée en proportion. C'est ce taux qui
+          commande, en aval, la répartition entre part organisme et part patient. Colonne non
+          relevée à l'écran, dont l'existence est documentée par une source (S-18). La couche
+          source la stocke en texte ; elle est ici convertie en NUMÉRIQUE exact, la chaîne vide
+          devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'prises_en_charge') }}"
                 source_column: taux_prise_en_charge
       - name: date_extraction
+        description: >
+          Date de l'extraction dont la ligne provient. Colonne TECHNIQUE de la zone
+          d'atterrissage, absente du système observé : elle partitionne le chargement et le rend
+          rejouable, une même partition pouvant être rechargée sans doublon. Colonne non relevée à
+          l'écran et posée sans preuve externe. La couche source la stocke en texte, au format
+          d'affichage du système observé — mois, jour, année ; elle est ici convertie en DATE, la
+          chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:

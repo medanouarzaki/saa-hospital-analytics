@@ -3,10 +3,12 @@ version: 2
 models:
   - name: int_patients
     description: >
-      source.patients typée : les colonnes date/horodatage/booleen converties par les
-      macros de dbt/macros/conversions.sql, les colonnes code/texte reprises telles quelles.
-      Une ligne par version de fiche (grain n_ipp, date_extraction), inchangé par rapport à
-      la couche source.
+      Une ligne par patient ET PAR DATE D'EXTRACTION, et non une ligne par patient : une fiche
+      modifiée puis rééxtraite porte deux lignes, dont les colonnes métier diffèrent. C'est de
+      cette structure que la couche aval tire l'historisation du patient. Couche de nettoyage sans
+      destruction : les trente-sept colonnes de code et de texte sont reprises telles quelles, les
+      neuf colonnes de date, d'horodatage et de booléen sont typées. Aucune ligne n'est écartée
+      ici — la mise en quarantaine est le fait du chargeur, en amont.
     tests:
       - meme_decompte_que_la_source:
           arguments:
@@ -15,57 +17,269 @@ models:
           arguments:
             column_name: "n_ipp || '|' || date_extraction"
     columns:
+      - name: n_ipp
+        description: >
+          Identifiant permanent du patient. Il ne suffit pas à identifier une ligne : il faut lui
+          adjoindre la date d'extraction. Une même personne enregistrée deux fois porte deux
+          identifiants distincts, ce que le rapprochement d'identités cherche à retrouver. Le
+          champ est relevé au poste sous le libellé « N° IPP » (relevé REL-PAT.D01).
+      - name: nom
+        description: >
+          Prénom du patient, tel qu'il est saisi à l'accueil. Le champ est relevé au poste sous le
+          libellé « Nom » (relevé REL-PAT.D02).
+      - name: nom_famille_1
+        description: >
+          Premier nom de famille. Le système en prévoit deux, sans imposer lequel est le nom
+          d'usage. Le champ est relevé au poste sous le libellé « Nom de famille 1 » (relevé
+          REL-PAT.D03).
+      - name: nom_famille_2
+        description: >
+          Second nom de famille, souvent vide. Le champ est relevé au poste sous le libellé « Nom
+          de famille 2 » (relevé REL-PAT.D04).
+      - name: sexe
+        description: >
+          Code du sexe du patient. Aucune table de libellés n'accompagne ce code. Le champ est
+          relevé au poste sous le libellé « Sexe » (relevé REL-PAT.D05).
       - name: date_naissance
+        description: >
+          Date de naissance du patient. Le champ est relevé au poste sous le libellé « D. Nai »
+          (relevé REL-PAT.D06). La couche source la stocke en texte, au format d'affichage du
+          système observé — mois, jour, année ; elle est ici convertie en DATE, la chaîne vide
+          devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'patients') }}"
                 source_column: date_naissance
+      - name: type_piece_identite
+        description: >
+          Code du type de pièce d'identité présentée. Aucun libellé documenté. Le champ est relevé
+          au poste sous le libellé « Type pièce d'identité » (relevé REL-PAT.D09).
+      - name: n_piece_identite
+        description: >
+          Numéro de la pièce d'identité présentée. Champ souvent vide, ce qui pèse sur le
+          rapprochement d'identités : l'absence des deux côtés d'une paire ne prouve rien. Le
+          champ est relevé au poste sous le libellé « N° pièce d'identité » (relevé REL-PAT.D10).
+      - name: etat_civil
+        description: >
+          Code de la situation matrimoniale. Aucun libellé documenté. Le champ est relevé au poste
+          sous le libellé « E. Civil » (relevé REL-PAT.D11).
+      - name: type_patient
+        description: >
+          Code du type de patient, qui distingue les régimes de prise en charge administrative. Le
+          champ est relevé au poste sous le libellé « Type patient » (relevé REL-PAT.D12).
       - name: date_photo
+        description: >
+          Date de la photographie versée au dossier, quand elle existe. Le champ est relevé au
+          poste sous le libellé « Date photo » (relevé REL-PAT.D13). La couche source la stocke en
+          texte, au format d'affichage du système observé — mois, jour, année ; elle est ici
+          convertie en DATE, la chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'patients') }}"
                 source_column: date_photo
+      - name: modifie_par
+        description: >
+          Identifiant du compte utilisateur ayant modifié la fiche en dernier. C'est un compte,
+          non un nom de personne. Le champ est relevé au poste sous le libellé « Modifié par »
+          (relevé REL-PAT.D14).
+      - name: cree_par
+        description: >
+          Identifiant du compte utilisateur ayant créé la fiche. Le champ est relevé au poste sous
+          le libellé « Créé par » (relevé REL-PAT.D15).
       - name: date_attribution
+        description: >
+          Date d'attribution de l'identifiant permanent au patient. Le champ est relevé au poste
+          sous le libellé « Date d'attribution » (relevé REL-PAT.D16). La couche source la stocke
+          en texte, au format d'affichage du système observé — mois, jour, année ; elle est ici
+          convertie en DATE, la chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'patients') }}"
                 source_column: date_attribution
+      - name: compagnie_assurance
+        description: >
+          Code de l'organisme couvrant les frais du patient. Les valeurs mêlent sigles de régime
+          et identifiants numériques d'organisme, sans table de libellés. C'est l'une des colonnes
+          qui changent d'une version de fiche à l'autre. Le champ est relevé au poste sous le
+          libellé « Compagnie d'assur. » (relevé REL-PAT.A01).
+      - name: police
+        description: >
+          Numéro de police d'assurance du patient auprès de son organisme. Le champ est relevé au
+          poste sous le libellé « Police » (relevé REL-PAT.A02).
+      - name: n_assure
+        description: >
+          Numéro d'assuré du patient, distinct du numéro de police : il identifie la personne, là
+          où la police identifie le contrat. Le champ est relevé au poste sous le libellé « N°
+          Assu » (relevé REL-PAT.A03).
+      - name: profession
+        description: >
+          Profession déclarée par le patient, en texte libre. Le champ est relevé au poste sous le
+          libellé « Profession » (relevé REL-PAT.A04).
+      - name: num_inscription
+        description: >
+          Numéro d'inscription du patient auprès de son organisme de couverture. Le champ est
+          relevé au poste sous le libellé « Num. inscription » (relevé REL-PAT.A05).
       - name: date_inscription
+        description: >
+          Date d'inscription du patient auprès de son organisme de couverture. Le champ est relevé
+          au poste sous le libellé « Date inscription » (relevé REL-PAT.A06). La couche source la
+          stocke en texte, au format d'affichage du système observé — mois, jour, année ; elle est
+          ici convertie en DATE, la chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'patients') }}"
                 source_column: date_inscription
-      - name: date_extraction
-        tests:
-          - conversion_sans_perte:
-              arguments:
-                source_relation: "{{ source('source', 'patients') }}"
-                source_column: date_extraction
-      - name: date_modification
-        tests:
-          - conversion_sans_perte:
-              arguments:
-                source_relation: "{{ source('source', 'patients') }}"
-                source_column: date_modification
+      - name: type_domicile
+        description: >
+          Code du type de domicile. Aucun libellé documenté. Le champ est relevé au poste sous le
+          libellé « Type » (relevé REL-PAT.H01).
+      - name: adresse
+        description: >
+          Adresse du domicile, en texte libre. C'est l'une des colonnes qui changent d'une version
+          de fiche à l'autre lors d'un déménagement. Le champ est relevé au poste sous le libellé
+          « Adresse » (relevé REL-PAT.H02).
+      - name: code_postal
+        description: >
+          Code postal du domicile. Le champ est relevé au poste sous le libellé « Code postal »
+          (relevé REL-PAT.H03).
+      - name: etat
+        description: >
+          Code de la région ou de l'état administratif du domicile. À ne pas confondre avec un
+          état civil ou un statut de dossier : la colonne appartient au bloc Domicile de la fiche.
+          Le champ est relevé au poste sous le libellé « État » (relevé REL-PAT.H04).
+      - name: ville
+        description: >
+          Code de la ville du domicile. Aucune table de libellés n'accompagne ce code. Le champ
+          est relevé au poste sous le libellé « Ville » (relevé REL-PAT.H05).
+      - name: quartier
+        description: >
+          Quartier du domicile, en texte libre. Le champ est relevé au poste sous le libellé «
+          Quartier » (relevé REL-PAT.H06).
+      - name: nationalite
+        description: >
+          Code de la nationalité du patient. Aucun libellé documenté. Le champ est relevé au poste
+          sous le libellé « Nationalité » (relevé REL-PAT.H07).
+      - name: telephone_1
+        description: >
+          Premier numéro de téléphone, le numéro principal. C'est l'une des colonnes qui changent
+          d'une version de fiche à l'autre. Un même numéro est fréquemment partagé au sein d'un
+          foyer, ce pour quoi il a été écarté comme critère de détection de doublons. Le champ est
+          relevé au poste sous le libellé « Téléphone 1 » (relevé REL-PAT.H08).
+      - name: telephone_2
+        description: >
+          Deuxième numéro de téléphone, souvent vide. Le champ est relevé au poste sous le libellé
+          « Téléphone 2 » (relevé REL-PAT.H09).
+      - name: telephone_3
+        description: >
+          Troisième numéro de téléphone, souvent vide. Le champ est relevé au poste sous le
+          libellé « Téléphone 3 » (relevé REL-PAT.H10).
+      - name: telephone_4
+        description: >
+          Quatrième numéro de téléphone, souvent vide. Le champ est relevé au poste sous le
+          libellé « Téléphone 4 » (relevé REL-PAT.H11).
       - name: avertissements_sms
+        description: >
+          Indique si le patient accepte d'être averti par message court. Le champ est relevé au
+          poste sous le libellé « Avertissements SMS » (relevé REL-PAT.H12). La couche source la
+          stocke en texte, sur un domaine réduit à « 1 », « 0 » et la chaîne vide ; elle est ici
+          convertie en BOOLÉEN, la chaîne vide comme toute autre valeur devenant une valeur
+          absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'patients') }}"
                 source_column: avertissements_sms
+      - name: email
+        description: >
+          Adresse de courrier électronique du patient. Le champ est relevé au poste sous le
+          libellé « E-mail » (relevé REL-PAT.H13).
       - name: avertissements_email
+        description: >
+          Indique si le patient accepte d'être averti par courrier électronique. Le champ est
+          relevé au poste sous le libellé « Avertissements e-mail » (relevé REL-PAT.H14). La
+          couche source la stocke en texte, sur un domaine réduit à « 1 », « 0 » et la chaîne vide
+          ; elle est ici convertie en BOOLÉEN, la chaîne vide comme toute autre valeur devenant
+          une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'patients') }}"
                 source_column: avertissements_email
+      - name: environnement
+        description: >
+          Code décrivant l'environnement de résidence, urbain ou rural. Aucun libellé documenté.
+          Le champ est relevé au poste sous le libellé « Environnement » (relevé REL-PAT.H15).
+      - name: nom_pere
+        description: >
+          Nom du père du patient, employé comme élément d'identification. Le champ est relevé au
+          poste sous le libellé « Nom. Père » (relevé REL-PAT.N01).
+      - name: nom_mere
+        description: >
+          Nom de la mère du patient, employé comme élément d'identification. Le champ est relevé
+          au poste sous le libellé « Nom. Mère » (relevé REL-PAT.N02).
+      - name: etat_naissance
+        description: >
+          Code de la région ou de l'état administratif du lieu de naissance. Le champ est relevé
+          au poste sous le libellé « Lieu de naissance - État » (relevé REL-PAT.N03).
+      - name: ville_naissance
+        description: >
+          Code de la ville de naissance. Aucune table de libellés n'accompagne ce code. Le champ
+          est relevé au poste sous le libellé « Ville » (relevé REL-PAT.N04).
+      - name: pays_naissance
+        description: >
+          Code du pays de naissance. Aucun libellé documenté. Le champ est relevé au poste sous le
+          libellé « Pays » (relevé REL-PAT.N05).
+      - name: quartier_naissance
+        description: >
+          Quartier du lieu de naissance, en texte libre. Le champ est relevé au poste sous le
+          libellé « Quartier » (relevé REL-PAT.N06).
+      - name: commentaire
+        description: >
+          Commentaire libre porté sur la fiche par l'accueil. Le champ est relevé au poste sous le
+          libellé « Commentaire » (relevé REL-PAT.K01).
+      - name: province
+        description: >
+          Code de la province de rattachement du patient. La colonne ne figure pas au bloc
+          Domicile de la fiche mais à la liste de résultats de la recherche d'identifiant. Le
+          champ est relevé au poste sous le libellé « Province » (relevé REL-IPP.R09).
       - name: exitus
+        description: >
+          Indique que le patient est décédé. Le champ est relevé au poste sous le libellé « Exitus
+          » (relevé REL-IPP.F04). La couche source la stocke en texte, sur un domaine réduit à « 1
+          », « 0 » et la chaîne vide ; elle est ici convertie en BOOLÉEN, la chaîne vide comme
+          toute autre valeur devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'patients') }}"
                 source_column: exitus
+      - name: date_modification
+        description: >
+          Horodatage de la dernière modification de la fiche. Colonne non relevée à l'écran et
+          posée sans preuve externe. La couche source la stocke en texte, au format d'affichage du
+          système observé — mois, jour, année, puis heure sur douze heures ; elle est ici
+          convertie en HORODATAGE, la chaîne vide devenant une valeur absente.
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'patients') }}"
+                source_column: date_modification
+      - name: date_extraction
+        description: >
+          Date de l'extraction dont la ligne provient. Colonne TECHNIQUE de la zone
+          d'atterrissage, absente du système observé : elle partitionne le chargement et le rend
+          rejouable, une même partition pouvant être rechargée sans doublon. Sur cette table, elle
+          fait partie de la clé : un patient dont la fiche a été rééxtraite porte une ligne par
+          extraction, et c'est ce qui permet à la couche aval de l'historiser. Colonne non relevée
+          à l'écran et posée sans preuve externe. La couche source la stocke en texte, au format
+          d'affichage du système observé — mois, jour, année ; elle est ici convertie en DATE, la
+          chaîne vide devenant une valeur absente.
+        tests:
+          - conversion_sans_perte:
+              arguments:
+                source_relation: "{{ source('source', 'patients') }}"
+                source_column: date_extraction

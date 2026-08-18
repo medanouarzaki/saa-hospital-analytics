@@ -3,11 +3,52 @@ version: 2
 models:
   - name: dim_date
     description: >
-      Dimension calendrier sur [var('dim_date_debut'), var('dim_date_fin')], attributs
-      calculables et jointure sur le seed calendrier_marocain pour est_ferie/est_ramadan.
+      Dimension calendrier, une ligne par jour, sur l'étendue portée par les variables
+      dim_date_debut et dim_date_fin de dbt/dbt_project.yml — aucune date n'est écrite en dur.
+      Aucune de ses colonnes ne reprend un champ du système observé : le calendrier est construit
+      par le projet, à partir d'une suite de jours et du seed calendrier_marocain, lui-même dérivé
+      mécaniquement de generator/config/calendrier.yml.
     tests:
       - unique:
           arguments:
             column_name: "date_jour"
     columns:
       - name: date_jour
+        description: >
+          Le jour lui-même, clé de la dimension. Engendré par generate_series entre les deux
+          variables de bornes, au pas d'un jour, sans trou ni doublon.
+      - name: libelle_ferie
+        description: >
+          Intitulé du ou des jours fériés tombant sur cette date, repris du seed
+          calendrier_marocain pour les catégories ferie_fixe et ferie_mobile. Quand plusieurs
+          fêtes coïncident, les intitulés sont concaténés par une virgule dans l'ordre
+          alphabétique. Vide lorsque le jour n'est pas férié.
+      - name: annee
+        description: Année civile du jour, obtenue par extraction du champ year de date_jour.
+      - name: trimestre
+        description: >
+          Trimestre civil du jour, de 1 à 4, obtenu par extraction du champ quarter de date_jour.
+      - name: mois
+        description: Mois civil du jour, de 1 à 12, obtenu par extraction du champ month de date_jour.
+      - name: jour
+        description: >
+          Quantième du mois, de 1 à 31, obtenu par extraction du champ day de date_jour. À ne pas
+          confondre avec date_jour, qui porte la date entière.
+      - name: jour_semaine_iso
+        description: >
+          Jour de la semaine au sens ISO, obtenu par extraction du champ isodow de date_jour :
+          1 pour lundi, 7 pour dimanche. La convention ISO est retenue plutôt que celle qui
+          numérote le dimanche à zéro, de sorte que le tri numérique suive la semaine ouvrée.
+      - name: est_weekend
+        description: >
+          Vrai lorsque le jour de la semaine ISO vaut 6 ou 7, c'est-à-dire samedi ou dimanche.
+          Calculé depuis date_jour seule, sans recours au seed : la notion ne dépend d'aucun
+          calendrier national.
+      - name: est_ferie
+        description: >
+          Vrai lorsque le jour figure au seed calendrier_marocain dans les catégories ferie_fixe
+          ou ferie_mobile. La valeur est donc vraie exactement quand libelle_ferie est renseigné.
+      - name: est_ramadan
+        description: >
+          Vrai lorsque le jour figure au seed calendrier_marocain dans la catégorie ramadan. La
+          période étant mobile d'une année à l'autre, elle est lue au seed et jamais recalculée.

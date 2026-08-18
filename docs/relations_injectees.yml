@@ -19,8 +19,10 @@
   parametre: pente_absenteisme_delai
   statut: HYP
   source: ""
-  consequence: "Le nuage délai/absentéisme de la page Rendez-vous reproduit la pente injectée. Aucune conclusion sur l'existence ou la force de cette relation ne peut en être tirée."
-  ou_apparait: "Tableau de bord, page Rendez-vous. Chapitre 7."
+  forme: "Positive, et INTERNE à une spécialité. Le paramètre ne change pas le NOMBRE d'absences — celui-ci vient de taux_absenteisme_par_specialite — mais seulement le délai tiré pour les lignes d'absence, par échantillonnage par rejet de poids 1 + pente x delai. À l'intérieur d'une spécialité, les rendez-vous manqués portent donc un délai plus long que les honorés."
+  consequence: "L'écart intra-activité de la page Rendez-vous reproduit la pente injectée. Aucune conclusion sur l'existence ou la force de cette relation ne peut en être tirée. Mesuré : +0,078 de corrélation une fois l'activité retirée par centrage, et un écart positif sur les huit activités."
+  page_tableau_de_bord: rendez_vous
+  ou_apparait: "Tableau de bord, page Rendez-vous, indicateur rendez_vous_delai_et_absence_intra_activite. Chapitre 7."
 
 - id: R-02
   relation: "Le niveau d'absentéisme diffère par spécialité, indépendamment du délai."
@@ -28,6 +30,7 @@
   statut: DOC
   source: S-24
   consequence: "Le classement des spécialités par absentéisme est imposé. La recommandation du chapitre 9 ne s'appuie pas dessus mais sur S-20 et S-24."
+  page_tableau_de_bord: rendez_vous
   ou_apparait: "Tableau de bord, page Rendez-vous."
 
 - id: R-03
@@ -36,6 +39,7 @@
   statut: DOC
   source: S-20
   consequence: "La forme log-normale de la distribution des délais et le classement des spécialités par délai médian sont imposés. Aucune conclusion du chapitre 7 sur la spécialité la plus engorgée ne peut en être tirée : c'est celle dont on a fixé la médiane la plus haute."
+  page_tableau_de_bord: rendez_vous
   ou_apparait: "Tableau de bord, page Rendez-vous. Chapitre 4."
 
 - id: R-04
@@ -44,6 +48,7 @@
   statut: HYP
   source: ""
   consequence: "Le profil horaire de la page Activité est un paramètre. Aucune conclusion sur les heures de tension."
+  page_tableau_de_bord: activite
   ou_apparait: "Tableau de bord, page Activité."
 
 - id: R-05
@@ -52,6 +57,7 @@
   statut: HYP
   source: ""
   consequence: "Le classement des jours par charge est imposé. Une recommandation de renforcement du guichet le lundi découlerait d'un paramètre et non d'une observation. Seule la capacité de la chaîne à produire un profil hebdomadaire par jour et par service est démontrée."
+  page_tableau_de_bord: activite
   ou_apparait: "Tableau de bord, page Activité."
 
 - id: R-06
@@ -60,6 +66,7 @@
   statut: HYP
   source: S-26
   consequence: "L'ampleur de l'effet Ramadan est imposée ; seules les dates viennent de la source."
+  page_tableau_de_bord: activite
   ou_apparait: "Tableau de bord, page Activité. Chapitre 7."
 
 - id: R-07
@@ -68,6 +75,7 @@
   statut: HYP
   source: S-26
   consequence: "L'ampleur de la chute d'activité les jours fériés et en août est imposée ; seules les dates viennent de la source. Aucune conclusion sur le dimensionnement des effectifs en période creuse ne peut s'appuyer sur la page Activité du tableau de bord."
+  page_tableau_de_bord: activite
   ou_apparait: "Tableau de bord, page Activité."
 
 - id: R-08
@@ -75,8 +83,9 @@
   parametre: repartition_couverture
   statut: HYP
   source: S-15
-  consequence: "La composition par régime de la page Patients est imposée. Les effectifs nationaux sont sourcés, la clé de recours hospitalier ne l'est pas."
-  ou_apparait: "Tableau de bord, page Patients."
+  consequence: "La composition par régime est imposée. Les effectifs nationaux sont sourcés, la clé de recours hospitalier ne l'est pas. La relation reste injectée dans les données, mais AUCUNE page ne la donne à voir : la ventilation par organisme payeur a été retirée du tableau de bord faute de fait référençant la dimension correspondante."
+  page_tableau_de_bord: aucune
+  ou_apparait: "Aucune page du tableau de bord. La colonne alimentée, compagnie_assurance, existe jusqu'à marts.dim_patient et n'est lue par aucune page."
 
 - id: R-09
   relation: "Les passages aux urgences se répartissent entre niveaux de tri selon une clé fixée."
@@ -84,6 +93,7 @@
   statut: DOC
   source: S-12
   consequence: "La pyramide de gravité de la page Urgences est imposée, y compris la part de passages relevant d'une consultation ordinaire. La recommandation d'une filière courte s'appuie donc sur S-12 et S-13, jamais sur la répartition observée dans les données générées."
+  page_tableau_de_bord: urgences
   ou_apparait: "Tableau de bord, page Urgences."
 
 - id: R-10
@@ -92,6 +102,7 @@
   statut: DOC
   source: S-14
   consequence: "Les cibles viennent de la source, mais le TAUX DE RESPECT est imposé. L'indicateur de conformité au délai cible est un paramètre affiché, non une performance mesurée."
+  page_tableau_de_bord: urgences
   ou_apparait: "Tableau de bord, page Urgences. Chapitre 7."
 
 - id: R-11
@@ -100,6 +111,7 @@
   statut: HYP
   source: S-12
   consequence: "Le taux de transfert et le taux d'hospitalisation sont imposés. Leur somme est adossée à S-12 et S-14, leur répartition ne l'est pas."
+  page_tableau_de_bord: urgences
   ou_apparait: "Tableau de bord, page Urgences."
 
 - id: R-12
@@ -108,6 +120,7 @@
   statut: DOC
   source: S-14
   consequence: "La corrélation entre le champ origine et le niveau de tri est imposée. Le tableau de bord montrera que les patients adressés sont mieux priorisés parce que le générateur l'a écrit ; ce que la chaîne démontre est que le rapprochement des deux champs est possible."
+  page_tableau_de_bord: urgences
   ou_apparait: "Tableau de bord, page Urgences. Chapitre 4."
 
 - id: R-13
@@ -115,8 +128,9 @@
   parametre: profil_recours_demographique
   statut: HYP
   source: S-05
-  consequence: "La pyramide des âges de la page Patients est imposée. La population de référence est sourcée, le profil de recours ne l'est pas."
-  ou_apparait: "Tableau de bord, page Patients."
+  consequence: "La pyramide des âges est imposée. La population de référence est sourcée, le profil de recours ne l'est pas. La relation reste injectée dans les données, mais AUCUNE page ne la donne à voir : aucune colonne d'âge ni de tranche d'âge n'est calculée dans les couches intermédiaire et marts."
+  page_tableau_de_bord: aucune
+  ou_apparait: "Aucune page du tableau de bord. La colonne alimentée, date_naissance, existe jusqu'à marts.dim_patient, où la seule page qui la lit — celle du rapprochement — l'emploie comme clé de collision d'identité et non comme grandeur démographique."
 
 - id: R-14
   relation: "Une part fixée des personnes porte deux fiches patient, avec une distribution de variations donnée."
@@ -124,6 +138,7 @@
   statut: HYP
   source: S-20
   consequence: "Le taux de doublons de la page Qualité des données est imposé. L'EXISTENCE du phénomène est établie par S-20, son ampleur ne l'est pas. La performance du rapprochement est mesurée contre cette distribution injectée et non contre une distribution réelle."
+  page_tableau_de_bord: qualite
   ou_apparait: "Tableau de bord, page Qualité des données. Chapitres 6 et 7."
 
 - id: R-15
@@ -132,6 +147,7 @@
   statut: HYP
   source: ""
   consequence: "Le classement des champs par complétude est imposé. La recommandation sur les champs à rendre obligatoires à la saisie s'appuie sur ce classement et est donc circulaire."
+  page_tableau_de_bord: qualite
   ou_apparait: "Tableau de bord, page Qualité des données. Chapitre 9."
 
 - id: R-16
@@ -140,6 +156,7 @@
   statut: HYP
   source: S-20
   consequence: "Le taux d'annulation est imposé. La DISTINCTION entre annulation et absence est une propriété du modèle de données, pas une relation injectée : elle relève de ce que la chaîne mesure."
+  page_tableau_de_bord: rendez_vous
   ou_apparait: "Tableau de bord, page Rendez-vous."
 
 - id: R-17
@@ -148,6 +165,7 @@
   statut: HYP
   source: ""
   consequence: "Le mode de la distribution des délais à zéro jour est imposé. Le cas relevé au poste, un rendez-vous pris pour le jour même avec une seconde d'écart entre création et rendez-vous, atteste que le phénomène existe ; sa fréquence dans les données est un paramètre."
+  page_tableau_de_bord: rendez_vous
   ou_apparait: "Tableau de bord, page Rendez-vous."
 
 - id: R-18
@@ -155,8 +173,9 @@
   parametre: part_patients_adresses
   statut: HYP
   source: ""
-  consequence: "La page Patients et la recommandation sur les conventions avec les centres adressants reposent sur ce paramètre."
-  ou_apparait: "Tableau de bord, page Patients. Chapitre 9."
+  consequence: "La recommandation sur les conventions avec les centres adressants repose sur ce paramètre. La relation reste injectée dans les données, mais AUCUNE page ne la donne à voir."
+  page_tableau_de_bord: aucune
+  ou_apparait: "Aucune page du tableau de bord. Les colonnes alimentées, origine et est_patient_adresse, existent jusqu'à marts.fct_rendez_vous et ne sont lues par aucune page. Chapitre 9."
 
 - id: R-19
   relation: "Un prélèvement de laboratoire donne lieu en moyenne à un nombre fixé d'examens."
@@ -164,7 +183,8 @@
   statut: DOC
   source: S-30
   consequence: "Le ratio en-tête sur ligne du laboratoire est imposé, quoique mesuré sur la source. Le chapitre 4 le présente comme une relation relevée dans une publication officielle puis reproduite, jamais comme une propriété découverte dans le jeu de données généré."
-  ou_apparait: "Chapitre 4."
+  page_tableau_de_bord: aucune
+  ou_apparait: "Aucune page du tableau de bord : la grandeur ne figure qu'au chapitre 4 du rapport."
 
 - id: R-20
   relation: "Le taux de facturation et le taux de recouvrement diffèrent par type d'épisode."
@@ -172,4 +192,15 @@
   statut: HYP
   source: S-20
   consequence: "Les montants et l'ancienneté des créances de la page Facturation et recouvrement sont imposés. La priorisation des relances qui en découle est circulaire ; la recommandation du chapitre 9 s'appuie sur S-20 et non sur les données générées."
+  page_tableau_de_bord: facturation
   ou_apparait: "Tableau de bord, page Facturation et recouvrement. Chapitre 9."
+
+- id: R-21
+  relation: "Les activités aux délais médians les plus longs sont celles dont le taux d'absentéisme est le plus bas."
+  parametre: delai_rdv_par_specialite, taux_absenteisme_par_specialite
+  statut: HYP
+  source: ""
+  forme: "Ce n'est PAS une relation causale injectée : aucun paramètre ne lie ces deux grandeurs. C'est la corrélation entre DEUX TABLES DE PARAMÈTRES posées séparément, l'une donnant un délai médian par spécialité, l'autre un taux d'absentéisme par spécialité. Mesurée sur les valeurs des paramètres eux-mêmes, elle vaut -0,4918 ; mesurée sur les données produites, elle vaut -0,4855. Son signe est l'INVERSE de celui de R-01, qui joue à l'intérieur de chaque spécialité."
+  consequence: "La corrélation affichée entre le délai médian et le taux d'absentéisme des huit activités est circulaire au même titre qu'une relation injectée : elle est entièrement fixée par le rangement conjoint des deux tables de paramètres. Aucune conclusion sur l'effet du délai sur l'absentéisme ne peut en être tirée, et surtout pas la conclusion inverse de R-01 : la relation interne aux spécialités reste positive."
+  page_tableau_de_bord: rendez_vous
+  ou_apparait: "Tableau de bord, page Rendez-vous, indicateur rendez_vous_delai_et_absence. Chapitre 7."

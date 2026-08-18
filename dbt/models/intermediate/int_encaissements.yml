@@ -3,9 +3,10 @@ version: 2
 models:
   - name: int_encaissements
     description: >
-      source.encaissements typée : les colonnes date/horodatage/booleen/numérique converties
-      par les macros de dbt/macros/conversions.sql, les colonnes code/texte reprises
-      telles quelles.
+      Une ligne par encaissement, identifiée par n_encaissement. Couche de nettoyage sans
+      destruction : codes et textes repris tels quels, dates, montants et booléens typés. Cette
+      table ne porte AUCUNE colonne patient : le rattachement au patient est reconstitué en aval,
+      en remontant la facture.
     tests:
       - meme_decompte_que_la_source:
           arguments:
@@ -14,25 +15,67 @@ models:
           arguments:
             column_name: "n_encaissement"
     columns:
+      - name: n_encaissement
+        description: >
+          Identifiant de l'encaissement, clé de la table. Colonne non relevée à l'écran, dont
+          l'existence est documentée par une source (S-27).
+      - name: n_facture
+        description: >
+          Identifiant de la facture réglée. Il rattache la ligne aux factures et constitue, en
+          aval, le seul chemin vers le patient. Colonne non relevée à l'écran, dont l'existence
+          est documentée par une source (S-27).
       - name: date_encaissement
+        description: >
+          Horodatage du règlement. Colonne non relevée à l'écran, dont l'existence est documentée
+          par une source (S-27). La couche source la stocke en texte, au format d'affichage du
+          système observé — mois, jour, année, puis heure sur douze heures ; elle est ici
+          convertie en HORODATAGE, la chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'encaissements') }}"
                 source_column: date_encaissement
+      - name: mode_reglement
+        description: >
+          Code du moyen de paiement employé. Aucune source ne documente la correspondance entre
+          ces codes et un intitulé, et aucun libellé n'est inventé. Colonne non relevée à l'écran
+          et posée sans preuve externe.
       - name: montant
+        description: >
+          Montant réglé, en dirhams. Il porte sur ce seul règlement : une facture peut en recevoir
+          plusieurs. Colonne non relevée à l'écran, dont l'existence est documentée par une source
+          (S-18). La couche source la stocke en texte ; elle est ici convertie en NUMÉRIQUE exact,
+          la chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'encaissements') }}"
                 source_column: montant
+      - name: regisseur
+        description: >
+          Identifiant du compte utilisateur ayant encaissé. C'est un compte, non un nom de
+          personne. Colonne non relevée à l'écran, dont l'existence est documentée par une source
+          (S-20).
       - name: billet_sortie_delivre
+        description: >
+          Indique qu'un billet de sortie a été délivré à l'occasion de ce règlement. Colonne non
+          relevée à l'écran, dont l'existence est documentée par une source (S-27). La couche
+          source la stocke en texte, sur un domaine réduit à « 1 », « 0 » et la chaîne vide ; elle
+          est ici convertie en BOOLÉEN, la chaîne vide comme toute autre valeur devenant une
+          valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'encaissements') }}"
                 source_column: billet_sortie_delivre
       - name: date_extraction
+        description: >
+          Date de l'extraction dont la ligne provient. Colonne TECHNIQUE de la zone
+          d'atterrissage, absente du système observé : elle partitionne le chargement et le rend
+          rejouable, une même partition pouvant être rechargée sans doublon. Colonne non relevée à
+          l'écran et posée sans preuve externe. La couche source la stocke en texte, au format
+          d'affichage du système observé — mois, jour, année ; elle est ici convertie en DATE, la
+          chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:

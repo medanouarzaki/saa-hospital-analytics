@@ -2,8 +2,18 @@ version: 2
 
 models:
   - name: agg_urgences_journalier
+    description: >
+      Une ligne par jour d'arrivée et niveau de tri — grain déclaré par l'enregistrement de
+      décision 0028 — agrégée depuis fct_passage_urgence. L'orientation de sortie y est ventilée
+      en quatre décomptes dont la somme égale exactement le nombre de passages : la colonne
+      d'orientation est mesurée intégralement renseignée, et les cinq codes de la nomenclature
+      sont tous couverts, deux d'entre eux étant regroupés faute d'une catégorie distincte
+      demandée.
     columns:
       - name: jour
+        description: >
+          Jour d'arrivée aux urgences, clé de rattachement à dim_date. Repris de la colonne
+          date_arrivee de fct_passage_urgence.
         tests:
           - not_null
           - relationships:
@@ -11,8 +21,53 @@ models:
                 to: "{{ ref('dim_date') }}"
                 field: "date_jour"
       - name: niveau_tri
+        description: >
+          Code du niveau de tri, second axe de groupement. Repris de fct_passage_urgence sans
+          transformation ; aucune table de libellés n'accompagne ces codes.
         tests:
           - not_null
       - name: nb_passages
+        description: >
+          Nombre de passages du groupe. Décompte des lignes de fct_passage_urgence groupées par
+          jour d'arrivée et niveau de tri. C'est le total auquel les quatre décomptes
+          d'orientation somment.
         tests:
           - not_null
+      - name: nb_patients_distincts
+        description: >
+          Nombre de patients DIFFÉRENTS parmi ces passages. Décompte des valeurs distinctes de
+          n_ipp sur le même groupe. Son écart à nb_passages mesure le recours répété aux urgences.
+      - name: mediane_delai_pec_minutes
+        description: >
+          Médiane du délai avant prise en charge médicale, en minutes, sur les passages du groupe.
+          Calculée par percentile continu d'ordre 0,5 sur delai_pec_minutes, avec interpolation
+          linéaire entre les valeurs encadrantes.
+      - name: p90_delai_pec_minutes
+        description: >
+          Neuvième décile du délai avant prise en charge médicale, en minutes, calculé par
+          percentile continu d'ordre 0,9. C'est lui, et non la médiane, qui décrit l'attente des
+          patients les moins vite pris en charge.
+      - name: mediane_duree_minutes
+        description: >
+          Médiane de la durée totale du passage aux urgences, en minutes, calculée par percentile
+          continu d'ordre 0,5 sur duree_minutes. À distinguer du délai de prise en charge, qui ne
+          couvre que l'attente avant le premier contact médical.
+      - name: n_retour_domicile
+        description: >
+          Nombre de passages dont l'orientation de sortie est le retour au domicile. Décompte
+          filtré sur le code correspondant de la nomenclature des orientations.
+      - name: n_hospitalisation
+        description: >
+          Nombre de passages ayant donné lieu à une hospitalisation. Décompte filtré sur le code
+          correspondant de la nomenclature des orientations. C'est le numérateur du taux
+          d'hospitalisation aux urgences.
+      - name: n_transfert
+        description: >
+          Nombre de passages ayant donné lieu à un transfert vers un autre établissement. Décompte
+          filtré sur le code correspondant de la nomenclature des orientations.
+      - name: n_autre_orientation
+        description: >
+          Nombre de passages relevant des deux issues restantes de la nomenclature — sortie contre
+          avis médical et décès — REGROUPÉES en un seul décompte faute d'une catégorie distincte
+          demandée par les indicateurs. Le regroupement est ce qui permet aux quatre décomptes de
+          sommer exactement à nb_passages.

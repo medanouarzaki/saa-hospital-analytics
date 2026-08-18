@@ -2,8 +2,20 @@ version: 2
 
 models:
   - name: dim_organisme
+    description: >
+      Dimension des organismes payeurs, à clé naturelle et sans clé de substitution. Une ligne par
+      code distinct, obtenue par union de int_patients.compagnie_assurance et de
+      int_prises_en_charge.organisme, les valeurs vides étant écartées.
     columns:
       - name: code_organisme
+        description: >
+          Code de l'organisme couvrant tout ou partie des frais, repris sans transformation. Le
+          champ est relevé au poste sous le libellé « Compagnie d'assur. » de la fiche patient
+          (relevé REL-PAT.A01) ; la colonne organisme des prises en charge n'a pas été relevée à
+          l'écran et provient de la documentation sur la couverture médicale de base (source
+          S-15). Les valeurs mêlent deux formes que le système ne distingue pas : des sigles de
+          régime et des identifiants numériques d'organisme. Aucune table de correspondance ne
+          donne l'intitulé de ces derniers, et aucun libellé n'est inventé.
         tests:
           - unique
           - not_null

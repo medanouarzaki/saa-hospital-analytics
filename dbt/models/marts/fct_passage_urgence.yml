@@ -2,6 +2,12 @@ version: 2
 
 models:
   - name: fct_passage_urgence
+    description: >
+      Un passage aux urgences par ligne, identifié par n_passage. C'est un satellite de
+      fct_passage et non une table indépendante : son espace de clés est un sous-ensemble strict
+      de celui des passages, et la relation vers fct_passage porte directement sur n_passage. Elle
+      porte les attributs propres au parcours d'urgence — tri, délai de prise en charge,
+      orientation — que la table pivot ne porte pas.
     tests:
       - meme_decompte_que_la_source:
           arguments:
@@ -11,6 +17,10 @@ models:
             jour_column: "date_arrivee"
     columns:
       - name: n_passage
+        description: >
+          Identifiant du passage aux urgences, clé de la table et clé de rattachement à
+          fct_passage. Repris sans transformation de la colonne source du même nom, documentée par
+          la description de l'organisation hospitalière (source S-27).
         tests:
           - unique
           - not_null
@@ -19,31 +29,95 @@ models:
                 to: "{{ ref('fct_passage') }}"
                 field: "n_passage"
       - name: n_ipp
+        description: >
+          Identifiant du patient. Repris sans transformation ; le champ est relevé au poste sous
+          le libellé « N° IPP » (relevé REL-PAT.D01).
         tests:
           - not_null
+      - name: patient_valide_de
+        description: >
+          Version de la fiche patient en vigueur au moment de l'événement, exprimée par sa borne
+          basse de validité. Elle complète n_ipp pour désigner une ligne unique de dim_patient :
+          un patient dont la fiche a changé porte plusieurs versions, et c'est celle qui était en
+          vigueur ce jour-là qui est rattachée ici. Obtenue par jointure sur dim_patient avec la
+          condition de bornes semi-ouvertes, la borne haute étant exclue.
+      - name: date_heure_arrivee
+        description: >
+          Horodatage d'arrivée aux urgences. Repris de la colonne source du même nom, converti du
+          texte en horodatage par la couche intermédiaire. Colonne documentée par la description
+          de l'organisation hospitalière (source S-27).
       - name: date_arrivee
+        description: >
+          Jour d'arrivée, obtenu en tronquant date_heure_arrivee à la date. C'est cette colonne
+          qui sert de clé de rattachement à dim_date.
         tests:
           - not_null
           - relationships:
               arguments:
                 to: "{{ ref('dim_date') }}"
                 field: "date_jour"
-      - name: mode_arrivee
-        tests:
-          - not_null
-      - name: motif_recours
-        tests:
-          - not_null
-      - name: niveau_tri
-        tests:
-          - not_null
       - name: date_heure_pec_medicale
+        description: >
+          Horodatage de la première prise en charge médicale, c'est-à-dire du moment où un médecin
+          voit le patient. Repris de la colonne source du même nom, converti en horodatage par la
+          couche intermédiaire.
         tests:
           - not_null
       - name: date_heure_sortie
+        description: >
+          Horodatage de sortie des urgences. Repris de la colonne source du même nom, converti en
+          horodatage par la couche intermédiaire.
         tests:
           - not_null
+      - name: mode_arrivee
+        description: >
+          Code du mode d'arrivée du patient aux urgences — venu de lui-même, amené, adressé.
+          Repris de la colonne source du même nom, la chaîne vide étant convertie en valeur
+          absente. Colonne documentée par la description de la prise en charge des urgences
+          (source S-12).
+        tests:
+          - not_null
+      - name: motif_recours
+        description: >
+          Code du motif pour lequel le patient consulte aux urgences. Repris de la colonne source
+          du même nom, la chaîne vide étant convertie en valeur absente. Colonne documentée par
+          l'étude sur les consultations non appropriées aux urgences (source S-13).
+        tests:
+          - not_null
+      - name: niveau_tri
+        description: >
+          Code du niveau de tri attribué à l'arrivée, qui exprime la gravité et commande la
+          priorité de prise en charge. Repris de la colonne source du même nom, la chaîne vide
+          étant convertie en valeur absente. Colonne documentée par la description de la prise en
+          charge des urgences (source S-12).
+        tests:
+          - not_null
+      - name: delai_pec_minutes
+        description: >
+          Délai avant prise en charge médicale, en minutes, CALCULÉ : différence entre
+          date_heure_pec_medicale et date_heure_arrivee, exprimée en secondes puis divisée par 60.
+          Aucune colonne de délai n'existe dans la source ; l'unité retenue est la minute, celle
+          des cibles de délai par niveau de tri.
+      - name: duree_minutes
+        description: >
+          Durée totale du passage aux urgences, en minutes, CALCULÉE : différence entre
+          date_heure_sortie et date_heure_arrivee, exprimée en secondes puis divisée par 60. À
+          distinguer de delai_pec_minutes, qui ne couvre que l'attente avant le premier contact
+          médical.
+      - name: orientation_sortie
+        description: >
+          Code de l'issue du passage — retour au domicile, hospitalisation, transfert, sortie
+          contre avis médical, décès. Repris de la colonne source du même nom, la chaîne vide
+          étant convertie en valeur absente. Colonne documentée par la description de
+          l'organisation hospitalière (source S-27).
       - name: code_service_orientation
+        description: >
+          Code du service vers lequel le patient est orienté à la sortie, rattaché à dim_service.
+          Repris de la colonne source service_orientation, la chaîne vide étant convertie en
+          valeur absente. Colonne mesurée très faiblement renseignée — environ six pour cent des
+          lignes — ce pour quoi aucun contrôle de non-nullité ne porte sur elle ; le contrôle
+          relationnel qui l'accompagne ne porte que sur les valeurs effectivement présentes, les
+          valeurs absentes étant nativement écartées.
         tests:
           - relationships:
               arguments:

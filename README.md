@@ -34,15 +34,20 @@ route de la composition est indispensable, faute de quoi le tableau de bord dém
    l'environnement.
 5. Produire le jeu de données : `uv run python -m generator generator/output`.
 6. Appliquer les schémas : `uv run python ingestion/appliquer_ddl.py` puis
-   `uv run python -m linkage.appliquer_ddl`. Ces commandes s'exécutent sur une base vide ; les
-   rejouer sur une base déjà pourvue échoue.
+   `uv run python -m linkage.appliquer_ddl`. Les deux sont **rejouables** : chaque objet est
+   supprimé s'il existe avant d'être recréé, si bien qu'une seconde application aboutit et laisse
+   le catalogue dans le même état. Elles **détruisent en revanche les données déjà chargées** des
+   tables qu'elles recréent : les rejouer impose de recharger les données.
 7. Charger les données : `uv run python -m ingestion.chargeur generator/output/scenario_30`.
 8. Déclarer le profil de connexion de dbt. Il ne figure pas dans le dépôt : écrire un
    `profiles.yml` sous `~/.dbt/` ou pointer `DBT_PROFILES_DIR` sur un répertoire qui en contient un,
    avec les variables `DBT_POSTGRES_HOST`, `DBT_POSTGRES_PORT`, `DBT_POSTGRES_USER`,
    `DBT_POSTGRES_PASSWORD` et `DBT_POSTGRES_DB` renseignées. Le fichier de workflow d'intégration
    continue en donne un exemple complet.
-9. Construire l'entrepôt : `cd dbt && uv run dbt seed && uv run dbt run --threads 1`.
+9. Construire l'entrepôt, puis le valider :
+   `cd dbt && uv run dbt seed && uv run dbt run --threads 1 && uv run dbt test`, **puis revenir à
+   la racine du dépôt** (`cd ..`) : les étapes suivantes s'exécutent depuis la racine, et lancées
+   depuis `dbt/` elles échouent sur `No module named 'linkage'`.
 10. Rapprocher les identités puis constituer l'instantané que lit le tableau de bord :
     `uv run python -m linkage.prediction`, `uv run python -m linkage.evaluation`,
     `uv run python -m instantane.rafraichir`. Le rapprochement lit la vérité terrain du scénario
@@ -52,6 +57,9 @@ route de la composition est indispensable, faute de quoi le tableau de bord dém
     `CHEMIN_COURBE_PRECISION_RAPPEL`. Le second se redirige avec `CHEMIN_CSV_ABLATION`, mais son
     contrôle lit le chemin par défaut : le rediriger lui ferait lire un fichier périmé.
 11. Ouvrir le tableau de bord sur le port déclaré par `STREAMLIT_PORT` dans `.env`.
+12. Facultatif, et seul moyen de peupler `exports/` : `uv run python -m livraison.exporter` produit
+    le classeur et les fichiers tabulaires de restitution à partir de l'instantané. Le répertoire
+    reste vide tant que cette commande n'a pas été lancée.
 
 Le graphe quotidien (`airflow/saa_daily.py`) enchaîne génération, chargement, construction, rapprochement et rafraîchissement pour une date d'extraction
 donnée, une fois les schémas en place.

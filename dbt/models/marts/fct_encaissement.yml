@@ -3,8 +3,10 @@ version: 2
 models:
   - name: fct_encaissement
     description: >
-      n_ipp est dérivé : obtenu via n_facture -> fct_facturation.n_ipp, aucune
-      colonne patient propre à int_encaissements.
+      Un encaissement par ligne, identifié par n_encaissement. Le grain est l'encaissement et non
+      la facture : une facture peut recevoir plusieurs règlements. Le rattachement au patient est
+      dérivé et non repris de la source — la couche intermédiaire des encaissements ne porte
+      aucune colonne patient, et n_ipp est obtenu en remontant la facture.
     tests:
       - meme_decompte_que_la_source:
           arguments:
@@ -14,10 +16,18 @@ models:
             jour_column: "jour_encaissement"
     columns:
       - name: n_encaissement
+        description: >
+          Identifiant de l'encaissement, clé de la table. Repris sans transformation de la colonne
+          source du même nom, dont l'existence est documentée par la description du circuit de
+          régie (source S-27) et qui n'a pas été relevée à l'écran.
         tests:
           - unique
           - not_null
       - name: n_facture
+        description: >
+          Identifiant de la facture réglée par cet encaissement. Repris sans transformation ; il
+          rattache la ligne à fct_facturation, raccordement mesuré intégralement couvert — toute
+          facture citée par un encaissement existe dans la table des factures.
         tests:
           - not_null
           - relationships:
@@ -25,28 +35,66 @@ models:
                 to: "{{ ref('fct_facturation') }}"
                 field: "n_facture"
       - name: n_ipp
+        description: >
+          Identifiant du patient, DÉRIVÉ et non repris : la source des encaissements ne porte
+          aucune colonne patient. Il est obtenu en suivant n_facture jusqu'à fct_facturation, dont
+          on lit le n_ipp.
         tests:
           - not_null
+      - name: patient_valide_de
+        description: >
+          Version de la fiche patient en vigueur au moment de l'événement, exprimée par sa borne
+          basse de validité. Elle complète n_ipp pour désigner une ligne unique de dim_patient :
+          un patient dont la fiche a changé porte plusieurs versions, et c'est celle qui était en
+          vigueur ce jour-là qui est rattachée ici. Obtenue par jointure sur dim_patient avec la
+          condition de bornes semi-ouvertes, la borne haute étant exclue.
+      - name: date_encaissement
+        description: >
+          Horodatage du règlement. Repris de la colonne source du même nom, que la couche
+          intermédiaire convertit du texte en horodatage. Colonne documentée par la description du
+          circuit de régie (source S-27), non relevée à l'écran.
       - name: jour_encaissement
+        description: >
+          Jour du règlement, obtenu en tronquant date_encaissement à la date. C'est cette colonne,
+          et non l'horodatage, qui sert de clé de rattachement à dim_date.
         tests:
           - not_null
           - relationships:
               arguments:
                 to: "{{ ref('dim_date') }}"
                 field: "date_jour"
-      - name: mode_reglement
+      - name: montant
+        description: >
+          Montant réglé par cet encaissement, en dirhams. Repris de la colonne source du même nom,
+          documentée par la description des flux financiers hospitaliers (source S-18). Il porte
+          sur ce règlement seul : la somme des encaissements d'une facture peut rester inférieure
+          au montant facturé, un règlement partiel étant possible.
         tests:
           - not_null
-      - name: montant
+      - name: billet_sortie_delivre
+        description: >
+          Indique qu'un billet de sortie a été délivré à l'occasion de ce règlement. La couche
+          source stocke la valeur en texte ; la couche intermédiaire la convertit en booléen.
+          Colonne documentée par la description du circuit de régie (source S-27).
+        tests:
+          - not_null
+      - name: mode_reglement
+        description: >
+          Code du moyen de paiement employé. Repris de la colonne source du même nom, la chaîne
+          vide étant convertie en valeur absente. C'est la seule colonne de cette table posée sans
+          preuve externe : aucune source ne documente la correspondance entre ces codes et un
+          intitulé, et aucun libellé n'est inventé.
         tests:
           - not_null
       - name: regisseur
+        description: >
+          Identifiant du compte utilisateur ayant encaissé. Repris de la colonne source du même
+          nom, la chaîne vide étant convertie en valeur absente. C'est un compte, non un nom de
+          personne. Colonne non relevée à l'écran, documentée par la description du circuit de
+          régie (source S-20).
         tests:
           - not_null
           - relationships:
               arguments:
                 to: "{{ ref('dim_agent') }}"
                 field: "code_agent"
-      - name: billet_sortie_delivre
-        tests:
-          - not_null
