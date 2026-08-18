@@ -37,7 +37,7 @@ route de la composition est indispensable, faute de quoi le tableau de bord dém
    `uv run python -m linkage.appliquer_ddl`. Les deux sont **rejouables** : chaque objet est
    supprimé s'il existe avant d'être recréé, si bien qu'une seconde application aboutit et laisse
    le catalogue dans le même état. Elles **détruisent en revanche les données déjà chargées** des
-   tables qu'elles recréent : les rejouer impose de reprendre à l'étape 7.
+   tables qu'elles recréent : les rejouer impose de recharger les données.
 7. Charger les données : `uv run python -m ingestion.chargeur generator/output/scenario_30`.
 8. Déclarer le profil de connexion de dbt. Il ne figure pas dans le dépôt : écrire un
    `profiles.yml` sous `~/.dbt/` ou pointer `DBT_PROFILES_DIR` sur un répertoire qui en contient un,
