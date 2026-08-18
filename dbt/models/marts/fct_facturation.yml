@@ -2,6 +2,12 @@ version: 2
 
 models:
   - name: fct_facturation
+    description: >
+      Une facture par ligne, identifiée par n_facture. L'épisode facturé se raccorde à fct_passage
+      pour les trois types d'épisode — consultation externe, hospitalisation, urgence — la table
+      des passages étant la cible pivot des trois. Deux colonnes, nb_lignes et montant_lignes,
+      sont recalculées indépendamment depuis les lignes de facture plutôt que reprises de
+      l'en-tête, afin que la réconciliation entre l'en-tête et le détail soit vérifiable.
     tests:
       - meme_decompte_que_la_source:
           arguments:
@@ -11,23 +17,40 @@ models:
             jour_column: "date_facture"
     columns:
       - name: n_facture
+        description: >
+          Identifiant de la facture, clé de la table. Repris sans transformation de la colonne
+          source du même nom, documentée par la description de la facturation hospitalière (source
+          S-09).
         tests:
           - unique
           - not_null
       - name: n_ipp
+        description: >
+          Identifiant du patient facturé. Repris sans transformation ; le champ est relevé au
+          poste sous le libellé « N° IPP » (relevé REL-PAT.D01).
         tests:
           - not_null
-      - name: n_episode
-        tests:
-          - not_null
-          - relationships:
-              arguments:
-                to: "{{ ref('fct_passage') }}"
-                field: "n_passage"
+      - name: patient_valide_de
+        description: >
+          Version de la fiche patient en vigueur au moment de l'événement, exprimée par sa borne
+          basse de validité. Elle complète n_ipp pour désigner une ligne unique de dim_patient :
+          un patient dont la fiche a changé porte plusieurs versions, et c'est celle qui était en
+          vigueur ce jour-là qui est rattachée ici. Obtenue par jointure sur dim_patient avec la
+          condition de bornes semi-ouvertes, la borne haute étant exclue.
       - name: type_episode
+        description: >
+          Code du type d'épisode facturé — consultation externe, hospitalisation ou urgence.
+          Repris sans transformation de la colonne source du même nom. C'est lui qui indique à
+          quelle population de passages l'épisode appartient. Colonne documentée par la
+          description de l'organisation hospitalière (source S-27).
         tests:
           - not_null
       - name: date_facture
+        description: >
+          Date d'émission de la facture. Reprise de la colonne source du même nom, convertie du
+          texte en date par la couche intermédiaire. Elle est déjà une date et non un horodatage :
+          aucune colonne de jour séparée n'est donc calculée, et c'est elle qui sert de clé de
+          rattachement à dim_date.
         tests:
           - not_null
           - relationships:
@@ -35,40 +58,102 @@ models:
                 to: "{{ ref('dim_date') }}"
                 field: "date_jour"
       - name: type_facture
+        description: >
+          Code du type de facture, qui distingue les régimes de facturation applicables. Repris
+          sans transformation de la colonne source du même nom, documentée par la description de
+          la facturation hospitalière (source S-09).
         tests:
           - not_null
+      - name: etat
+        description: >
+          Code de l'état de la facture — émise, réglée, annulée. Repris sans transformation de la
+          colonne source du même nom, documentée par la description de la facturation hospitalière
+          (source S-09).
+        tests:
+          - not_null
+      - name: montant_total
+        description: >
+          Montant total DÉCLARÉ par l'en-tête de la facture, en dirhams. Repris de la colonne
+          source du même nom, documentée par la description de la tarification hospitalière
+          (source S-17). À confronter à montant_lignes, qui recalcule la même grandeur depuis le
+          détail : l'écart entre les deux est un défaut de saisie mesurable, et c'est pour le
+          rendre mesurable que les deux colonnes coexistent.
+        tests:
+          - not_null
+      - name: part_organisme
+        description: >
+          Part du montant prise en charge par l'organisme payeur, en dirhams. Reprise de la
+          colonne source du même nom, documentée par la description des flux financiers
+          hospitaliers (source S-18).
+        tests:
+          - not_null
+      - name: part_patient
+        description: >
+          Part du montant restant à la charge du patient, en dirhams. Reprise de la colonne source
+          du même nom, documentée par la description des flux financiers hospitaliers (source
+          S-18). Avec part_organisme, elle décompose montant_total.
+        tests:
+          - not_null
+      - name: date_creation
+        description: >
+          Horodatage de création de la ligne de facture dans le système. Repris de la colonne
+          source du même nom, converti du texte en horodatage par la couche intermédiaire ; le
+          champ est relevé au poste sous le libellé « Date création » (relevé REL-RDV.C02). À
+          distinguer de date_facture, qui est la date d'émission portée par la facture elle-même.
+        tests:
+          - not_null
+      - name: n_episode
+        description: >
+          Identifiant de l'épisode de soins facturé, clé de rattachement à fct_passage. Repris de
+          la colonne source du même nom, la chaîne vide étant convertie en valeur absente. Le
+          raccordement est mesuré intégralement couvert pour les trois types d'épisode.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: "{{ ref('fct_passage') }}"
+                field: "n_passage"
+      - name: code_diagnostic_cim10
+        description: >
+          Code diagnostic porté sur la facture, dans la classification internationale des
+          maladies. Repris de la colonne source du même nom, la chaîne vide étant convertie en
+          valeur absente. Attribut SANS dimension : aucune table de diagnostics n'existe dans ce
+          dépôt, le code est donc conservé tel quel et aucun libellé n'est inventé.
       - name: service_emetteur
+        description: >
+          Code du service ayant émis la facture, clé de rattachement à dim_service. Repris de la
+          colonne source du même nom, la chaîne vide étant convertie en valeur absente. Colonne
+          documentée par la description de l'organisation hospitalière (source S-27).
         tests:
           - not_null
           - relationships:
               arguments:
                 to: "{{ ref('dim_service') }}"
                 field: "code_service"
-      - name: etat
-        tests:
-          - not_null
-      - name: montant_total
-        tests:
-          - not_null
-      - name: part_organisme
-        tests:
-          - not_null
-      - name: part_patient
-        tests:
-          - not_null
       - name: nb_lignes
+        description: >
+          Nombre de lignes de détail portées par la facture, CALCULÉ indépendamment de l'en-tête :
+          décompte des lignes de la couche intermédiaire des lignes de facture, groupées par
+          n_facture, ramené à zéro lorsque la facture n'a aucune ligne. C'est ce recalcul, et non
+          une colonne reprise, qui rend la réconciliation vérifiable.
         tests:
           - not_null
       - name: montant_lignes
+        description: >
+          Somme des montants des lignes de détail de la facture, en dirhams, CALCULÉE
+          indépendamment de l'en-tête : somme de la colonne montant de la couche intermédiaire des
+          lignes de facture, groupée par n_facture, ramenée à zéro en l'absence de ligne. Sa
+          confrontation à montant_total est l'objet d'un contrôle de réconciliation.
         tests:
           - not_null
       - name: agent_creation
+        description: >
+          Identifiant du compte utilisateur ayant créé la facture, clé de rattachement à
+          dim_agent. Repris de la colonne source cree_par, relevée au poste sous le libellé « Créé
+          par » (relevé REL-RDV.C01), la chaîne vide étant convertie en valeur absente.
         tests:
           - not_null
           - relationships:
               arguments:
                 to: "{{ ref('dim_agent') }}"
                 field: "code_agent"
-      - name: date_creation
-        tests:
-          - not_null

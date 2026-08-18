@@ -2,6 +2,11 @@ version: 2
 
 models:
   - name: fct_passage
+    description: >
+      Un passage par ligne, identifié par n_passage. Table pivot couvrant les TROIS types de
+      passage — consultation, hospitalisation et urgence — et non le seul type externe : c'est à
+      elle que se raccordent les épisodes des factures et des prises en charge, pour les trois
+      types.
     tests:
       - meme_decompte_que_la_source:
           arguments:
@@ -11,39 +16,109 @@ models:
             jour_column: "date_entree"
     columns:
       - name: n_passage
+        description: >
+          Identifiant du passage, clé de la table. Repris sans transformation de la colonne source
+          du même nom, documentée par la description des systèmes d'information hospitaliers
+          (source S-08) et non relevée à l'écran.
         tests:
           - unique
           - not_null
       - name: n_ipp
+        description: >
+          Identifiant du patient concerné par le passage. Repris sans transformation ; le champ
+          est relevé au poste sous le libellé « N° IPP » (relevé REL-PAT.D01).
         tests:
           - not_null
+      - name: patient_valide_de
+        description: >
+          Version de la fiche patient en vigueur au moment de l'événement, exprimée par sa borne
+          basse de validité. Elle complète n_ipp pour désigner une ligne unique de dim_patient :
+          un patient dont la fiche a changé porte plusieurs versions, et c'est celle qui était en
+          vigueur ce jour-là qui est rattachée ici. Obtenue par jointure sur dim_patient avec la
+          condition de bornes semi-ouvertes, la borne haute étant exclue.
       - name: type_passage
+        description: >
+          Code du type de passage : consultation, hospitalisation ou urgence. Repris sans
+          transformation de la colonne source du même nom, documentée par la description de
+          l'organisation des soins (source S-06). C'est cette colonne qui distingue les trois
+          populations réunies dans cette table.
         tests:
           - not_null
       - name: code_service
+        description: >
+          Code du service où le passage a eu lieu. Repris de la colonne source service, la chaîne
+          vide étant convertie en valeur absente et le nom étant préfixé pour marquer le
+          rattachement à dim_service. Colonne documentée par la description de l'organisation
+          hospitalière (source S-27).
         tests:
           - not_null
           - relationships:
               arguments:
                 to: "{{ ref('dim_service') }}"
                 field: "code_service"
+      - name: code_activite
+        description: >
+          Code de l'activité, rattaché à dim_activite. Repris de la colonne source activite,
+          relevée au poste sous le libellé « Activité » (relevé REL-RDV.R02), la chaîne vide étant
+          convertie en valeur absente. Renseignée pour les SEULS passages de consultation —
+          mesurée intégralement présente sur ce sous-ensemble et intégralement absente sur les
+          hospitalisations et les urgences — ce pour quoi aucun contrôle de non-nullité ne porte
+          sur elle.
       - name: n_rdv_resolu
+        description: >
+          Identifiant du rendez-vous à l'origine du passage, exposé UNIQUEMENT lorsque le
+          rendez-vous existe réellement. La colonne source n_rdv est renseignée sur toutes les
+          lignes mais ne se raccorde pas toujours à un rendez-vous ; la valeur n'est donc reprise
+          que si une ligne correspondante existe dans la couche intermédiaire des rendez-vous, et
+          reste vide sinon. C'est cette colonne, et non la colonne brute, qui porte la relation
+          vers fct_rendez_vous.
         tests:
           - relationships:
               arguments:
                 to: "{{ ref('fct_rendez_vous') }}"
                 field: "n_rdv"
+      - name: date_heure_entree
+        description: >
+          Horodatage d'entrée du patient. Repris de la colonne source du même nom, que la couche
+          intermédiaire convertit du texte en horodatage. Colonne documentée par la description
+          des systèmes d'information hospitaliers (source S-08).
       - name: date_entree
+        description: >
+          Jour d'entrée, obtenu en tronquant date_heure_entree à la date. C'est cette colonne qui
+          sert de clé de rattachement à dim_date.
         tests:
           - not_null
           - relationships:
               arguments:
                 to: "{{ ref('dim_date') }}"
                 field: "date_jour"
+      - name: date_heure_sortie
+        description: >
+          Horodatage de sortie du patient. Repris de la colonne source du même nom, converti du
+          texte en horodatage par la couche intermédiaire.
+      - name: duree_minutes
+        description: >
+          Durée du passage en minutes, CALCULÉE : différence entre date_heure_sortie et
+          date_heure_entree, exprimée en secondes puis divisée par 60. Aucune colonne de durée
+          n'existe dans la source pour cette table ; l'unité retenue est la minute, alignée sur
+          celle du paramètre de durée médiane par catégorie de la configuration de génération.
       - name: mode_prise_en_charge
+        description: >
+          Code du mode de prise en charge administrative du passage. Repris de la colonne source
+          du même nom, la chaîne vide étant convertie en valeur absente. Colonne documentée par la
+          description des flux financiers hospitaliers (source S-18).
         tests:
           - not_null
+      - name: medecin
+        description: >
+          Nom du médecin ayant assuré le passage, en texte libre. Repris de la colonne source du
+          même nom, la chaîne vide étant convertie en valeur absente. Colonne documentée par la
+          description de l'organisation des soins (source S-06) et non relevée à l'écran.
       - name: agent_creation
+        description: >
+          Identifiant du compte utilisateur ayant créé la ligne de passage. Repris de la colonne
+          source cree_par, relevée au poste sous le libellé « Créé par » (relevé REL-RDV.C01), la
+          chaîne vide étant convertie en valeur absente. Clé de rattachement à dim_agent.
         tests:
           - not_null
           - relationships:
