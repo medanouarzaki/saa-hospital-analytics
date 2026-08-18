@@ -23,11 +23,85 @@ import yaml
 from dashboard import lecture
 
 REGISTRE = Path(__file__).resolve().parent / "indicateurs.yml"
+LIBELLES = Path(__file__).resolve().parent / "libelles_dimensions.yml"
+
+# Le séparateur entre le code et son libellé. Le code reste EN TÊTE, et ce n'est pas une
+# question de goût : il porte l'ordre de tri des axes — les codes d'activité sont du texte,
+# triés lexicographiquement, et les préfixer conserve exactement l'ordre rendu jusqu'ici —
+# et il reste le lien avec les exports, où seul le code figure. Un lecteur qui retrouve
+# « 20 » dans un fichier tabulaire doit pouvoir le rapprocher de ce qu'il voit à l'écran.
+SEPARATEUR_LIBELLE = " — "
 
 
 @functools.lru_cache(maxsize=1)
 def registre() -> dict:
     return yaml.safe_load(REGISTRE.read_text(encoding="utf-8"))
+
+
+@functools.lru_cache(maxsize=1)
+def registre_libelles() -> dict:
+    return yaml.safe_load(LIBELLES.read_text(encoding="utf-8"))
+
+
+@functools.lru_cache(maxsize=1)
+def _libelles_par_dimension() -> dict[str, dict[str, dict]]:
+    """Les entrées du registre des libellés, indexées par dimension puis par code."""
+    index: dict[str, dict[str, dict]] = {}
+    for entree in registre_libelles()["libelles"]:
+        index.setdefault(entree["dimension"], {})[str(entree["code"])] = entree
+    return index
+
+
+def libelle_dimension(dimension: str, code) -> str:
+    """Le code, suivi de son libellé si — et seulement si — une source l'établit.
+
+    Un code classé `non_documente` au registre est rendu tel quel. C'est la règle qui
+    empêche l'invention : le mécanisme n'a aucun moyen de fabriquer un libellé, il ne sait
+    que lire celui qu'une source a établi.
+
+    Un code absent du registre est rendu tel quel lui aussi, et le contrôle dédié rougit :
+    l'affichage ne doit pas décider à la place du registre, même pour se protéger.
+    """
+    entree = _libelles_par_dimension().get(dimension, {}).get(str(code))
+    if entree is None or entree.get("categorie") != "documente":
+        return str(code)
+    return f"{code}{SEPARATEUR_LIBELLE}{entree['libelle']}"
+
+
+def avec_libelles(tableau, colonne: str, dimension: str):
+    """Rend une copie du tableau dont `colonne` porte le code suivi de son libellé."""
+    if colonne not in tableau.columns:
+        return tableau
+    return tableau.assign(
+        **{colonne: tableau[colonne].map(lambda code: libelle_dimension(dimension, code))}
+    )
+
+
+def mention_source_libelles(dimension: str) -> None:
+    """Cite à l'écran la source qui établit les libellés d'une dimension.
+
+    La version installée de la bibliothèque d'affichage accepte un paramètre `help` sur
+    `st.caption` — lu dans sa signature : `caption(body, unsafe_allow_html=False, *,
+    help=None, width='stretch', text_alignment='left')`. Le renvoi précis y est porté en
+    infobulle, la ligne visible restant courte.
+
+    N'émet rien si aucun code de la dimension n'est documenté : la page porte alors sa
+    propre mention, qui dit que les codes sont nus.
+    """
+    documentes = [
+        entree
+        for entree in _libelles_par_dimension().get(dimension, {}).values()
+        if entree.get("categorie") == "documente"
+    ]
+    if not documentes:
+        return
+    sources = sorted({entree["source"] for entree in documentes})
+    renvois = sorted({f"{entree['source']} — {entree['renvoi']}" for entree in documentes})
+    st.caption(
+        f"Libellés établis par {', '.join(sources)} ; aucun n'est inventé. "
+        f"{len(documentes)} code(s) documenté(s) sur {len(_libelles_par_dimension()[dimension])}.",
+        help=" | ".join(renvois),
+    )
 
 
 def indicateurs_de(page: str) -> list[dict]:
