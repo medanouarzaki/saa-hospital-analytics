@@ -74,7 +74,12 @@
 #      l'a tranché en filtrable sous réserve, la date disponible étant celle de
 #      naissance de la créance. Les non filtrables passent de douze à onze et les
 #      filtrables de vingt-six à vingt-sept.
-#   Total : vingt-sept filtrables et onze non filtrables, soit trente-huit.
+#   4. la page « Données », ajoutée après cet examen, porte deux entrées qui n'y
+#      figuraient pas — elle répond à « lesquels » là où l'examen n'avait recensé
+#      que des grandeurs répondant à « combien ». Les deux sont filtrables sans
+#      réserve : les filtrables passent de vingt-sept à vingt-neuf. Elles sont
+#      comptées parmi les dédoublements, qui totalisent donc quatre.
+#   Total : vingt-neuf filtrables et onze non filtrables, soit quarante.
 
 examen_initial:
   elements_examines: 37
@@ -83,12 +88,12 @@ examen_initial:
 
 composition:
   exclus: 1
-  dedoubles: 2
+  dedoubles: 4
   reclasses_filtrables: 1
-  entrees_attendues: 38
+  entrees_attendues: 40
 
 filtrabilite_attendue:
-  oui: 22
+  oui: 24
   oui_sous_reserve: 5
   non: 11
 
@@ -100,6 +105,7 @@ pages:
   - facturation
   - qualite
   - rapprochement
+  - donnees
 
 indicateurs:
 
@@ -754,3 +760,47 @@ indicateurs:
     filtrabilite: non
     motif: objet_sans_colonne_temporelle
     recalcule_depuis: rapprochement
+
+  # ------------------------------------------------------------------- donnees
+
+  - identifiant: donnees_lignes_filtrees
+    page: donnees
+    libelle: Lignes retenues par le filtre
+    definition: >-
+      Nombre de lignes que la table consultée porte après application des
+      filtres de période, de service et d'activité.
+    decision_servie: >-
+      Retrouver les dossiers concernés par un chiffre agrégé, pour agir sur eux
+      plutôt que sur la moyenne.
+    objets_lus:
+      - marts.fct_passage_urgence
+      - marts.fct_facturation
+      - marts.fct_rendez_vous
+      - marts.fct_sejour
+    filtrabilite: oui
+    colonne_de_date: date_arrivee, date_facture, date_rendez_vous, jour_admission
+    recalcule_depuis: faits
+    note: >-
+      La colonne de date est celle de la table consultée, la page en portant
+      quatre. Le décompte porte sur la totalité de la sélection ; le tableau
+      affiché est plafonné, et la page le dit à l'écran.
+
+  - identifiant: donnees_export_selection
+    page: donnees
+    libelle: Téléchargement de la sélection
+    definition: >-
+      Fichier tabulaire portant toutes les lignes que le filtre retient sur la
+      table consultée.
+    decision_servie: >-
+      Sortir la liste des dossiers concernés pour la traiter hors de l'écran.
+    objets_lus:
+      - marts.fct_passage_urgence
+      - marts.fct_facturation
+      - marts.fct_rendez_vous
+      - marts.fct_sejour
+    filtrabilite: oui
+    colonne_de_date: date_arrivee, date_facture, date_rendez_vous, jour_admission
+    recalcule_depuis: faits
+    note: >-
+      Extraction ponctuelle de ce qui est affiché, au format et à l'encodage des
+      fichiers tabulaires du livrable quotidien, qu'elle ne remplace pas.
