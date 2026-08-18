@@ -281,6 +281,13 @@ jobs:
         env:
           DBT_PROFILES_DIR: ${{ runner.temp }}/dbt_profiles
 
+      # Placé immédiatement après la construction dbt, et dans ce job plutôt qu'un autre : ce
+      # contrôle interrogeant le catalogue de la base pour y lire les colonnes réellement
+      # présentes des couches intermediate et marts, sa précondition est que ces deux couches
+      # existent. C'est l'étape ci-dessus qui l'établit — aucun autre emplacement de la chaîne ne
+      # la fournit plus tôt, et l'ordre des étapes la rend ici explicite.
+      - run: uv run pytest tests/test_documentation_couches_aval.py -v
+
       - run: uv run pytest tests/test_dim_patient.py -v
 
       - run: uv run pytest tests/test_delai_rendez_vous.py tests/test_indicateurs_sejour.py -v
