@@ -3,9 +3,9 @@ version: 2
 models:
   - name: int_passages
     description: >
-      source.passages typée : les colonnes date/horodatage/booleen/numérique converties
-      par les macros de dbt/macros/conversions.sql, les colonnes code/texte reprises
-      telles quelles.
+      Une ligne par passage, identifiée par n_passage. Table pivot couvrant les trois types de
+      passage — consultation, hospitalisation et urgence — et non le seul type externe. Couche de
+      nettoyage sans destruction : codes et textes repris tels quels, horodatages et date typés.
     tests:
       - meme_decompte_que_la_source:
           arguments:
@@ -14,25 +14,92 @@ models:
           arguments:
             column_name: "n_passage"
     columns:
+      - name: n_passage
+        description: >
+          Identifiant du passage, clé de la table. Colonne non relevée à l'écran, dont l'existence
+          est documentée par une source (S-08).
+      - name: n_ipp
+        description: >
+          Identifiant du patient concerné. Le champ est relevé au poste sous le libellé « N° IPP »
+          (relevé REL-PAT.D01).
+      - name: type_passage
+        description: >
+          Code du type de passage : consultation, hospitalisation ou urgence. C'est lui qui
+          distingue les trois populations réunies dans cette table. Colonne non relevée à l'écran,
+          dont l'existence est documentée par une source (S-06).
+      - name: service
+        description: >
+          Code du service où le passage a eu lieu. Colonne non relevée à l'écran, dont l'existence
+          est documentée par une source (S-27).
+      - name: activite
+        description: >
+          Code de l'activité. Renseigné pour les seuls passages de consultation, et absent pour
+          les hospitalisations et les urgences. Le champ est relevé au poste sous le libellé «
+          Activité » (relevé REL-RDV.R02).
+      - name: n_rdv
+        description: >
+          Identifiant du rendez-vous à l'origine du passage. Renseigné sur toutes les lignes, mais
+          ne se raccordant PAS toujours à un rendez-vous existant : la couche aval n'expose la
+          valeur que lorsque le raccordement est vérifié, et cette colonne brute ne doit pas être
+          employée telle quelle comme clé. Colonne non relevée à l'écran et posée sans preuve
+          externe.
+      - name: mode_prise_en_charge
+        description: >
+          Code du mode de prise en charge administrative du passage. Colonne non relevée à
+          l'écran, dont l'existence est documentée par une source (S-18).
       - name: date_heure_entree
+        description: >
+          Horodatage d'entrée du patient. Colonne non relevée à l'écran, dont l'existence est
+          documentée par une source (S-08). La couche source la stocke en texte, au format
+          d'affichage du système observé — mois, jour, année, puis heure sur douze heures ; elle
+          est ici convertie en HORODATAGE, la chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'passages') }}"
                 source_column: date_heure_entree
       - name: date_heure_sortie
+        description: >
+          Horodatage de sortie du patient. C'est la différence entre les deux horodatages qui
+          donne, en aval, la durée du passage — aucune colonne de durée n'existant dans la source.
+          Colonne non relevée à l'écran, dont l'existence est documentée par une source (S-08). La
+          couche source la stocke en texte, au format d'affichage du système observé — mois, jour,
+          année, puis heure sur douze heures ; elle est ici convertie en HORODATAGE, la chaîne
+          vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'passages') }}"
                 source_column: date_heure_sortie
+      - name: medecin
+        description: >
+          Nom du médecin ayant assuré le passage, en texte libre. Ce n'est pas un identifiant de
+          compte utilisateur. Colonne non relevée à l'écran, dont l'existence est documentée par
+          une source (S-06).
+      - name: cree_par
+        description: >
+          Identifiant du compte utilisateur ayant créé la ligne de passage. Le champ est relevé au
+          poste sous le libellé « Créé par » (relevé REL-RDV.C01).
       - name: date_creation
+        description: >
+          Horodatage de création de la ligne dans le système, à distinguer de l'horodatage
+          d'entrée du patient. Le champ est relevé au poste sous le libellé « Date création »
+          (relevé REL-RDV.C02). La couche source la stocke en texte, au format d'affichage du
+          système observé — mois, jour, année, puis heure sur douze heures ; elle est ici
+          convertie en HORODATAGE, la chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'passages') }}"
                 source_column: date_creation
       - name: date_extraction
+        description: >
+          Date de l'extraction dont la ligne provient. Colonne TECHNIQUE de la zone
+          d'atterrissage, absente du système observé : elle partitionne le chargement et le rend
+          rejouable, une même partition pouvant être rechargée sans doublon. Colonne non relevée à
+          l'écran et posée sans preuve externe. La couche source la stocke en texte, au format
+          d'affichage du système observé — mois, jour, année ; elle est ici convertie en DATE, la
+          chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:

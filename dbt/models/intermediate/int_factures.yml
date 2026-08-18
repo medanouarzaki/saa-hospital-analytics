@@ -3,9 +3,10 @@ version: 2
 models:
   - name: int_factures
     description: >
-      source.factures typée : les colonnes date/horodatage/booleen/numérique converties
-      par les macros de dbt/macros/conversions.sql, les colonnes code/texte reprises
-      telles quelles.
+      Une ligne par facture, identifiée par n_facture. C'est l'en-tête de la facture ; son détail
+      vit dans int_lignes_facture, et la confrontation des deux — montant déclaré ici contre somme
+      des lignes — est vérifiée en aval. Couche de nettoyage sans destruction : codes et textes
+      repris tels quels, dates, horodatage et montants typés.
     tests:
       - meme_decompte_que_la_source:
           arguments:
@@ -14,37 +15,112 @@ models:
           arguments:
             column_name: "n_facture"
     columns:
+      - name: n_facture
+        description: >
+          Identifiant de la facture, clé de la table. Colonne non relevée à l'écran, dont
+          l'existence est documentée par une source (S-09).
+      - name: n_ipp
+        description: >
+          Identifiant du patient facturé. Le champ est relevé au poste sous le libellé « N° IPP »
+          (relevé REL-PAT.D01).
+      - name: n_episode
+        description: >
+          Identifiant de l'épisode de soins facturé. Il se raccorde au passage correspondant, pour
+          les trois types d'épisode. Colonne non relevée à l'écran, dont l'existence est
+          documentée par une source (S-09).
+      - name: type_episode
+        description: >
+          Code du type d'épisode facturé — consultation externe, hospitalisation ou urgence.
+          Colonne non relevée à l'écran, dont l'existence est documentée par une source (S-27).
+      - name: code_diagnostic_cim10
+        description: >
+          Code diagnostic dans la classification internationale des maladies. Aucune table de
+          diagnostics n'existe dans ce dépôt : le code est conservé tel quel et aucun libellé
+          n'est inventé. Colonne non relevée à l'écran, dont l'existence est documentée par une
+          source (S-27).
       - name: date_facture
+        description: >
+          Date d'émission de la facture. Elle est de type date et non horodatage, ce pour quoi
+          aucune colonne de jour séparée n'en est dérivée en aval. Colonne non relevée à l'écran,
+          dont l'existence est documentée par une source (S-09). La couche source la stocke en
+          texte, au format d'affichage du système observé — mois, jour, année ; elle est ici
+          convertie en DATE, la chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'factures') }}"
                 source_column: date_facture
+      - name: type_facture
+        description: >
+          Code du type de facture, qui distingue les régimes de facturation applicables. Colonne
+          non relevée à l'écran, dont l'existence est documentée par une source (S-09).
+      - name: service_emetteur
+        description: >
+          Code du service ayant émis la facture. Il peut différer du service exécutant porté par
+          les lignes de détail. Colonne non relevée à l'écran, dont l'existence est documentée par
+          une source (S-27).
+      - name: etat
+        description: >
+          Code de l'état de la facture — émise, réglée, annulée. Colonne non relevée à l'écran,
+          dont l'existence est documentée par une source (S-09).
       - name: montant_total
+        description: >
+          Montant total DÉCLARÉ par l'en-tête, en dirhams. C'est le membre de gauche de la
+          réconciliation vérifiée en aval, le membre de droite étant la somme des montants des
+          lignes de détail. Colonne non relevée à l'écran, dont l'existence est documentée par une
+          source (S-17). La couche source la stocke en texte ; elle est ici convertie en NUMÉRIQUE
+          exact, la chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'factures') }}"
                 source_column: montant_total
       - name: part_organisme
+        description: >
+          Part du montant prise en charge par l'organisme payeur, en dirhams. Colonne non relevée
+          à l'écran, dont l'existence est documentée par une source (S-18). La couche source la
+          stocke en texte ; elle est ici convertie en NUMÉRIQUE exact, la chaîne vide devenant une
+          valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'factures') }}"
                 source_column: part_organisme
       - name: part_patient
+        description: >
+          Part du montant restant à la charge du patient, en dirhams. Avec la part organisme, elle
+          décompose le montant total. Colonne non relevée à l'écran, dont l'existence est
+          documentée par une source (S-18). La couche source la stocke en texte ; elle est ici
+          convertie en NUMÉRIQUE exact, la chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'factures') }}"
                 source_column: part_patient
+      - name: cree_par
+        description: >
+          Identifiant du compte utilisateur ayant créé la facture. Le champ est relevé au poste
+          sous le libellé « Créé par » (relevé REL-RDV.C01).
       - name: date_creation
+        description: >
+          Horodatage de création de la facture dans le système, à distinguer de sa date
+          d'émission. Le champ est relevé au poste sous le libellé « Date création » (relevé
+          REL-RDV.C02). La couche source la stocke en texte, au format d'affichage du système
+          observé — mois, jour, année, puis heure sur douze heures ; elle est ici convertie en
+          HORODATAGE, la chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'factures') }}"
                 source_column: date_creation
       - name: date_extraction
+        description: >
+          Date de l'extraction dont la ligne provient. Colonne TECHNIQUE de la zone
+          d'atterrissage, absente du système observé : elle partitionne le chargement et le rend
+          rejouable, une même partition pouvant être rechargée sans doublon. Colonne non relevée à
+          l'écran et posée sans preuve externe. La couche source la stocke en texte, au format
+          d'affichage du système observé — mois, jour, année ; elle est ici convertie en DATE, la
+          chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:

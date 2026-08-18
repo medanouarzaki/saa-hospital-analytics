@@ -3,9 +3,11 @@ version: 2
 models:
   - name: int_passages_urgences
     description: >
-      source.passages_urgences typée : les colonnes date/horodatage/booleen/numérique converties
-      par les macros de dbt/macros/conversions.sql, les colonnes code/texte reprises
-      telles quelles.
+      Une ligne par passage aux urgences, identifiée par n_passage. C'est un satellite de
+      int_passages et non une table indépendante : son espace de clés est un sous-ensemble de
+      celui des passages. Elle porte les attributs propres au parcours d'urgence — mode d'arrivée,
+      tri, orientation — que la table pivot ne porte pas. Couche de nettoyage sans destruction :
+      codes repris tels quels, horodatages, date et booléens typés.
     tests:
       - meme_decompte_que_la_source:
           arguments:
@@ -14,43 +16,126 @@ models:
           arguments:
             column_name: "n_passage"
     columns:
+      - name: n_passage
+        description: >
+          Identifiant du passage aux urgences, clé de la table et clé de rattachement au passage
+          correspondant. Colonne non relevée à l'écran, dont l'existence est documentée par une
+          source (S-27).
+      - name: n_ipp
+        description: >
+          Identifiant du patient. Le champ est relevé au poste sous le libellé « N° IPP » (relevé
+          REL-PAT.D01).
       - name: date_heure_arrivee
+        description: >
+          Horodatage d'arrivée aux urgences. Colonne non relevée à l'écran, dont l'existence est
+          documentée par une source (S-27). La couche source la stocke en texte, au format
+          d'affichage du système observé — mois, jour, année, puis heure sur douze heures ; elle
+          est ici convertie en HORODATAGE, la chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'passages_urgences') }}"
                 source_column: date_heure_arrivee
+      - name: mode_arrivee
+        description: >
+          Code du mode d'arrivée — venu de lui-même, amené, adressé. Colonne non relevée à
+          l'écran, dont l'existence est documentée par une source (S-12).
+      - name: motif_recours
+        description: >
+          Code du motif pour lequel le patient consulte aux urgences. Colonne non relevée à
+          l'écran, dont l'existence est documentée par une source (S-13).
+      - name: niveau_tri
+        description: >
+          Code du niveau de tri attribué à l'arrivée, qui exprime la gravité et commande la
+          priorité de prise en charge. Aucune table de libellés n'accompagne ce code. Colonne non
+          relevée à l'écran, dont l'existence est documentée par une source (S-12).
       - name: date_heure_pec_medicale
+        description: >
+          Horodatage de la première prise en charge médicale. C'est la différence avec
+          l'horodatage d'arrivée qui donne, en aval, le délai avant prise en charge — aucune
+          colonne de délai n'existant dans la source. Colonne non relevée à l'écran, dont
+          l'existence est documentée par une source (S-27). La couche source la stocke en texte,
+          au format d'affichage du système observé — mois, jour, année, puis heure sur douze
+          heures ; elle est ici convertie en HORODATAGE, la chaîne vide devenant une valeur
+          absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'passages_urgences') }}"
                 source_column: date_heure_pec_medicale
       - name: date_heure_sortie
+        description: >
+          Horodatage de sortie des urgences. Colonne non relevée à l'écran, dont l'existence est
+          documentée par une source (S-27). La couche source la stocke en texte, au format
+          d'affichage du système observé — mois, jour, année, puis heure sur douze heures ; elle
+          est ici convertie en HORODATAGE, la chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'passages_urgences') }}"
                 source_column: date_heure_sortie
+      - name: orientation_sortie
+        description: >
+          Code de l'issue du passage — retour au domicile, hospitalisation, transfert, sortie
+          contre avis médical, décès. Colonne intégralement renseignée, ce qui permet à la
+          ventilation aval de sommer exactement au nombre de passages. Colonne non relevée à
+          l'écran, dont l'existence est documentée par une source (S-27).
+      - name: service_orientation
+        description: >
+          Code du service vers lequel le patient est orienté à la sortie. Colonne très faiblement
+          renseignée, de l'ordre de six pour cent des lignes. Colonne non relevée à l'écran, dont
+          l'existence est documentée par une source (S-27).
+      - name: motif_transfert
+        description: >
+          Code du motif de transfert vers un autre établissement. Renseigné pour les seuls
+          passages dont l'issue est un transfert. Cette colonne NE REMONTE dans aucune couche aval
+          : aucun indicateur ne l'emploie, et sa présence ici est une reprise fidèle de la source,
+          non une matière de restitution. Colonne non relevée à l'écran, dont l'existence est
+          documentée par une source (S-27).
       - name: consentement_transfert
+        description: >
+          Indique que le patient a consenti au transfert. Comme le motif de transfert, cette
+          colonne ne remonte dans aucune couche aval. Colonne non relevée à l'écran, dont
+          l'existence est documentée par une source (S-27). La couche source la stocke en texte,
+          sur un domaine réduit à « 1 », « 0 » et la chaîne vide ; elle est ici convertie en
+          BOOLÉEN, la chaîne vide comme toute autre valeur devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'passages_urgences') }}"
                 source_column: consentement_transfert
       - name: famille_informee
+        description: >
+          Indique que la famille du patient a été informée. Cette colonne ne remonte dans aucune
+          couche aval. Colonne non relevée à l'écran, dont l'existence est documentée par une
+          source (S-27). La couche source la stocke en texte, sur un domaine réduit à « 1 », « 0 »
+          et la chaîne vide ; elle est ici convertie en BOOLÉEN, la chaîne vide comme toute autre
+          valeur devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'passages_urgences') }}"
                 source_column: famille_informee
       - name: inventaire_effets
+        description: >
+          Indique qu'un inventaire des effets personnels du patient a été réalisé. Cette colonne
+          ne remonte dans aucune couche aval. Colonne non relevée à l'écran, dont l'existence est
+          documentée par une source (S-27). La couche source la stocke en texte, sur un domaine
+          réduit à « 1 », « 0 » et la chaîne vide ; elle est ici convertie en BOOLÉEN, la chaîne
+          vide comme toute autre valeur devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'passages_urgences') }}"
                 source_column: inventaire_effets
       - name: date_extraction
+        description: >
+          Date de l'extraction dont la ligne provient. Colonne TECHNIQUE de la zone
+          d'atterrissage, absente du système observé : elle partitionne le chargement et le rend
+          rejouable, une même partition pouvant être rechargée sans doublon. Colonne non relevée à
+          l'écran et posée sans preuve externe. La couche source la stocke en texte, au format
+          d'affichage du système observé — mois, jour, année ; elle est ici convertie en DATE, la
+          chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
