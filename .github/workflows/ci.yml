@@ -474,3 +474,10 @@ jobs:
 
       # Les contrôles des livrables produisent l'export puis LISENT les fichiers produits.
       - run: uv run pytest tests/test_exports.py -v
+
+      # test_echantillon.py siège ici : trois de ses propriétés n'interrogent aucune base et
+      # s'exécutent partout — dont celle qui vérifie la mention portée par chaque ligne, la
+      # seule qui protège la publication. Les deux autres confrontent l'échantillon aux tables
+      # dont il est extrait, et s'abstiennent avec un motif explicite sur la fenêtre réduite
+      # que ce job charge, l'échantillon étant tiré du jeu complet.
+      - run: uv run pytest tests/test_echantillon.py -v
