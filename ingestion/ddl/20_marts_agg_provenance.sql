@@ -12,6 +12,15 @@
 
 create schema if not exists marts;
 
+-- La vue est supprimée avant d'être recréée, et non créée sous condition
+-- d'absence : une création conditionnelle laisserait en place une définition
+-- ancienne sans rien signaler, tandis que ce couple applique toujours la
+-- définition ci-dessous. Aucun objet de la base n'en dépend : le mode
+-- restrict, qui s'applique par défaut, suffit donc, et si une dépendance
+-- apparaissait un jour la suppression échouerait bruyamment plutôt que
+-- d'emporter l'objet dépendant sans le dire.
+drop view if exists marts.agg_provenance_champs;
+
 create view marts.agg_provenance_champs as
 with commentaires as (
     select (regexp_match(d.description, 'provenance=([A-Z]+);'))[1] as provenance
