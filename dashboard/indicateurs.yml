@@ -711,8 +711,8 @@ indicateurs:
     page: rapprochement
     libelle: Courbe de précision et de rappel
     definition: >-
-      Précision, rappel et F-mesure du rapprochement pour chaque seuil de
-      décision balayé.
+      Précision du rapprochement en fonction de son rappel, un point par seuil de
+      décision balayé, le seuil retenu étant repéré.
     decision_servie: >-
       Déplacer le seuil de décision en connaissance du compromis entre précision
       et rappel.
