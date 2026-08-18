@@ -3,12 +3,18 @@ version: 2
 models:
   - name: agg_recouvrement
     description: >
-      Une ligne par jour de naissance de créance et type de débiteur. Chaque créance
-      n'est comptée qu'une fois, via son instantané le plus récent (max
-      date_extraction) -- les instantanés antérieurs de la même créance sont exclus,
-      pour ne pas surcompter montant_du.
+      Une ligne par jour de naissance de créance et type de débiteur — grain déclaré par
+      l'enregistrement de décision 0028 — agrégée depuis la couche intermédiaire des créances et
+      des relances. Un point commande la lecture de tout cet agrégat : une créance porte PLUSIEURS
+      instantanés, un par date d'extraction, dont le montant dû est constant tandis que le
+      recouvré et le restant évoluent. Sommer toutes les lignes surcompterait le montant dû. Seul
+      l'instantané le PLUS RÉCENT de chaque créance est donc retenu, les antérieurs étant écartés.
     columns:
       - name: jour
+        description: >
+          Jour de naissance de la créance, clé de rattachement à dim_date. C'est la date à
+          laquelle la dette est née, et non celle d'un règlement ou d'une relance — une créance
+          née un jour donné continue d'être recouvrée les jours suivants sans changer de ligne.
         tests:
           - not_null
           - relationships:
@@ -16,26 +22,61 @@ models:
                 to: "{{ ref('dim_date') }}"
                 field: "date_jour"
       - name: type_debiteur
+        description: >
+          Code du type de débiteur, second axe de groupement : il distingue une créance due par un
+          organisme d'une créance due par un patient. Repris de la couche intermédiaire des
+          créances sans transformation.
         tests:
           - not_null
       - name: n_creances
+        description: >
+          Nombre de créances du groupe. Décompte des créances après réduction à leur instantané le
+          plus récent : une créance compte pour une, quel que soit le nombre d'extractions qui
+          l'ont vue.
         tests:
           - not_null
       - name: montant_du
+        description: >
+          Somme des montants dus du groupe, en dirhams. Somme de la colonne montant_du sur les
+          instantanés les plus récents. C'est le DÉNOMINATEUR du taux de recouvrement.
         tests:
           - not_null
       - name: montant_recouvre
+        description: >
+          Somme des montants déjà recouvrés du groupe, en dirhams, sur les instantanés les plus
+          récents. C'est le NUMÉRATEUR du taux de recouvrement.
         tests:
           - not_null
       - name: montant_restant
+        description: >
+          Somme des montants restant à recouvrer du groupe, en dirhams, sur les instantanés les
+          plus récents. Avec montant_recouvre, il décompose montant_du.
         tests:
           - not_null
       - name: taux_recouvrement
+        description: >
+          Taux de recouvrement du groupe. NUMÉRATEUR : la somme des montants recouvrés.
+          DÉNOMINATEUR : la somme des montants dus. Le rapport porte sur des MONTANTS et non sur
+          des décomptes de créances, et il est calculé sur les créances NÉES ce jour-là — non sur
+          les factures émises. C'est ce qui le distingue du taux d'encaissement des factures, qui
+          rapporte des règlements à des factures émises : les deux grandeurs sont voisines,
+          portent sur des populations différentes, et les confondre ferait afficher l'une pour
+          l'autre.
         tests:
           - not_null
       - name: n_relances
+        description: >
+          Nombre de relances émises sur les créances du groupe. Décompte des lignes de la couche
+          intermédiaire des relances jointes aux créances retenues, ramené à zéro lorsque aucune
+          relance n'a été émise. Une relance n'ayant qu'une seule ligne, ce décompte est
+          indépendant du nombre d'instantanés de la créance.
         tests:
           - not_null
       - name: n_relances_abouties
+        description: >
+          Nombre de relances ayant abouti, c'est-à-dire dont le résultat est un paiement complet
+          ou partiel. Décompte filtré sur ces deux codes de la nomenclature des résultats de
+          relance, à l'exclusion des relances sans réponse et des refus. Ramené à zéro en
+          l'absence de relance.
         tests:
           - not_null

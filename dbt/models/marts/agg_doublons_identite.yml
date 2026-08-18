@@ -3,29 +3,59 @@ version: 2
 models:
   - name: agg_doublons_identite
     description: >
-      Une ligne par critère de collision exacte, mesurée sur dim_patient (version
-      courante). Compte et expose des collisions exactes uniquement -- ne réconcilie
-      ni ne fusionne aucun patient. Deux critères retenus après mesure de
-      non-dégénérescence (nom + nom_famille_1 + date_naissance ; type_piece_identite +
-      n_piece_identite) ; le téléphone a été écarté, mesuré dégénéré (95 % des
-      patients concernés).
+      Une ligne par critère de collision exacte — deux lignes — mesurée sur les patients de
+      version courante. Grain déclaré par l'enregistrement de décision 0028. Cet agrégat COMPTE et
+      EXPOSE des collisions ; il ne réconcilie ni ne fusionne aucun patient, le rapprochement
+      probabiliste relevant d'un autre traitement. Un troisième critère, le numéro de téléphone, a
+      été écarté après mesure : dégénéré, il concernait 95 % des patients courants, un partage de
+      ligne de foyer n'étant pas un signal de doublon.
     columns:
       - name: critere
+        description: >
+          Nom du critère de collision, clé de la ligne. Deux valeurs : la conjonction du prénom,
+          du premier nom de famille et de la date de naissance ; et la conjonction du type et du
+          numéro de pièce d'identité.
         tests:
           - not_null
           - unique
       - name: patients_examines
+        description: >
+          Nombre total de patients de version courante soumis au critère. Décompte des lignes de
+          dim_patient filtrées sur le drapeau de version courante. IDENTIQUE sur les deux lignes
+          de l'agrégat, et incluant les patients dont la valeur du critère est vide — ceux-ci sont
+          dénombrés à part et retirés du seul calcul des groupes.
         tests:
           - not_null
       - name: patients_valeur_vide
+        description: >
+          Nombre de patients dont au moins une des colonnes du critère est vide ou absente. Ils
+          sont retirés du calcul des groupes : deux valeurs vides sont égales au sens de l'égalité
+          textuelle, et les apparier produirait des collisions fantômes. Mesuré nul pour le
+          critère fondé sur le nom, et de 268 patients pour celui fondé sur la pièce d'identité.
         tests:
           - not_null
       - name: nombre_groupes
+        description: >
+          Nombre de groupes de patients partageant exactement la même valeur de critère. Décompte
+          des groupes d'au moins deux patients, les patients isolés n'étant pas des collisions.
         tests:
           - not_null
       - name: patients_concernes
+        description: >
+          Nombre de patients appartenant à un groupe de collision. Somme des tailles des groupes
+          retenus, ramenée à zéro en l'absence de groupe. Il porte sur les seuls patients à valeur
+          renseignée.
         tests:
           - not_null
       - name: taille_plus_grand_groupe
+        description: >
+          Taille du plus grand groupe de collision, c'est-à-dire le nombre de patients partageant
+          la valeur de critère la plus répandue. Maximum des tailles de groupe, ramené à zéro en
+          l'absence de groupe.
         tests:
           - not_null
+      - name: taille_mediane_groupes
+        description: >
+          Taille médiane des groupes de collision, calculée par percentile continu d'ordre 0,5 sur
+          les tailles de groupe. Lue à côté de la taille du plus grand groupe, elle dit si les
+          collisions sont surtout des paires ou des agrégats plus larges.
