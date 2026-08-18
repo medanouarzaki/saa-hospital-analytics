@@ -87,8 +87,19 @@ def _requetes_de_page(nom: str) -> dict[str, str]:
             exec(compile(module, "page", "exec"), local)
         except Exception:
             continue
-    assert "REQUETES" in local, f"la page {nom} ne définit pas de requêtes lisibles"
-    return local["REQUETES"]
+    # Deux mécanismes coexistent, et un seul des deux se lit comme un dictionnaire. Les sept
+    # premières pages déclarent leurs requêtes en constante `REQUETES` ; la page « Données » les
+    # compose depuis la table choisie à l'écran, et déclare à la place la constante `TABLES` qui
+    # nomme les objets et leurs colonnes de filtre. Ce lecteur rend alors un dictionnaire vide, et
+    # les propriétés qui ÉNUMÈRENT les requêtes d'une page passent leur tour sur elle — non pour la
+    # dispenser d'un contrôle, mais parce qu'une autre propriété la couvre plus fortement, en
+    # exécutant ses clauses et en comparant deux décomptes.
+    #
+    # L'un des deux doit exister : une page qui n'aurait ni l'un ni l'autre échapperait aux deux.
+    assert "REQUETES" in local or "TABLES" in local, (
+        f"la page {nom} ne définit ni requêtes lisibles ni tables déclarées"
+    )
+    return local.get("REQUETES", {})
 
 
 def _constantes_de_page(nom: str) -> dict:
@@ -1453,4 +1464,208 @@ def test_le_signe_de_la_mesure_intra_activite_est_celui_du_parametre_injecte() -
         f"la corrélation intra-activité vaut {correlation_intra}, alors que le paramètre injecté "
         "allonge le délai des lignes d'absence : une valeur nulle ou négative signifierait que ce "
         "paramètre est sans effet observable"
+    )
+
+
+# --------------------------------------------------------------------------- page « Données »
+#
+# Ces quatre propriétés APPELLENT LA PAGE. Plusieurs contrôles de ce dépôt ont comparé un registre à
+# lui-même au lieu d'observer ce que l'écran porte ; ici, le décompte affiché, le tableau rendu et
+# le fichier téléchargeable sont lus sur l'application rendue, et confrontés à des mesures écrites
+# indépendamment, en base.
+
+
+def _page_donnees():
+    """Rend la page « Données » en interceptant le bouton de téléchargement.
+
+    Un seul rendu par processus dans ce fichier : un second se termine par un signal de
+    segmentation sur cette machine, mesuré à plusieurs reprises.
+    """
+    import streamlit as st  # noqa: PLC0415
+
+    capte: dict = {}
+    origine = st.download_button
+
+    def espion(label, data=None, file_name=None, **kwargs):
+        capte["data"] = data
+        capte["file_name"] = file_name
+        return origine(label, data=data, file_name=file_name, **kwargs)
+
+    st.download_button = espion
+    try:
+        application = _rendre_page("donnees")
+    finally:
+        st.download_button = origine
+    return application, capte
+
+
+def _constantes_donnees() -> dict:
+    return _constantes_de_page("donnees")
+
+
+def test_chaque_filtre_de_la_page_donnees_porte_une_restriction_reelle() -> None:
+    """Un filtre déclaré restreint réellement la requête, et le décompte bouge quand il bouge.
+
+    POURQUOI CETTE PROPRIÉTÉ EST ÉCRITE AINSI. Le taux d'encaissement affichait la mention
+    « filtré par la période » alors que sa requête ne portait aucun motif de restriction : la valeur
+    ne bougeait pour aucune période. Une propriété qui aurait seulement lu la déclaration ne
+    l'aurait pas vu. Celle-ci **exécute** la clause que la page construit et **compare deux
+    décomptes** : sans restriction, et avec. Une clause inopérante rend deux fois le même nombre, et
+    c'est cela qui rougit.
+
+    CE QU'ELLE NE COUVRE PAS : que la colonne restreinte soit la bonne. Une clause portant sur une
+    autre date ferait aussi bouger le décompte.
+    """
+    from datetime import date  # noqa: PLC0415
+
+    lecture = _lecture()
+    _instantane_pret(lecture)
+    tables = _constantes_donnees()["TABLES"]
+    espace = _module_de_page("donnees")
+    clause_de = espace["_clause"]
+
+    fautifs = []
+    for nom, configuration in tables.items():
+        objet = configuration["objet"]
+        total = int(lecture.interroger(f"select count(*) as n from {objet}")["n"][0])
+        assert total, f"{nom} : la table {objet} est vide, la propriété ne prouverait rien"
+
+        bornes = lecture.interroger(
+            f"select min({configuration['colonne_date']}) as debut, "
+            f"max({configuration['colonne_date']}) as fin from {objet}"
+        )
+        debut, fin = bornes["debut"][0], bornes["fin"][0]
+
+        # Période resserrée : le premier tiers de l'étendue réelle, jamais une date en dur.
+        milieu = debut + (fin - debut) // 3
+        clause_large = clause_de(configuration, (debut, fin), [], [])
+        clause_serree = clause_de(configuration, (debut, milieu), [], [])
+
+        large = int(lecture.interroger(f"select count(*) as n from {objet} {clause_large}")["n"][0])
+        serree = int(
+            lecture.interroger(f"select count(*) as n from {objet} {clause_serree}")["n"][0]
+        )
+        if "where" not in clause_serree:
+            fautifs.append(f"{nom} : la clause de période ne porte aucune restriction")
+        if serree >= large:
+            fautifs.append(
+                f"{nom} : resserrer la période du {debut} au {milieu} ne réduit pas le décompte "
+                f"({serree} contre {large}) — la restriction ne s'applique pas"
+            )
+
+        for cle in ("colonne_service", "colonne_activite"):
+            colonne = configuration[cle]
+            if not colonne:
+                clause_sans = clause_de(configuration, (debut, fin), ["INEXISTANT"], ["INEXISTANT"])
+                if colonne is None and f"{cle}" in clause_sans:
+                    fautifs.append(f"{nom} : {cle} absente mais citée dans la clause")
+                continue
+            valeurs = [
+                str(valeur)
+                for valeur in lecture.interroger(
+                    f"select distinct {colonne} as valeur from {objet} "
+                    f"where {colonne} is not null order by {colonne}"
+                )["valeur"]
+            ]
+            assert len(valeurs) > 1, (
+                f"{nom} : la colonne {colonne} ne porte qu'une valeur, le filtre ne prouverait rien"
+            )
+            argument = {
+                "colonne_service": ([valeurs[0]], []),
+                "colonne_activite": ([], [valeurs[0]]),
+            }[cle]
+            clause_une = clause_de(configuration, (debut, fin), *argument)
+            une = int(lecture.interroger(f"select count(*) as n from {objet} {clause_une}")["n"][0])
+            if une >= large:
+                fautifs.append(
+                    f"{nom} : retenir la seule valeur « {valeurs[0]} » de {colonne} ne réduit pas "
+                    f"le décompte ({une} contre {large}) — la restriction ne s'applique pas"
+                )
+        assert isinstance(debut, date)
+
+    assert not fautifs, "filtres sans effet réel : " + " | ".join(fautifs)
+
+
+def test_le_decompte_affiche_par_la_page_donnees_egale_le_decompte_mesure() -> None:
+    """Le nombre annoncé à l'écran est celui que le filtre retient, mesuré indépendamment."""
+    lecture = _lecture()
+    _instantane_pret(lecture)
+    application, _capte = _page_donnees()
+
+    metriques = [m for m in application.metric if "Lignes retenues" in m.label]
+    assert len(metriques) == 1, f"la page devrait porter un décompte et un seul, {len(metriques)}"
+    affiche = int(metriques[0].value.replace(" ", "").replace(" ", ""))
+
+    # La page s'ouvre sur la première table et la période entière : le décompte attendu est donc le
+    # nombre de lignes de cette table, mesuré ici par une requête écrite indépendamment.
+    tables = _constantes_donnees()["TABLES"]
+    objet = next(iter(tables.values()))["objet"]
+    mesure = int(lecture.interroger(f"select count(*) as n from {objet}")["n"][0])
+
+    assert affiche == mesure, (
+        f"la page annonce {affiche} lignes retenues, la mesure en rend {mesure} sur {objet}"
+    )
+
+    tableaux = [e for e in application.main if e.type == "dataframe"]
+    assert len(tableaux) == 1, f"la page devrait rendre un tableau et un seul, {len(tableaux)}"
+    plafond = _constantes_donnees()["PLAFOND_AFFICHAGE"]
+    assert tableaux[0].value.shape[0] == min(mesure, plafond), (
+        f"le tableau rend {tableaux[0].value.shape[0]} lignes, attendu {min(mesure, plafond)}"
+    )
+
+
+def test_le_fichier_telechargeable_porte_la_selection_entiere_et_non_le_tableau_tronque() -> None:
+    """Égalité entre deux mesures : les lignes du fichier et le décompte annoncé."""
+    lecture = _lecture()
+    _instantane_pret(lecture)
+    application, capte = _page_donnees()
+
+    assert capte.get("data") is not None, "la page ne propose aucun téléchargement"
+    plafond = _constantes_donnees()["PLAFOND_AFFICHAGE"]
+    affiche = int(
+        [m for m in application.metric if "Lignes retenues" in m.label][0]
+        .value.replace(" ", "")
+        .replace(" ", "")
+    )
+
+    lignes = capte["data"].decode("utf-8-sig").splitlines()
+    portees = len(lignes) - 1  # l'en-tête
+
+    assert portees == affiche, f"le fichier porte {portees} lignes, le filtre en annonce {affiche}"
+    assert portees > plafond, (
+        f"le fichier porte {portees} lignes et le plafond d'affichage vaut {plafond} : sur cette "
+        "sélection, la propriété ne distinguerait pas la sélection entière du tableau tronqué"
+    )
+    assert "csv" in (capte.get("file_name") or ""), (
+        f"nom de fichier inattendu : {capte.get('file_name')!r}"
+    )
+
+
+def test_la_page_donnees_ne_lit_que_l_instantane() -> None:
+    """Tous les objets que la page nomme appartiennent au schéma d'instantané.
+
+    La restriction est structurelle — le module de lecture réduit le chemin de recherche à ce seul
+    schéma — mais une requête qualifiant explicitement un autre schéma la contournerait. Cette
+    propriété lit les objets déclarés par la page et les confronte au catalogue.
+    """
+    lecture = _lecture()
+    _instantane_pret(lecture)
+    tables = _constantes_donnees()["TABLES"]
+    objets = {configuration["objet"] for configuration in tables.values()}
+    assert objets, "la page ne déclare aucun objet"
+
+    presents = {
+        str(nom)
+        for nom in lecture.interroger(
+            "select table_name as nom from information_schema.tables "
+            "where table_schema = 'instantane'"
+        )["nom"]
+    }
+    absents = sorted(objets - presents)
+    assert not absents, f"objets nommés par la page et absents de l'instantané : {absents}"
+
+    source = (PAGES / "donnees.py").read_text(encoding="utf-8")
+    qualifies = re.findall(r"\b(marts|source|intermediate|linkage|quarantaine)\.", source)
+    assert not qualifies, (
+        f"la page qualifie des objets hors de l'instantané : {sorted(set(qualifies))}"
     )
