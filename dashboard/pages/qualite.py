@@ -1,10 +1,10 @@
-"""Page de qualité : les trois indicateurs que le registre déclare pour elle.
+"""Page de qualité : les quatre indicateurs que le registre déclare pour elle.
 
 **Aucun de ses indicateurs ne répond au filtre de période**, et la page n'en porte donc pas : elle
-affiche à la place le motif que le registre donne. C'est la première page dans ce cas.
+affiche à la place le motif que le registre donne.
 
-Aucun des trois n'est recalculé depuis les tables de faits — deux lisent la couche intermédiaire,
-le troisième le catalogue des colonnes — et chacun l'affiche.
+Aucun des quatre n'est recalculé depuis les tables de faits — deux lisent la couche intermédiaire,
+les deux autres la dimension des patients et les tables de rapprochement — et chacun l'affiche.
 
 Les taux de mise en quarantaine sont affichés **avec leurs effectifs bruts en regard** : deux rejets
 sur quarante et deux mille sur quarante mille donnent le même taux et n'appellent pas la même
@@ -15,6 +15,10 @@ lisible. La présentation retenue part de la distribution mesurée plutôt que d
 d'avance : les couples parfaitement renseignés sont comptés, et seuls les autres sont détaillés.
 C'est la mesure qui commande la présentation — cent trente-deux couples sur cent soixante-quinze
 sont à cent pour cent, et les énumérer n'apprendrait rien.
+
+Les deux grandeurs de doublon d'identité siègent ici et non avec l'évaluation du rapprochement :
+elles disent **combien de dossiers sont en cause** et commandent le lancement d'une campagne de
+fusion. La performance du modèle qui les regroupe, elle, relève de l'évaluation de la chaîne.
 """
 
 from __future__ import annotations
@@ -25,10 +29,9 @@ from dashboard import lecture, rendu
 
 PAGE = "qualite"
 
-PROVENANCES_LISIBLES = {
-    "OBS": "Observée — relevée sur le système d'information",
-    "DOC": "Documentée — établie par une source écrite",
-    "HYP": "Hypothétique — posée faute de source",
+CRITERES_LISIBLES = {
+    "nom_date_naissance": "Nom et date de naissance identiques",
+    "piece_identite": "Pièce d'identité identique",
 }
 
 REQUETES = {
@@ -53,10 +56,28 @@ REQUETES = {
         group by nom_table
         order by nom_table
     """,
-    "qualite_provenance_champs": """
-        select provenance, nb_colonnes, part_pourcent
-        from agg_provenance_champs
-        order by provenance
+    "rapprochement_collisions_exactes": """
+        select critere,
+               patients_examines,
+               nombre_groupes,
+               patients_concernes,
+               taille_plus_grand_groupe,
+               taille_mediane_groupes
+        from agg_doublons_identite
+        order by critere
+    """,
+    # La distribution des tailles est plus informative que le seul nombre de grappes : elle dit si
+    # le rapprochement fusionne par paires ou forme de grandes grappes, ce que le total masque.
+    # Le décompte porte sur les GRAPPES, non sur les lignes : la table porte une ligne par
+    # enregistrement rapproché, si bien que compter les lignes multiplierait chaque grappe par sa
+    # taille. La distinction se voit à la confrontation et non à la lecture.
+    "rapprochement_grappes": """
+        select taille_grappe,
+               count(distinct grappe_id) as grappes,
+               count(*) as enregistrements
+        from grappes_identite
+        group by taille_grappe
+        order by taille_grappe
     """,
 }
 
@@ -114,19 +135,36 @@ def rendre() -> None:
         y_label="Lignes mises en quarantaine",
     )
 
-    rendu.titre_indicateur("qualite_provenance_champs")
-    provenance = lecture.interroger(REQUETES["qualite_provenance_champs"])
-    provenance = provenance.assign(
-        libelle=provenance["provenance"].map(lambda code: PROVENANCES_LISIBLES.get(code, code))
+    rendu.titre_indicateur("rapprochement_collisions_exactes")
+    collisions = lecture.interroger(REQUETES["rapprochement_collisions_exactes"])
+    collisions = collisions.assign(
+        critere=collisions["critere"].map(lambda code: CRITERES_LISIBLES.get(code, code))
     )
-    st.bar_chart(
-        rendu.en_nombres(provenance, "part_pourcent"),
-        x="libelle",
-        y="nb_colonnes",
-        x_label="Provenance de la définition",
-        y_label="Colonnes",
+    # `height="content"` et non la valeur par défaut : la documentation de la version installée dit
+    # que `"auto"` dimensionne le cadre pour « au plus dix lignes », d'après une hauteur de ligne
+    # nominale. Les libellés de critère et les en-têtes de colonne de ce tableau se replient sur
+    # deux lignes, si bien que ses deux lignes réelles dépassent ce cadre et que la seconde
+    # n'apparaît qu'après défilement. `"content"` fait épouser au cadre la hauteur de son contenu.
+    st.dataframe(collisions, hide_index=True, height="content")
+
+    rendu.titre_indicateur("rapprochement_grappes")
+    grappes = lecture.interroger(REQUETES["rapprochement_grappes"])
+    gauche, droite = st.columns(2)
+    with gauche:
+        st.metric("Grappes formées", f"{int(grappes['grappes'].sum())}")
+    with droite:
+        st.metric("Enregistrements rapprochés", f"{int(grappes['enregistrements'].sum())}")
+    st.caption(
+        "La distribution des tailles dit ce que le total masque : un rapprochement qui fusionne "
+        "par paires et un rapprochement qui forme de grandes grappes donnent le même nombre "
+        "d'enregistrements et n'ont pas le même effet."
     )
-    st.dataframe(provenance, hide_index=True)
+    st.dataframe(grappes, hide_index=True)
+    st.caption(
+        "Ce que vaut le modèle qui forme ces grappes — sa précision, son rappel, le seuil auquel "
+        "il a été réglé — est page [Rapprochement d'identités](/rapprochement), sous "
+        "« Évaluation de la chaîne »."
+    )
 
 
 rendre()
