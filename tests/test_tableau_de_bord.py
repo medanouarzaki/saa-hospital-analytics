@@ -122,6 +122,35 @@ def _constantes_de_page(nom: str) -> dict:
     return local
 
 
+def _page_de_l_indicateur(identifiant: str) -> str:
+    """La page où siège un indicateur, DEMANDÉE au registre et jamais écrite ici.
+
+    Nommer la page en dur dans un contrôle rend celui-ci faux au premier déplacement : il rougit
+    par `KeyError` en désignant l'indicateur, alors que rien n'est cassé — seul le contrôle
+    n'avait pas suivi. Quatre propriétés étaient dans ce cas ; elles passent toutes par ici.
+    """
+    for entree in _registre()["indicateurs"]:
+        if entree["identifiant"] == identifiant:
+            return entree["page"]
+    raise AssertionError(f"indicateur absent du registre : {identifiant}")
+
+
+def _requete_de_l_indicateur(identifiant: str) -> str:
+    """La requête d'un indicateur, trouvée par la page que le registre lui déclare."""
+    page = _page_de_l_indicateur(identifiant)
+    requetes = _requetes_de_page(page)
+    assert identifiant in requetes, (
+        f"le registre déclare l'indicateur '{identifiant}' page '{page}', mais cette page ne "
+        f"porte pas de requête de ce nom : {sorted(requetes)}"
+    )
+    return requetes[identifiant]
+
+
+def _constantes_de_l_indicateur(identifiant: str) -> dict:
+    """Les constantes de la page où siège un indicateur, trouvée par le registre."""
+    return _constantes_de_page(_page_de_l_indicateur(identifiant))
+
+
 def _lecture():
     """Importé à l'appel, jamais à l'import : le module ouvre des connexions."""
     from dashboard import lecture
@@ -475,7 +504,10 @@ def test_les_indicateurs_de_facturation_et_de_qualite_egalent_leur_seconde_mesur
     ecarts = []
 
     def sans_filtre(page: str, identifiant: str, **parametres) -> str:
-        requete = _requetes_de_page(page)[identifiant]
+        # La page nommée par l'appelant n'est plus consultée : c'est le registre qui dit où
+        # l'indicateur siège, de sorte qu'un déplacement n'invalide pas ce contrôle.
+        del page
+        requete = _requete_de_l_indicateur(identifiant)
         if "{filtre}" in requete:
             requete = requete.format(filtre="")
         # Le taux d'encaissement porte DEUX restrictions, une par membre du rapport : son
@@ -623,7 +655,11 @@ def test_l_anciennete_des_creances_part_de_la_date_de_reference() -> None:
 
 
 def test_les_indicateurs_du_rapprochement_egalent_leur_seconde_mesure() -> None:
-    """Les cinq valeurs de la page, confrontées à des calculs écrits autrement.
+    """Les cinq valeurs du rapprochement, confrontées à des calculs écrits autrement.
+
+    Les cinq ne siègent plus sur la même page — le seuil, l'apport et la courbe relèvent de
+    l'évaluation de la chaîne, les grappes et les collisions du pilotage — et chacune est donc
+    trouvée par le registre plutôt que par un nom de page écrit ici.
 
     Le croisement des deux méthodes est reconstruit ici **en dehors du serveur**, à partir des
     deux ensembles de paires obtenus séparément : c'est un chemin réellement distinct de la
@@ -631,15 +667,14 @@ def test_les_indicateurs_du_rapprochement_egalent_leur_seconde_mesure() -> None:
     """
     lecture = _lecture()
     _instantane_pret(lecture)
-    requetes = _requetes_de_page("rapprochement")
     ecarts = []
 
-    seuil = lecture.interroger(requetes["rapprochement_seuil"]).iloc[0]
+    seuil = lecture.interroger(_requete_de_l_indicateur("rapprochement_seuil")).iloc[0]
     porte = lecture.interroger("select distinct seuil from grappes_identite")["seuil"][0]
     if abs(float(seuil["seuil_applique"]) - float(porte)) > 1e-12:
         ecarts.append(f"seuil : {seuil['seuil_applique']} contre {porte}")
 
-    grappes = lecture.interroger(requetes["rapprochement_grappes"])
+    grappes = lecture.interroger(_requete_de_l_indicateur("rapprochement_grappes"))
     compte = lecture.interroger(
         "select count(distinct grappe_id) as grappes, count(*) as enregistrements "
         "from grappes_identite"
@@ -650,19 +685,19 @@ def test_les_indicateurs_du_rapprochement_egalent_leur_seconde_mesure() -> None:
                 f"grappes.{colonne} : {int(grappes[colonne].sum())} contre {int(compte[colonne])}"
             )
 
-    courbe = lecture.interroger(requetes["rapprochement_courbe"])
+    courbe = lecture.interroger(_requete_de_l_indicateur("rapprochement_courbe"))
     seuils = int(lecture.interroger("select count(*) as n from evaluation")["n"][0])
     if len(courbe) != seuils:
         ecarts.append(f"courbe : {len(courbe)} points contre {seuils}")
 
-    collisions = lecture.interroger(requetes["rapprochement_collisions_exactes"])
+    collisions = lecture.interroger(_requete_de_l_indicateur("rapprochement_collisions_exactes"))
     agregat = lecture.interroger(
         "select critere, nombre_groupes, patients_concernes from agg_doublons_identite"
     )
     if int(collisions["nombre_groupes"].sum()) != int(agregat["nombre_groupes"].sum()):
         ecarts.append("collisions : décompte de groupes divergent")
 
-    apport = lecture.interroger(requetes["rapprochement_apport"]).iloc[0]
+    apport = lecture.interroger(_requete_de_l_indicateur("rapprochement_apport")).iloc[0]
     probabiliste = lecture.interroger(
         "select a.n_ipp as x, b.n_ipp as y from grappes_identite a "
         "join grappes_identite b on a.grappe_id = b.grappe_id and a.n_ipp < b.n_ipp"
@@ -1309,17 +1344,19 @@ def test_la_mesure_intra_activite_egale_sa_seconde_mesure() -> None:
 
     lecture = _lecture()
     _instantane_pret(lecture)
-    requetes = _requetes_de_page("rendez_vous")
-    # Le code d'absence est LU dans la page, jamais recopié ici. Le code d'honoré, lui, n'est pas
-    # déclaré par la page : il est DÉDUIT des données, en relevant le code d'état que portent les
-    # lignes honorées. Aucun des deux n'est écrit en littéral dans ce fichier.
-    code_absence = _constantes_de_page("rendez_vous")["ETAT_ABSENCE"]
+    # Le code d'absence est LU dans la page, jamais recopié ici, et la page est celle que le
+    # registre déclare. Le code d'honoré, lui, n'est pas déclaré par la page : il est DÉDUIT des
+    # données, en relevant le code d'état que portent les lignes honorées. Aucun des deux n'est
+    # écrit en littéral dans ce fichier.
+    code_absence = _constantes_de_l_indicateur("rendez_vous_delai_et_absence")["ETAT_ABSENCE"]
 
     intra = lecture.interroger(
-        requetes["rendez_vous_delai_et_absence_intra_activite"].format(filtre="")
+        _requete_de_l_indicateur("rendez_vous_delai_et_absence_intra_activite").format(filtre="")
     )
     agrege = lecture.interroger(
-        _constantes_de_page("rendez_vous")["REQUETE_INTRA_AGREGEE"].format(filtre="")
+        _constantes_de_l_indicateur("rendez_vous_delai_et_absence_intra_activite")[
+            "REQUETE_INTRA_AGREGEE"
+        ].format(filtre="")
     )
 
     # Les lignes brutes, lues une seule fois, sur lesquelles la seconde mesure est construite.
@@ -1437,13 +1474,13 @@ def test_le_signe_de_la_mesure_intra_activite_est_celui_du_parametre_injecte() -
             "période dans son entier"
         )
 
-    requetes = _requetes_de_page("rendez_vous")
-
     intra = lecture.interroger(
-        requetes["rendez_vous_delai_et_absence_intra_activite"].format(filtre="")
+        _requete_de_l_indicateur("rendez_vous_delai_et_absence_intra_activite").format(filtre="")
     )
     agrege = lecture.interroger(
-        _constantes_de_page("rendez_vous")["REQUETE_INTRA_AGREGEE"].format(filtre="")
+        _constantes_de_l_indicateur("rendez_vous_delai_et_absence_intra_activite")[
+            "REQUETE_INTRA_AGREGEE"
+        ].format(filtre="")
     )
 
     negatives = [
@@ -1668,4 +1705,178 @@ def test_la_page_donnees_ne_lit_que_l_instantane() -> None:
     qualifies = re.findall(r"\b(marts|source|intermediate|linkage|quarantaine)\.", source)
     assert not qualifies, (
         f"la page qualifie des objets hors de l'instantané : {sorted(set(qualifies))}"
+    )
+
+
+# ---------------------------------------------------------------- les deux publics
+
+
+def _sections_declarees() -> dict[str, list[str]]:
+    """Les sections de la navigation et leurs pages, lues sans exécuter le point d'entrée.
+
+    L'exécuter appellerait `st.Page`, qui exige un contexte d'affichage. L'arbre syntaxique donne
+    la même composition : les intitulés sont des constantes affectées avant le dictionnaire, et
+    chaque valeur est une liste d'appels dont le premier argument nomme le fichier de page.
+    """
+    arbre = ast.parse(POINT_ENTREE.read_text(encoding="utf-8"))
+    intitules: dict[str, str] = {}
+    composition: dict[str, list[str]] = {}
+    for noeud in arbre.body:
+        if not isinstance(noeud, ast.Assign) or not isinstance(noeud.targets[0], ast.Name):
+            continue
+        nom = noeud.targets[0].id
+        if isinstance(noeud.value, ast.Constant) and isinstance(noeud.value.value, str):
+            intitules[nom] = noeud.value.value
+        elif nom == "PAGES" and isinstance(noeud.value, ast.Dict):
+            for cle, valeur in zip(noeud.value.keys, noeud.value.values, strict=True):
+                assert isinstance(cle, ast.Name) and cle.id in intitules, (
+                    "chaque intitulé de section est une constante nommée, affectée avant la "
+                    f"composition : {ast.dump(cle)}"
+                )
+                composition[intitules[cle.id]] = MOTIF_PAGE_DECLAREE.findall(ast.unparse(valeur))
+    assert composition, "le point d'entrée ne déclare aucune section"
+    return composition
+
+
+# Les mots qui, dans une décision servie, nomment un OBJET DE LA CHAÎNE et non une action du
+# service : un seuil de décision, une technique de rapprochement, le modèle lui-même, une table de
+# paramètres. Aucun n'est choisi d'avance — chacun a été relevé dans une décision servie réelle.
+#
+# « rappel » a été essayé et RETIRÉ après mesure : il reconnaît « Décider d'un rappel de
+# rendez-vous », qui est une action de guichet. Le témoin négatif ci-dessous est exactement cette
+# phrase, de sorte que l'ajouter à nouveau ferait rougir la propriété plutôt que de passer.
+MOTS_DE_LA_CHAINE = ("seuil", "rapprochement probabiliste", "du modèle", "tables de paramètres")
+
+
+def test_le_classement_se_derive_de_la_decision_servie() -> None:
+    """Une décision servie qui nomme un objet de la chaîne désigne un indicateur de méthode.
+
+    La propriété est écrite dans UN SEUL SENS, et c'est la seule direction qu'elle puisse tenir.
+    Un indicateur de méthode peut très bien déclarer une décision servie qui ne nomme aucun objet
+    de la chaîne — `rendez_vous_delai_et_absence_intra_activite` est dans ce cas, et il relève de
+    la méthode pour une autre raison, que la propriété suivante tient. L'implication réciproque
+    serait donc fausse, et l'écrire ferait rougir un classement correct.
+
+    Ce qu'elle attrape : un indicateur laissé en pilotage alors que ce qu'il sert à décider porte
+    sur la chaîne. C'est la faute que le classement pouvait commettre.
+    """
+    motif = re.compile("|".join(re.escape(mot) for mot in MOTS_DE_LA_CHAINE), re.IGNORECASE)
+    assert motif.search("Déplacer le seuil de décision en connaissance du compromis."), (
+        "le motif ne reconnaît pas un cas positif"
+    )
+    assert not motif.search("Décider d'un rappel de rendez-vous et choisir les activités."), (
+        "le motif reconnaît un cas négatif — c'est exactement la mesure qui a fait retirer "
+        "« rappel » du lexique"
+    )
+
+    fautives = [
+        f"{entree['identifiant']} : « {' '.join(entree['decision_servie'].split())} »"
+        for entree in _registre()["indicateurs"]
+        if entree["section"] != "methode" and motif.search(entree["decision_servie"])
+    ]
+    assert not fautives, (
+        "indicateurs laissés en pilotage alors que leur décision servie nomme un objet de la "
+        "chaîne : " + " | ".join(fautives)
+    )
+
+
+def test_tout_indicateur_nomme_par_le_registre_des_relations_est_en_methode() -> None:
+    """Un indicateur qu'une relation injectée nomme ne peut pas être présenté comme opérationnel.
+
+    Le registre des relations dit, en tête, que toute relation qu'il liste est produite PAR
+    CONSTRUCTION et ne peut pas être présentée comme un résultat. Un indicateur qui la donne à voir
+    affiche donc un paramètre, non une mesure de l'activité, et sa place est dans la section de
+    méthode. C'est aussi la seule chose que le classement pouvait manquer sur ces deux-là : leur
+    décision servie ne le dit pas toujours.
+
+    Un seul sens, là encore : la section de méthode accueille légitimement des indicateurs
+    qu'aucune relation ne nomme — la provenance des champs, le seuil du rapprochement.
+    """
+    chemin = RACINE / "docs" / "relations_injectees.yml"
+    relations = yaml.safe_load(chemin.read_text(encoding="utf-8"))
+    sections = {e["identifiant"]: e["section"] for e in _registre()["indicateurs"]}
+
+    motif = re.compile(r"\b([a-z]+(?:_[a-z]+)+)\b")
+    assert motif.findall("indicateur rendez_vous_delai_et_absence. Chapitre 7."), (
+        "le motif ne reconnaît pas un identifiant pourtant présent"
+    )
+
+    nommes = {
+        nom
+        for relation in relations
+        for nom in motif.findall(str(relation.get("ou_apparait", "")))
+        if nom in sections
+    }
+    assert nommes, "aucun indicateur n'est nommé par le registre des relations : motif à revoir"
+
+    fautives = sorted(nom for nom in nommes if sections[nom] != "methode")
+    assert not fautives, (
+        "indicateurs nommés par une relation injectée mais classés opérationnels : "
+        + ", ".join(fautives)
+    )
+
+
+def test_la_navigation_declare_les_deux_sections_et_leurs_pages() -> None:
+    """Les sections de la navigation et celles du registre déclarent les mêmes pages.
+
+    Les deux membres sont calculés chacun de son côté — l'un par lecture du point d'entrée, l'autre
+    par regroupement des entrées du registre — et confrontés. Une page rangée dans une section à
+    l'écran et déclarée dans l'autre au registre fait rougir ici.
+    """
+    navigation = _sections_declarees()
+    registre = _registre()["indicateurs"]
+
+    # Le registre nomme les sections par un code ; la navigation par l'intitulé qu'un lecteur voit.
+    # Le rapprochement se fait sur la COMPOSITION, jamais sur une correspondance de noms écrite
+    # ici : deux sections, et celle qui contient une page donnée doit être la même des deux côtés.
+    par_code: dict[str, set[str]] = {}
+    for entree in registre:
+        par_code.setdefault(entree["section"], set()).add(entree["page"])
+
+    assert len(navigation) == len(par_code) == 2, (
+        f"la navigation déclare {len(navigation)} section(s) et le registre {len(par_code)} : "
+        f"{sorted(navigation)} contre {sorted(par_code)}"
+    )
+
+    composition_navigation = sorted(sorted(pages) for pages in navigation.values())
+    composition_registre = sorted(sorted(pages) for pages in par_code.values())
+    assert composition_navigation == composition_registre, (
+        "la composition des sections diverge entre la navigation et le registre : "
+        f"{composition_navigation} contre {composition_registre}"
+    )
+
+    # Et l'en-tête du registre annonce les effectifs : troisième réconciliation, chaque membre
+    # calculé de son côté.
+    annonces = _registre()["sections"]
+    reels = {code: sum(1 for e in registre if e["section"] == code) for code in par_code}
+    assert annonces == reels, f"effectifs annoncés {annonces} contre effectifs réels {reels}"
+    assert sum(reels.values()) == len(registre), (
+        f"la somme des deux sections ({sum(reels.values())}) n'égale pas le nombre d'entrées "
+        f"({len(registre)})"
+    )
+
+
+def test_aucune_page_declaree_n_est_vide_et_aucun_fichier_ne_manque() -> None:
+    """Toute page déclarée porte au moins un indicateur et son fichier existe, et réciproquement.
+
+    Une réorganisation peut vider une page sans la retirer de la navigation : le lecteur voit
+    alors une entrée de menu qui n'affiche rien. Elle peut aussi laisser un fichier de page que
+    plus rien ne déclare, qui reste dans le dépôt et qu'aucun contrôle ne rend.
+    """
+    registre = _registre()
+    portees = {entree["page"] for entree in registre["indicateurs"]}
+
+    vides = sorted(set(registre["pages"]) - portees)
+    assert not vides, f"pages déclarées ne portant aucun indicateur : {vides}"
+
+    declarees = {page for pages in _sections_declarees().values() for page in pages}
+    assert declarees == portees, (
+        "pages de la navigation et pages portées par le registre divergent : "
+        f"{sorted(declarees ^ portees)}"
+    )
+
+    fichiers = set(pages_ecrites())
+    assert declarees <= fichiers, f"pages déclarées sans fichier : {sorted(declarees - fichiers)}"
+    assert fichiers <= declarees, (
+        f"fichiers de page qu'aucune section ne déclare : {sorted(fichiers - declarees)}"
     )
