@@ -3,9 +3,11 @@ version: 2
 models:
   - name: int_relances
     description: >
-      source.relances typée : les colonnes date/horodatage/booleen/numérique converties
-      par les macros de dbt/macros/conversions.sql, les colonnes code/texte reprises
-      telles quelles.
+      Une ligne par relance de recouvrement, identifiée par n_relance. Couche de nettoyage sans
+      destruction : les colonnes de code et de texte sont reprises telles quelles, les colonnes de
+      date sont typées. Aucune ligne n'est écartée ici — la mise en quarantaine est le fait du
+      chargeur, en amont. L'ensemble des colonnes de cette table est posé sans preuve externe :
+      aucune n'a été relevée à l'écran ni documentée par une source.
     tests:
       - meme_decompte_que_la_source:
           arguments:
@@ -14,13 +16,43 @@ models:
           arguments:
             column_name: "n_relance"
     columns:
+      - name: n_relance
+        description: >
+          Identifiant de la relance, clé de la table. Colonne non relevée à l'écran et posée sans
+          preuve externe.
+      - name: n_creance
+        description: >
+          Identifiant de la créance relancée. Il rattache la ligne aux créances. Colonne non
+          relevée à l'écran et posée sans preuve externe.
       - name: date_relance
+        description: >
+          Date d'émission de la relance. Colonne non relevée à l'écran et posée sans preuve
+          externe. La couche source la stocke en texte, au format d'affichage du système observé —
+          mois, jour, année ; elle est ici convertie en DATE, la chaîne vide devenant une valeur
+          absente.
         tests:
           - conversion_sans_perte:
               arguments:
                 source_relation: "{{ source('source', 'relances') }}"
                 source_column: date_relance
+      - name: canal
+        description: >
+          Code du canal employé pour relancer — courrier, téléphone ou autre. Aucune table de
+          libellés n'accompagne ce code, et aucun n'est inventé. Colonne non relevée à l'écran et
+          posée sans preuve externe.
+      - name: resultat
+        description: >
+          Code du résultat de la relance : paiement complet, paiement partiel, absence de réponse
+          ou refus. Ce sont les deux premiers qui font qu'une relance est tenue pour aboutie en
+          aval. Colonne non relevée à l'écran et posée sans preuve externe.
       - name: date_extraction
+        description: >
+          Date de l'extraction dont la ligne provient. Colonne TECHNIQUE de la zone
+          d'atterrissage, absente du système observé : elle partitionne le chargement et le rend
+          rejouable, une même partition pouvant être rechargée sans doublon. Colonne non relevée à
+          l'écran et posée sans preuve externe. La couche source la stocke en texte, au format
+          d'affichage du système observé — mois, jour, année ; elle est ici convertie en DATE, la
+          chaîne vide devenant une valeur absente.
         tests:
           - conversion_sans_perte:
               arguments:
