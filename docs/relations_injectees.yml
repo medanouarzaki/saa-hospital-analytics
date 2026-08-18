@@ -21,8 +21,8 @@
   source: ""
   forme: "Positive, et INTERNE à une spécialité. Le paramètre ne change pas le NOMBRE d'absences — celui-ci vient de taux_absenteisme_par_specialite — mais seulement le délai tiré pour les lignes d'absence, par échantillonnage par rejet de poids 1 + pente x delai. À l'intérieur d'une spécialité, les rendez-vous manqués portent donc un délai plus long que les honorés."
   consequence: "L'écart intra-activité de la page Rendez-vous reproduit la pente injectée. Aucune conclusion sur l'existence ou la force de cette relation ne peut en être tirée. Mesuré : +0,078 de corrélation une fois l'activité retirée par centrage, et un écart positif sur les huit activités."
-  page_tableau_de_bord: rendez_vous
-  ou_apparait: "Tableau de bord, page Rendez-vous, indicateur rendez_vous_delai_et_absence_intra_activite. Chapitre 7."
+  page_tableau_de_bord: provenance_et_parametres
+  ou_apparait: "Tableau de bord, page Provenance et paramètres, indicateur rendez_vous_delai_et_absence_intra_activite. Chapitre 7."
 
 - id: R-02
   relation: "Le niveau d'absentéisme diffère par spécialité, indépendamment du délai."
@@ -202,5 +202,5 @@
   source: ""
   forme: "Ce n'est PAS une relation causale injectée : aucun paramètre ne lie ces deux grandeurs. C'est la corrélation entre DEUX TABLES DE PARAMÈTRES posées séparément, l'une donnant un délai médian par spécialité, l'autre un taux d'absentéisme par spécialité. Mesurée sur les valeurs des paramètres eux-mêmes, elle vaut -0,4918 ; mesurée sur les données produites, elle vaut -0,4855. Son signe est l'INVERSE de celui de R-01, qui joue à l'intérieur de chaque spécialité."
   consequence: "La corrélation affichée entre le délai médian et le taux d'absentéisme des huit activités est circulaire au même titre qu'une relation injectée : elle est entièrement fixée par le rangement conjoint des deux tables de paramètres. Aucune conclusion sur l'effet du délai sur l'absentéisme ne peut en être tirée, et surtout pas la conclusion inverse de R-01 : la relation interne aux spécialités reste positive."
-  page_tableau_de_bord: rendez_vous
-  ou_apparait: "Tableau de bord, page Rendez-vous, indicateur rendez_vous_delai_et_absence. Chapitre 7."
+  page_tableau_de_bord: provenance_et_parametres
+  ou_apparait: "Tableau de bord, page Provenance et paramètres, indicateur rendez_vous_delai_et_absence. Chapitre 7."
