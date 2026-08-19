@@ -477,6 +477,11 @@ jobs:
       # marts, que la construction dbt de ce même job établit — il compare les deux.
       - run: uv run pytest tests/test_indicateurs_sejour_affiches.py -v
 
+      # La correspondance entre ce que le registre déclare et ce que les pages lisent, et les trois
+      # indicateurs qu'aucune seconde mesure ne touchait. Les deux rendent des pages contre le
+      # schéma d'instantané : leur place est cet emplacement, le seul qui le rafraîchisse.
+      - run: uv run pytest tests/test_correspondance_registre_usage.py tests/test_indicateurs_sans_seconde_mesure.py -v
+
       # Les contrôles des livrables produisent l'export puis LISENT les fichiers produits.
       - run: uv run pytest tests/test_exports.py -v
 
