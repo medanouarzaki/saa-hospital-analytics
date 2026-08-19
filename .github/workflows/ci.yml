@@ -481,3 +481,10 @@ jobs:
       # dont il est extrait, et s'abstiennent avec un motif explicite sur la fenêtre réduite
       # que ce job charge, l'échantillon étant tiré du jeu complet.
       - run: uv run pytest tests/test_echantillon.py -v
+
+      # test_disjonction_structurelle.py siège ici et à un seul endroit. Il lui faut les deux
+      # à la fois : une couche source PEUPLÉE — le job provenance applique la définition de
+      # schéma sans charger de données, et ses tables sont vides — et les fichiers versés au
+      # dépôt, qu'il lit sur l'arbre de travail. La fenêtre réduite que ce job charge ne le
+      # gêne pas : il porte sur la FORME de chaque valeur, jamais sur leur nombre.
+      - run: uv run pytest tests/test_disjonction_structurelle.py -v
