@@ -70,20 +70,29 @@ COLONNE_MENTION = "donnees_synthetiques"
 LIGNES_SOURCE = 200
 LIGNES_ANALYTIQUE = 50
 
-# Les onze tables de la couche source, avec la colonne qui ordonne l'échantillonnage systématique.
-# L'ordre est celui d'une clé stable, jamais celui de l'insertion : il doit rendre le même extrait à
-# chaque exécution.
+# Les onze tables de la couche source, avec les colonnes qui ordonnent l'échantillonnage
+# systématique. L'ordre est celui d'une clé stable, jamais celui de l'insertion : il doit rendre le
+# même extrait à chaque exécution.
+#
+# **Chaque clé est UNIQUE sur sa table, et ce n'est pas une précaution de style.** Le rang est
+# calculé par `row_number() over (order by …)` ; sur une clé qui se répète, l'ordre entre lignes
+# égales n'est pas défini, et deux exécutions sur le même contenu peuvent rendre deux extraits
+# différents. Trois clés étaient dans ce cas et ont été mesurées : `patients` par `n_ipp` — 29 107
+# lignes pour 25 842 valeurs, une fiche étant réextraite à plusieurs dates —, `mouvements` par
+# `n_sejour` — 6 310 pour 2 980, un séjour portant plusieurs mouvements — et `creances` par
+# `n_creance` — 5 876 pour 5 486, une créance étant suivie à plusieurs dates. La date d'extraction,
+# et le rang de mutation pour les mouvements, complètent la clé et la rendent unique.
 TABLES_SOURCE = {
-    "patients": "n_ipp",
+    "patients": "n_ipp, date_extraction",
     "rendez_vous": "n_rdv",
     "passages": "n_passage",
-    "mouvements": "n_sejour",
+    "mouvements": "n_sejour, n_mutation, date_extraction",
     "passages_urgences": "n_passage",
     "factures": "n_facture",
     "lignes_facture": "n_facture, n_ligne",
     "prises_en_charge": "n_prise_en_charge",
     "encaissements": "n_encaissement",
-    "creances": "n_creance",
+    "creances": "n_creance, date_extraction",
     "relances": "n_relance",
 }
 
