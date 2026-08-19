@@ -25,6 +25,17 @@ qu'elle lit, et ses requêtes passent par son propre point de lecture, celui qui
 de recherche au schéma d'instantané. Un contrôle qui ouvrirait sa propre connexion ne prouverait
 rien de ce que la page voit.
 
+GARDE D'APPLICABILITÉ. Les quatre grandeurs sont annualisées et n'ont de sens que sur une génération
+couvrant la période entière : c'est la décision consignée à
+`docs/decisions/0026-garde-applicabilite-indicateurs-sejour.md`, et la condition retenue y est une
+égalité mesurée — la date d'admission maximale contre la date de fin de période configurée — jamais
+une marge. Ce contrôle reprend cette condition et la pose DES DEUX CÔTÉS, la couche modélisée et
+l'instantané devant l'un et l'autre couvrir la période entière pour être comparables. Sur une
+fenêtre partielle, les deux implémentations divergent pour une raison qui ne dit rien de leur
+justesse : l'une annualise un volume de trois mois par la durée de la période complète, l'autre
+prolonge jusqu'à la borne de fin les séjours qu'une fenêtre courte laisse tous ouverts. S'abstenir
+avec un motif explicite vaut mieux qu'élargir une tolérance jusqu'à ne plus rien détecter.
+
 Aucun travail au niveau du module : ni connexion, ni lecture de variable d'environnement à
 l'import. Le fichier se collecte sur un clone frais sans base.
 """
@@ -107,6 +118,41 @@ def _sorties_de_la_page(lecture) -> dict[str, float]:
     return {colonne: float(ligne[colonne]) * facteur for colonne, _, _, facteur in CORRESPONDANCE}
 
 
+def _fenetre_complete_ou_abstention(lecture) -> None:
+    """S'abstient si l'une des deux couches ne couvre pas la période entière.
+
+    La condition est celle de `tests/test_indicateurs_sejour.py` : la date d'admission maximale
+    doit égaler la date de fin de période configurée. Elle est vérifiée sur les DEUX couches, la
+    fonction du contrôle de l'entrepôt étant appelée pour la sienne.
+    """
+    from generator import config
+    from tests import test_indicateurs_sejour as entrepot
+
+    date_fin = date.fromisoformat(config.valeur("date_fin"))
+
+    conn = entrepot._connexion()
+    try:
+        max_marts = entrepot._max_jour_admission(conn)
+    finally:
+        conn.close()
+
+    max_instantane = lecture.interroger("select max(jour_admission) as fin from fct_sejour")["fin"][
+        0
+    ]
+
+    for couche, mesuree in (
+        ("marts.fct_sejour", max_marts),
+        ("instantane.fct_sejour", max_instantane),
+    ):
+        if mesuree != date_fin:
+            pytest.skip(
+                f"fenêtre chargée partielle : date d'admission maximale de {couche} ({mesuree}) "
+                f"!= date de fin de période configurée ({date_fin}) -- les quatre indicateurs, "
+                "annualisés sur la période complète, ne sont comparables ni aux valeurs publiées "
+                "ni entre eux sur une génération qui ne couvre pas cette période dans son entier"
+            )
+
+
 def _valeurs_publiees() -> dict[str, float]:
     """Les quatre valeurs relevées, lues dans le fichier de configuration qui les porte."""
     contenu = yaml.safe_load(VOLUMETRIE.read_text(encoding="utf-8"))
@@ -119,6 +165,7 @@ def test_les_quatre_indicateurs_affiches_tiennent_aux_valeurs_publiees() -> None
 
     lecture = _lecture()
     _instantane_pret(lecture)
+    _fenetre_complete_ou_abstention(lecture)
 
     obtenues = _sorties_de_la_page(lecture)
     publiees = _valeurs_publiees()
@@ -151,6 +198,7 @@ def test_les_quatre_indicateurs_affiches_egalent_l_implementation_de_l_entrepot(
 
     lecture = _lecture()
     _instantane_pret(lecture)
+    _fenetre_complete_ou_abstention(lecture)
 
     conn = entrepot._connexion()
     try:
