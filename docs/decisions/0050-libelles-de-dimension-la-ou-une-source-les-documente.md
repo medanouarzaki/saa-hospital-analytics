@@ -92,14 +92,14 @@ affirme que l'hôpital s'organise en services **sans les nommer individuellement
 qu'il existe des services, pas lesquels.
 
 **Types d'épisode — `HOS`, `CE`, `UR`.** L'article 36 établit une taxonomie réglementaire des modes
-d'utilisation **sans l'énumérer**. C'est le cas le plus tentant du lot : ces trois codes se lisent
+d'utilisation **sans l'énumérer**. C'est le cas le plus tentant : ces trois codes se lisent
 immédiatement comme hospitalisation, consultation externe et urgences, et la configuration porte
 déjà ces trois libellés — sous l'étiquette `HYP`. **La ressemblance n'est pas une source**, et le
 raisonnement « cela ne peut être que cela » est précisément le signal de classer en non documenté.
 
 ## Ce qui aurait invalidé cette décision
 
-**Qu'aucune source du registre ne documente aucune nomenclature.** Le lot n'aurait alors produit que
+**Qu'aucune source du registre ne documente aucune nomenclature.** Cette décision n'aurait alors produit que
 le registre des non-documentés — ce qui resterait utile, puisqu'il rend explicite et vérifiable ce
 qui n'était jusque-là qu'une absence.
 
@@ -125,7 +125,7 @@ fait inventer un libellé à une page.
 (Santé en chiffres 2024), `S-12` (avis sur les urgences médicales).
 `docs/observation/releve_champs.yml` — `REL-RDV.R02`, dont aucune valeur n'a été observée.
 `docs/champs/registre_champs.yml` — la provenance déclarée de chaque colonne concernée.
-`docs/decisions/0020-dimensions-simples-cle-naturelle.md` — la règle dont ce lot précise la portée.
+`docs/decisions/0020-dimensions-simples-cle-naturelle.md` — la règle dont cette décision précise la portée.
 `docs/decisions/0049-documentation-des-couches-aval.md` — la même distinction, appliquée aux
 descriptions de colonnes.
 `docs/decisions/0043-instantane-schema-dedie-du-tableau-de-bord.md` — ce que le service lit.

@@ -11,7 +11,7 @@ La couche `source` est intégralement en `text`, sans exception (`docs/decisions
 catalogue PostgreSQL (`information_schema.columns`/`.tables`), filtré sur `t.table_type =
 'BASE TABLE'` : toute colonne de `intermediate`/`marts` qui matérialiserait en TABLE
 apparaîtrait dans ce catalogue sans correspondant dans le registre (qui ne couvre que
-`source`) et ferait rougir ce test — mesuré avant d'écrire, au lot de mesure qui a établi le
+`source`) et ferait rougir ce test — mesuré avant d'écrire, lors de la mesure qui a établi le
 périmètre de ce test. `docs/champs/registre_champs.yml` et `dbt/models/sources/source.yml`
 (généré mécaniquement depuis lui, comparé octet à octet par
 `test_provenance.py::test_artefacts_synchrones`) ne gouvernent que la couche source ; aucun
@@ -64,7 +64,7 @@ de lint du reste du dépôt.
 `ignore_paths` déclaré à la racine avec des motifs préfixés `dbt/` (`dbt/target/`) ne
 s'appliquait pas, mesuré empiriquement ; le même motif relatif (`target/`) déclaré dans
 `dbt/.sqlfluff` fonctionnait. Retenu tel quel, sans chercher plus loin la cause exacte
-(résolution de chemin interne à sqlfluff, hors périmètre de ce lot) — le comportement mesuré
+(résolution de chemin interne à sqlfluff, hors périmètre de cette décision) — le comportement mesuré
 suffit à la décision.
 
 ### Pourquoi deux générateurs de test génériques plutôt que dbt_utils
@@ -87,7 +87,7 @@ les 46 colonnes de `source.patients`. Aucune colonne `decimal`/`entier` n'y figu
 `convertir_numerique` reste écrite et testable isolément (mutation-testable de la même façon)
 mais n'est exercée par aucun test pour l'instant — un futur modèle sur une table à colonnes
 numériques (`creances`, `lignes_facture`, ...) l'exercera. La CI actuelle ne lance encore
-aucune commande dbt (`.github/workflows/ci.yml` non modifié par ce lot) — un lot ultérieur.
+aucune commande dbt (`.github/workflows/ci.yml` non modifié ici) — plus tard.
 
 ## Ce qui aurait invalidé cette décision
 

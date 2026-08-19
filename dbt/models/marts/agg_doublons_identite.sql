@@ -5,7 +5,7 @@
     collision exacte est un signal ; un rapprochement probabiliste relève d'un
     autre traitement, hors de cette couche.
 
-    Deux critères retenus, mesurés non dégénérés en J0 (voir le rapport) :
+    Deux critères retenus, mesurés non dégénérés en J0 :
       - nom_date_naissance : prénom (colonne nom, cf. generator/patients.py) + nom de
         famille 1 + date de naissance. Aucune valeur vide sur ce critère (0/25842).
       - piece_identite : type de pièce d'identité + numéro de pièce d'identité.

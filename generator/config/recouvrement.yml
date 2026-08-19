@@ -9,7 +9,7 @@ parametres:
   provenance: HYP
   preuve: sans_preuve_externe
   note: Second nom imposé par la relation R-20 du registre des relations injectées, qui porte
-    deux paramètres (taux_facturation, taux_recouvrement) - le premier relève du lot
+    deux paramètres (taux_facturation, taux_recouvrement) - le premier relève du fichier
     précédent. R-20 affirme explicitement que ce taux diffère par type d'épisode, une
     correspondance dès l'écriture de ce paramètre, jamais un scalaire. Aucune source ne
     mesure ces taux pour cet établissement. Un séjour d'hospitalisation se recouvre le mieux
@@ -83,8 +83,8 @@ parametres:
   provenance: HYP
   preuve: sans_preuve_externe
   note: Aucune source ne fixe ce seuil. Posé à 5 dirhams - un règlement de quelques centimes
-    n'a pas de sens (mesuré avant d'écrire, un minimum de 0,01 DH observé sur la sortie du
-    lot précédent). Un versement partiel qui tomberait sous ce seuil est absorbé par le
+    n'a pas de sens (mesuré avant d'écrire, un minimum de 0,01 DH observé sur la sortie
+    précédente). Un versement partiel qui tomberait sous ce seuil est absorbé par le
     versement voisin plutôt que produit tel quel ; la somme des encaissements d'une facture
     reste inchangée, seul leur nombre de lignes diminue. Ne s'applique pas à un versement
     unique déjà minoritaire en montant (un dû résiduel réellement inférieur au seuil reste

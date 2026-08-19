@@ -32,8 +32,7 @@ provenance.
 3. **Complétude bidirectionnelle testée, écrite indépendamment du modèle.** Chaque dimension a un
    test singulier qui réécrit l'union des colonnes source (pas un appel à `ref('dim_X')` pour
    construire son propre attendu) et la compare par `except` dans les deux sens à ce que produit
-   le modèle. Mutation-testé dans les quatre directions (voir les mutations du rapport de ce
-   lot) : filtrage d'un code, ajout d'un code fantôme, duplication, injection d'un `null` —
+   le modèle. Mutation-testé dans les quatre directions : filtrage d'un code, ajout d'un code fantôme, duplication, injection d'un `null` —
    chacune isole le test visé, un seul collatéral réel rencontré (une valeur `null` injectée fait
    aussi rougir la complétude, puisque chaque branche du recalcul exclut déjà les valeurs vides/
    nulles par construction — expliqué, pas un défaut).
@@ -74,7 +73,7 @@ et exclus par le même raisonnement, en sens inverse.
 Seize vues dans `marts` (`dim_date`, quatre nouvelles dimensions, `agg_provenance_champs`), 99
 tests dbt verts (87 précédents + 8 génériques + 4 de complétude). La dette obstétricale (aucune
 colonne mesurée ne distingue un accouchement d'un autre séjour du service `HGO`) est mesurée et
-consignée dans ce lot, sans décision — reportée à la couche des faits qui devra soit s'en passer,
+consignée ici, sans décision — reportée à la couche des faits qui devra soit s'en passer,
 soit documenter une source qui comble ce manque.
 
 ## Ce qui aurait invalidé cette décision

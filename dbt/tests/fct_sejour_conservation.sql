@@ -8,10 +8,10 @@
     compter deux fois une ligne dans l'agrégation.
 
     Troisième propriété, ajoutée après mesure qu'aucun autre test ne la couvrait
-    (règle 4 du lot de rapport) : la dérivation de service_sortie -- destination de
+    (règle de vérification par mutation) : la dérivation de service_sortie -- destination de
     mutation quand le séjour en porte une, service d'accueil sinon -- recalculée ici
     indépendamment de fct_sejour.sql et comparée à sa valeur publiée. Seul fichier de
-    test singulier autorisé pour ce lot ; cette propriété affirmée par fct_sejour.yml
+    test singulier autorisé ici ; cette propriété affirmée par fct_sejour.yml
     n'avait aucune preuve avant cet ajout.
 #}
 

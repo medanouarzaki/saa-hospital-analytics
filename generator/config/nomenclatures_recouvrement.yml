@@ -73,7 +73,7 @@ parametres:
   preuve: S-20
   note: 'Le rapport de la Cour des comptes relève des sorties sans règlement, des patients non identifiés
     et des évasions comme motifs de non-recouvrement (S-20, déjà cité par le registre pour cette colonne).
-    Un quatrième code, RCV (Recouvré), ajouté à ce lot en valeur - permission explicite pour l''état d''une
+    Un quatrième code, RCV (Recouvré), ajouté en valeur - permission explicite pour l''état d''une
     créance soldée, la table des créances ne portant aucune colonne dédiée à un état propre. Une créance
     dont le montant restant atteint zéro est écrite dans cet état final (motif_non_recouvrement = RCV,
     montant_restant = 0) plutôt que retirée de la table : la distinction entre une créance encore ouverte

@@ -86,7 +86,7 @@ Le job `dbt` est complet, vérifié par répétition locale intégrale (deux foi
 le bug de racine du chargeur et la borne de `dim_date`, une fois confirmant la levée des deux et
 révélant la comptabilité des retraits, une troisième fois confirmant tout vert). 104 tests dbt et
 2 tests de confrontation verts sur les deux générations canoniques (base complète, sous-ensemble
-CI). Le premier run CI réel de la branche, au lot de publication, reste le juge final — la
+CI). Le premier run CI réel de la branche, à la publication, reste le juge final — la
 répétition locale n'a jamais prétendu reproduire l'environnement du runner.
 
 ## Ce qui aurait invalidé cette décision

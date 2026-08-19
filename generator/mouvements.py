@@ -4,14 +4,14 @@ Un séjour correspond à un passage d'hospitalisation et un seul, dans l'ordre o
 passages apparaissent. Il donne lieu à une ligne d'admission, une ligne de mutation
 facultative, puis une ligne de sortie si le passage correspondant en porte une. La durée du
 séjour est tirée par ce module, indépendamment de celle déjà tirée par
-`generator/passages.py` pour le même passage (non modifiable ce lot) ; sa moyenne, pas sa
+`generator/passages.py` pour le même passage ; sa moyenne, pas sa
 médiane, est ajustée pour reproduire le rapport journées d'hospitalisation / admissions
-mesuré (voir le rapport), le seul degré de liberté qui reste une fois les admissions et
+mesuré, le seul degré de liberté qui reste une fois les admissions et
 leur date déjà fixées par le fil des épisodes. Chaque séjour est admis dans l'une des trois
 unités d'hospitalisation non chirurgicales, restreinte aux unités éligibles pour son patient :
 la gynéco-obstétrique (HGO) n'admet que des patientes (sexe F), la pédiatrie (HPED) que des
 patients de quinze ans révolus au plus à la date d'admission — deux contraintes dures du
-document de cadrage, absentes de tout contrôle avant ce lot (mesuré avant d'écrire, voir le
+document de cadrage, absentes de tout contrôle jusqu'ici (mesuré avant d'écrire, voir le
 rapport : 300 admissions HGO sur 573 et 596 admissions HPED sur 806 en désaccord). Une
 mutation change toujours d'unité, jamais vers celle d'origine, et respecte la même
 éligibilité. Un lit ne porte jamais deux séjours qui se chevauchent au sein d'une même unité :

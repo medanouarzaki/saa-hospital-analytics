@@ -194,11 +194,11 @@ parametres:
   unite: proportion par code de nomenclature, par colonne geographique
   provenance: HYP
   preuve: S-05
-  note: 'Restructure au lot de correction de vraisemblance : la region est tiree en premier, puis ville
+  note: 'la region est tiree en premier, puis ville
     et province partagent le meme tirage par_region[region], donc portent toujours le meme code par construction.
     Avant cette restructuration, ville, province et region etaient tirees independamment, ce qui produisait
     48,93 % de lignes ou ville differait de province et 5,15 % de lignes ou une province de Fes-Meknes
-    etait associee a une region differente (mesure du lot de correction). MEK domine (70 %) la region
+    etait associee a une region differente (mesuré). MEK domine (70 %) la region
     Fes-Meknes, coherent avec l''implantation de l''etablissement a Meknes ; TT, CS et RS ne portent chacune
     qu''un seul chef-lieu (TNG, CAS, RAB), une simplification explicite qui ne distingue pas les provinces
     a l''interieur de ces regions minoritaires. Le partage urbain/rural (63,9 % / 36,1 %) reprend la mesure
@@ -219,7 +219,7 @@ parametres:
   preuve: REL-PAT.H07
   note: 'Repartition retenue pour nationalite et pays_naissance, partagee entre les deux colonnes, tirees
     independamment l''une de l''autre (accord non exige : la nationalite et le pays de naissance sont
-    deux attributs distincts qui peuvent legitimement differer, mesure du lot de correction : 9,45 % de
+    deux attributs distincts qui peuvent legitimement differer, mesuré : 9,45 % de
     lignes ou ils different, un taux compatible avec un tirage independant a 95 % / 95 %, sans signal
     d''incoherence). Le code 504 (MAROC) est dominant a 95 %, conforme a ce que le releve de champs observe
     comme la nationalite et le pays de naissance de la tres grande majorite des patients d''un hopital
@@ -260,7 +260,7 @@ parametres:
   unite: proportion par tranche d'age
   provenance: HYP
   preuve: sans_preuve_externe
-  note: Remplace au lot de correction le taux_exitus scalaire unique (0,02 pour toute la population),
+  note: Remplace le taux_exitus scalaire unique (0,02 pour toute la population),
     qui ne satisfaisait que la moitie de l'exigence de vraisemblance (part tres minoritaire, mais aucune
     croissance avec l'age). Chaque taux croit strictement avec la tranche, reste minoritaire (maximum
     8 %), et sa moyenne ponderee par structure_age (~0,024) reste proche de l'ancien taux scalaire, pour
@@ -317,9 +317,9 @@ parametres:
   unite: proportion par code de nomenclature_type_piece_identite, selon la nationalite
   provenance: HYP
   preuve: sans_preuve_externe
-  note: 'Ajoute au lot de correction : avant, type_piece_identite etait tiree uniformement sur les trois
+  note: 'Avant, type_piece_identite etait tiree uniformement sur les trois
     codes (33 % chacun), une repartition uniforme sur une nomenclature ou une distribution etait attendue
-    (releve au 1.2 du lot de correction). La C.I.N (C) domine tres largement chez les patients de nationalite
+    (mesuré). La C.I.N (C) domine tres largement chez les patients de nationalite
     marocaine (code 504 de repartition_pays) ; passeport et carte de sejour dominent chez les patients
     de nationalite etrangere, conforme au fait qu''un etranger ne detient generalement pas de C.I.N marocaine.
     Pose sans source specifique. Si cette repartition etait fausse, la part de chaque piece d''identite
@@ -349,9 +349,9 @@ parametres:
   unite: proportion par code de nomenclature_etat_civil, par tranche d'age, pour les 18 ans et plus
   provenance: HYP
   preuve: sans_preuve_externe
-  note: 'Ajoute au lot de correction : avant, etat_civil etait tiree uniformement sur les quatre codes
+  note: 'Avant, etat_civil etait tiree uniformement sur les quatre codes
     (25 % chacun) pour tous les patients, y compris les mineurs, une repartition uniforme sur une nomenclature
-    ou une distribution etait attendue, avec des mineurs veufs (releve au 1.2 et a l''etape 3 du lot de
+    ou une distribution etait attendue, avec des mineurs veufs (mesuré
     correction). Les patients de moins de 18 ans ne sont pas tires depuis cette table : ils recoivent
     le code C (celibataire) de maniere deterministe, hors de toute distribution. Pour les 18 ans et plus,
     cette table est indexee par la tranche d''age de structure_age (qui contient des mineurs et des majeurs
@@ -373,9 +373,9 @@ parametres:
   unite: proportion par code de nomenclature_type_patient, selon la presence d'une compagnie d'assurance
   provenance: HYP
   preuve: sans_preuve_externe
-  note: 'Ajoute au lot de correction : avant, type_patient etait tiree uniformement sur les quatre codes
+  note: 'Avant, type_patient etait tiree uniformement sur les quatre codes
     independamment de compagnie_assurance, ce qui produisait 4,96 % de fiches sans compagnie d''assurance
-    (SANS) marquees neanmoins Assure (AS), mesure du lot de correction. Le code AS (Assure) est desormais
+    (SANS) marquees neanmoins Assure (AS), mesuré. Le code AS (Assure) est desormais
     exclu du tirage lorsque compagnie_assurance vaut SANS : une fiche sans compagnie ne peut plus etre
     de type Assure. Poids poses sans source specifique. Si ces repartitions etaient fausses, la part de
     chaque type de patient affichee serait faussee, sans effet sur aucun total.'
@@ -392,9 +392,9 @@ parametres:
   unite: code postal par code de nomenclature_ville
   provenance: HYP
   preuve: sans_preuve_externe
-  note: 'Ajoute au lot de correction : avant, code_postal valait la constante 50000 (celui de Meknes)
-    pour toutes les lignes quelle que soit la ville, une colonne a valeur unique sur toute la table (releve
-    au 1.2) et incoherente avec ville pour 29,80 % des fiches hors Meknes (mesure du lot de correction).
+  note: 'Avant, code_postal valait la constante 50000 (celui de Meknes)
+    pour toutes les lignes quelle que soit la ville, une colonne a valeur unique sur toute la table (mesure)
+    et incoherente avec ville pour 29,80 % des fiches hors Meknes (mesuré).
     Chaque code postal ici est le code reel de sa ville de nomenclature_ville. Si l''un de ces codes etait
     faux, seule la vraisemblance de l''adresse affichee pour cette ville serait affectee, sans effet sur
     aucun total.'
@@ -410,15 +410,15 @@ parametres:
   unite: proportion de fiches ou la colonne est renseignee
   provenance: HYP
   preuve: sans_preuve_externe
-  note: 'Ajoute au lot de correction : ces sept colonnes sont facultatives, une fiche reelle ne les renseigne
+  note: 'ces sept colonnes sont facultatives, une fiche reelle ne les renseigne
     pas toutes. Avant, telephone_2/3/4 et commentaire etaient vides sur 100 % des lignes et profession
     valait la constante NON PRECISEE sur 100 % des lignes (colonnes a valeur unique, relevees au 1.2) ;
     email et nom_famille_2 etaient renseignees sur 100 % des lignes. Une valeur absente ici parce que la
     colonne est facultative et n''a pas ete saisie est une absence structurelle, qui fait partie du jeu
-    de donnees normal : ce n''est pas un defaut injecte. Le decompte de la verite terrain, dans un lot
+    de donnees normal : ce n''est pas un defaut injecte. Le decompte de la verite terrain, plus
     ulterieur, ne doit compter que les defauts reellement injectes, pas ces absences structurelles. Si
     ces taux etaient faux, la part de fiches renseignees pour ces colonnes serait faussee, sans effet
-    sur aucun total. Profession reajuste de 0,4 a 0,6 dans un lot ulterieur : le taux de champs
+    sur aucun total. Profession reajuste ensuite de 0,4 a 0,6 : le taux de champs
     manquants du cadrage pour cette colonne (44 % de manquant au total) est inferieur a ce que
     l''ancienne valeur (0,4 renseigne, 60 % manquant) produisait a elle seule -- un mecanisme
     d''injection ne peut qu''ajouter de l''absence, jamais en retirer. Le tirage de la profession
@@ -426,11 +426,11 @@ parametres:
     renseignee), si bien que deplacer ce seuil decale la position du flux aleatoire pour toutes
     les fiches suivantes et, par ricochet, les tables qui lisent source.patients en entree
     (mesure avant d''ecrire : un premier essai a 0,7 renseigne faisait sortir la conformite des
-    journees d''hospitalisation de sa tolerance de 3 % etablie a un lot anterieur, 3,34 % contre
+    journees d''hospitalisation de sa tolerance de 3 % etablie anterieurement, 3,34 % contre
     1,65 % avant ajustement). Remonter la part structurelle a 60 % renseigne (40 % manquant, la
     plus petite hausse qui reste sous la cible de 44 %) laisse un espace etroit mais suffisant a
     l''injection, tout en minimisant ce decalage -- revarifie a cette valeur, la conformite reste
-    verte (voir le rapport).'
+    verte.'
 - nom: liste_professions
   valeur:
   - Enseignant
@@ -446,7 +446,7 @@ parametres:
   unite: liste de professions
   provenance: HYP
   preuve: sans_preuve_externe
-  note: Ajoute au lot de correction, pour remplacer la constante NON PRECISEE (releve au 1.2 comme
+  note: pour remplacer la constante NON PRECISEE (mesuré comme
     colonne a valeur unique). Dix professions usuelles posees sans source, tirees uniformement quand
     profession est renseignee (taux_renseignement.profession). Si cette liste etait fausse ou trop
     courte, la vraisemblance des professions affichees serait affectee, sans effet sur aucun total.
@@ -526,8 +526,8 @@ parametres:
   unite: liste de comptes utilisateurs
   provenance: HYP
   preuve: sans_preuve_externe
-  note: 'Ajoute au lot de correction : avant, cree_par valait la constante SYSTEME pour toutes les lignes
-    (colonne a valeur unique, relevee au 1.2), et modifie_par n''avait que deux valeurs (vide ou SYSTEME).
+  note: 'Avant, cree_par valait la constante SYSTEME pour toutes les lignes
+    (colonne a valeur unique, mesuré), et modifie_par n''avait que deux valeurs (vide ou SYSTEME).
     Desormais, cree_par et modifie_par sont tires dans ce petit ensemble de comptes plausibles (agents
     d''accueil, infirmiers de bureau des entrees), poses sans source. Si cette liste etait fausse, les
     comptes affiches seraient invraisemblables, sans effet sur aucun total.'

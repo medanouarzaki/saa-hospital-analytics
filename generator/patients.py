@@ -493,10 +493,10 @@ def generer_lignes(
                 # difference de .random()/.integers()/...) : les tirages du changement
                 # metier restent isoles sur cette seule fiche et ne decalent pas la sequence
                 # que les patients suivants de la boucle consomment depuis `generateur` --
-                # mesure avant d'ecrire (voir le rapport) : sans cet isolement, le decalage se
+                # mesure avant d'ecrire : sans cet isolement, le decalage se
                 # propageait a toutes les fiches suivantes et faisait deriver des statistiques
                 # sans rapport (occupation des lits, generator/mouvements.py) qui ne lisent
-                # pourtant aucune des colonnes que ce lot modifie.
+                # pourtant aucune des colonnes corrigees ici.
                 generateur_metier = generateur.spawn(1)[0]
                 _, changements = _appliquer_changement_metier(
                     ligne_base, entrees, generateur_metier

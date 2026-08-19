@@ -68,7 +68,7 @@ charge a été *initiée*, pas quand elle a été *décidée*.
 
 ### Pourquoi l'inventaire ne s'est pas arrêté à `prises_en_charge.py`
 
-Le prompt de ce lot ne citait que `generator/prises_en_charge.py` comme lecteur connu. Le
+L'énoncé du besoin ne citait que `generator/prises_en_charge.py` comme lecteur connu. Le
 même motif de recherche (`lignes_patients`, paramètre reçu d'un générateur amont), validé sur
 ce cas positif avant d'être appliqué ailleurs, a fait ressortir un second lecteur non anticipé
 avec la même sémantique erronée : `generator/defauts.py::_injecter_factures_sans_pec`, qui

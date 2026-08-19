@@ -66,7 +66,7 @@ parametres:
     des notions différentes (le régime AMO gestionnaire, contre la compagnie d''assurance
     inscrite sur la fiche). generator/config/demographie.yml le note déjà explicitement pour
     repartition_couverture : "la correspondance entre regimes nationaux et compagnies de
-    nomenclature_compagnie_assurance n''est pas etablie". Ce lot pose donc la correspondance
+    nomenclature_compagnie_assurance n''est pas etablie". La correspondance est donc posee
     minimale nécessaire pour remplir la colonne organisme depuis la compagnie déjà tirée sur
     la fiche patient : CNSS PIPC (00116) vers le régime CNSS, dont il porte le nom ; SAHAM
     (00042) et RMA (00089), deux assureurs privés sans régime AMO propre parmi les cinq codes
@@ -86,8 +86,8 @@ parametres:
   provenance: DOC
   preuve: S-18
   note: 'Remplace taux_couverture_par_organisme (retiré, un taux par organisme plutôt que par
-    type d''épisode et seuil de montant), mécanisme posé à un lot antérieur en écart déclaré
-    par rapport à S-18, que ce lot corrige pour appliquer la règle documentée telle quelle :
+    type d''épisode et seuil de montant), mécanisme posé antérieurement en écart déclaré
+    par rapport à S-18, corrigé depuis pour appliquer la règle documentée telle quelle :
     S-18 décrit une prise en charge totale des frais en hospitalisation et hôpital de jour
     sur la base de la TNR. Ce générateur ne porte pas de type d''épisode "hôpital de jour"
     distinct (seuls HOS, CE, UR existent) ; la règle s''applique donc au seul type HOS. Si ce
@@ -143,7 +143,7 @@ parametres:
   note: 'Le registre des champs ne porte qu''une seule colonne de date pour cette table,
     date_verification ("le patient présente les documents exigés selon son statut de
     couverture, ce qui date la vérification", S-27) : aucune colonne distincte ne porte la
-    date de la demande elle-même. Ce lot retient donc la date de facture comme point de
+    date de la demande elle-même. La date de facture est donc retenue comme point de
     départ implicite de la démarche (la demande suit la facturation, jamais ne la précède,
     conformément à la note de facturation.yml sur le délai d''émission), et date_verification
     comme la date de décision, conformément à sa propre note. Un délai qui, ajouté à la date

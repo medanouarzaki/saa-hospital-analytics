@@ -1,6 +1,6 @@
 {#
     dim_agent : clé naturelle code_agent, aucun libellé inventé — union des colonnes de la
-    famille agent mesurée depuis le registre (voir le rapport de ce lot), vides exclus. Pas de
+    famille agent mesurée depuis le registre, vides exclus. Pas de
     clé de substitution : la vue reste déterministe d'une exécution à l'autre.
 #}
 

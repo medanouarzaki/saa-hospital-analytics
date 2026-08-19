@@ -141,7 +141,7 @@ def test_naissance_et_solde(generation: dict) -> None:
     # cours de vie, auquel cas son etat final doit etre ecrit (motif RCV, montant restant
     # nul), pas supprime. Ancienne assertion, reportee ici pour memoire :
     #   for cre in lignes_cre: assert cre["montant_restant"] > 0
-    # -- rougirait desormais sur toute creance soldee, par construction voulue de ce lot.
+    # -- rougirait desormais sur toute creance soldee, par construction voulue.
     entrees = generation["entrees"]
     lignes_fac = generation["lignes"][TABLE_FAC]
     lignes_cre = generation["lignes"][TABLE_CRE]

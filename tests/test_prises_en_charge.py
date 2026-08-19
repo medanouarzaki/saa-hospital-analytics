@@ -42,7 +42,7 @@ def test_eligibilite(generation: dict) -> None:
     # (generator/patients.py::COLONNES_PAR_TYPE_MODIFICATION), l'eligibilite se juge sur la
     # couverture en vigueur au moment de la facture, pas sur la derniere version reextraite
     # -- sans quoi une PEC correctement accordee avant un changement de couverture vers SANS
-    # ferait rougir ce test a tort (mesure au lot qui a introduit ce changement, voir le
+    # ferait rougir ce test a tort (mesure a l'introduction de ce changement, voir le
     # rapport).
     lignes_pat = generation["lignes"]["source.patients"]
     lignes_fac = generation["lignes"][TABLE_FACTURES]

@@ -101,7 +101,7 @@ parametres:
   preuve: sans_preuve_externe
   note: Meme schema que contraintes_coherence (generator/config/coherence.yml) et
     contraintes_coherence_rendez_vous (generator/config/rendez_vous.yml), repris ici sous
-    un nom distinct faute d'ecriture autorisee sur ces deux fichiers dans ce lot. Lu par
+    un nom distinct, ces deux fichiers n'etant pas modifiables ici. Lu par
     generator/passages.py (application) et par le test d'invariant generique de cohérence
     intra-ligne (verification, via contraintes_coherence_par_table).
 - nom: contraintes_coherence_par_table
@@ -146,7 +146,7 @@ parametres:
       collision exacte entre deux tirages reste possible mathematiquement mais n''est pas
       garantie sur une execution donnee, la resolution effective (secondes sur pres de deux
       ans et demi) rendant l''entiere distinction la realisation la plus frequente, pas une
-      anomalie de generation. Mesure avant d''ecrire ce lot (voir le rapport) : 27360 valeurs
+      anomalie de generation. Mesure avant ecriture : 27360 valeurs
       distinctes sur 27360 lignes apres l''alignement de repartition_niveaux_tri sur le
       document de cadrage, qui deplace la distribution des delais tires sans en reduire la
       continuite.'
@@ -154,9 +154,9 @@ parametres:
     distincte sur toute la periode, par table
   provenance: HYP
   preuve: sans_preuve_externe
-  note: Complete, pour les tables ecrites avant ce lot, les declarations deja faites sous
+  note: Complete, pour les tables ecrites auparavant, les declarations deja faites sous
     un autre nom de parametre specifique a leur propre fichier de configuration (non
-    ouvert a l'ecriture dans ce lot) ; toute colonne degeneree decouverte dans
-    source.passages par la mesure de ce lot est declaree ici directement, ce fichier etant
+    ouvert a l'ecriture) ; toute colonne degeneree decouverte dans
+    source.passages par la mesure est declaree ici directement, ce fichier etant
     ouvert a l'ecriture. Lu par le test d'invariant generique de colonne degeneree, par
     table, sans jamais citer de nom de colonne dans le fichier de test lui-meme.

@@ -63,7 +63,7 @@ def test_taux_mesures(generation: dict) -> None:
     ]
     # denominateur identique a celui de generator/defauts.py::_injecter_rdv_doublon_creneau :
     # les rendez-vous honores, hors ceux deja touches par une date aberrante (jamais
-    # eligibles a la duplication, voir l'etape 3 du rapport).
+    # eligibles a la duplication).
     n_honores_eligibles = sum(
         1
         for ligne in lignes_rdv
