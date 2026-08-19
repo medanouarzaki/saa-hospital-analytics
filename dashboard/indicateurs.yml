@@ -457,7 +457,8 @@ indicateurs:
     libelle: Occupation, durée moyenne et rotation
     definition: >-
       Taux d'occupation moyen, durée moyenne de séjour, taux de rotation et
-      intervalle de rotation, calculés sur la période complète.
+      intervalle de rotation, annualisés sur la période complète, séjours non
+      clos censurés à la date de référence des données.
     decision_servie: >-
       Remonter à la statistique nationale les quatre indicateurs de séjour
       attendus d'un hôpital nommé.

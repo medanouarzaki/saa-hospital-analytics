@@ -62,12 +62,21 @@ def TEMPORISATION_S(tentative):
 SUFFIXE_NEUF = "__neuf"
 SUFFIXE_REBUT = "__rebut"
 
-# Le fichier suivi où vit déjà la capacité litière, et la clé qui la porte. Le module la LIT ici
-# et ne la redéclare nulle part : une seconde déclaration serait une source de vérité concurrente.
-FICHIER_PARAMETRES = (
-    Path(__file__).resolve().parent.parent / "generator" / "config" / "volumetrie.yml"
-)
-PARAMETRES_REPRIS = ("capacite_litiere_fonctionnelle",)
+# Les fichiers suivis où vivent déjà les paramètres que le tableau de bord doit lire, et la clé qui
+# porte chacun. Le module les LIT ici et n'en redéclare aucun : une seconde déclaration serait une
+# source de vérité concurrente, et c'est elle qui dériverait en silence le jour où la première
+# change. Chaque paramètre est donc nommé avec le fichier qui le porte, et non recopié.
+#
+# Le mécanisme pointait un fichier unique tant qu'un seul paramètre était repris. La durée de
+# l'année de référence vit dans un autre fichier de la même configuration : la reprise est donc
+# décrite par une correspondance nom -> fichier plutôt que par un fichier unique et une liste de
+# noms, ce qui laisse un troisième paramètre s'ajouter sans que la forme change encore.
+RACINE_CONFIGURATION = Path(__file__).resolve().parent.parent / "generator" / "config"
+FICHIER_PAR_PARAMETRE = {
+    "capacite_litiere_fonctionnelle": RACINE_CONFIGURATION / "volumetrie.yml",
+    "jours_annee_reference": RACINE_CONFIGURATION / "periode.yml",
+    "nombre_jours_periode": RACINE_CONFIGURATION / "periode.yml",
+}
 
 REQUETE_OBJETS = """
 select n.nspname, c.relname
@@ -165,16 +174,30 @@ def parametres_repris() -> list[tuple[str, str, str, str]]:
 
     Un test relit le fichier que cette colonne désigne et compare : c'est ce qui rend la
     provenance vérifiable plutôt que décorative.
-    """
-    contenu = yaml.safe_load(FICHIER_PARAMETRES.read_text(encoding="utf-8"))
-    par_nom = {entree["nom"]: entree for entree in contenu["parametres"]}
 
-    chemin = FICHIER_PARAMETRES.relative_to(FICHIER_PARAMETRES.parent.parent.parent).as_posix()
+    Chaque fichier n'est lu qu'une fois, quel que soit le nombre de paramètres qu'il porte.
+    """
+    racine_depot = RACINE_CONFIGURATION.parent.parent
+    contenus: dict[Path, dict] = {}
     lignes = []
-    for nom in PARAMETRES_REPRIS:
+    for nom, fichier in FICHIER_PAR_PARAMETRE.items():
+        if fichier not in contenus:
+            charge = yaml.safe_load(fichier.read_text(encoding="utf-8"))
+            contenus[fichier] = {entree["nom"]: entree for entree in charge["parametres"]}
+        par_nom = contenus[fichier]
         if nom not in par_nom:
-            raise ValueError(f"paramètre absent du fichier de configuration : {nom}")
-        lignes.append((nom, str(par_nom[nom]["valeur"]), chemin, f"parametres[nom={nom}].valeur"))
+            raise ValueError(
+                f"paramètre absent du fichier de configuration : {nom} "
+                f"attendu dans {fichier.relative_to(racine_depot).as_posix()}"
+            )
+        lignes.append(
+            (
+                nom,
+                str(par_nom[nom]["valeur"]),
+                fichier.relative_to(racine_depot).as_posix(),
+                f"parametres[nom={nom}].valeur",
+            )
+        )
     return lignes
 
 

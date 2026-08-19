@@ -76,6 +76,40 @@ def _max_jour_admission(conn: psycopg.Connection) -> date | None:
         return valeur
 
 
+def indicateurs_recalcules(lignes: list[dict], date_fin: date, n_jours_periode: int) -> dict:
+    """Les quatre indicateurs, calculés depuis les lignes brutes de `marts.fct_sejour`.
+
+    Extraite du corps du contrôle ci-dessous, qu'elle sert toujours, pour qu'un second contrôle
+    puisse APPELER cette convention au lieu de la recopier. Une convention recopiée diverge, et
+    deux chiffres du même dépôt cessent alors d'être comparables sans que rien ne le signale.
+
+    Ni la convention, ni les grandeurs qu'elle emploie ne changent ici : durée mesurée sur les
+    horodatages, séjour non clos censuré à la borne de fin de période, annualisation par le
+    rapport de l'année de référence à la durée de la période.
+    """
+    capacite = config.valeur("capacite_litiere_fonctionnelle")
+    jours_an = config.valeur("jours_annee_reference")
+
+    # Serveur en UTC (`show timezone`, vérifié avant d'écrire) : les colonnes
+    # timestamptz de fct_sejour reviennent avec un fuseau, la borne construite ici
+    # doit en porter un aussi pour rester comparable.
+    borne_fin = datetime.combine(date_fin, time(23, 59, 59), tzinfo=UTC)
+    total_journees = 0.0
+    for ligne in lignes:
+        fin = ligne["date_heure_sortie"] if ligne["date_heure_sortie"] is not None else borne_fin
+        total_journees += (fin - ligne["date_heure_admission"]).total_seconds() / 86400
+
+    journees_annuelles = total_journees * 365 / n_jours_periode
+    admissions_annuelles_mesure = len(lignes) * 365 / n_jours_periode
+
+    return {
+        "TOM": journees_annuelles / (capacite * jours_an) * 100,
+        "DMS": journees_annuelles / admissions_annuelles_mesure,
+        "TROT": admissions_annuelles_mesure / capacite,
+        "IROT": (capacite * jours_an - journees_annuelles) / admissions_annuelles_mesure,
+    }
+
+
 def test_indicateurs_sejour_recalcules_depuis_fct_sejour() -> None:
     conn = _connexion()
     try:
@@ -92,35 +126,18 @@ def test_indicateurs_sejour_recalcules_depuis_fct_sejour() -> None:
 
         date_debut = date.fromisoformat(config.valeur("date_debut"))
         n_jours_periode = (date_fin - date_debut).days + 1
-        capacite = config.valeur("capacite_litiere_fonctionnelle")
-        jours_an = config.valeur("jours_annee_reference")
 
         lignes = _sejours(conn)
     finally:
         conn.close()
 
-    # Serveur en UTC (`show timezone`, vérifié avant d'écrire) : les colonnes
-    # timestamptz de fct_sejour reviennent avec un fuseau, la borne construite ici
-    # doit en porter un aussi pour rester comparable.
-    borne_fin = datetime.combine(date_fin, time(23, 59, 59), tzinfo=UTC)
-    total_journees = 0.0
-    for ligne in lignes:
-        fin = ligne["date_heure_sortie"] if ligne["date_heure_sortie"] is not None else borne_fin
-        total_journees += (fin - ligne["date_heure_admission"]).total_seconds() / 86400
-
-    journees_annuelles = total_journees * 365 / n_jours_periode
-    admissions_annuelles_mesure = len(lignes) * 365 / n_jours_periode
-
-    tom_mesure = journees_annuelles / (capacite * jours_an) * 100
-    dms_mesure = journees_annuelles / admissions_annuelles_mesure
-    trot_mesure = admissions_annuelles_mesure / capacite
-    irot_mesure = (capacite * jours_an - journees_annuelles) / admissions_annuelles_mesure
+    mesures = indicateurs_recalcules(lignes, date_fin, n_jours_periode)
 
     publies = {
-        "TOM": (tom_mesure, config.valeur("tom_publie")),
-        "DMS": (dms_mesure, config.valeur("dms_publie")),
-        "TROT": (trot_mesure, config.valeur("trot_publie")),
-        "IROT": (irot_mesure, config.valeur("irot_publie")),
+        "TOM": (mesures["TOM"], config.valeur("tom_publie")),
+        "DMS": (mesures["DMS"], config.valeur("dms_publie")),
+        "TROT": (mesures["TROT"], config.valeur("trot_publie")),
+        "IROT": (mesures["IROT"], config.valeur("irot_publie")),
     }
 
     echecs = []
