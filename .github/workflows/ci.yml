@@ -472,6 +472,11 @@ jobs:
       # conditions sont réunies, l'instantané étant absent des autres emplacements.
       - run: uv run pytest tests/test_tableau_de_bord_contexte_conteneur.py -v
 
+      # Les quatre indicateurs de séjour tels que la page les affiche. Sa place est ici et nulle
+      # part ailleurs : il lui faut l'instantané, que seul cet emplacement rafraîchit, et la couche
+      # marts, que la construction dbt de ce même job établit — il compare les deux.
+      - run: uv run pytest tests/test_indicateurs_sejour_affiches.py -v
+
       # Les contrôles des livrables produisent l'export puis LISENT les fichiers produits.
       - run: uv run pytest tests/test_exports.py -v
 

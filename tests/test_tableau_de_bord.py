@@ -461,29 +461,20 @@ def test_les_indicateurs_des_trois_pages_egalent_leur_seconde_mesure() -> None:
     if abs(float(ordinaire["part"]) - float(seconde)) > 1e-12:
         ecarts.append(f"consultation ordinaire : {ordinaire['part']} contre {seconde}")
 
-    # Séjours : les grandeurs réglementaires, recalculées ici depuis les mêmes ingrédients bruts.
-    capacite = int(
-        lecture.interroger(
-            "select valeur from instantane_parametres where nom = 'capacite_litiere_fonctionnelle'"
-        )["valeur"][0]
-    )
-    reglementaires = lecture.interroger(
-        sans_filtre("sejours", "sejours_indicateurs_reglementaires") % {"capacite": capacite}
-    ).iloc[0]
-    ingredients = lecture.interroger(
-        """select count(*) as sejours, sum(duree_jours) as journees,
-                  max(coalesce(jour_sortie, jour_admission)) - min(jour_admission) + 1 as jours
-           from fct_sejour"""
-    ).iloc[0]
-    attendus = {
-        "taux_occupation": float(ingredients["journees"]) / (int(ingredients["jours"]) * capacite),
-        "duree_moyenne_jours": float(ingredients["journees"]) / int(ingredients["sejours"]),
-        "rotation": int(ingredients["sejours"]) / capacite,
-    }
-    for colonne, attendu in attendus.items():
-        obtenu = float(reglementaires[colonne])
-        if abs(obtenu - attendu) > 1e-9:
-            ecarts.append(f"{colonne} : {obtenu} contre {attendu}")
+    # Séjours : les trois grandeurs réglementaires ne sont plus ici. Elles sont couvertes par
+    # tests/test_indicateurs_sejour_affiches.py, qui les confronte aux valeurs publiées et à
+    # l'implémentation indépendante de tests/test_indicateurs_sejour.py.
+    #
+    # Le motif du déplacement tient à ce qu'une seconde mesure peut prouver, et à ce qu'elle ne
+    # peut pas. Celle qui siégeait ici RETRANSCRIVAIT la formule de la page — mêmes ingrédients,
+    # mêmes opérations, écrites une seconde fois — et se comparait à elle à 1e-9 près. Une telle
+    # comparaison est vraie par construction : elle ne peut départager une formule juste d'une
+    # formule fausse, puisque les deux membres portent la même. Elle est restée verte pendant que
+    # le taux de rotation affiché valait 74,5 au lieu de 29,8, faute d'annualisation — mesuré.
+    #
+    # Ce qu'une seconde mesure doit être pour mordre : soit une référence EXTERNE au code, que le
+    # code ne peut pas rendre vraie, soit une implémentation ÉCRITE SÉPARÉMENT dont la coïncidence
+    # est une propriété et non une tautologie. Le contrôle nommé ci-dessus porte les deux.
 
     # Séjours : les non clos, contre l'absence de date de sortie plutôt que le drapeau.
     non_clos = lecture.interroger(sans_filtre("sejours", "sejours_non_clos")).iloc[0]
