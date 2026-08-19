@@ -118,8 +118,8 @@ réservés par la norme n'ont pas ce défaut.
 
 **Les anciennes valeurs sont dans un dépôt public.** Elles y sont entrées avec la couche source du
 jeu de données, versée au fil des fusions successives ; l'échantillon de vingt-trois fichiers qui
-les exposait le plus directement n'a, lui, **jamais été poussé** — la revue qui a trouvé ce défaut
-l'a trouvé avant la publication de ce lot-là, et rien n'a été poussé depuis.
+les exposait le plus directement n'a, lui, **jamais été poussé** : la revue d'hygiène qui précède
+toute publication l'a arrêtée, et rien n'a été poussé depuis.
 
 Ce qui a été publié ne se retire pas. **Un historique poussé reste accessible par référence directe
 même après réécriture** : les objets restent servis par leur empreinte tant qu'ils ne sont pas
