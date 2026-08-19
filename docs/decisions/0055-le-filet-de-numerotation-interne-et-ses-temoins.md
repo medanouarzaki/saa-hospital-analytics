@@ -13,17 +13,21 @@ contrôle permanent, `tests/test_aucune_trace_processus.py`, est censé la tenir
 
 Une revue manuelle a mesuré ce qu'il laissait passer : **135 occurrences sur 44 fichiers suivis**.
 
+**Les formes sont nommées ici, jamais reproduites.** Cet enregistrement est un fichier suivi comme
+un autre ; y écrire un exemple le ferait rougir sous le filet qu'il institue. Les exemples de chaque
+forme vivent dans le contrôle, seul fichier à porter une exclusion déclarée, et c'est là qu'il faut
+les lire : `tests/test_aucune_trace_processus.py`, tables `TEMOINS_POSITIFS` et `TEMOINS_NEGATIFS`.
+
 | Forme | Occurrences | Le filet la voyait-il ? |
 |---|---|---|
-| unité de travail désignée — « ce lot », « au lot », « du lot » | 108 | **non** : son motif exigeait un chiffre après le mot |
-| unité de travail nommée — « lot de correction », « lot de vraisemblance » | 16 | **non** : même raison |
-| étape numérotée — « à l'etape 3 », « voir Etape 5 » | 8 | **non** pour la graphie sans accent ; son motif exigeait « étape » accentué |
-| renvoi décimal interne — « relevé au 1.2 », « mesure du 1.3 » | 3 | **non** : son motif de sous-étape attendait chiffre-point-**lettre** |
-| unité de travail numérotée — « lot 12 », « bloc 3 » | 0 | oui, et c'est la seule forme qu'il cherchait |
+| unité de travail désignée par un déterminant | 108 | **non** : son motif exigeait un chiffre après le mot |
+| unité de travail qualifiée par un nom de passe de travail | 16 | **non** : même raison |
+| étape suivie d'un nombre | 8 | **non** pour la graphie sans accent ; son motif exigeait la graphie accentuée |
+| renvoi à une mesure interne, chiffre-point-chiffre | 3 | **non** : son motif attendait chiffre-point-**lettre** |
+| unité de travail suivie d'un nombre | 0 | oui, et c'est la seule forme qu'il cherchait |
 
 Une cinquième cécité, découverte en corrigeant : **le filet lisait ligne à ligne**. Six occurrences
-coupées par un retour à la ligne — « touchées par ce ⏎ lot » — échappaient à la fois au motif et au
-découpage.
+coupées par un retour à la ligne échappaient à la fois au motif et au découpage.
 
 **Le filet cherchait donc une forme sur cinq, et a été cru sur son silence depuis l'origine.** La
 règle qu'il devait tenir est en vigueur depuis le début du projet.
