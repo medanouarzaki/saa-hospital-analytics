@@ -68,12 +68,12 @@ appliqué est donc 365 ÷ 912 = 0,4002192982.
 |---|---|---|---|---|---|---|---|
 | **Capacité litière existante** | lits installés, en service ou non | **non calculable faute de champ** | *aucune* | table de structure de l'établissement | — | 140 lits [`S-29`, 2020] | — |
 | **Capacité litière fonctionnelle** | lits en service | **calculable** | `source.mouvements` | — | **40** | **40** | **0,00 %** |
-| **Admissions** | nombre de séjours | **calculable** | `marts.fct_sejour` | — | **1 192,65 / an** | 1 197 / an | **0,3634 %** |
-| **Journées d'hospitalisation** | somme des durées de séjour | **calculable** | `marts.fct_sejour` | — | **7 791,12 / an** | 7 851 / an | **0,7627 %** |
-| **Taux d'occupation moyen** | journées ÷ (capacité × 365) | **calculable** | `marts.fct_sejour` + capacité | — | **53,3639 %** | 53,8 % | **0,8106 %** |
-| **Durée moyenne de séjour** | journées ÷ admissions | **calculable** | `marts.fct_sejour` | — | **6,5326 j** | 6,6 j | **1,0212 %** |
-| **Taux de rotation** | admissions ÷ capacité | **calculable** | `marts.fct_sejour` + capacité | — | **29,8163** | 29,9 | **0,2799 %** |
-| **Intervalle de rotation** | (capacité × 365 − journées) ÷ admissions | **calculable** | `marts.fct_sejour` + capacité | — | **5,7090 j** | 5,6 j | **1,9464 %** |
+| **Admissions** | nombre de séjours | **calculable** | `marts.fct_sejour` | — | **1 192,65 / an** | 1 197 / an | **0,3631 %** |
+| **Journées d'hospitalisation** | somme de `duree_jours`, colonne nulle pour un séjour non clos | **calculable** | `marts.fct_sejour` | — | **7 751,88 / an** | 7 851 / an | **1,2625 %** |
+| **Taux d'occupation moyen** | journées ÷ (capacité × 365) | **calculable** | `marts.fct_sejour` + capacité | — | **53,0951 %** | 53,8 % | **1,3103 %** |
+| **Durée moyenne de séjour** | journées ÷ admissions | **calculable** | `marts.fct_sejour` | — | **6,4997 j** | 6,6 j | **1,5198 %** |
+| **Taux de rotation** | admissions ÷ capacité | **calculable** | `marts.fct_sejour` + capacité | — | **29,8163** | 29,9 | **0,2798 %** |
+| **Intervalle de rotation** | (capacité × 365 − journées) ÷ admissions | **calculable** | `marts.fct_sejour` + capacité | — | **5,7419 j** | 5,6 j | **2,5343 %** |
 | **Consultations spécialisées externes** | passages de consultation | **calculable** | `marts.fct_passage` | — | **4 126,26 / an** | 4 142 / an | **0,3800 %** |
 | **Consultations par médecin** | consultations ÷ médecins | **non calculable faute de champ** | `marts.fct_passage` (numérateur seul) | référentiel des médecins | 206,31 | 518 | **60,1718 %** |
 | **Passages aux urgences** | admissions au service des urgences | **calculable** | `marts.fct_passage_urgence` | — | **10 950 / an**, 30,00 / jour | *aucune* | — |

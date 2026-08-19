@@ -87,13 +87,14 @@ def _requetes_de_page(nom: str) -> dict[str, str]:
             exec(compile(module, "page", "exec"), local)
         except Exception:
             continue
-    # Deux mécanismes coexistent, et un seul des deux se lit comme un dictionnaire. Les sept
-    # premières pages déclarent leurs requêtes en constante `REQUETES` ; la page « Données » les
-    # compose depuis la table choisie à l'écran, et déclare à la place la constante `TABLES` qui
-    # nomme les objets et leurs colonnes de filtre. Ce lecteur rend alors un dictionnaire vide, et
-    # les propriétés qui ÉNUMÈRENT les requêtes d'une page passent leur tour sur elle — non pour la
-    # dispenser d'un contrôle, mais parce qu'une autre propriété la couvre plus fortement, en
-    # exécutant ses clauses et en comparant deux décomptes.
+    # Deux mécanismes coexistent, et un seul des deux se lit comme un dictionnaire. Toutes les
+    # pages sauf celle des lignes déclarent leurs requêtes en constante `REQUETES` ; la page
+    # « Données » les compose depuis la table choisie à l'écran, et déclare à la place la
+    # constante `TABLES`, qui nomme les objets et leurs colonnes de filtre. Ce lecteur rend
+    # alors un dictionnaire vide, et les propriétés qui ÉNUMÈRENT les requêtes d'une page
+    # passent leur tour sur elle — non pour la dispenser d'un contrôle, mais parce qu'une autre
+    # propriété la couvre plus fortement, en exécutant ses clauses et en comparant deux
+    # décomptes.
     #
     # L'un des deux doit exister : une page qui n'aurait ni l'un ni l'autre échapperait aux deux.
     assert "REQUETES" in local or "TABLES" in local, (

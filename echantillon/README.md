@@ -22,7 +22,7 @@ marque d'ordre d'octets — les mêmes que ceux du livrable complet.
 
 | Couche | Tables | Lignes par table |
 |---|---|---|
-| Source — les données telles qu'elles arrivent du système d'information | 11 | 200 |
+| Source — les données telles qu'elles arrivent du système d'information | 11 | 200, et 202 pour les patients |
 | Analytique — le schéma en étoile qui les modélise | 12 | jusqu'à 50 |
 
 Les lignes sont prélevées **systématiquement** : une ligne sur *N*, dans l'ordre d'une clé stable.
