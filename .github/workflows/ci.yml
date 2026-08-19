@@ -74,6 +74,10 @@ jobs:
 
       - run: uv run pytest tests/test_collecte_ci.py -v
 
+      # L'index des enregistrements de décision : il ne lit que des fichiers, aucune base. Sa place
+      # est donc l'emplacement qui n'en démarre aucune.
+      - run: uv run pytest tests/test_index_des_decisions.py -v
+
   tests-matrice:
     runs-on: ubuntu-latest
     strategy:
@@ -295,6 +299,11 @@ jobs:
       - run: uv run pytest tests/test_dim_patient.py -v
 
       - run: uv run pytest tests/test_delai_rendez_vous.py tests/test_indicateurs_sejour.py -v
+
+      # L'appariement de un à un entre le fait de séjour et le passage d'hospitalisation. Il exige
+      # la couche marts, que la construction dbt de ce job établit ; sa propriété est structurelle
+      # et vaut donc sur la fenêtre réduite que cet emplacement charge.
+      - run: uv run pytest tests/test_faits_sejour_et_passage.py -v
 
       - run: uv run pytest tests/test_linkage_population.py -v
 
