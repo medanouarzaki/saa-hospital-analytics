@@ -58,7 +58,7 @@ parametres:
   note: 'Declare les couples de colonnes de source.patients qui doivent s''accorder au sein d''une meme
     ligne, la nature de cet accord (egalite, appartenance, derivation), et la tolerance admise (0 partout
     : chaque couple retenu ici est un couple ou l''accord est exigible a 100 %, pas une correlation statistique
-    approchee). Les couples retenus sont ceux que la mesure de cohérence intra-ligne du lot de correction
+    approchee). Les couples retenus sont ceux que la mesure de cohérence intra-ligne
     a etablis comme devant s''accorder ; pays_naissance/nationalite en a ete ecarte deliberement (9,45
     % de desaccord mesure, sans que les deux colonnes doivent necessairement coincider : nationalite et
     pays de naissance sont deux attributs distincts). Cette configuration est lue a la fois par generator/patients.py

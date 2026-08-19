@@ -3,7 +3,7 @@
 
     Ventilation de l'orientation de sortie en quatre décomptes, construite depuis
     generator/config/nomenclatures_clinique.yml::nomenclature_orientation_sortie
-    (cinq codes : RD, HO, TR, SC, DC -- cf. rapport de ce lot) :
+    (cinq codes : RD, HO, TR, SC, DC, mesures depuis le registre) :
       - n_retour_domicile   : orientation_sortie = 'RD'
       - n_hospitalisation   : orientation_sortie = 'HO'
       - n_transfert         : orientation_sortie = 'TR'

@@ -2,7 +2,7 @@
 
 Une ligne par passage de catégorie U, exactement, dans l'ordre où ces passages
 apparaissent. L'heure d'arrivée est celle déjà tirée par `generator/passages.py` pour le
-même passage (non modifiable ce lot), jamais redessinée : l'effet de report post-rupture du
+même passage, jamais redessinée : l'effet de report post-rupture du
 jeûne, déjà porté par le moteur temporel sur le flux « urgences », traverse donc jusqu'à
 cette table sans rien y ajouter. Le niveau de tri est modulé par le mode d'arrivée (le mode
 SMUR, ambulance médicalisée, sert de substitut au champ d'origine absent du registre des

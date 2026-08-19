@@ -3,7 +3,7 @@
 Rassemble, dans un fichier unique, les treize règles d'accord entre tables que le cadrage
 énonce comme critères de fin de bloc : neuf règles de rattachement, d'ordre et de somme
 déjà vérifiées ailleurs (déplacées ici depuis les fichiers par table plutôt que dupliquées),
-et quatre règles ajoutées propres à ce lot (égalité urgences-hospitalisation, durée
+et quatre règles ajoutées ensuite (égalité urgences-hospitalisation, durée
 résiduelle des séjours non obstétricaux, absence d'actes interdits, indicateurs de séjour
 recalculés). Porte aussi les deux critères de fin de bloc restants : la conformité de
 volumétrie des grandeurs relevées (séjours, journées d'hospitalisation, consultations
@@ -204,12 +204,12 @@ def test_regle_09_rendez_vous_honore_a_un_passage_annule_n_en_a_pas(generation: 
     assert n_rdv_annules.isdisjoint(set(n_rdv_references)), "un rendez-vous annulé a un passage"
 
 
-# --- règles 10 à 13 : ajoutées par ce lot ---
+# --- règles 10 à 13 ---
 
 
 def test_regle_10_egalite_urgences_hospitalisees_et_sejours_urgences(generation: dict) -> None:
     # deplacee depuis tests/test_mouvements.py::test_coherence_urgences_hospitalisation
-    # (ecrite au lot precedent, inversee par ce lot -- voir sa note).
+    # (ecrite d'abord dans un sens, inversee depuis -- voir sa note).
     entrees = generation["entrees"]
     lignes_urg = generation["lignes"][TABLE_URG]
     lignes_mvt = generation["lignes"][TABLE_MVT]
@@ -267,13 +267,13 @@ def test_regle_10_bis_part_urgences_mesuree_suit_le_parametre_pose(generation: d
 
 def test_regle_11_duree_residuelle_sejours_non_obstetricaux(generation: dict) -> None:
     # mesure d'abord, comme demande : les sejours obstetricaux sont distinguables via
-    # service_accueil == "HGO" (source.mouvements, contrainte dure ajoutee a un lot
+    # service_accueil == "HGO" (source.mouvements, contrainte dure ajoutee
     # anterieur). Mesure : leur nombre, leur duree moyenne, et la duree moyenne residuelle
     # des autres sejours -- reportes au rapport. La duree n'est PAS aujourd'hui differenciee
     # par unite dans le generateur (meme loi log-normale pour toutes) : ce test verifie
     # donc une plausibilite large (la duree residuelle reste dans un intervalle raisonnable
     # autour de la duree moyenne de sejour publiee), pas une differenciation reelle -- une
-    # limite mesuree et signalee, pas corrigee dans ce lot (il faudrait une loi de duree
+    # limite mesuree et signalee, pas corrigee (il faudrait une loi de duree
     # propre a HGO, distincte de celle des autres unites, pour que ce test devienne un
     # controle de differenciation reelle plutot qu'un controle de plausibilite).
     entrees = generation["entrees"]
@@ -335,7 +335,7 @@ def test_regle_13_indicateurs_sejour_recalcules_depuis_les_donnees(generation: d
     # source.mouvements et source.passages, compares aux valeurs relevees (S-30,
     # generator/config/volumetrie.yml). TOM et DMS deplacent le controle deja ecrit a un
     # lot anterieur (tests/test_mouvements.py::test_taux_occupation,
-    # test_duree_moyenne_de_sejour) ; TROT et IROT sont ajoutes par ce lot.
+    # test_duree_moyenne_de_sejour) ; TROT et IROT sont ajoutes ici.
     entrees = generation["entrees"]
     lignes_mvt = generation["lignes"][TABLE_MVT]
     lignes_passages = generation["lignes"][TABLE_PAS]
@@ -504,7 +504,7 @@ def test_volumetrie_grandeurs_derivees_reportees(generation: dict) -> None:
     # les grandeurs derivees (rendez-vous, factures, lignes, encaissements, fiches) ne sont
     # pas soumises a la conformite de volumetrie : les comparer a une cible qu'elles
     # produisent elles-memes ne mesurerait rien. Ce test se contente de les reporter,
-    # chacune associee au parametre dont elle decoule, pour le rapport (Etape 5).
+    # chacune associee au parametre dont elle decoule, pour le rapport.
     lignes = generation["lignes"]
     entrees = generation["entrees"]
 

@@ -144,6 +144,34 @@ def pages_declarees() -> list[tuple[str, str]]:
     return pages
 
 
+# Les fonctions de graphique de la bibliothèque d'affichage. **Définies une seule fois**, ici, et
+# injectées dans le pilote à son écriture : le pilote les instrumente pour compter les lignes
+# transmises, et ce fichier les cherche dans le code des pages pour savoir lesquelles doivent
+# tracer. Deux listes séparées auraient dérivé l'une de l'autre sans que rien ne le signale.
+FONCTIONS_DE_GRAPHIQUE = ("area_chart", "bar_chart", "line_chart", "scatter_chart")
+
+
+def graphiques_declares(page: str) -> list[str]:
+    """Les appels de graphique que le CODE d'une page déclare, lus sans l'exécuter.
+
+    Le registre des indicateurs ne dit rien des graphiques — ses clés sont l'identifiant, la page,
+    le libellé, la définition, la décision servie, les objets lus, la filtrabilité, la section et
+    ce dont la valeur est recalculée, et aucune ne porte la forme d'affichage. Il ne peut donc pas
+    fournir cette information, et la déduire du code de la page est la seule dérivation
+    disponible. Ce qui compte est qu'aucun nom de page ne soit écrit ici : une page qui change de
+    nom, de section ou de contenu est suivie sans retouche.
+    """
+    chemin = APP.parent / page
+    arbre = ast.parse(chemin.read_text(encoding="utf-8"))
+    return [
+        noeud.func.attr
+        for noeud in ast.walk(arbre)
+        if isinstance(noeud, ast.Call)
+        and isinstance(noeud.func, ast.Attribute)
+        and noeud.func.attr in FONCTIONS_DE_GRAPHIQUE
+    ]
+
+
 # Le pilote est exécuté par le processus fils. Il fixe lui-même le chemin d'import — le fils étant
 # lancé en mode isolé, rien ne s'y ajoute dans son dos — puis rend la page demandée.
 PILOTE = '''
@@ -151,9 +179,6 @@ import json, sys, time
 
 entrees, app, page = json.loads(sys.argv[1]), sys.argv[2], sys.argv[3]
 sys.path[:] = entrees + sys.path
-
-FONCTIONS_DE_GRAPHIQUE = ("area_chart", "bar_chart", "line_chart", "scatter_chart")
-
 
 def compter_les_lignes_transmises(st, journal):
     """Enregistre, a chaque appel de graphique, le nombre de lignes que la page lui transmet."""
@@ -244,7 +269,9 @@ print("RESULTAT_JSON:" + json.dumps(resultat))
 
 def rendre_dans_le_contexte_du_service(page: str, pilote: Path) -> dict:
     """Rend une page dans un processus fils isolé, sous le chemin d'import du service."""
-    pilote.write_text(PILOTE, encoding="utf-8")
+    pilote.write_text(
+        f"FONCTIONS_DE_GRAPHIQUE = {FONCTIONS_DE_GRAPHIQUE!r}\n" + PILOTE, encoding="utf-8"
+    )
     acheve = subprocess.run(
         [
             sys.executable,
@@ -327,6 +354,10 @@ def test_chaque_graphique_recoit_des_donnees_placables_sur_ses_axes(
 ) -> None:
     """Chaque graphique reçoit des lignes, et aucun de ses axes de position ne dégénère.
 
+    **Sur les pages qui en tracent.** Une page peut légitimement n'en tracer aucun ; ce que la
+    propriété tient alors est que son code n'en déclare aucun non plus, l'accord entre les deux
+    étant vérifié dans les deux sens avant tout le reste.
+
     Compter les éléments rendus ne suffit pas : **un graphique vide est un élément rendu**. Cette
     propriété-ci descend d'un cran et observe, d'une part le nombre de lignes que la page transmet
     à chaque appel, d'autre part le type d'axe que le serveur a réellement émis pour le navigateur.
@@ -349,8 +380,25 @@ def test_chaque_graphique_recoit_des_donnees_placables_sur_ses_axes(
         f"la page « {titre} » ({page}) ne rend pas : {resultat['exception']}"
     )
 
+    # Une page sans graphique n'est PAS un défaut. La propriété porte sur les graphiques qu'une
+    # page trace, et une page qui n'en trace aucun n'en a aucun à vérifier : la page des lignes
+    # répond à « lesquels » et non à « combien », elle montre des dossiers et non des formes.
+    # Exiger un graphique de toute page ferait de ce choix d'affichage une faute.
+    #
+    # Ce qui reste à tenir est l'accord entre ce que la page DÉCLARE et ce qu'elle REND, dans les
+    # deux sens : une page dont le code appelle une fonction de graphique doit en tracer au moins
+    # un — sans quoi l'appel est dans une branche jamais prise et le contrôle passerait à vide —
+    # et une page dont le code n'en appelle aucune ne doit pas en produire. Les deux membres sont
+    # calculés chacun de son côté, l'un par lecture statique du code de la page, l'autre par
+    # observation du rendu dans le processus fils.
     appels = resultat["appels"]
-    assert appels, f"page « {titre} » ({page}) : aucun appel de graphique n'a ete observe"
+    declares = graphiques_declares(page)
+    assert bool(appels) == bool(declares), (
+        f"page « {titre} » ({page}) : le code déclare {len(declares)} appel(s) de graphique "
+        f"({', '.join(sorted(set(declares))) or 'aucun'}) et le rendu en observe {len(appels)}.\n"
+        "Une page qui déclare un graphique doit en tracer au moins un, et une page qui n'en "
+        "déclare aucun ne doit pas en produire."
+    )
     vides = [(rang, appel) for rang, appel in enumerate(appels, 1) if appel["lignes"] <= 0]
     assert not vides, (
         f"page « {titre} » ({page}) : un graphique ne recoit aucune ligne, il n'y a rien a "

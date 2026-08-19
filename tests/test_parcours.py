@@ -159,7 +159,7 @@ def _hash_parcours_sous_processus(graine: int) -> str:
 
 
 def test_invariance_fil_episodes_par_categorie_et_patients() -> None:
-    # ce lot deplace des dates de creation de fiche, il ne refait pas le fil : le nombre
+    # le mecanisme deplace des dates de creation de fiche, il ne refait pas le fil : le nombre
     # d'episodes par categorie et le nombre de patients distincts doivent rester ceux que
     # produit le module de volumes, independamment de la deuxieme passe qui deplace les
     # dates de creation des fiches ouvertes a la prise d'un rendez-vous.

@@ -24,7 +24,7 @@ parametres:
     clinique), mesure descriptive sans colonne dediee
   provenance: DOC
   preuve: S-13
-  note: 'Parametre ajoute par ce lot : S-13 mesure 30,7 % de consultations non appropriees
+  note: 'S-13 mesure 30,7 % de consultations non appropriees
     aux urgences sur 410 patients au CHP de Nador (2010). Le registre des champs de
     source.passages_urgences ne porte aucune colonne dediee au caractere ordinaire ou non
     d''un passage (seul niveau_tri existe, et sa repartition en cinq niveaux ne recoupe pas
@@ -77,7 +77,7 @@ parametres:
   provenance: HYP
   preuve: sans_preuve_externe
   note: 'Nom impose par la relation R-11 du registre des relations injectees. Ce parametre
-    ne pose plus la part hospitalisation (code HO) : le lot precedent l''avait appliquee
+    ne pose plus la part hospitalisation (code HO) : elle avait ete appliquee
     telle que donnee par le document de cadrage (10,2 %), et avait mesure que, combinee au
     fil des episodes gele (admissions_annuelles, S-30) et au scenario retenu de passages
     aux urgences, elle impliquait environ 93,7 % des admissions d''hospitalisation
@@ -86,7 +86,7 @@ parametres:
     generator/config/volumetrie.yml), la meme valeur donne des parts de 43 %, 93 % et
     168 % : le troisieme est arithmetiquement impossible (une part ne depasse pas 1),
     l''analyse de sensibilite ne pouvait plus etre produite. Le sens de la derivation est
-    inverse par ce lot : c''est desormais part_sejours_provenant_urgences (une propriete
+    inverse depuis : c''est desormais part_sejours_provenant_urgences (une propriete
     d''organisation de l''etablissement, independante du volume de passages) qui est posee,
     et HO qui en est calcule, scenario par scenario -- generator/urgences.py calcule HO =
     part_sejours_provenant_urgences x admissions_annuelles / passages_annuels_du_scenario,
@@ -101,7 +101,7 @@ parametres:
     (mode_admission = U), independante du scenario de volumetrie retenu
   provenance: HYP
   preuve: sans_preuve_externe
-  note: 'Parametre ajoute par ce lot, remplace la part HO precedemment posee dans
+  note: 'Remplace la part HO precedemment posee dans
     orientation_urgences (voir sa note). Intervalle admissible calcule a partir d''une
     borne haute et d''une borne basse de plausibilite pour le taux d''hospitalisation aux
     urgences qui en derive : borne haute 15,3 %, calculee (pas posee) depuis les taux

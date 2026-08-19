@@ -13,12 +13,12 @@ clé sœur, sans jamais restructurer une clé déjà écrite.
 
 `fiches_modifiees` fait exception au circuit ci-dessus : ce module ne reçoit ni les lignes de
 `source.patients` ni le type de changement métier tiré par `generator/patients.py` (l'appel
-d'orchestration, dans `generator/execution.py`, hors du périmètre modifiable de ce lot, ne les
+d'orchestration, dans `generator/execution.py`, hors du périmètre modifiable ici, ne les
 transmet pas). Cette catégorie est donc recalculée ici en relisant les fichiers CSV déjà écrits
 par `execution` (`execution.partitions`), après que `generator/defauts.py` a pu altérer ces
 mêmes lignes en place : la vérité rapportée est donc toujours celle qui a réellement atteint le
 disque, y compris dans le cas rare où un défaut de surface porte sur la même colonne qu'un
-changement métier et l'efface — mesuré et documenté au rapport du lot qui a introduit cette
+changement métier et l'efface — mesuré et documenté à l'introduction de cette
 catégorie, pas devinable depuis ce seul fichier.
 """
 

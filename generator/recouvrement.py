@@ -205,7 +205,7 @@ def generer_lignes(
         # une creance qui atteint zero est ecrite dans son etat final (motif RCV, montant
         # restant nul), jamais retiree : la contraindre a ne jamais naitre a zero (verifie
         # plus haut) est une chose, lui interdire d'atteindre zero en est une autre - la
-        # premiere version de ce lot confondait les deux, ce qui faisait disparaitre de la
+        # premiere version confondait les deux, ce qui faisait disparaitre de la
         # table toute relance ayant reellement solde sa creance (mesure avant d'ecrire,
         # voir le rapport).
         instantanes: list[dict] = [

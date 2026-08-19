@@ -6,7 +6,7 @@ produit la suite chronologique des épisodes et la population de patients qui le
 Ne tire aucun nombre en dehors du générateur reçu ; deux appels avec deux générateurs
 construits depuis la même graine rendent le même résultat.
 
-Conception du tirage pondéré retenue, mesurée avant d'être écrite (voir le rapport) :
+Conception du tirage pondéré retenue, mesurée avant d'être écrite :
 la probabilité de retour d'un patient connu décroît exponentiellement avec le temps
 écoulé depuis son dernier épisode ; le facteur de temps courant s'annulant à la
 normalisation, un score non normalisé croissant avec la date du dernier épisode suffit.

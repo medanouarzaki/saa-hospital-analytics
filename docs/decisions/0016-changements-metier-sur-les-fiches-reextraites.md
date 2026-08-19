@@ -58,7 +58,7 @@ une différence déjà posée par le changement métier, jamais en créer une no
 colonne qu'aucun des deux mécanismes ne modifie. Une collision mesurée sur une génération
 d'essai (`IPP-000273`, catégorie `casse_accents`) a confirmé ce risque : l'adresse
 « démenagée » a été réécrite identiquement sur les deux versions par le défaut de surface,
-effaçant le changement. Le seul point de passage vers `verite_terrain.ecrire()` que ce lot est
+effaçant le changement. Le seul point de passage vers `verite_terrain.ecrire()` que cette décision est
 autorisé à modifier est `generator/verite_terrain.py` lui-même — `generator/execution.py`, qui
 orchestre l'appel et ne transmet aujourd'hui que les paires de doublons et les altérations de
 `defauts.py`, est explicitement hors périmètre. `fiches_modifiees` est donc recalculée après
@@ -82,11 +82,11 @@ correspondaient à ce cas (la sixième à la collision de défaut de surface ci-
 (`generateur`) entre tous les patients de la boucle : chaque tirage supplémentaire pour un
 patient décale la position de flux consommée par tous les patients suivants. Mesuré : router
 les tirages du changement métier à travers ce générateur partagé faisait dériver, à graine
-fixe, une statistique sans rapport et sans dépendance directe aux colonnes touchées par ce
-lot (`tests/test_coherence_inter_tables.py::test_regle_13_indicateurs_sejour_recalcules_depuis_les_donnees`,
+fixe, une statistique sans rapport et sans dépendance directe aux colonnes touchées
+(`tests/test_coherence_inter_tables.py::test_regle_13_indicateurs_sejour_recalcules_depuis_les_donnees`,
 IROT mesuré à 5,7685 contre 5,6 ± 0,168 attendu — l'écart franchissait la tolérance de 3 %
 de moins de 0,01 point). Lecture de `generator/mouvements.py::_unites_eligibles` : elle ne
-lit que `sexe` et `date_naissance` du patient, deux colonnes jamais touchées par ce lot — la
+lit que `sexe` et `date_naissance` du patient, deux colonnes que ce changement ne touche pas — la
 dérive ne venait donc pas d'une dépendance de donnée, mais du décalage de position dans le
 flux aléatoire partagé, qui change les tirages (âge, sexe, noms, ...) de tous les patients
 traités après le premier patient réextrait. `np.random.Generator.spawn(n)` dérive des
@@ -94,7 +94,7 @@ générateurs enfants indépendants sans consommer le flux du parent (mécanisme
 `SeedSequence`, déjà utilisé par `generator/execution.py::_generateur_pour` pour dériver un
 générateur par table) : les tirages du changement métier utilisent désormais
 `generateur.spawn(1)[0]`, un générateur propre à la fiche en cours, laissant le flux principal
-de la table `patients` strictement identique à ce qu'il aurait été sans ce lot. Vérifié : le
+de la table `patients` strictement identique à ce qu'il aurait été sans ce changement. Vérifié : le
 test ci-dessus, et l'ensemble de la suite (245 tests), passent avec ce générateur dérivé.
 
 ## Conséquences

@@ -1,4 +1,9 @@
-"""Page de rapprochement : les cinq indicateurs que le registre déclare pour elle.
+"""Page de rapprochement : les trois indicateurs que le registre déclare pour elle.
+
+**Cette page évalue la chaîne, elle ne mesure pas l'activité.** Elle dit ce que vaut le modèle
+de rapprochement — à quel seuil il a été réglé, ce qu'il gagne sur une collision exacte, ce que
+coûte un déplacement du seuil. Combien de dossiers sont en cause est une autre question, et
+elle est traitée page Qualité des données.
 
 **Aucun de ses indicateurs ne répond au filtre de période**, et la page n'en porte donc pas : elle
 affiche le motif que le registre donne. Aucun n'est recalculé depuis les tables de faits, et chacun
@@ -11,8 +16,8 @@ réellement servi à former les grappes affichées à côté.
 L'apport du rapprochement **compare deux méthodes l'une à l'autre**, et non une méthode à une
 vérité : les paires que le rapprochement probabiliste regroupe, contre celles que la collision
 exacte réunit. Les deux ensembles se dérivent de l'instantané seul. C'est ce que la décision servie
-demande — faut-il lancer une campagne de fusion, et sur quelle règle — et cela tiendrait à
-l'identique dans un établissement où aucune correspondance n'est connue d'avance.
+demande — le rapprochement probabiliste vaut-il son coût face à une collision exacte — et cela
+tiendrait à l'identique dans un établissement où aucune correspondance n'est connue d'avance.
 
 Les grandeurs de précision et de rappel, elles, viennent d'une évaluation menée en amont ; l'écran
 les présente comme telles, sans reconstruire ce sur quoi elles ont été établies.
@@ -26,35 +31,7 @@ from dashboard import lecture, rendu
 
 PAGE = "rapprochement"
 
-CRITERES_LISIBLES = {
-    "nom_date_naissance": "Nom et date de naissance identiques",
-    "piece_identite": "Pièce d'identité identique",
-}
-
 REQUETES = {
-    "rapprochement_collisions_exactes": """
-        select critere,
-               patients_examines,
-               nombre_groupes,
-               patients_concernes,
-               taille_plus_grand_groupe,
-               taille_mediane_groupes
-        from agg_doublons_identite
-        order by critere
-    """,
-    # La distribution des tailles est plus informative que le seul nombre de grappes : elle dit si
-    # le rapprochement fusionne par paires ou forme de grandes grappes, ce que le total masque.
-    # Le décompte porte sur les GRAPPES, non sur les lignes : la table porte une ligne par
-    # enregistrement rapproché, si bien que compter les lignes multiplierait chaque grappe par sa
-    # taille. La distinction se voit à la confrontation et non à la lecture.
-    "rapprochement_grappes": """
-        select taille_grappe,
-               count(distinct grappe_id) as grappes,
-               count(*) as enregistrements
-        from grappes_identite
-        group by taille_grappe
-        order by taille_grappe
-    """,
     "rapprochement_courbe": """
         select seuil, precision_valeur, rappel, f_mesure
         from evaluation
@@ -217,31 +194,13 @@ def rendre() -> None:
         height="content",
     )
 
-    rendu.titre_indicateur("rapprochement_grappes")
-    grappes = lecture.interroger(REQUETES["rapprochement_grappes"])
-    gauche, droite = st.columns(2)
-    with gauche:
-        st.metric("Grappes formées", f"{int(grappes['grappes'].sum())}")
-    with droite:
-        st.metric("Enregistrements rapprochés", f"{int(grappes['enregistrements'].sum())}")
     st.caption(
-        "La distribution des tailles dit ce que le total masque : un rapprochement qui fusionne "
-        "par paires et un rapprochement qui forme de grandes grappes donnent le même nombre "
-        "d'enregistrements et n'ont pas le même effet."
+        "**Le nombre de dossiers en cause n'est pas sur cette page.** Les grappes formées et les "
+        "collisions exactes disent combien de dossiers une campagne de fusion toucherait : c'est "
+        "une décision de service, et elles siègent page "
+        "[Qualité des données](/qualite), sous « Pilotage du service ». Cette page-ci dit ce que "
+        "vaut le modèle qui les produit."
     )
-    st.dataframe(grappes, hide_index=True)
-
-    rendu.titre_indicateur("rapprochement_collisions_exactes")
-    collisions = lecture.interroger(REQUETES["rapprochement_collisions_exactes"])
-    collisions = collisions.assign(
-        critere=collisions["critere"].map(lambda code: CRITERES_LISIBLES.get(code, code))
-    )
-    # `height="content"` et non la valeur par défaut : la documentation de la version installée dit
-    # que `"auto"` dimensionne le cadre pour « au plus dix lignes », d'après une hauteur de ligne
-    # nominale. Les libellés de critère et les en-têtes de colonne de ce tableau se replient sur
-    # deux lignes, si bien que ses deux lignes réelles dépassent ce cadre et que la seconde
-    # n'apparaît qu'après défilement. `"content"` fait épouser au cadre la hauteur de son contenu.
-    st.dataframe(collisions, hide_index=True, height="content")
 
 
 rendre()

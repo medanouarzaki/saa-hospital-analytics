@@ -7,7 +7,7 @@
     couvre qu'à partir du 1er août 2023 (var dim_date_debut) : cinq fériés fixes de 2023
     (janvier, mai, juillet) tombent avant cette borne et sont hors de portée de dim_date sans que
     ce soit une divergence. Comparaison restreinte à l'étendue réelle de dim_date, par les mêmes
-    variables — mesuré, pas supposé (voir le rapport de ce lot).
+    variables — mesuré, pas supposé.
 #}
 
 with jours_dim as (

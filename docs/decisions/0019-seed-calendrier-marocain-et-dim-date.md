@@ -77,7 +77,7 @@ alors que `dim_date` ne commence que le 1ᵉʳ août 2023 — cinq fériés fixe
 2023 existent légitimement dans le seed sans avoir de contrepartie dans `dim_date`. Ce n'est pas
 un défaut du seed (il a raison de porter l'année 2023 complète, une future dimension pourrait
 vouloir la même donnée sur une étendue plus large) ni de `dim_date` (son étendue est fixée par
-mesure des événements, `docs/decisions` du lot de mesure). Le test compare donc le seed restreint
+mesure des événements, `docs/decisions` de la mesure). Le test compare donc le seed restreint
 aux mêmes variables que `dim_date` (`jour >= var("dim_date_debut") and jour <= var("dim_date_
 fin")`), pas le seed modifié.
 

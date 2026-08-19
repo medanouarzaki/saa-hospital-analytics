@@ -74,7 +74,26 @@
 #      l'a tranché en filtrable sous réserve, la date disponible étant celle de
 #      naissance de la créance. Les non filtrables passent de douze à onze et les
 #      filtrables de vingt-six à vingt-sept.
-#   Total : vingt-sept filtrables et onze non filtrables, soit trente-huit.
+#   4. la page « Données », ajoutée après cet examen, porte deux entrées qui n'y
+#      figuraient pas — elle répond à « lesquels » là où l'examen n'avait recensé
+#      que des grandeurs répondant à « combien ». Les deux sont filtrables sans
+#      réserve : les filtrables passent de vingt-sept à vingt-neuf. Elles sont
+#      comptées parmi les dédoublements, qui totalisent donc quatre.
+#   Total : vingt-neuf filtrables et onze non filtrables, soit quarante.
+#
+# Partage des deux publics, et la règle qui le décide. Chaque entrée porte une
+# `section`, `pilotage` ou `methode`, et aucune autre valeur. La règle est
+# unique : un indicateur reste OPÉRATIONNEL si sa valeur peut changer une
+# décision du service ; il passe en MÉTHODE s'il décrit la chaîne — sa
+# performance, sa provenance, ses paramètres — et non l'activité. Le classement
+# se DÉRIVE de la décision servie que chaque entrée déclare, il n'est pas
+# décrété : une décision servie qui nomme un objet de la chaîne — un seuil, un
+# modèle, une table de paramètres, une provenance de définition — désigne un
+# indicateur de méthode.
+#
+# Troisième réconciliation, calculée et non recopiée : la somme des indicateurs
+# des deux sections égale le nombre d'entrées.
+#   trente-quatre en pilotage + six en méthode = quarante entrées.
 
 examen_initial:
   elements_examines: 37
@@ -83,14 +102,18 @@ examen_initial:
 
 composition:
   exclus: 1
-  dedoubles: 2
+  dedoubles: 4
   reclasses_filtrables: 1
-  entrees_attendues: 38
+  entrees_attendues: 40
 
 filtrabilite_attendue:
-  oui: 22
+  oui: 24
   oui_sous_reserve: 5
   non: 11
+
+sections:
+  pilotage: 34
+  methode: 6
 
 pages:
   - activite
@@ -99,7 +122,9 @@ pages:
   - sejours
   - facturation
   - qualite
+  - donnees
   - rapprochement
+  - provenance_et_parametres
 
 indicateurs:
 
@@ -107,6 +132,7 @@ indicateurs:
 
   - identifiant: activite_volume_journalier
     page: activite
+    section: pilotage
     libelle: Volume d'événements par jour
     definition: >-
       Nombre d'événements enregistrés chaque jour, ventilé par famille
@@ -124,6 +150,7 @@ indicateurs:
 
   - identifiant: activite_patients_distincts
     page: activite
+    section: pilotage
     libelle: Patients distincts par jour
     definition: >-
       Nombre de patients différents concernés chaque jour, en regard du nombre
@@ -141,6 +168,7 @@ indicateurs:
 
   - identifiant: activite_profil_semaine
     page: activite
+    section: pilotage
     libelle: Profil de jour de semaine
     definition: >-
       Volume moyen d'événements pour chaque jour de la semaine sur toute la
@@ -157,6 +185,7 @@ indicateurs:
 
   - identifiant: activite_effet_ramadan
     page: activite
+    section: pilotage
     libelle: Effet du Ramadan
     definition: >-
       Volume journalier moyen des jours de Ramadan comparé à celui des autres
@@ -174,6 +203,7 @@ indicateurs:
 
   - identifiant: activite_effet_calendaire
     page: activite
+    section: pilotage
     libelle: Effet des jours fériés et des week-ends
     definition: >-
       Volume journalier moyen des jours fériés et des week-ends comparé à celui
@@ -190,6 +220,7 @@ indicateurs:
 
   - identifiant: activite_profil_horaire
     page: activite
+    section: pilotage
     libelle: Profil horaire des arrivées
     definition: >-
       Répartition des événements par heure de la journée, pour les
@@ -213,6 +244,7 @@ indicateurs:
 
   - identifiant: rendez_vous_delai_obtention
     page: rendez_vous
+    section: pilotage
     libelle: Délai d'obtention
     definition: >-
       Nombre de jours entre la prise et la tenue du rendez-vous, en médiane et
@@ -228,6 +260,7 @@ indicateurs:
 
   - identifiant: rendez_vous_part_jour_meme
     page: rendez_vous
+    section: pilotage
     libelle: Part de rendez-vous le jour même
     definition: >-
       Proportion des rendez-vous pris et tenus le même jour, par activité.
@@ -242,6 +275,7 @@ indicateurs:
 
   - identifiant: rendez_vous_taux_absence
     page: rendez_vous
+    section: pilotage
     libelle: Taux d'absentéisme
     definition: >-
       Proportion des rendez-vous où le patient ne s'est pas présenté, par
@@ -256,6 +290,7 @@ indicateurs:
 
   - identifiant: rendez_vous_taux_annulation
     page: rendez_vous
+    section: pilotage
     libelle: Taux d'annulation
     definition: >-
       Proportion des rendez-vous annulés avant leur date, par activité.
@@ -269,7 +304,8 @@ indicateurs:
     recalcule_depuis: faits
 
   - identifiant: rendez_vous_delai_et_absence
-    page: rendez_vous
+    page: provenance_et_parametres
+    section: methode
     libelle: Comparaison des activités entre elles — délai médian et absentéisme
     definition: >-
       Corrélation entre le délai médian d'obtention et le taux d'absentéisme
@@ -287,7 +323,8 @@ indicateurs:
     recalcule_depuis: faits
 
   - identifiant: rendez_vous_delai_et_absence_intra_activite
-    page: rendez_vous
+    page: provenance_et_parametres
+    section: methode
     libelle: Écart à l'intérieur de chaque activité — absents contre honorés
     definition: >-
       Écart entre le délai médian des rendez-vous non honorés pour absence et
@@ -307,6 +344,7 @@ indicateurs:
 
   - identifiant: urgences_passages_par_niveau
     page: urgences
+    section: pilotage
     libelle: Passages par niveau de tri
     definition: >-
       Nombre de passages aux urgences par jour et par niveau de tri, et total
@@ -321,6 +359,7 @@ indicateurs:
 
   - identifiant: urgences_delai_prise_en_charge
     page: urgences
+    section: pilotage
     libelle: Délai de prise en charge médicale
     definition: >-
       Temps écoulé entre l'arrivée et la prise en charge médicale, en médiane et
@@ -336,6 +375,7 @@ indicateurs:
 
   - identifiant: urgences_orientation_sortie
     page: urgences
+    section: pilotage
     libelle: Orientation de sortie
     definition: >-
       Répartition des passages selon leur orientation à la sortie, en effectif
@@ -349,6 +389,7 @@ indicateurs:
 
   - identifiant: urgences_consultation_ordinaire
     page: urgences
+    section: pilotage
     libelle: Part relevant d'une consultation ordinaire
     definition: >-
       Proportion des passages classés aux deux niveaux de tri les moins graves,
@@ -376,6 +417,7 @@ indicateurs:
 
   - identifiant: urgences_duree_passage
     page: urgences
+    section: pilotage
     libelle: Durée de passage
     definition: >-
       Temps total passé aux urgences, en médiane et au 90e centile, par niveau
@@ -391,6 +433,7 @@ indicateurs:
 
   - identifiant: sejours_admissions_journees
     page: sejours
+    section: pilotage
     libelle: Admissions et journées d'hospitalisation
     definition: >-
       Nombre de séjours débutés et nombre de journées d'hospitalisation, par
@@ -410,6 +453,7 @@ indicateurs:
 
   - identifiant: sejours_indicateurs_reglementaires
     page: sejours
+    section: pilotage
     libelle: Occupation, durée moyenne et rotation
     definition: >-
       Taux d'occupation moyen, durée moyenne de séjour, taux de rotation et
@@ -429,6 +473,7 @@ indicateurs:
 
   - identifiant: sejours_repartition_service
     page: sejours
+    section: pilotage
     libelle: Répartition par service d'accueil
     definition: Nombre et part des séjours par service d'accueil.
     decision_servie: >-
@@ -441,6 +486,7 @@ indicateurs:
 
   - identifiant: sejours_distribution_duree
     page: sejours
+    section: pilotage
     libelle: Distribution de la durée de séjour
     definition: >-
       Minimum, quartiles, médiane, 90e centile et maximum de la durée des
@@ -459,6 +505,7 @@ indicateurs:
 
   - identifiant: sejours_non_clos
     page: sejours
+    section: pilotage
     libelle: Séjours non clos
     definition: >-
       Nombre et part des séjours sans date de sortie à la date de référence des
@@ -480,6 +527,7 @@ indicateurs:
 
   - identifiant: facturation_montants_par_type
     page: facturation
+    section: pilotage
     libelle: Montants facturés
     definition: >-
       Montant total facturé par type d'épisode et par service émetteur, en
@@ -495,6 +543,7 @@ indicateurs:
 
   - identifiant: facturation_part_organisme_patient
     page: facturation
+    section: pilotage
     libelle: Part organisme et part patient
     definition: >-
       Répartition du montant facturé entre la part prise en charge par un
@@ -508,6 +557,7 @@ indicateurs:
 
   - identifiant: facturation_ecart_total_lignes
     page: facturation
+    section: pilotage
     libelle: Écart entre total déclaré et somme des lignes
     definition: >-
       Nombre de factures dont le montant total diffère de la somme de leurs
@@ -523,6 +573,7 @@ indicateurs:
 
   - identifiant: facturation_taux_recouvrement
     page: facturation
+    section: pilotage
     libelle: Taux de recouvrement des créances
     definition: >-
       Part des créances recouvrées rapportée aux créances nées, à la date de
@@ -546,6 +597,7 @@ indicateurs:
 
   - identifiant: facturation_taux_encaissement
     page: facturation
+    section: pilotage
     libelle: Taux d'encaissement des factures
     definition: >-
       Montant encaissé rapporté au montant facturé sur la période.
@@ -570,6 +622,7 @@ indicateurs:
 
   - identifiant: facturation_anciennete_creances
     page: facturation
+    section: pilotage
     libelle: Ancienneté des créances
     definition: >-
       Répartition des créances non recouvrées par tranche d'ancienneté, comptée
@@ -588,6 +641,7 @@ indicateurs:
 
   - identifiant: facturation_aboutissement_relances
     page: facturation
+    section: pilotage
     libelle: Aboutissement des relances
     definition: >-
       Nombre de relances émises, nombre ayant abouti, et leur rapport.
@@ -604,6 +658,7 @@ indicateurs:
 
   - identifiant: facturation_episodes_non_factures
     page: facturation
+    section: pilotage
     libelle: Épisodes non facturés
     definition: >-
       Nombre et part des épisodes de soin sans facture rattachée, par famille
@@ -628,6 +683,7 @@ indicateurs:
 
   - identifiant: qualite_completude_champs
     page: qualite
+    section: pilotage
     libelle: Complétude par champ
     definition: >-
       Taux de renseignement de chaque colonne de chaque table, à la date du
@@ -643,6 +699,7 @@ indicateurs:
 
   - identifiant: qualite_taux_quarantaine
     page: qualite
+    section: pilotage
     libelle: Taux de mise en quarantaine
     definition: >-
       Part des lignes rejetées à l'ingestion par table, avec les effectifs bruts
@@ -657,7 +714,8 @@ indicateurs:
     recalcule_depuis: couche_intermediaire
 
   - identifiant: qualite_provenance_champs
-    page: qualite
+    page: provenance_et_parametres
+    section: methode
     libelle: Provenance des champs
     definition: >-
       Répartition des colonnes du système d'information selon que leur
@@ -674,7 +732,8 @@ indicateurs:
   # ----------------------------------------------------------- rapprochement
 
   - identifiant: rapprochement_collisions_exactes
-    page: rapprochement
+    page: qualite
+    section: pilotage
     libelle: Doublons par collision exacte
     definition: >-
       Nombre de groupes de patients partageant exactement les mêmes valeurs sur
@@ -694,7 +753,8 @@ indicateurs:
       périmètre et jamais de la formule.
 
   - identifiant: rapprochement_grappes
-    page: rapprochement
+    page: qualite
+    section: pilotage
     libelle: Grappes d'identité
     definition: >-
       Nombre de grappes formées par le rapprochement probabiliste et
@@ -709,6 +769,7 @@ indicateurs:
 
   - identifiant: rapprochement_courbe
     page: rapprochement
+    section: methode
     libelle: Courbe de précision et de rappel
     definition: >-
       Précision du rapprochement en fonction de son rappel, un point par seuil de
@@ -724,6 +785,7 @@ indicateurs:
 
   - identifiant: rapprochement_apport
     page: rapprochement
+    section: methode
     libelle: Apport du rapprochement probabiliste
     definition: >-
       Nombre de paires de patients que le rapprochement probabiliste regroupe et
@@ -741,6 +803,7 @@ indicateurs:
 
   - identifiant: rapprochement_seuil
     page: rapprochement
+    section: methode
     libelle: Seuil de décision retenu
     definition: >-
       Valeur du seuil appliqué, lue dans les données, et précision et rappel
@@ -754,3 +817,49 @@ indicateurs:
     filtrabilite: non
     motif: objet_sans_colonne_temporelle
     recalcule_depuis: rapprochement
+
+  # ------------------------------------------------------------------- donnees
+
+  - identifiant: donnees_lignes_filtrees
+    page: donnees
+    section: pilotage
+    libelle: Lignes retenues par le filtre
+    definition: >-
+      Nombre de lignes que la table consultée porte après application des
+      filtres de période, de service et d'activité.
+    decision_servie: >-
+      Retrouver les dossiers concernés par un chiffre agrégé, pour agir sur eux
+      plutôt que sur la moyenne.
+    objets_lus:
+      - marts.fct_passage_urgence
+      - marts.fct_facturation
+      - marts.fct_rendez_vous
+      - marts.fct_sejour
+    filtrabilite: oui
+    colonne_de_date: date_arrivee, date_facture, date_rendez_vous, jour_admission
+    recalcule_depuis: faits
+    note: >-
+      La colonne de date est celle de la table consultée, la page en portant
+      quatre. Le décompte porte sur la totalité de la sélection ; le tableau
+      affiché est plafonné, et la page le dit à l'écran.
+
+  - identifiant: donnees_export_selection
+    page: donnees
+    section: pilotage
+    libelle: Téléchargement de la sélection
+    definition: >-
+      Fichier tabulaire portant toutes les lignes que le filtre retient sur la
+      table consultée.
+    decision_servie: >-
+      Sortir la liste des dossiers concernés pour la traiter hors de l'écran.
+    objets_lus:
+      - marts.fct_passage_urgence
+      - marts.fct_facturation
+      - marts.fct_rendez_vous
+      - marts.fct_sejour
+    filtrabilite: oui
+    colonne_de_date: date_arrivee, date_facture, date_rendez_vous, jour_admission
+    recalcule_depuis: faits
+    note: >-
+      Extraction ponctuelle de ce qui est affiché, au format et à l'encodage des
+      fichiers tabulaires du livrable quotidien, qu'elle ne remplace pas.

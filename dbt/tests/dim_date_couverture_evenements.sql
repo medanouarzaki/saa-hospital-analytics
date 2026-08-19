@@ -3,7 +3,7 @@
     dim_date. Liste des 34 colonnes d'événement générée par script depuis le registre (34
     colonnes date/horodatage, moins les quatre colonnes d'état civil de patients dont le minimum
     mesuré est antérieur à 2023-08-01 : date_naissance, date_photo, date_attribution,
-    date_inscription — voir le rapport du lot qui a mesuré cette exclusion). La liste est collée
+    date_inscription, exclusion mesuree). La liste est collée
     ici, statique ; le script n'est que l'outil de génération, pas une dépendance du test.
 #}
 

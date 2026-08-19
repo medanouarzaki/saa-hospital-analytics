@@ -19,8 +19,8 @@ par l'autre.
    (`.github/workflows/ci.yml`, job `dbt`). Option lue et citée dans `dbt run --help` :
    `--threads INTEGER — Specify number of threads to use while executing models. Overrides
    settings in profiles.yml.`
-2. **Fréquences mesurées dans les deux configurations** (10 exécutions chacune, lot de mesure
-   6g, H0) : 3 échecs sur 10 à 4 fils (le défaut du profil), 0 échec sur 10 à 1 fil.
+2. **Fréquences mesurées dans les deux configurations** (10 exécutions chacune) : 3 échecs
+   sur 10 à 4 fils (le défaut du profil), 0 échec sur 10 à 1 fil.
 3. **Seule l'étape de matérialisation est restreinte.** `dbt seed` et `dbt test` gardent leur
    parallélisme à 4 fils (valeur inchangée du profil, `threads: 4`,
    `.github/workflows/ci.yml`) : les tests sont des lectures qui ne prennent aucun verrou

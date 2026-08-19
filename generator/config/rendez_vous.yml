@@ -71,7 +71,7 @@ parametres:
     valeurs par specialite. Les valeurs precedentes (posees, 6 % a 12 %, classement plausible medecine
     generale/cardiologie les plus touchees, dermatologie la moins touchee) sont reprises a l''echelle par
     un facteur unique (x1,855670), choisi pour reproduire exactement la moyenne ponderee par
-    repartition_activites_rdv du cadrage (18,00 % mesure apres application, voir Etape 5) tout en preservant
+    repartition_activites_rdv du cadrage (18,00 % mesure apres application) tout en preservant
     le classement relatif d''origine : un facteur constant ne peut pas satisfaire simultanement une moyenne
     et deux bornes independantes (trois contraintes, un seul degre de liberte), le choix retenu privilegie
     la moyenne, citee au singulier ("dix-huit pour cent global"), sur les bornes, citees comme un intervalle
@@ -98,17 +98,17 @@ parametres:
     gyneco-obstetrique (code 14, 30 j) -- reprises telles quelles, provenance DOC. Les trois autres
     specialites du cadrage (pneumologie, stomatologie, explorations fonctionnelles) n''ont aucun equivalent
     dans nomenclature_activite (huit specialites non chirurgicales mesurees, S-30, restriction deja justifiee
-    au lot qui l''a ecrite) et ne sont donc pas appliquees ici -- ecart documente a l''Etape 1, pas une
+    a son ecriture) et ne sont donc pas appliquees ici -- ecart documente, pas une
     correspondance forcee. Les cinq activites de la nomenclature sans equivalent cadrage (medecine interne
-    21, cardiologie 4, ophtalmologie 28, ORL 29, dermatologie 11) conservent leur valeur posee au lot
+    21, cardiologie 4, ophtalmologie 28, ORL 29, dermatologie 11) conservent leur valeur posee anterieurement
     precedent, ordre de grandeur plausible, non mesuree, HYP dans les faits meme si le nom du parametre
     reste unique et sa provenance globale DOC pour les trois valeurs desormais sourcees. Une activite absente
     de cette table doit faire echouer le chargement plutot que de recevoir une valeur par defaut :
     generator/rendez_vous.py leve une KeyError explicite, sans valeur de repli -- verifie par mutation a
-    l''etape 3, faute de test dedie prealable. Si les trois medianes sourcees etaient fausses, le classement
+    faute de test dedie prealable. Si les trois medianes sourcees etaient fausses, le classement
     des specialites par delai median affiche au tableau de bord serait errone pour ces trois-la ; si les
     cinq autres etaient fausses, la consequence est la meme mais relève d''une hypothese non mesuree comme
-    avant ce lot.'
+    auparavant.'
 - nom: ecart_type_log_delai_par_specialite
   valeur:
     '20': 1.0
@@ -130,7 +130,7 @@ parametres:
     code 20 (5 j, 18 j) -> sigma = (ln(18) - ln(5)) / z90 = 1,2810 / 1,28155 = 0,99961, arrondi 1,0 ;
     code 30 (14 j, 45 j) -> sigma = (ln(45) - ln(14)) / z90 = 1,16760 / 1,28155 = 0,91108, arrondi 0,9111 ;
     code 14 (30 j, 80 j) -> sigma = (ln(80) - ln(30)) / z90 = 0,98083 / 1,28155 = 0,76535, arrondi 0,7653.
-    Les cinq activites sans equivalent cadrage conservent la valeur unique posee au lot precedent (0,5,
+    Les cinq activites sans equivalent cadrage conservent la valeur unique posee anterieurement (0,5,
     HYP dans les faits). Si un ecart-type source etait faux, l''etalement de la distribution des delais de
     cette specialite serait plus ou moins large, sans effet sur sa mediane ni sur aucun total.'
 - nom: taux_annulation
@@ -142,7 +142,7 @@ parametres:
     est annulee, distincte de l''absenteisme." S-20 est cite comme source de la relation elle-meme (l''existence
     d''un phenomene d''annulation distinct de l''absence), pas de sa valeur chiffree pour cet etablissement.
     Le document de cadrage fixe desormais cette valeur a 7 %, restant neanmoins HYP -- le cadrage lui-meme
-    ne cite aucune source propre a ce chiffre, contrairement aux quatre parametres dont l''Etape 2 impose
+    ne cite aucune source propre a ce chiffre, contrairement aux quatre parametres dont le cadrage impose
     explicitement le passage a DOC. Si ce taux etait faux, le volume de rendez-vous annules affiche serait
     faussee, sans effet sur le nombre de rendez-vous honores.'
 - nom: part_rdv_jour_meme
@@ -169,7 +169,7 @@ parametres:
   note: 'Nom impose par la relation R-18 du registre des relations injectees. Le code d''origine correspondant
     (AU, AUTRES HOPITAUX) est deja releve au poste (REL-RDV.R03, nomenclature_origine) : ce parametre
     fixe seulement la part des rendez-vous qui le portent, pas le code lui-meme. Valeur portee de 15 % a
-    25 % par ce lot, conformement au document de cadrage ; le cadrage ne cite aucune source propre a ce
+    25 %, conformement au document de cadrage ; le cadrage ne cite aucune source propre a ce
     chiffre, la provenance reste HYP. Si ce taux etait faux, la part de patients adresses affichee page
     Patients serait faussee, sans effet sur aucun total de rendez-vous.'
 - nom: repartition_types_attention
@@ -180,7 +180,7 @@ parametres:
   provenance: HYP
   preuve: sans_preuve_externe
   note: 'La consultation de suivi (code 2) domine la premiere consultation (code 1), plausible pour une
-    file active dominee par des patients deja connus (mesure du lot de la table des patients : profil_recours_demographique).
+    file active dominee par des patients deja connus (mesure sur la table des patients : profil_recours_demographique).
     Pose sans source. Si cette repartition etait fausse, la part de premieres consultations affichee serait
     faussee, sans effet sur aucun total.'
 - nom: part_liste_attente
@@ -198,7 +198,7 @@ parametres:
   provenance: OBS
   preuve: REL-RDV.R12
   note: 'La seule valeur observee au poste (REL-RDV.R12) est zero. Ce n''est pas un accident de generation
-    a corriger comme les colonnes dagenerees du lot precedent : c''est l''unique donnee reelle disponible
+    a corriger comme les colonnes degenerees deja traitees : c''est l''unique donnee reelle disponible
     sur cette colonne, et rien n''indique que le systeme en place la renseigne jamais autrement (aucune
     autre valeur relevee, aucune source documentaire ne decrit une duree calculee). Retenue telle quelle
     pour toutes les lignes : une valeur inventee non appuyee par la preuve serait moins fidele que la
@@ -275,7 +275,7 @@ parametres:
     la table des patients (taux_renseignement, demographie.yml). Une valeur absente ici
     parce que la colonne est facultative et n'a pas ete saisie est une absence
     structurelle, qui fait partie du jeu de donnees normal, ce n'est pas un defaut
-    injecte. Le decompte de la verite terrain, dans un lot ulterieur, ne doit compter que
+    injecte. Le decompte de la verite terrain ne doit compter que
     les defauts reellement injectes, pas ces absences structurelles. Si ce taux etait
     faux, la part de rendez-vous modifies affichee serait faussee, sans effet sur aucun
     total.
@@ -290,7 +290,7 @@ parametres:
       un etablissement d'origine (hopital_cs) ; une ligne d'origine spontanee (SP) n'en
       nomme jamais. Meme mecanisme de configuration que contraintes_coherence
       (coherence.yml, lot de la table des patients), repris ici sous un nom distinct
-      faute d'ecriture autorisee sur ce fichier dans ce lot ; verifie par un test
+      faute d'ecriture autorisee sur ce fichier ; verifie par un test
       generique qui lit cette liste sans citer les colonnes en dur.
   unite: liste de contraintes d'accord intra-ligne pour source.rendez_vous
   provenance: HYP

@@ -81,7 +81,7 @@ parametres:
   preuve: sans_preuve_externe
   note: 'Ce que le mecanisme exige : la translitteration variable d''un meme prenom suppose
     des variantes graphiques connues. La liste versionnee de prenoms
-    (generator/config/demographie.yml, hors liste d''ecriture de ce lot) n''en porte aucune
+    (generator/config/demographie.yml) n''en porte aucune
     (mesure : 0 / 40, voir le rapport). Cette table couvre la moitie des prenoms de la liste
     (10 masculins, 10 feminins) avec une a deux variantes usuelles chacun, posee sans source,
     et vit uniquement ici : elle n''est lue que par le mecanisme d''injection des doublons,
@@ -106,7 +106,7 @@ parametres:
   note: 'Ce que le mecanisme exige : la variation prenom_compose_inverse suppose un prenom
     compose existant, affiche dans un ordre different sur chacune des deux fiches. Aucun
     prenom compose ne figure dans la liste versionnee de prenoms (mesure : 0 / 40, voir le
-    rapport), et cette liste est hors perimetre d''ecriture de ce lot. Cette table de huit
+    rapport). Cette table de huit
     paires, posee sans source, sert exclusivement a construire, pour une paire de fiches
     assignee a cette categorie, un prenom compose impose des les deux fiches (premiere
     fiche : partie1 partie2, seconde fiche : partie2 partie1) avant toute generation de
@@ -164,12 +164,12 @@ parametres:
   note: 'Taux impose par le cadrage (0,3 %). Applique a la colonne date_rendez_vous (horodatage,
     non identifiante, non codee) de source.rendez_vous plutot qu''a date_extraction : cette derniere
     est bornee par generator/ecriture.py::_valider_bornage_periode et ferait echouer l''ecriture
-    hors de la liste d''ecriture de ce lot. La valeur hors plage produite est une date reelle mais
+    La valeur hors plage produite est une date reelle mais
     tres anterieure (annee 1900), jamais posterieure a la fin de periode, pour ne jamais entrer dans
     le perimetre du dela deja gere par generator/rendez_vous.py (rdv_supplementaire, etat EI). Une
     date reellement mal formee (chaine non calendaire) est hors de portee sans modifier
     generator/ecriture.py::mettre_en_forme, qui exige un objet date/datetime valide pour ce
-    type_metier -- generator/ecriture.py n''est pas dans la liste d''ecriture de ce lot. Si ce taux
+    type_metier -- porte par generator/ecriture.py. Si ce taux
     etait faux, le nombre de lignes que le bloc de quarantaine doit rejeter pour cette raison serait
     faux, sans effet sur aucun autre total.'
 - nom: taux_ages_incoherents
@@ -204,7 +204,7 @@ parametres:
     de generator/prises_en_charge.py, non ajuste) produit a elle seule 30,53 % de factures couvertes
     sans prise en charge -- tres au-dessus de la cible, pour la meme raison que profession a
     l''etape des champs manquants : un mecanisme d''injection ne peut qu''ajouter des cas, jamais en
-    retirer. generator/config/prises_en_charge.yml n''est pas dans la liste d''ecriture de ce lot ;
+    retirer, generator/config/prises_en_charge.yml portant la valeur ;
     facteur_reduction_demande_structurelle (ci-dessous), lu par generator/prises_en_charge.py,
     resserre proportionnellement ce taux structurel avant l''injection, qui fournit ensuite
     exactement le complement necessaire pour atteindre 3 % au total. generator/defauts.py retire la
@@ -219,7 +219,7 @@ parametres:
   provenance: HYP
   preuve: sans_preuve_externe
   note: 'Ce que le mecanisme exige, en reconciliation avec taux_demande_par_type_episode (existant,
-    generator/config/prises_en_charge.yml, hors liste d''ecriture de ce lot) : generator/prises_en_charge.py
+    generator/config/prises_en_charge.yml) : generator/prises_en_charge.py
     multiplie la part structurelle de non-demande (1 - taux_demande_par_type_episode[type]) par ce
     facteur avant de tirer, ramenant proportionnellement chaque type sous la cible du cadrage
     (0,1 % pour HOS, 0,3 % pour CE, 1 % pour UR, contre 5 %/15 %/50 % avant) sans effacer la

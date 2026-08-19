@@ -312,7 +312,7 @@ def test_ordres_vraisemblance(generation: dict) -> None:
     assert n_mineurs_veufs == 0
 
     # 3. aucune fiche sans compagnie d'assurance n'est de type assure (regle deja generique au
-    # test de coherence intra-ligne ; reaffirmee ici comme ordre explicite de l'etape 3)
+    # test de coherence intra-ligne ; reaffirmee ici comme ordre explicite)
     contrainte_assurance = next(
         c
         for c in entrees["contraintes_coherence"]["valeur"]

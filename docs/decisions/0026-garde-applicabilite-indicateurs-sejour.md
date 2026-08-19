@@ -23,7 +23,7 @@ mécanisme qui domine le calcul quand la fenêtre est courte.
    de `marts.fct_sejour` comparé à `date_fin` de la configuration. Coïncidence exacte sur la base
    principale : `2026-06-30` des deux côtés — le test s'y exécute, ne s'abstient pas.
 
-Ampleur de la domination sur fenêtre partielle, mesurée en forçant la condition (mutation du lot
+Ampleur de la domination sur fenêtre partielle, mesurée en forçant la condition (mutation
 6j, K4) : en excluant la seule ligne à date d'admission maximale de `fct_sejour`, le test passe
 de vert (exécuté) à une abstention avec le motif attendu — la condition réagit à un écart d'un
 seul jour entre la base et la configuration, la plus petite divergence possible, confirmant

@@ -37,7 +37,7 @@ COLONNES_ENUMEREES_AU_REGISTRE = [
 
 TERMES_INTERDITS = ["chirurg", "bactério", "bacterio", "parasito", "hygiène aliment"]
 
-# Mesure 1.4 du lot : catégories de laboratoire non nulles sur la période, et le préfixe de
+# Mesuré : catégories de laboratoire non nulles sur la période, et le préfixe de
 # code d'acte retenu pour chacune (§3). Les trois catégories mesurées à zéro (bactériologie,
 # parasitologie, hygiène alimentaire) ne portent aucun préfixe : aucun acte ne doit leur
 # correspondre.

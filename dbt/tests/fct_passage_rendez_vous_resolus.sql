@@ -1,8 +1,8 @@
 {#
-    Propriété reportée depuis le lot des faits de flux : le nombre de passages dont
+    Propriété reportée depuis les faits de flux : le nombre de passages dont
     le rendez-vous est résolu égale le nombre de rendez-vous honorés. Deux quantités
     calculées indépendamment, l'une sur fct_passage, l'autre sur fct_rendez_vous,
-    aucun littéral. Mesuré vrai avant écriture (voir le rapport de ce lot).
+    aucun littéral. Mesuré vrai avant écriture.
 #}
 
 with passages_rdv_resolu as (

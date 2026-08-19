@@ -145,7 +145,7 @@ def generer_lignes(
     # episode urgences facturable a part entiere : la prestation qu'il declenche est deja
     # portee par le sejour d'hospitalisation qui en resulte (journees, laboratoire,
     # imagerie), et la facturer une seconde fois via une consultation aux urgences
-    # doublerait la meme prise en charge. Mesure avant d'ecrire (voir le rapport) : 842
+    # doublerait la meme prise en charge. Mesure avant d'ecrire : 842
     # passages sur 27360 (3,08 %) sont dans ce cas sur une execution de reference.
     orientations = {u["n_passage"]: u["orientation_sortie"] for u in lignes_urgences}
     lignes_u_facturables = [p for p in lignes_u if orientations.get(p["n_passage"]) != "HO"]

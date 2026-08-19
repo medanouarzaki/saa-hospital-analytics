@@ -1,0 +1,222 @@
+# Registre des libellés de dimension — un libellé par code, aucun libellé sans source citée
+#
+# RÈGLE DE PREUVE. Un code ne reçoit un libellé que si une source du registre des
+# sources (`docs/sources/sources.yml`) établit la correspondance, et cette source est
+# citée ici par son identifiant et par le renvoi précis qui la porte. Un code dont
+# aucune source n'établit la signification figure ici aussi, sans libellé, avec le
+# motif : un registre qui ne porterait que les codes documentés laisserait croire à
+# l'exhaustivité.
+#
+# CE QUE LA RÈGLE DU CADRAGE INTERDIT, ET CE QU'ELLE N'INTERDIT PAS. L'interdiction
+# d'inventer un libellé porte sur les VALEURS DE CODE VENUES DU SYSTÈME OBSERVÉ : on ne
+# décide pas que tel code signifie tel service si rien ne l'établit. Elle n'interdit pas
+# d'afficher un libellé qu'une source documentée donne, avec sa référence.
+#
+# LES DEUX GARDE-FOUS QUI ONT SERVI À CLASSER.
+#   - Une correspondance plausible n'est pas une correspondance documentée. Qu'un code
+#     ressemble à l'abréviation d'un mot ne l'établit pas.
+#   - Les décomptes doivent concorder. Si une source décrit trois groupes et que les
+#     données en portent cinq, la correspondance n'est pas établie.
+#
+# `categorie` prend deux valeurs et deux seulement :
+#   - `documente` : une source établit la correspondance ; `source` et `renvoi` sont
+#     renseignés, `libelle` l'est aussi.
+#   - `non_documente` : aucune source ne l'établit ; `libelle` est absent et `motif` dit
+#     pourquoi. Le code s'affiche nu.
+#
+# Une source décrivant la nomenclature sans établir la correspondance exacte du code
+# relève de `non_documente` : c'est le cas des niveaux de tri, dont la source ne
+# distingue que trois groupes de gravité là où les données portent cinq niveaux.
+
+decompte:
+  codes: 28
+  documentes: 13
+  non_documentes: 15
+
+libelles:
+
+  # --------------------------------------------------------------- activité
+  # S-30, « Santé en chiffres 2024 », nomenclature nationale des spécialités
+  # médicales, tableau 38, pages 63-64. La source donne les codes ET les libellés
+  # ensemble ; les huit codes présents dans les données en sont huit entrées.
+  - dimension: activite
+    code: '4'
+    libelle: Cardiologie
+    categorie: documente
+    source: S-30
+    renvoi: tableau 38, pages 63-64 — nomenclature nationale des spécialités médicales
+
+  - dimension: activite
+    code: '11'
+    libelle: Dermatologie
+    categorie: documente
+    source: S-30
+    renvoi: tableau 38, pages 63-64 — nomenclature nationale des spécialités médicales
+
+  - dimension: activite
+    code: '14'
+    libelle: Gynécologie-obstétrique
+    categorie: documente
+    source: S-30
+    renvoi: tableau 38, pages 63-64 — nomenclature nationale des spécialités médicales
+
+  - dimension: activite
+    code: '20'
+    libelle: Médecine générale
+    categorie: documente
+    source: S-30
+    renvoi: tableau 38, pages 63-64 — nomenclature nationale des spécialités médicales
+
+  - dimension: activite
+    code: '21'
+    libelle: Médecine interne
+    categorie: documente
+    source: S-30
+    renvoi: tableau 38, pages 63-64 — nomenclature nationale des spécialités médicales
+
+  - dimension: activite
+    code: '28'
+    libelle: Ophtalmologie
+    categorie: documente
+    source: S-30
+    renvoi: tableau 38, pages 63-64 — nomenclature nationale des spécialités médicales
+
+  - dimension: activite
+    code: '29'
+    libelle: Oto-rhino-laryngologie
+    categorie: documente
+    source: S-30
+    renvoi: tableau 38, pages 63-64 — nomenclature nationale des spécialités médicales
+
+  - dimension: activite
+    code: '30'
+    libelle: Pédiatrie
+    categorie: documente
+    source: S-30
+    renvoi: tableau 38, pages 63-64 — nomenclature nationale des spécialités médicales
+
+  # ----------------------------------------------------- orientation de sortie
+  # S-27, règlement intérieur des hôpitaux, reproduction intégrale de l'arrêté S-03.
+  # Les articles 42, 44, 46 et 47 NOMMENT cinq issues du passage, et les données
+  # portent cinq codes.
+  - dimension: orientation_sortie
+    code: RD
+    libelle: Retour à domicile
+    categorie: documente
+    source: S-27
+    renvoi: articles 42, 44, 46 et 47 — issues du passage aux urgences
+
+  - dimension: orientation_sortie
+    code: HO
+    libelle: Hospitalisation
+    categorie: documente
+    source: S-27
+    renvoi: articles 42, 44, 46 et 47 — issues du passage aux urgences
+
+  - dimension: orientation_sortie
+    code: TR
+    libelle: Transfert
+    categorie: documente
+    source: S-27
+    renvoi: articles 42, 44, 46 et 47 — issues du passage aux urgences
+
+  - dimension: orientation_sortie
+    code: SC
+    libelle: Sortie contre avis médical
+    categorie: documente
+    source: S-27
+    renvoi: articles 42, 44, 46 et 47 — issues du passage aux urgences
+
+  - dimension: orientation_sortie
+    code: DC
+    libelle: Décès
+    categorie: documente
+    source: S-27
+    renvoi: articles 42, 44, 46 et 47 — issues du passage aux urgences
+
+  # ------------------------------------------------------------ niveau de tri
+  # S-12 ne distingue que TROIS groupes de gravité — urgences vitales, urgences
+  # réelles non vitales, consultations non urgentes — là où les données portent
+  # CINQ niveaux. La nomenclature est décrite, la correspondance de chaque code
+  # ne l'est pas : les décomptes ne concordent pas.
+  - dimension: niveau_tri
+    code: '1'
+    categorie: non_documente
+    motif: >-
+      S-12 distingue trois groupes de gravité, les données portent cinq niveaux ;
+      la correspondance d'un niveau à un groupe n'est pas établie par la source
+  - dimension: niveau_tri
+    code: '2'
+    categorie: non_documente
+    motif: >-
+      S-12 distingue trois groupes de gravité, les données portent cinq niveaux ;
+      la correspondance d'un niveau à un groupe n'est pas établie par la source
+  - dimension: niveau_tri
+    code: '3'
+    categorie: non_documente
+    motif: >-
+      S-12 distingue trois groupes de gravité, les données portent cinq niveaux ;
+      la correspondance d'un niveau à un groupe n'est pas établie par la source
+  - dimension: niveau_tri
+    code: '4'
+    categorie: non_documente
+    motif: >-
+      S-12 distingue trois groupes de gravité, les données portent cinq niveaux ;
+      la correspondance d'un niveau à un groupe n'est pas établie par la source
+  - dimension: niveau_tri
+    code: '5'
+    categorie: non_documente
+    motif: >-
+      S-12 distingue trois groupes de gravité, les données portent cinq niveaux ;
+      la correspondance d'un niveau à un groupe n'est pas établie par la source
+
+  # ------------------------------------------------------------------ service
+  # L'article 27 du règlement intérieur affirme que l'hôpital s'organise en
+  # services SANS LES NOMMER individuellement. La source établit qu'il existe des
+  # services, pas lesquels.
+  - dimension: service
+    code: CE
+    categorie: non_documente
+    motif: l'article 27 de S-27 affirme une organisation en services sans les nommer
+  - dimension: service
+    code: UR
+    categorie: non_documente
+    motif: l'article 27 de S-27 affirme une organisation en services sans les nommer
+  - dimension: service
+    code: HM
+    categorie: non_documente
+    motif: l'article 27 de S-27 affirme une organisation en services sans les nommer
+  - dimension: service
+    code: HGO
+    categorie: non_documente
+    motif: l'article 27 de S-27 affirme une organisation en services sans les nommer
+  - dimension: service
+    code: HPED
+    categorie: non_documente
+    motif: l'article 27 de S-27 affirme une organisation en services sans les nommer
+  - dimension: service
+    code: LAB
+    categorie: non_documente
+    motif: l'article 27 de S-27 affirme une organisation en services sans les nommer
+  - dimension: service
+    code: RAD
+    categorie: non_documente
+    motif: l'article 27 de S-27 affirme une organisation en services sans les nommer
+
+  # ----------------------------------------------------------- type d'épisode
+  # L'article 36 du règlement intérieur établit une taxonomie réglementaire des
+  # modes d'utilisation de l'hôpital SANS L'ÉNUMÉRER. Que ces trois codes se
+  # lisent immédiatement comme hospitalisation, consultation et urgences est une
+  # ressemblance, non une source.
+  - dimension: type_episode
+    code: HOS
+    categorie: non_documente
+    motif: l'article 36 de S-27 établit une taxonomie des modes d'utilisation sans l'énumérer
+  - dimension: type_episode
+    code: CE
+    categorie: non_documente
+    motif: l'article 36 de S-27 établit une taxonomie des modes d'utilisation sans l'énumérer
+  - dimension: type_episode
+    code: UR
+    categorie: non_documente
+    motif: l'article 36 de S-27 établit une taxonomie des modes d'utilisation sans l'énumérer

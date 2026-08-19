@@ -91,7 +91,7 @@ def generer_lignes(
 
         # regle S-18 : prise en charge totale en hospitalisation, ticket moderateur en
         # ambulatoire (CE, UR) au-dela d'un seuil de montant, aucune prise en charge en
-        # deca -- remplace un taux par organisme, ecart declare a S-18 corrige par ce lot.
+        # deca -- remplace un taux par organisme, ecart declare a S-18 depuis corrige.
         if facture["type_episode"] == "HOS":
             taux_couverture = taux_hospitalisation
         elif facture["montant_total"] > seuil_ambulatoire:

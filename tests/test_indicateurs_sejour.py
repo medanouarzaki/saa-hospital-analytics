@@ -11,8 +11,8 @@ une variable locale à sa fonction, non importable ; recopiée ici.
 
 Ces quatre grandeurs sont annualisées et définies sur la période complète de
 génération. Sur une fenêtre partielle, la prolongation des séjours non clos jusqu'à
-la borne de période domine le calcul et l'écart sort de la tolérance -- mesuré au
-lot qui a écrit ce test. Le test s'abstient donc, avec un motif explicite, lorsque la
+la borne de période domine le calcul et l'écart sort de la tolérance -- mesuré à
+l'écriture de ce test. Le test s'abstient donc, avec un motif explicite, lorsque la
 date d'admission maximale présente dans marts.fct_sejour ne coïncide pas avec la
 date de fin de période lue dans la configuration -- une égalité mesurée en base et en
 configuration, jamais une marge arbitraire.

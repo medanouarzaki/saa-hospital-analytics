@@ -12,7 +12,7 @@ de version : `generator/patients.py::version_en_vigueur(versions, jour)` retient
 version dont `date_extraction <= jour` — c'est la version « en vigueur » à une date donnée, déjà
 utilisée par `generator/prises_en_charge.py` et `generator/defauts.py` pour ancrer leurs décisions
 sur la couverture réellement en vigueur au moment de l'événement (`docs/decisions/0017-...md`).
-Aucune dimension patient n'existait avant ce lot.
+Aucune dimension patient n'existait auparavant.
 
 ## Décision
 
@@ -38,20 +38,19 @@ Aucune dimension patient n'existait avant ce lot.
    distinctes pour le même individu réel, hors du périmètre SCD 2) restent intacts et ne sont ni
    détectés ni fusionnés ici — c'est le travail d'une future couche de rapprochement, hors
    périmètre de cette dimension.
-4. **Confrontation à la vérité terrain démontrée par script, pas committée en test pytest dans ce
-   lot.** La confrontation exige une base chargée avec `dbt run` déjà exécuté, ce dont aucun
+4. **Confrontation à la vérité terrain démontrée par script, pas committée en test pytest.** La confrontation exige une base chargée avec `dbt run` déjà exécuté, ce dont aucun
    groupe de la CI actuelle ne dispose (`.github/workflows/ci.yml`, lu, non modifié). Un test
    pytest committé maintenant échouerait en CI ou casserait le garde-fou de collecte
    (`test_collecte_ci.py`) faute d'emplacement pour l'héberger. Démontrée ici par script éphémère
    (`/tmp/lot_5l/`, deux comparateurs, chacun validé sur un cas positif connu avant tout verdict) ;
-   son institutionnalisation en test committé attend le lot d'intégration CI qui créera le job
+   son institutionnalisation en test committé attend l'intégration continue qui créera le job
    capable de l'héberger.
 
 ## Justification des points non triviaux
 
 ### Pourquoi la confrontation n'est pas un test dbt
 
-Les deux comparateurs de ce lot lisent `generator/output/scenario_30/verite_terrain.yml`, un
+Les deux comparateurs lisent `generator/output/scenario_30/verite_terrain.yml`, un
 artefact hors du dépôt de données que dbt interroge (dbt ne lit que la base). Une confrontation
 à la vérité terrain du générateur ne peut être qu'un script (Python, comme pour la confrontation
 de `int_patients` aux lots de rechargement) ou un test pytest — jamais un test dbt.
@@ -62,7 +61,7 @@ Dix-sept vues dans `marts` désormais (`dim_date`, quatre dimensions simples, `d
 `agg_provenance_champs`), 104 tests dbt verts (99 précédents + 2 génériques + 3 singuliers). La
 confrontation à la vérité terrain (égalité d'ensembles A == B à 3 064, exactitude des 3 064
 versions, critère de bloc sur trois cas réels de déménagement) est démontrée mais pas encore
-committée comme garde-fou automatique — dette explicite, portée par ce même ADR jusqu'au lot
+committée comme garde-fou automatique — dette explicite, portée par ce même ADR jusqu'à l'écriture
 d'intégration CI.
 
 ## Ce qui aurait invalidé cette décision

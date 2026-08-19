@@ -102,7 +102,7 @@ def test_pente_absenteisme_reelle(generation: dict) -> None:
     # plutot qu'un decompte agrege sur la generation complete : un decoupage global en
     # tranches de delai (ex. court/long en jours absolus) melange les specialites, dont les
     # medianes vont de 5 a 45 jours, et le simple melange des specialites peut reproduire
-    # l'ordre attendu meme sans pente reelle -- mesure du lot, voir mutation ci-dessous.
+    # l'ordre attendu meme sans pente reelle -- mesure, voir mutation ci-dessous.
     # Comparer les tirages de la fonction biaisee a ceux de la loi log-normale non biaisee
     # au meme parametre isole proprement l'effet de la pente.
     rng_biaise = alea.construire_generateur(GRAINE)
@@ -131,7 +131,7 @@ def test_delai_median_par_activite(generation: dict) -> None:
     delais_medians_attendus = entrees["delai_rdv_par_specialite"]["valeur"]
     honores = [ligne for ligne in lignes if ligne["etat"] == "HO"]
 
-    # objet du lot : depuis que la fiche d'une premiere consultation programmee est creee
+    # depuis que la fiche d'une premiere consultation programmee est creee
     # a la prise du rendez-vous (et non plus le jour de l'episode), le delai est observable
     # sur la quasi-totalite des rendez-vous honores, plus seulement sur un sous-ensemble
     # "eligible" -- mesure sur la totalite des lignes honorees, sans filtre.
@@ -176,10 +176,10 @@ def test_part_rdv_jour_meme(generation: dict) -> None:
     )
     part_mesuree = n_jour_meme / len(eligibles)
 
-    # tolerance recalibree par ce lot (part_rdv_jour_meme portee de 0,03 a 0,06) : le
+    # tolerance recalibree (part_rdv_jour_meme portee de 0,03 a 0,06) : le
     # tirage jour-meme peut retomber sur un jour ferme, alors reporte au jour ouvert le
     # plus proche (_jour_ouvert_borne_inferieurement), diluant le taux observe a environ
-    # 45 % du parametre configure -- deja le cas avant ce lot (mesure sur le code d'avant
+    # 45 % du parametre configure -- deja le cas auparavant (mesure sur le code d'avant
     # lot, graine 1 : parametre 0,03, mesure 0,0138, dilution 46 %), seul l'ecart absolu
     # grandit avec un parametre plus grand. Mesure sur 2 graines independantes avec le
     # parametre aligne : graine 1, ecart 0,0331 ; graine 2, ecart 0,0342.

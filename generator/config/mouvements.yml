@@ -4,14 +4,14 @@ parametres:
   unite: ans revolus, age maximal a la date d'admission pour une eligibilite a l'unite HPED
   provenance: HYP
   preuve: sans_preuve_externe
-  note: 'Parametre ajoute par ce lot : le document de cadrage borne la pediatrie a quinze ans
+  note: 'Le document de cadrage borne la pediatrie a quinze ans
     revolus, une contrainte dure sans source propre citee (posee comme regle d''eligibilite,
     pas comme mesure). Applique par generator/mouvements.py au tirage de l''unite
     d''admission (et de la destination d''une mutation) : un patient de plus de quinze ans
     revolus a la date d''admission n''est jamais eligible a HPED, le poids de
     repartition_unites_hospitalisation restreint et renormalise aux seules unites eligibles
-    avant tirage. Mesure avant d''ecrire (voir le rapport) : 596 admissions HPED sur 806
-    (73,9 %) portaient un patient de plus de quinze ans avant ce lot, faute de tout controle.
+    avant tirage. Mesure avant d''ecrire : 596 admissions HPED sur 806
+    (73,9 %) portaient un patient de plus de quinze ans avant ce parametre, faute de tout controle.
     Si ce seuil etait faux, la frontiere entre patients eligibles et non eligibles a HPED
     serait faussee, sans effet sur le nombre total de sejours ni sur les autres unites.'
 - nom: repartition_unites_hospitalisation
@@ -34,7 +34,7 @@ parametres:
     contraintes dures ci-dessous, faute d''acces au sexe et a l''age du patient a l''endroit
     ou elle est ecrite (generator/urgences.py ne recoit pas la table des patients).
 
-    Depuis ce lot, generator/mouvements.py restreint ce tirage aux unites eligibles pour le
+    generator/mouvements.py restreint desormais ce tirage aux unites eligibles pour le
     patient admis avant application des poids ci-dessus, renormalises sur le sous-ensemble
     eligible : HGO (gyneco-obstetrique) n''admet que des patientes (sexe F), contrainte dure
     du document de cadrage, sans exception ; HPED (pediatrie) n''admet que des patients d''au

@@ -2,7 +2,7 @@
     Couche intermediate de source.patients : les 46 colonnes du registre, chaque colonne
     typée (date/horodatage/booleen) passée par la macro de conversion correspondant à son
     type_metier ; les colonnes code/texte reprises telles quelles. Correspondance colonne ->
-    macro générée par script depuis le registre, pas écrite de mémoire (voir le rapport).
+    macro générée par script depuis le registre, pas écrite de mémoire.
 #}
 
 select

@@ -1,6 +1,6 @@
 {#
     dim_organisme : clé naturelle code_organisme, aucun libellé inventé — union des colonnes de la
-    famille organisme mesurée depuis le registre (voir le rapport de ce lot), vides exclus. Pas de
+    famille organisme mesurée depuis le registre, vides exclus. Pas de
     clé de substitution : la vue reste déterministe d'une exécution à l'autre.
 #}
 

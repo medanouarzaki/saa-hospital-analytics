@@ -9,7 +9,7 @@ parametres:
   preuve: S-20
   note: 'Nom imposé par la relation R-20 du registre des relations injectées, qui porte
     deux paramètres séparés par une virgule (taux_facturation, taux_recouvrement) ; seul le
-    premier relève de ce lot, le second (taux_recouvrement) de la table des créances, non
+    premier relève de ce fichier, le second (taux_recouvrement) de la table des créances, non
     écrite ici. R-20 affirme explicitement que ce taux diffère par type d''épisode - un
     paramètre scalaire unique ne pouvait porter cette différence ; la forme (correspondance
     type d''épisode vers taux) ne change pas ici, seules les valeurs et la provenance
@@ -33,7 +33,7 @@ parametres:
   unite: liste de codes de nomenclature_type_episode
   provenance: HYP
   preuve: sans_preuve_externe
-  note: Les urgences (UR) sont retenues depuis ce lot, désormais que la nomenclature des
+  note: Les urgences (UR) sont retenues désormais que la nomenclature des
     actes porte un acte de consultation propre aux urgences (CONS-UR). Un passage aux
     urgences orienté vers l'hospitalisation (orientation_sortie égale à HO) est exclu de ce
     type facturable - la prestation qu'il déclenche est déjà portée par le séjour
