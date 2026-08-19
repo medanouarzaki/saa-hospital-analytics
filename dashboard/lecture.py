@@ -23,6 +23,8 @@ pourrait contourner par inadvertance, mais une propriété du serveur, éprouvé
 
 from __future__ import annotations
 
+import contextlib
+
 import pandas as pd
 import psycopg
 import streamlit as st
@@ -31,6 +33,32 @@ from ingestion import appliquer_ddl
 
 SCHEMA = "instantane"
 TABLE_ETAT = "instantane_etat"
+
+# Journal des requêtes émises, ouvert par un appelant qui veut les OBSERVER plutôt que les déduire.
+# Il vaut None en usage normal, et `interroger` ne fait alors rien de plus qu'avant : aucune
+# allocation, aucune branche coûteuse, aucun effet.
+#
+# Il existe parce qu'un contrôle doit pouvoir comparer ce qu'une page DÉCLARE lire à ce qu'elle lit
+# RÉELLEMENT, et qu'aucune analyse du code source ne le peut : une requête construite par
+# interpolation n'est pas lisible avant son exécution, et une extraction syntaxique s'est déjà
+# trompée en attribuant à une requête une table qu'elle ne nomme pas. Observer la requête émise est
+# la seule forme qui échappe aux deux.
+_journal: list[str] | None = None
+
+
+@contextlib.contextmanager
+def requetes_observees():
+    """Recueille les requêtes émises pendant le bloc, et rend la liste qui les porte.
+
+    Réentrant : un bloc imbriqué recueille dans sa propre liste et rend l'ancienne en sortant.
+    """
+    global _journal
+    precedent = _journal
+    _journal = []
+    try:
+        yield _journal
+    finally:
+        _journal = precedent
 
 
 def _connexion():
@@ -95,4 +123,6 @@ def _interroger(requete: str, horodatage) -> pd.DataFrame:
 
 def interroger(requete: str) -> pd.DataFrame:
     """Point d'entrée des pages. La clé de cache est prise ici, à chaque appel."""
+    if _journal is not None:
+        _journal.append(requete)
     return _interroger(requete, etat()["rafraichi_le"])

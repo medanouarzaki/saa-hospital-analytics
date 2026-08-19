@@ -464,6 +464,8 @@ indicateurs:
       attendus d'un hôpital nommé.
     objets_lus:
       - marts.fct_sejour
+      - instantane.instantane_etat
+      - instantane.instantane_parametres
     filtrabilite: non
     motif: grandeur_annualisee
     recalcule_depuis: faits_et_parametre
@@ -516,6 +518,7 @@ indicateurs:
       durées.
     objets_lus:
       - marts.fct_sejour
+      - instantane.instantane_etat
     filtrabilite: non
     motif: grandeur_annualisee
     recalcule_depuis: faits
@@ -632,6 +635,7 @@ indicateurs:
       Prioriser le recouvrement sur les créances les plus anciennes.
     objets_lus:
       - intermediate.int_creances
+      - instantane.instantane_etat
     filtrabilite: non
     motif: date_hors_couche_des_faits
     recalcule_depuis: couche_intermediaire
