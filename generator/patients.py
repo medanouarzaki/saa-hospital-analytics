@@ -139,10 +139,23 @@ def _tirer_adresse(pool: dict, generateur: np.random.Generator) -> str:
 
 
 def _tirer_telephone(pool: dict, generateur: np.random.Generator) -> str:
+    """Un numéro STRUCTURELLEMENT IMPOSSIBLE : onze chiffres, là où le plan national en fait dix.
+
+    Le plan de numérotation marocain donne, en forme nationale, exactement dix chiffres — le zéro
+    de tête suivi de neuf chiffres significatifs. Un numéro de onze chiffres ne peut donc être
+    attribué à personne, aujourd'hui ni plus tard : c'est une impossibilité de structure, et non
+    une non-attribution, laquelle est administrative et révocable.
+
+    Le septième chiffre de bourrage est le SEUL changement : le préfixe tiré et l'entier tiré
+    restent les mêmes, si bien que la correspondance entre l'ancienne valeur et la nouvelle est
+    injective par construction. Deux fiches dont les téléphones coïncidaient coïncident encore ;
+    deux fiches qui différaient diffèrent encore. C'est ce qui protège le rapprochement, dont une
+    règle de blocage compare ce champ.
+    """
     prefixe = _tirage_uniforme_liste(pool["prefixes_telephone"], generateur)
     borne_min_tel, borne_max_tel = pool["plage_numero_telephone"]
     numero_tel = int(generateur.integers(borne_min_tel, borne_max_tel + 1))
-    return f"{prefixe}{numero_tel:06d}"
+    return f"{prefixe}{numero_tel:07d}"
 
 
 def _tirer_foyer(
@@ -357,23 +370,30 @@ def _generer_ligne_patient(
     )
     telephone_2 = None
     if _renseigne("telephone_2", entrees, generateur):
-        telephone_2 = f"0620{generateur.integers(0, 999999):06d}"
+        telephone_2 = f"0620{generateur.integers(0, 999999):07d}"
     telephone_3 = None
     if _renseigne("telephone_3", entrees, generateur):
-        telephone_3 = f"0630{generateur.integers(0, 999999):06d}"
+        telephone_3 = f"0630{generateur.integers(0, 999999):07d}"
     telephone_4 = None
     if _renseigne("telephone_4", entrees, generateur):
-        telephone_4 = f"0640{generateur.integers(0, 999999):06d}"
+        telephone_4 = f"0640{generateur.integers(0, 999999):07d}"
     commentaire = "COMMENTAIRE PATIENT" if _renseigne("commentaire", entrees, generateur) else None
 
     profession = None
     if _renseigne("profession", entrees, generateur):
         profession = _tirage_uniforme_liste(entrees["liste_professions"]["valeur"], generateur)
 
+    # La pièce d'identité reste à NEUF CHIFFRES SANS LETTRE, et c'est déjà une impossibilité de
+    # structure : la carte nationale marocaine porte une ou deux lettres suivies de chiffres, si
+    # bien qu'une suite purement numérique ne peut être aucune carte réelle.
     n_piece_identite = f"{int(generateur.integers(1_000_000, 7_000_000)):09d}"
-    police = f"{int(generateur.integers(1_000_000, 7_000_000)):09d}"
-    n_assure = f"{int(generateur.integers(1_000_000, 7_000_000)):09d}"
-    num_inscription = f"{int(generateur.integers(1_000_000, 7_000_000)):09d}"
+    # Les trois numéros administratifs passent à DOUZE CHIFFRES. Neuf chiffres recouvraient
+    # exactement l'immatriculation à la caisse nationale de sécurité sociale, qui en compte neuf ;
+    # douze n'est le format d'aucun de ces registres. Le bourrage est le seul changement, l'entier
+    # tiré restant le même : la correspondance reste injective.
+    police = f"{int(generateur.integers(1_000_000, 7_000_000)):012d}"
+    n_assure = f"{int(generateur.integers(1_000_000, 7_000_000)):012d}"
+    num_inscription = f"{int(generateur.integers(1_000_000, 7_000_000)):012d}"
 
     ligne = {
         "n_ipp": n_ipp,

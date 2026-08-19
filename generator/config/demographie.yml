@@ -503,15 +503,19 @@ parametres:
   unite: modele de foyers partages
   provenance: HYP
   preuve: sans_preuve_externe
-  note: 'Ajoute au lot de correction : avant, adresse et telephone_1 etaient construites par concatenation
-    d''un prefixe fixe et du rang de la ligne, autant de valeurs distinctes que de fiches (releve au 1.2),
-    rendant tout rapprochement par foyer impossible (0 couple de fiches partageant un meme telephone,
-    mesure du 1.3 du lot de correction). Desormais, les patients sont regroupes en foyers de taille moyenne
-    3,5 ; chaque foyer recoit une adresse (une voie de la liste ci-dessus et un numero dans la plage)
-    et un telephone (un prefixe operateur plausible et un numero dans la plage) tires une seule fois,
-    partages par tous ses membres. Voies et prefixes poses sans source, plausibles pour une ville marocaine.
-    Si ce modele etait faux, la repartition des adresses et des telephones par foyer serait faussee, sans
-    effet sur le nombre de fiches produites.'
+  note: 'Les patients sont regroupes en foyers de taille moyenne 3,5 ; chaque foyer recoit une adresse
+    (une voie de la liste ci-dessus et un numero dans la plage) et un telephone tires une seule fois,
+    partages par tous ses membres. Une construction anterieure concatenait un prefixe fixe et le rang de
+    la ligne, ce qui donnait autant de valeurs distinctes que de fiches et rendait tout rapprochement par
+    foyer impossible : aucun couple de fiches ne partageait alors un meme telephone.
+    LE NUMERO PRODUIT EST STRUCTURELLEMENT IMPOSSIBLE. Le prefixe et la plage ci-dessous donnent la
+    structure d''accord entre fiches ; le generateur les met en forme sur ONZE CHIFFRES, la ou le plan de
+    numerotation marocain en compte exactement dix en forme nationale. Aucun numero produit ne peut donc
+    etre attribue a qui que ce soit, ni aujourd''hui ni plus tard. Le prefixe n''est PAS un espace non
+    attribue et ne doit pas etre lu comme tel : une attribution est administrative et revocable, une
+    longueur impossible est permanente.
+    Voies et prefixes poses sans source. Si ce modele etait faux, la repartition des adresses et des
+    telephones par foyer serait faussee, sans effet sur le nombre de fiches produites.'
 - nom: comptes_utilisateurs_systeme
   valeur:
   - ADM-ACC01

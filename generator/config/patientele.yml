@@ -72,22 +72,27 @@ parametres:
 
   - nom: domaines_email
     valeur:
-      - gmail.com
-      - yahoo.fr
-      - hotmail.com
-      - outlook.com
-      - menara.ma
-    unite: liste de fournisseurs de messagerie
+      - example.com
+      - example.net
+      - example.org
+      - messagerie.invalid
+      - menara.invalid
+    unite: liste de domaines reserves
     provenance: HYP
     preuve: sans_preuve_externe
     note: >-
-      Avant ce lot, l'adresse portait un préfixe fixe suivi du rang de la fiche
-      (patient{rang}@exemple.ma) : une valeur séquentielle, le symptôme même que le lot de
-      vraisemblance avait éliminé sur les autres colonnes de texte libre. L'adresse est
-      désormais construite depuis le prénom et le premier nom de famille de la fiche, suivis
-      d'un domaine tiré uniformément dans cette liste ; les collisions entre deux fiches
-      partageant prénom, nom et domaine sont possibles et ne sont pas évitées, comme pour
-      toute adresse réelle. Quatre fournisseurs génériques usuels et un fournisseur
-      marocain historique (Menara, Maroc Telecom), posés sans source. Si cette liste était
-      fausse ou trop courte, seule la vraisemblance des domaines affichés serait affectée,
-      sans effet sur le taux de renseignement de la colonne ni sur aucun total.
+      Cinq domaines RÉSERVÉS PAR LA NORME, et aucun domaine exploité. Le document RFC 2606
+      réserve `example.com`, `example.net` et `example.org` ainsi que le domaine de premier
+      niveau `.invalid`, et interdit leur enregistrement : aucune de ces adresses ne peut
+      être la boîte de qui que ce soit, ni aujourd'hui ni plus tard. C'est une impossibilité
+      de structure, non une non-attribution.
+      La partie locale reste construite depuis le prénom et le premier nom de famille de la
+      fiche, si bien que la vraisemblance de forme et la structure d'accord entre fiches sont
+      inchangées ; les collisions entre deux fiches partageant prénom, nom et domaine restent
+      possibles et ne sont pas évitées, comme pour toute adresse réelle.
+      La liste compte cinq entrées dans le même ordre qu'auparavant : le rang tiré est le
+      même, la correspondance entre l'ancienne valeur et la nouvelle est donc injective, et
+      deux fiches dont les adresses coïncidaient coïncident encore.
+      Si cette liste était fausse ou trop courte, seule la vraisemblance des domaines
+      affichés serait affectée, sans effet sur le taux de renseignement de la colonne ni sur
+      aucun total.

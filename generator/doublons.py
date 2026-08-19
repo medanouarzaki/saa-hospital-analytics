@@ -162,7 +162,9 @@ def _appliquer_telephone_different(ligne: dict, generateur: np.random.Generator)
     origine = ligne["telephone_1"]
     candidat = origine
     while candidat == origine:
-        candidat = f"0620{int(generateur.integers(0, 999999)):06d}"
+        # Onze chiffres, comme tout téléphone produit par ce générateur : la fiche en double
+        # ne doit pas être le seul endroit où un numéro reprenne une forme possible.
+        candidat = f"0620{int(generateur.integers(0, 999999)):07d}"
     ligne["telephone_1"] = candidat
 
 
