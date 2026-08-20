@@ -75,3 +75,4 @@ chaque exécution.
 | [0059](0059-la-divergence-des-durees-entre-sejour-et-passage-n-est-pas-regeneree.md) | Les deux faits ne s'accordent pas sur la fin d'un épisode, et le jeu n'est pas régénéré |
 | [0060](0060-le-tableau-de-bord-est-lance-par-le-module-et-non-par-l-executable.md) | Le service d'affichage est lancé par `python -m streamlit`, jamais par l'exécutable |
 | [0061](0061-les-grandeurs-decimales-sont-converties-a-l-affichage-seulement.md) | Une grandeur décimale est convertie en nombre à virgule pour être tracée, et là seulement |
+| [0062](0062-l-etat-declare-du-document-et-ses-marqueurs-nominatifs.md) | Le document déclare son état, et cet état dit ce que ses marqueurs nominatifs doivent porter |
