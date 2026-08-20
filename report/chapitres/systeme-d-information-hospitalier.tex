@@ -1,12 +1,507 @@
 % Ce chapitre repose sur :
-%   DOC: (aucun)
-%   OBS: (aucun)
+%   DOC: s06, s07, s08, s09, s10
+%   OBS: REL-DEM.I01, REL-DEM.I02, REL-DEM.P01, REL-DEM.P02, REL-DEM.P03, REL-DEM.P04, REL-DEM.P05,
+%   OBS: REL-DEM.M01, REL-DEM.M02, REL-DEM.M03, REL-DEM.M04, REL-IPP.O01, REL-IPP.O02, REL-IPP.O03,
+%   OBS: REL-IPP.O04, REL-IPP.C01, REL-IPP.C02, REL-IPP.C03, REL-IPP.C04, REL-IPP.C05, REL-IPP.C06,
+%   OBS: REL-IPP.C07, REL-IPP.C08, REL-IPP.C09, REL-IPP.C10, REL-IPP.C11, REL-IPP.C12, REL-IPP.C13,
+%   OBS: REL-IPP.F01, REL-IPP.F02, REL-IPP.F03, REL-IPP.F04, REL-IPP.R01, REL-IPP.R02, REL-IPP.R03,
+%   OBS: REL-IPP.R04, REL-IPP.R05, REL-IPP.R06, REL-IPP.R07, REL-IPP.R08, REL-IPP.R09, REL-IPP.R10,
+%   OBS: REL-IPP.R11, REL-IPP.R12, REL-PAT.T01, REL-PAT.T02, REL-PAT.T03, REL-PAT.D01, REL-PAT.D02,
+%   OBS: REL-PAT.D03, REL-PAT.D04, REL-PAT.D05, REL-PAT.D06, REL-PAT.D07, REL-PAT.D08, REL-PAT.D09,
+%   OBS: REL-PAT.D10, REL-PAT.D11, REL-PAT.D12, REL-PAT.D13, REL-PAT.D14, REL-PAT.D15, REL-PAT.D16,
+%   OBS: REL-PAT.A01, REL-PAT.A02, REL-PAT.A03, REL-PAT.A04, REL-PAT.A05, REL-PAT.A06, REL-PAT.H01,
+%   OBS: REL-PAT.H02, REL-PAT.H03, REL-PAT.H04, REL-PAT.H05, REL-PAT.H06, REL-PAT.H07, REL-PAT.H08,
+%   OBS: REL-PAT.H09, REL-PAT.H10, REL-PAT.H11, REL-PAT.H12, REL-PAT.H13, REL-PAT.H14, REL-PAT.H15,
+%   OBS: REL-PAT.N01, REL-PAT.N02, REL-PAT.N03, REL-PAT.N04, REL-PAT.N05, REL-PAT.N06, REL-PAT.K01,
+%   OBS: REL-RDV.I01, REL-RDV.I02, REL-RDV.I03, REL-RDV.I04, REL-RDV.I05, REL-RDV.I06, REL-RDV.I07,
+%   OBS: REL-RDV.I08, REL-RDV.I09, REL-RDV.I10, REL-RDV.R01, REL-RDV.R02, REL-RDV.R03, REL-RDV.R04,
+%   OBS: REL-RDV.R05, REL-RDV.R06, REL-RDV.R07, REL-RDV.R08, REL-RDV.R09, REL-RDV.R10, REL-RDV.R11,
+%   OBS: REL-RDV.R12, REL-RDV.R13, REL-RDV.R14, REL-RDV.C01, REL-RDV.C02, REL-RDV.C03, REL-RDV.C04,
+%   OBS: REL-RDV.C05, REL-RDV.C06, REL-RDV.C07, REL-RDV.C08, REL-RDV.L01, REL-RDV.L02, REL-RDV.L03
 %   HYP: (aucun)
+%   SECTIONS: 8
 
 \chapter{Le système d'information hospitalier}
 
-\section{Le progiciel en place}
+\section{Hosix.NET, origine et architecture}
 
-\section{Les modules observés et leurs écrans}
+Le système d'information en place est Hosix.NET, édité par SIVSA Soluciones Informáticas
+\cite{s06}. Sa conception remonte aux années 1980, et l'éditeur en revendique le déploiement dans
+plus de trente hôpitaux répartis sur six pays \cite{s07}.
 
-\section{Ce que le système ne porte pas}
+L'origine du produit se lit dans sa nomenclature avant de se lire dans sa documentation
+commerciale. La raison sociale de l'éditeur est espagnole, et les modules portent des noms
+espagnols que la documentation reprend sans les traduire : \emph{Consultas} pour la gestion des
+agendas et des rendez-vous \cite{s08}, \emph{Facturación} pour l'émission des factures
+\cite{s09}, auxquels s'ajoutent \emph{Médicos}, \emph{Urgencias} et \emph{admisión}. Un produit
+déployé au Maroc et servi en français conserve donc, dans son organisation interne, la langue de
+son concepteur.
+
+L'architecture fonctionnelle se contracte en trois paquets — Core, Clinic et Extension Packs —
+qui rassemblent vingt-six modules : douze au Core, six au Clinic, huit aux Extension Packs
+\cite{s06}. La répartition n'est pas indifférente. Le Core porte les fonctions administratives du
+dossier — admission, agendas, facturation —, le Clinic les fonctions médicales, et les Extension
+Packs des compléments contractables séparément. Un établissement peut donc exploiter la gestion
+administrative des patients sans exploiter la couche clinique, et c'est une configuration que
+l'observation conduite ici ne permet ni de confirmer ni d'exclure : le périmètre installé n'est
+pas connu, la documentation de l'éditeur décrivant ce qui est contractable et jamais ce qui est
+contracté.
+
+Le produit a fait l'objet d'une migration technique, de WebForms vers le patron
+modèle-vue-contrôleur, et l'éditeur la déclare achevée sur quatre modules : prescription,
+admission, facturation et approvisionnements \cite{s07}. Cette migration n'est pas un détail
+d'implantation. Elle explique qu'un même logiciel présente des écrans dont l'ergonomie diffère
+d'un module à l'autre, et elle situe l'observation conduite ici dans un produit en cours de
+transformation, non dans un état stable.
+
+Une précision sur ce que ce chapitre ne dit pas, et elle vaut pour tout le dossier
+documentaire. La documentation consultée est celle de l'éditeur, et elle est commerciale : elle
+publie une fiche par module, et ces fiches énoncent des fonctions, pas des schémas de données.
+Elles établissent qu'une fonction existe et ce qu'elle recouvre ; elles ne disent jamais quels
+champs la portent, sous quel type, ni sous quelle contrainte. Aucune colonne du modèle construit
+plus loin ne peut donc être justifiée par la seule documentation de l'éditeur.
+
+Tout ce qui touche aux champs vient du relevé conduit au poste. C'est une matière d'une autre
+nature : elle est datée, limitée à un profil et à quatre écrans, et elle ne couvre qu'une fraction
+du produit. Elle a en revanche une propriété que la documentation n'a pas — elle porte sur
+l'installation réelle de l'établissement, et non sur le produit générique. Les quatre sections de
+relevé qui suivent la restituent intégralement, élément par élément.
+
+\section{Les cinq profils applicatifs et les processus qu'ils portent}
+
+L'écran de démarrage propose cinq profils applicatifs, et le relevé les reproduit sous leur
+libellé exact : \texttt{MSM - FACTURATION SAA}, \texttt{MSM - GESTION DE RDV},
+\texttt{MSM - RECOUVREMENT}, \texttt{MSM - URGENCE} et
+\texttt{MSM RAPPORTS ET STATISTIQUES}\releve{REL-DEM.P02}. L'irrégularité du dernier — l'absence
+de tiret séparateur — est celle de l'écran, et elle est conservée : un libellé se reproduit, il ne
+se corrige pas.
+
+Ces cinq profils ne sont pas cinq vues d'un même écran : chacun ouvre un jeu de modules distinct,
+et les habilitations cloisonnent l'accès. Un seul a été ouvert au poste, les quatre autres n'ont
+été relevés qu'à l'écran de démarrage. Le tableau ci-dessous rattache chaque profil au processus
+qu'il porte et au module de l'éditeur qui le sert, en distinguant ce qui a été vu de ce qui a été
+reconstruit par voie documentaire.
+
+\begin{center}
+\begin{tabular}{@{}p{4.3cm}p{4.6cm}p{3.1cm}p{2.2cm}@{}}
+\toprule
+Profil & Processus porté & Module & Établi par \\
+\midrule
+\texttt{MSM - GESTION DE RDV} & prise, modification et annulation de rendez-vous ; liste d'attente & \emph{Consultas} \cite{s08} & observation \\
+\addlinespace
+\texttt{MSM - FACTURATION SAA} & captation des mouvements, émission des factures & \emph{Facturación} \cite{s09} & documentation \\
+\addlinespace
+\texttt{MSM - RECOUVREMENT} & suivi des créances et des relances & \emph{Facturación} \cite{s09} & documentation \\
+\addlinespace
+\texttt{MSM - URGENCE} & admission et prise en charge aux urgences & \emph{Urgencias} & documentation \\
+\addlinespace
+\texttt{MSM RAPPORTS ET STATISTIQUES} & production des indicateurs remontés à la statistique nationale & — \cite{s10} & documentation \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+
+La documentation du module \emph{Consultas} énonce ce que le profil de rendez-vous recouvre :
+génération d'agendas, prise de rendez-vous manuelle ou automatique, modification, annulation,
+intégration à la liste d'attente, production de notifications, de listings et de statistiques
+\cite{s08}. Celle de \emph{Facturación} énonce la captation manuelle ou automatique des
+mouvements, le contrôle de l'état facturé ou en attente, le paramétrage par groupes, par types de
+contrats et de prestations, et la facturation aux entités publiques, privées et mutuelles
+\cite{s09}. L'éditeur ne publie aucune fiche distincte pour le recouvrement : la fonction est
+intégrée au module de facturation, ce qui explique que deux profils s'y rattachent.
+
+Le cinquième profil est le seul dont le contenu se déduise d'une source extérieure à l'éditeur :
+la nomenclature des indicateurs qu'un hôpital nommé remonte à la statistique nationale
+\cite{s10}.
+
+\section{Méthode de relevé}
+
+L'observation a porté sur un poste de travail du service, sur le profil
+\texttt{MSM - GESTION DE RDV}, le 28 juillet 2026\releve{REL-DEM.P02}. Quatre écrans ont été
+parcourus : l'écran de démarrage, la recherche d'identifiant patient, la fiche patient et l'écran
+de prise de rendez-vous. Cent quarante-trois éléments y ont été relevés.
+
+Chaque élément est consigné avec un identifiant stable, le bloc de l'écran auquel il appartient,
+son libellé reproduit à l'identique, son type apparent, et la valeur affichée lorsqu'une valeur
+l'était. L'identifiant n'est pas une commodité de rédaction : c'est la clé par laquelle le
+registre de provenance des colonnes désigne son témoin d'observation, et par laquelle les
+tableaux qui suivent se relient au modèle de données construit plus loin.
+
+Deux conventions gouvernent la restitution, et toutes deux consistent à ne pas affirmer plus que
+ce qui a été vu. La première : le caractère obligatoire ou facultatif d'un champ n'a été relevé
+sur aucun écran, et n'est donc affirmé nulle part — une valeur binaire imposée ici produirait cent
+quarante-trois affirmations non observées. La seconde : la mention \texttt{sans objet} désigne un
+élément qui n'est pas un champ de saisie de dossier — bouton, onglet, entrée de menu, libellé de
+profil, colonne de résultat, filtre de recherche. Les boutons des barres d'outils ne figurent pas
+aux tableaux : ils déclenchent une opération et ne portent aucune donnée, et le relevé les déclare
+comme tels.
+
+\section{Relevé — l'écran de démarrage et les profils}
+
+L'écran d'entrée identifie l'établissement et l'autorité dont il relève, puis propose les cinq
+profils et quatre menus principaux. Onze éléments y sont relevés.
+
+\begin{longtable}{@{}p{2.9cm}p{3.9cm}p{2.8cm}p{4.0cm}@{}}
+\toprule
+Identifiant & Libellé à l'écran & Type apparent & Valeur observée \\
+\midrule\endfirsthead
+\toprule
+Identifiant & Libellé à l'écran & Type apparent & Valeur observée \\
+\midrule\endhead
+\multicolumn{4}{@{}l}{\textbf{Identification du site}} \\
+\texttt{REL-DEM.I01} & Identification du site & texte & \texttt{005 Fès-Meknès; Sidi Said} \\
+\texttt{REL-DEM.I02} & Ministère de tutelle & texte & \texttt{Ministère de la Santé} \\
+\addlinespace
+\multicolumn{4}{@{}l}{\textbf{Profils applicatifs}} \\
+\texttt{REL-DEM.P01} & MSM - FACTURATION SAA & liste & — \\
+\texttt{REL-DEM.P02} & MSM - GESTION DE RDV & liste & — \\
+\texttt{REL-DEM.P03} & MSM - RECOUVREMENT & liste & — \\
+\texttt{REL-DEM.P04} & MSM - URGENCE & liste & — \\
+\texttt{REL-DEM.P05} & MSM RAPPORTS ET STATISTIQUES & liste & — \\
+\addlinespace
+\multicolumn{4}{@{}l}{\textbf{Menus principaux}} \\
+\texttt{REL-DEM.M01} & Hosix.NET & menu & — \\
+\texttt{REL-DEM.M02} & Données Patient & menu & — \\
+\texttt{REL-DEM.M03} & Centre de Consultation & menu & — \\
+\texttt{REL-DEM.M04} & Factures & menu & — \\
+\addlinespace
+\bottomrule
+\end{longtable}
+
+\medskip
+
+Le code de région y est accolé au nom de l'établissement sous une graphie que le relevé
+conserve telle quelle, séparateur compris\releve{REL-DEM.I01}. Les quatre menus donnent l'ossature
+de la navigation, et deux d'entre eux mènent aux écrans relevés ci-après.
+
+\section{Relevé — la recherche d'identifiant patient}
+
+Cet écran est celui par lequel un agent retrouve un dossier avant toute opération. Trente-trois
+éléments y sont relevés, répartis en quatre blocs.
+
+\begin{longtable}{@{}p{2.9cm}p{3.9cm}p{2.8cm}p{4.0cm}@{}}
+\toprule
+Identifiant & Libellé à l'écran & Type apparent & Valeur observée \\
+\midrule\endfirsthead
+\toprule
+Identifiant & Libellé à l'écran & Type apparent & Valeur observée \\
+\midrule\endhead
+\multicolumn{4}{@{}l}{\textbf{Onglets}} \\
+\texttt{REL-IPP.O01} & Chercher & onglet & — \\
+\texttt{REL-IPP.O02} & Chercher MPI & onglet & — \\
+\texttt{REL-IPP.O03} & Chercher MPI Pondéré & onglet & — \\
+\texttt{REL-IPP.O04} & Nouvel IPP & onglet & — \\
+\addlinespace
+\multicolumn{4}{@{}l}{\textbf{Critères de recherche}} \\
+\texttt{REL-IPP.C01} & N° document & texte & \texttt{C.I.N} \\
+\texttt{REL-IPP.C02} & Nom & texte & — \\
+\texttt{REL-IPP.C03} & Prénom & texte & — \\
+\texttt{REL-IPP.C04} & Date de naissance & date & — \\
+\texttt{REL-IPP.C05} & Mois & entier & — \\
+\texttt{REL-IPP.C06} & Année & entier & — \\
+\texttt{REL-IPP.C07} & Approximation en années & entier & — \\
+\texttt{REL-IPP.C08} & Âge & entier & — \\
+\texttt{REL-IPP.C09} & Téléphone & texte & — \\
+\texttt{REL-IPP.C10} & N° document de contact & texte & — \\
+\texttt{REL-IPP.C11} & Sexe & liste & — \\
+\texttt{REL-IPP.C12} & État civil & liste & — \\
+\texttt{REL-IPP.C13} & N° assuré & texte & — \\
+\addlinespace
+\multicolumn{4}{@{}l}{\textbf{Filtres de population}} \\
+\texttt{REL-IPP.F01} & Patients Hospitalisés & option & — \\
+\texttt{REL-IPP.F02} & Patients aux Urgences & option & — \\
+\texttt{REL-IPP.F03} & Tous les patients & option & — \\
+\texttt{REL-IPP.F04} & Exitus & case\ a\ cocher & — \\
+\addlinespace
+\multicolumn{4}{@{}l}{\textbf{Colonnes de résultat}} \\
+\texttt{REL-IPP.R01} & IPP & colonne & — \\
+\texttt{REL-IPP.R02} & Nom & colonne & — \\
+\texttt{REL-IPP.R03} & D. Naissance & colonne & — \\
+\texttt{REL-IPP.R04} & N° pièce d'identité & colonne & — \\
+\texttt{REL-IPP.R05} & N° Assu & colonne & — \\
+\texttt{REL-IPP.R06} & E. Civil & colonne & — \\
+\texttt{REL-IPP.R07} & Tél & colonne & — \\
+\texttt{REL-IPP.R08} & Sexe & colonne & — \\
+\texttt{REL-IPP.R09} & Province & colonne & — \\
+\texttt{REL-IPP.R10} & Ville & colonne & — \\
+\texttt{REL-IPP.R11} & Code postal & colonne & — \\
+\texttt{REL-IPP.R12} & Probabilité & colonne & — \\
+\addlinespace
+\bottomrule
+\end{longtable}
+
+\medskip
+
+\textbf{Un index maître des patients existe dans le système.} Le bloc d'onglets en porte la
+preuve : à côté de la recherche ordinaire et de la création d'un nouvel identifiant, deux onglets
+s'adressent explicitement à un index maître, dont l'un en recherche
+pondérée\releve{REL-IPP.O03}. Le bloc des colonnes de résultat le confirme : la dernière colonne
+affiche une \emph{probabilité}\releve{REL-IPP.R12}. Une recherche qui rend des probabilités n'est
+pas une recherche exacte — c'est un rapprochement.
+
+Ce que le relevé établit s'arrête là. Il atteste qu'un index maître et une recherche pondérée
+existent dans l'installation observée ; il n'établit rien sur leur déploiement au-delà de cet
+établissement, et aucune source du dossier ne le porte. La portée de cette observation pour la
+modélisation est reprise au chapitre~\ref{chap:qualite}.
+
+Les treize critères de recherche méritent une lecture. Ils ne cherchent pas seulement par
+identifiant : nom, prénom, date de naissance, mais aussi mois et année seuls, âge, et une
+\emph{approximation en années}. Un écran qui offre de chercher à l'âge approché est un écran conçu
+pour des dossiers dont la date de naissance est incertaine ou absente.
+
+\section{Relevé — la fiche patient}
+
+La fiche patient est l'écran le plus dense du périmètre observé : cinquante-sept éléments, dont
+dix boutons de barre d'outils qui ne figurent pas au tableau. Les quarante-sept restants se
+répartissent en trois onglets et cinq blocs de données.
+
+\begin{center}
+\begin{tabular}{@{}c@{}}
+\fbox{\begin{minipage}{0.86\linewidth}
+\centering\small
+\fbox{\begin{minipage}{0.95\linewidth}\centering Barre d'actions \\ \footnotesize dix boutons, hors tableau\end{minipage}}\\[3pt]
+\fbox{\begin{minipage}{0.95\linewidth}\centering Onglets : Général \quad|\quad Contacts \quad|\quad Quota soins primaires\end{minipage}}\\[3pt]
+\fbox{\begin{minipage}{0.95\linewidth}\centering Données principales \\ \footnotesize seize éléments\end{minipage}}\\[3pt]
+\fbox{\begin{minipage}{0.46\linewidth}\centering Compagnie d'assurance \\ \footnotesize six éléments\end{minipage}}%
+\hfill
+\fbox{\begin{minipage}{0.46\linewidth}\centering Né \\ \footnotesize six éléments\end{minipage}}\\[3pt]
+\fbox{\begin{minipage}{0.95\linewidth}\centering Domicile \\ \footnotesize quinze éléments\end{minipage}}\\[3pt]
+\fbox{\begin{minipage}{0.95\linewidth}\centering Commentaire\end{minipage}}
+\end{minipage}}
+\end{tabular}
+\end{center}
+
+\begin{center}
+\footnotesize Agencement des blocs de la fiche patient. Reconstitution structurelle : aucun
+contenu, aucune valeur.
+\end{center}
+
+\medskip
+
+\begin{longtable}{@{}p{2.9cm}p{3.9cm}p{2.8cm}p{4.0cm}@{}}
+\toprule
+Identifiant & Libellé à l'écran & Type apparent & Valeur observée \\
+\midrule\endfirsthead
+\toprule
+Identifiant & Libellé à l'écran & Type apparent & Valeur observée \\
+\midrule\endhead
+\multicolumn{4}{@{}l}{\textbf{Onglets}} \\
+\texttt{REL-PAT.T01} & Général & onglet & — \\
+\texttt{REL-PAT.T02} & Contacts & onglet & — \\
+\texttt{REL-PAT.T03} & Quota soins primaires & onglet & — \\
+\addlinespace
+\multicolumn{4}{@{}l}{\textbf{Données principales}} \\
+\texttt{REL-PAT.D01} & N° IPP & texte & — \\
+\texttt{REL-PAT.D02} & Nom & texte & — \\
+\texttt{REL-PAT.D03} & Nom de famille 1 & texte & — \\
+\texttt{REL-PAT.D04} & Nom de famille 2 & texte & — \\
+\texttt{REL-PAT.D05} & Sexe & liste & — \\
+\texttt{REL-PAT.D06} & D. Nai & date & — \\
+\texttt{REL-PAT.D07} & Âge & entier & — \\
+\texttt{REL-PAT.D08} & Num & non\ determine & — \\
+\texttt{REL-PAT.D09} & Type pièce d'identité & liste & \texttt{C} / \texttt{C.I.N} \\
+\texttt{REL-PAT.D10} & N° pièce d'identité & texte & — \\
+\texttt{REL-PAT.D11} & E. Civil & liste & \texttt{C} / \texttt{CÉLIBATAIRE} \\
+\texttt{REL-PAT.D12} & Type patient & liste & — \\
+\texttt{REL-PAT.D13} & Date photo & date & — \\
+\texttt{REL-PAT.D14} & Modifié par & texte & — \\
+\texttt{REL-PAT.D15} & Créé par & texte & — \\
+\texttt{REL-PAT.D16} & Date d'attribution & date & — \\
+\addlinespace
+\multicolumn{4}{@{}l}{\textbf{Compagnie d'assurance}} \\
+\texttt{REL-PAT.A01} & Compagnie d'assur. & liste & \texttt{00116} / \texttt{CNSS PIPC} \\
+\texttt{REL-PAT.A02} & Police & texte & — \\
+\texttt{REL-PAT.A03} & N° Assu & texte & — \\
+\texttt{REL-PAT.A04} & Profession & texte & — \\
+\texttt{REL-PAT.A05} & Num. inscription & texte & — \\
+\texttt{REL-PAT.A06} & Date inscription & date & — \\
+\addlinespace
+\multicolumn{4}{@{}l}{\textbf{Domicile}} \\
+\texttt{REL-PAT.H01} & Type & liste & — \\
+\texttt{REL-PAT.H02} & Adresse & texte & — \\
+\texttt{REL-PAT.H03} & Code postal & texte & — \\
+\texttt{REL-PAT.H04} & État & liste & — \\
+\texttt{REL-PAT.H05} & Ville & liste & — \\
+\texttt{REL-PAT.H06} & Quartier & texte & — \\
+\texttt{REL-PAT.H07} & Nationalité & liste & \texttt{504} / \texttt{MAROC} \\
+\texttt{REL-PAT.H08} & Téléphone 1 & texte & — \\
+\texttt{REL-PAT.H09} & Téléphone 2 & texte & — \\
+\texttt{REL-PAT.H10} & Téléphone 3 & texte & — \\
+\texttt{REL-PAT.H11} & Téléphone 4 & texte & — \\
+\texttt{REL-PAT.H12} & Avertissements SMS & case\ a\ cocher & — \\
+\texttt{REL-PAT.H13} & E-mail & texte & — \\
+\texttt{REL-PAT.H14} & Avertissements e-mail & case\ a\ cocher & — \\
+\texttt{REL-PAT.H15} & Environnement & liste & — \\
+\addlinespace
+\multicolumn{4}{@{}l}{\textbf{Né}} \\
+\texttt{REL-PAT.N01} & Nom. Père & texte & — \\
+\texttt{REL-PAT.N02} & Nom. Mère & texte & — \\
+\texttt{REL-PAT.N03} & Lieu de naissance - État & liste & — \\
+\texttt{REL-PAT.N04} & Ville & liste & — \\
+\texttt{REL-PAT.N05} & Pays & liste & \texttt{504} / \texttt{MAROC} \\
+\texttt{REL-PAT.N06} & Quartier & texte & — \\
+\addlinespace
+\multicolumn{4}{@{}l}{\textbf{Commentaire}} \\
+\texttt{REL-PAT.K01} & Commentaire & zone\ texte & — \\
+\addlinespace
+\bottomrule
+\end{longtable}
+
+\medskip
+
+Quatre valeurs affichées documentent la forme des nomenclatures du
+système\releve{REL-PAT.D09}. Deux sont des couples code-libellé : la compagnie d'assurance et la
+nationalité, cette dernière relevée deux fois — au domicile et au lieu de naissance — sous le même
+couple. Deux autres sont des couples de valeurs codées : le type de pièce d'identité et l'état
+civil, tous deux abrégés par une lettre suivie de son libellé développé. Le système code donc ses
+références et affiche les deux faces du couple ; c'est ce qui permet, plus loin, de reconstituer
+des dimensions sans inventer de libellés.
+
+Le bloc du domicile porte quatre lignes de téléphone et deux cases d'avertissement, l'une par
+message court, l'autre par courrier électronique\releve{REL-PAT.H12}. Les canaux de contact
+existent donc déjà dans la fiche.
+
+\section{Relevé — donner rendez-vous}
+
+L'écran de prise de rendez-vous compte quarante-deux éléments, dont sept boutons de barre d'outils
+hors tableau. Les trente-cinq restants se répartissent en quatre blocs : un rappel d'identité du
+patient, le rendez-vous lui-même, un bloc de contrôle des modifications, et la liste d'attente des
+consultations.
+
+\begin{center}
+\begin{tabular}{@{}c@{}}
+\fbox{\begin{minipage}{0.86\linewidth}
+\centering\small
+\fbox{\begin{minipage}{0.95\linewidth}\centering Barre d'actions \\ \footnotesize sept boutons, hors tableau\end{minipage}}\\[3pt]
+\fbox{\begin{minipage}{0.95\linewidth}\centering Identification du patient \\ \footnotesize dix éléments, rappelés de la fiche\end{minipage}}\\[3pt]
+\fbox{\begin{minipage}{0.95\linewidth}\centering Rendez-vous \\ \footnotesize quatorze éléments\end{minipage}}\\[3pt]
+\fbox{\begin{minipage}{0.46\linewidth}\centering Contrôle de modifications \\ \footnotesize huit éléments\end{minipage}}%
+\hfill
+\fbox{\begin{minipage}{0.46\linewidth}\centering Liste d'attente \\ \footnotesize trois colonnes\end{minipage}}
+\end{minipage}}
+\end{tabular}
+\end{center}
+
+\begin{center}
+\footnotesize Agencement des blocs de l'écran de prise de rendez-vous. Reconstitution
+structurelle : aucun contenu, aucune valeur.
+\end{center}
+
+\medskip
+
+\begin{longtable}{@{}p{2.9cm}p{3.9cm}p{2.8cm}p{4.0cm}@{}}
+\toprule
+Identifiant & Libellé à l'écran & Type apparent & Valeur observée \\
+\midrule\endfirsthead
+\toprule
+Identifiant & Libellé à l'écran & Type apparent & Valeur observée \\
+\midrule\endhead
+\multicolumn{4}{@{}l}{\textbf{Identification du patient}} \\
+\texttt{REL-RDV.I01} & N° IPP & texte & — \\
+\texttt{REL-RDV.I02} & Téléphone & texte & — \\
+\texttt{REL-RDV.I03} & Compagnie & liste & — \\
+\texttt{REL-RDV.I04} & N° Assu & texte & — \\
+\texttt{REL-RDV.I05} & Âge & entier & — \\
+\texttt{REL-RDV.I06} & Date naissance & date & — \\
+\texttt{REL-RDV.I07} & C.I.N & texte & — \\
+\texttt{REL-RDV.I08} & Num & non\ determine & — \\
+\texttt{REL-RDV.I09} & Adresse & texte & — \\
+\texttt{REL-RDV.I10} & Ville & liste & — \\
+\addlinespace
+\multicolumn{4}{@{}l}{\textbf{Rendez-vous}} \\
+\texttt{REL-RDV.R01} & Agenda & liste & — \\
+\texttt{REL-RDV.R02} & Activité & liste & — \\
+\texttt{REL-RDV.R03} & Origine & liste & \texttt{AU} / \texttt{AUTRES HÔPITAUX} \\
+\texttt{REL-RDV.R04} & Hôpital/C.S. & liste & — \\
+\texttt{REL-RDV.R05} & Médecin ext. & texte & — \\
+\texttt{REL-RDV.R06} & Service ext. & texte & — \\
+\texttt{REL-RDV.R07} & Observations & zone\ texte & — \\
+\texttt{REL-RDV.R08} & Date rendez-vous & horodatage & \texttt{07/28/2026 10:57:07 AM} \\
+\texttt{REL-RDV.R09} & Rendez-vous supplémentaire & case\ a\ cocher & — \\
+\texttt{REL-RDV.R10} & Type d'attention & liste & — \\
+\texttt{REL-RDV.R11} & État & liste & \texttt{En instance} \\
+\texttt{REL-RDV.R12} & Durée & entier & \texttt{0} \\
+\texttt{REL-RDV.R13} & Date réception & horodatage & — \\
+\texttt{REL-RDV.R14} & Imprimer données & case\ a\ cocher & — \\
+\addlinespace
+\multicolumn{4}{@{}l}{\textbf{Contrôle de modifications}} \\
+\texttt{REL-RDV.C01} & Créé par & texte & — \\
+\texttt{REL-RDV.C02} & Date création & horodatage & \texttt{07/28/2026 10:57:06 AM} \\
+\texttt{REL-RDV.C03} & Modifié par & texte & — \\
+\texttt{REL-RDV.C04} & Date mod. & horodatage & — \\
+\texttt{REL-RDV.C05} & Confirmé par & texte & — \\
+\texttt{REL-RDV.C06} & Date conf. & horodatage & — \\
+\texttt{REL-RDV.C07} & Annulé par & texte & — \\
+\texttt{REL-RDV.C08} & Date annul. & horodatage & — \\
+\addlinespace
+\multicolumn{4}{@{}l}{\textbf{Liste d'attente des consultations}} \\
+\texttt{REL-RDV.L01} & Service & colonne & — \\
+\texttt{REL-RDV.L02} & Agenda & colonne & — \\
+\texttt{REL-RDV.L03} & Activité & colonne & — \\
+\addlinespace
+\bottomrule
+\end{longtable}
+
+\medskip
+
+Le bloc du rendez-vous porte l'origine de la demande sous forme de couple code-libellé, et la
+valeur observée désigne un adressage par une autre structure
+hospitalière\releve{REL-RDV.R03}. L'état du rendez-vous à la création et sa durée sont également
+lisibles\releve{REL-RDV.R11}. Le bloc de contrôle des modifications porte quatre couples
+d'auteur et d'horodatage — création, modification, confirmation, annulation — dont la portée est
+traitée à la section suivante.
+
+Les dix éléments du bloc d'identification ne sont pas des champs de saisie propres à cet écran :
+ils rappellent des valeurs de la fiche patient. Le modèle de données ne les enregistre donc pas
+deux fois.
+
+\section{Trois observations exploitables}
+
+Trois relevés de cet écran dépassent la description : ils fondent une grandeur, une distinction et
+un diagnostic que le reste du rapport reprend. Chacun est une observation, et rien d'autre.
+
+\textbf{L'écart entre la création et le rendez-vous est le délai
+d'obtention}\releve{REL-RDV.C02}. Le bloc de contrôle des modifications horodate la création ; le
+bloc du rendez-vous horodate la date convenue. Leur différence est le délai qu'un patient attend,
+grandeur que ni l'un ni l'autre des deux champs ne porte seul. Sur le rendez-vous observé, cette
+différence vaut une seconde : la création à \texttt{10:57:06} et le rendez-vous à
+\texttt{10:57:07} du même jour, soit un rendez-vous donné pour l'instant même. Le cas est extrême
+et il est instructif : il montre que le système accepte un délai nul, donc que la grandeur est
+bornée à zéro et non strictement positive. Le chapitre~\ref{chap:activite} en fait un indicateur.
+
+\textbf{Un couple de champs sépare l'annulation de l'absence}\releve{REL-RDV.C07}. Le bloc de
+contrôle porte un champ d'auteur de confirmation et un champ d'auteur d'annulation, chacun avec
+son horodatage. Sans ce couple, un rendez-vous non honoré serait un état unique. Avec lui, deux
+situations se distinguent : l'annulation déclarée, qui laisse au service le temps de réaffecter le
+créneau, et l'absence non prévenue, qui le perd. La distinction n'est pas cosmétique — elle sépare
+deux taux dont les remèdes diffèrent, et le chapitre~\ref{chap:activite} les mesure séparément.
+
+\textbf{La recherche pondérée est un aveu}\releve{REL-IPP.O03}. Un système qui offre de chercher
+un patient par similarité, et qui affiche une probabilité en regard de chaque résultat, admet que
+la recherche exacte ne suffit pas. Elle ne suffit pas parce qu'une même personne y possède
+plusieurs dossiers. La fonction existe dans le produit installé ; ce que le relevé ne dit pas,
+c'est si le service l'emploie. Le chapitre~\ref{chap:qualite} construit un rapprochement
+probabiliste sur ce constat, et le confronte à une collision exacte pour mesurer ce que la
+similarité apporte.
+
+Une quatrième observation, mineure et têtue, court à travers les trois précédentes : les
+horodatages s'affichent au format mois-jour-année avec un indicateur de méridien, dans une
+interface par ailleurs française\releve{REL-RDV.R08}. La date observée le montre sans ambiguïté —
+le quantième vaut vingt-huit, ce qui exclut toute lecture jour-mois, et lève l'incertitude qu'une
+date antérieure au treizième jour du mois aurait laissée entière.
+
+Ce détail d'affichage n'est pas cosmétique. Une extraction du système rend ses dates dans la forme
+où l'écran les compose ; toute date entrant dans la chaîne de données doit donc être convertie
+depuis ce format, et la conversion doit être écrite une fois et vérifiée, faute de quoi un jour et
+un mois s'échangent silencieusement onze fois sur douze sans qu'aucune valeur ne devienne
+invalide. C'est une contrainte de chargement, reprise au chapitre~\ref{chap:architecture}.
+
+Ces quatre observations partagent une propriété qu'il faut nommer, parce qu'elle gouverne la
+suite. Aucune ne résulte d'un entretien ni d'une documentation : chacune est lisible sur un écran,
+et chacune est consignée sous un identifiant que le lecteur peut retrouver dans les tableaux des
+sections précédentes. Elles ne disent rien de la fréquence des situations qu'elles révèlent — un
+seul rendez-vous a été observé, et un cas n'est pas une distribution. Ce qu'elles établissent est
+qu'une grandeur est calculable, qu'une distinction est enregistrée, qu'une fonction existe et
+qu'un format s'impose. C'est précisément ce dont la modélisation a besoin : non pas des valeurs,
+mais la certitude que les champs qui les porteraient existent.
