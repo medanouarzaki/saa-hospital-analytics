@@ -950,3 +950,39 @@ ecrans:
         type_apparent: colonne
         saisie: sans_objet
         valeurs_observees: aucune_valeur_observee
+
+# --- champs relevés que rien n'emploie, et le motif de leur non-emploi ------------
+#
+# Un champ relevé à l'écran est employé de trois façons : une entrée du registre des
+# champs l'invoque comme preuve d'observation, un chapitre du rapport le cite, ou il
+# est déclaré ici avec son motif. Sans cette troisième voie, un champ observé puis
+# oublié disparaîtrait du modèle sans que rien ne le dise — et c'est le sens que le
+# contrôle de provenance ne vérifiait pas.
+champs_non_employes:
+  - motif: >-
+      Boutons de la barre d'outils de la fiche patient. Ils déclenchent une opération
+      et ne portent aucune donnée de dossier : aucune colonne n'en dérive, et les
+      tableaux du rapport ne les reprennent pas. Leur relevé est conservé parce qu'il
+      atteste l'agencement de l'écran, restitué par un schéma structurel.
+    champs:
+      - REL-PAT.B01
+      - REL-PAT.B02
+      - REL-PAT.B03
+      - REL-PAT.B04
+      - REL-PAT.B05
+      - REL-PAT.B06
+      - REL-PAT.B07
+      - REL-PAT.B08
+      - REL-PAT.B09
+      - REL-PAT.B10
+  - motif: >-
+      Boutons de la barre d'outils de l'écran de prise de rendez-vous. Même raison que
+      pour la fiche patient : une action, aucune donnée.
+    champs:
+      - REL-RDV.B01
+      - REL-RDV.B02
+      - REL-RDV.B03
+      - REL-RDV.B04
+      - REL-RDV.B05
+      - REL-RDV.B06
+      - REL-RDV.B07
