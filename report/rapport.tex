@@ -23,6 +23,12 @@
 \usepackage{booktabs}
 \usepackage{fancyhdr}
 
+% Tracé vectoriel, pour la seule courbe de précision et de rappel. Le paquet est présent dans
+% toute distribution complète, et l'image de composition de l'intégration continue en porte une :
+% le choix est mesuré, non supposé.
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
 \usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
 \addbibresource{biblio.bib}
 
