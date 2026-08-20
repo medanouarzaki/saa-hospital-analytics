@@ -83,6 +83,11 @@ jobs:
       # n'est donc pas le travail qui compile.
       - run: uv run pytest tests/test_marqueurs_nominatifs.py tests/test_structure_du_rapport.py -v
 
+      # La provenance des affirmations du rapport. Ce contrôle lit les fichiers de chapitre, le fichier
+      # bibliographique produit et le registre des sources : aucune base, aucune compilation. Sa place est
+      # donc ici, avec les deux précédents, et non dans le travail qui compile.
+      - run: uv run pytest tests/test_provenance_des_chapitres.py -v
+
   tests-matrice:
     runs-on: ubuntu-latest
     strategy:
