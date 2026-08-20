@@ -1,0 +1,81 @@
+% Support de présentation de la soutenance.
+%
+% Même moteur que le rapport — pdflatex par latexmk — et pour le même motif : la
+% classe beamer et les polices Latin Modern sont présentes dans toute distribution
+% complète, sans dépendre d'une police du système.
+%
+% Aucun contenu n'est rédigé : chaque section porte son titre et une planche vide.
+% Les marqueurs nominatifs sont ceux du rapport, lus dans son fichier unique.
+
+\documentclass[aspectratio=169]{beamer}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[french]{babel}
+\usepackage{csquotes}
+
+\usetheme{default}
+\usecolortheme{default}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+
+\input{../report/marqueurs}
+
+\title{Chaîne de données et tableau de bord\\pour un établissement hospitalier}
+\author{\marqueurAuteur}
+\institute{\marqueurEtablissementFormation\\\marqueurFiliere}
+\date{\marqueurDateSoutenance}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \siBrouillon{\begin{center}\fbox{\mentionVersionDeTravail}\end{center}}
+  \titlepage
+  \begin{center}
+    \small
+    \begin{tabular}{rl}
+      Encadrant académique & \marqueurEncadrantAcademique \\
+      Encadrant professionnel & \marqueurEncadrantProfessionnel \\
+      Organisme d'accueil & \marqueurOrganismeAccueil \\
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Plan}
+  \tableofcontents
+\end{frame}
+
+\section{Contexte et problème}
+\begin{frame}{Contexte et problème}
+\end{frame}
+
+\section{Démarche}
+\begin{frame}{Démarche}
+\end{frame}
+
+\section{Le jeu de données}
+\begin{frame}{Le jeu de données}
+\end{frame}
+
+\section{La chaîne de données}
+\begin{frame}{La chaîne de données}
+\end{frame}
+
+\section{Qualité et rapprochement d'identités}
+\begin{frame}{Qualité et rapprochement d'identités}
+\end{frame}
+
+\section{Analyse de l'activité}
+\begin{frame}{Analyse de l'activité}
+\end{frame}
+
+\section{Le tableau de bord}
+\begin{frame}{Le tableau de bord}
+\end{frame}
+
+\section{Limites et perspectives}
+\begin{frame}{Limites et perspectives}
+\end{frame}
+
+\end{document}
