@@ -98,6 +98,12 @@ jobs:
       # `docs/chiffres/mesurer.py --verifier`, qui exige la période entière.
       - run: uv run pytest tests/test_registre_des_chiffres.py -v
 
+      # La correspondance entre les relations injectées et les conclusions du chapitre d'analyse,
+      # dans les deux sens. Ce contrôle lit deux FICHIERS — le registre des relations et la source
+      # du chapitre — et n'ouvre aucune base : sa place est ici, avec les autres contrôles de
+      # sources du rapport, et non dans un emplacement qui démarre un service.
+      - run: uv run pytest tests/test_correspondance_relations_conclusions.py -v
+
   tests-matrice:
     runs-on: ubuntu-latest
     strategy:
@@ -351,6 +357,18 @@ jobs:
       # PLACÉ ICI, ET PAS PLUS TÔT : le registre lit maintenant linkage.grappes_identite et
       # linkage.evaluation, que l'étape ci-dessus est la première à peupler. Mesuré — placé après la
       # construction dimensionnelle seulement, ce contrôle échouait sur une table encore vide.
+      #
+      # CE MODE COUVRE AUSSI LES SÉRIES, et il ne les ÉCRIT PAS : seul `--ecrire-series` écrit les
+      # fichiers de données, et il ne s'exécute jamais ici — le garde d'arbre propre, quelques
+      # étapes plus bas, rougirait sinon. Ce que ce mode prouve des séries est que chaque commande
+      # s'exécute encore et rend exactement les colonnes déclarées ; que le fichier lu soit celui
+      # que la commande produit relève de tests/test_registre_des_chiffres.py, et que l'empreinte
+      # du registre soit celle de la commande relève de `--verifier`, qui exige la période entière.
+      #
+      # AUCUNE SÉRIE NE LIT LE SCHÉMA D'INSTANTANÉ, et c'est délibéré : cet emplacement ne le
+      # rafraîchit pas. L'ancienneté des créances se compte donc depuis la date d'extraction la
+      # plus récente des créances, mesurée égale à la date de référence de l'instantané sur la
+      # base complète.
       - run: uv run python3 docs/chiffres/mesurer.py --formes
 
       # Aucune étape de chaîne ne doit modifier un fichier SUIVI. `git diff --exit-code` « exits
