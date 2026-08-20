@@ -82,3 +82,4 @@ chaque exécution.
 | [0066](0066-le-registre-des-chiffres-et-ce-que-l-integration-continue-n-en-prouve-pas.md) | Aucun nombre du rapport n'est tapé : un registre des chiffres, et ce que l'intégration continue n'en prouve pas |
 | [0067](0067-trois-grandeurs-la-personne-l-identifiant-et-la-version.md) | La personne, l'identifiant et la version sont trois grandeurs, et le registre des chiffres portait la confusion |
 | [0068](0068-la-courbe-de-precision-et-de-rappel-est-composee-et-non-tabulee.md) | La courbe de précision et de rappel est composée par un paquet de tracé, et le choix a été tranché par mesure |
+| [0069](0069-le-registre-des-chiffres-s-etend-aux-series-et-la-dette-de-correspondance-se-solde.md) | Le registre des chiffres s'étend aux séries, et la dette de correspondance se solde |
