@@ -673,7 +673,7 @@ chiffres:
   commande: (R/'airflow/saa_daily.py').read_text(encoding='utf-8').count('task_id=')
   portee: independant-des-donnees
 - id: fichiers-de-controle
-  valeur: 72
+  valeur: 73
   unite: fichiers
   type: python
   commande: len(list((R/'tests').glob('test_*.py')))
@@ -919,3 +919,1264 @@ chiffres:
   portee: periode-entiere
   note: Fiches réunies à tort dans une grappe trop grande, sur la population entière. Métrique SECONDAIRE,
     au niveau de la grappe ; la métrique primaire est au niveau de la paire.
+- id: flux-passages-total
+  valeur: 40650
+  unite: passages
+  type: sql
+  commande: >-
+    select count(*) from marts.fct_passage
+  portee: periode-entiere
+  note: >-
+    Toutes natures confondues — consultation externe, hospitalisation et urgences, soit les trois
+    codes de type_passage. À ne pas confondre avec `flux-programme-total`.
+- id: flux-programme-total
+  valeur: 13290
+  unite: passages
+  type: sql
+  commande: >-
+    select count(*) from marts.fct_passage where type_passage <> 'U'
+  portee: periode-entiere
+  note: >-
+    Activité programmée seule, définie comme le complément du code de passage aux urgences et non
+    par les libellés des deux autres codes, qu'aucune source ne documente.
+- id: flux-jours-ouverts
+  valeur: 749
+  unite: jours
+  type: sql
+  commande: >-
+    select count(distinct date_entree) from marts.fct_passage where type_passage <> 'U'
+  portee: periode-entiere
+  note: >-
+    Jours portant au moins un passage programmé. Les urgences en portent 912, soit la période
+    entière.
+- id: flux-programme-moyenne
+  valeur: 17.7437
+  unite: jours (moyenne)
+  type: sql
+  commande: >-
+    select round((select count(*)::float8 / count(distinct date_entree) from marts.fct_passage where
+    type_passage <> 'U')::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Passages programmés par jour ouvert. Dénominateur — les jours ouverts, jamais les 912 jours de
+    la période.
+- id: flux-urgences-moyenne
+  valeur: 30.0
+  unite: jours (moyenne)
+  type: sql
+  commande: >-
+    select count(*)::float8 / count(distinct date_entree) from marts.fct_passage where type_passage
+    = 'U'
+  portee: periode-entiere
+  note: >-
+    Passages aux urgences par jour, sur les 912 jours de la période — le service n'a aucun jour sans
+    passage.
+- id: flux-lundi-moyenne
+  valeur: 23.1969
+  unite: jours (moyenne)
+  type: sql
+  commande: >-
+    select round((select count(*)::float8 / count(distinct p.date_entree) from marts.fct_passage p
+    join marts.dim_date d on d.date_jour = p.date_entree where p.type_passage <> 'U' and
+    d.jour_semaine_iso = 1)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Passages programmés du premier jour de la semaine, par jour de ce rang.
+- id: flux-samedi-moyenne
+  valeur: 7.7165
+  unite: jours (moyenne)
+  type: sql
+  commande: >-
+    select round((select count(*)::float8 / count(distinct p.date_entree) from marts.fct_passage p
+    join marts.dim_date d on d.date_jour = p.date_entree where p.type_passage <> 'U' and
+    d.jour_semaine_iso = 6)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Passages programmés du sixième jour de la semaine, par jour de ce rang.
+- id: flux-dimanche-programme
+  valeur: 0
+  unite: passages
+  type: sql
+  commande: >-
+    select count(*) from marts.fct_passage p join marts.dim_date d on d.date_jour = p.date_entree
+    where p.type_passage <> 'U' and d.jour_semaine_iso = 7
+  portee: periode-entiere
+  note: >-
+    Une absence, et elle n'est un résultat que parce que la même commande trouve autre chose aux six
+    autres rangs de la semaine.
+- id: flux-heure-pointe
+  valeur: 9
+  unite: heures
+  type: sql
+  commande: >-
+    select extract(hour from date_heure_entree)::int from marts.fct_passage where type_passage <>
+    'U' group by 1 order by count(*) desc limit 1
+  portee: periode-entiere
+  note: >-
+    Heure d'entrée la plus chargée de l'activité programmée, sur la période entière.
+- id: flux-passages-heure-pointe
+  valeur: 2470
+  unite: passages
+  type: sql
+  commande: >-
+    select count(*) from marts.fct_passage where type_passage <> 'U' and extract(hour from
+    date_heure_entree)::int = 9
+  portee: periode-entiere
+  note: >-
+    Passages programmés entrés dans l'heure de pointe, cumulés sur la période entière et non par
+    jour.
+- id: ramadan-jours
+  valeur: 89
+  unite: jours
+  type: sql
+  commande: >-
+    select count(*) from marts.dim_date where est_ramadan and date_jour between '2024-01-01' and
+    '2026-06-30'
+  portee: periode-entiere
+  note: >-
+    Jours de Ramadan compris dans la période des données. Le calendrier en porte davantage, la
+    période n'en couvre que ceux-là.
+- id: ramadan-jours-ouverts
+  valeur: 76
+  unite: jours
+  type: sql
+  commande: >-
+    select count(distinct p.date_entree) from marts.fct_passage p join marts.dim_date d on
+    d.date_jour = p.date_entree where p.type_passage <> 'U' and d.est_ramadan
+  portee: periode-entiere
+  note: >-
+    Jours de Ramadan portant au moins un passage programmé — treize de moins que le total,
+    l'établissement étant fermé le septième jour de la semaine et les jours fériés.
+- id: ramadan-programme-moyenne
+  valeur: 13.8289
+  unite: jours (moyenne)
+  type: sql
+  commande: >-
+    select round((select count(*)::float8 / count(distinct p.date_entree) from marts.fct_passage p
+    join marts.dim_date d on d.date_jour = p.date_entree where p.type_passage <> 'U' and
+    d.est_ramadan)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Passages programmés par jour ouvert de Ramadan.
+- id: ramadan-hors-moyenne
+  valeur: 18.1857
+  unite: jours (moyenne)
+  type: sql
+  commande: >-
+    select round((select count(*)::float8 / count(distinct p.date_entree) from marts.fct_passage p
+    join marts.dim_date d on d.date_jour = p.date_entree where p.type_passage <> 'U' and not
+    d.est_ramadan)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Passages programmés par jour ouvert hors Ramadan — le terme de comparaison.
+- id: ramadan-baisse
+  valeur: 23.9572
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select 100.0 * (1 - (count(*) filter (where d.est_ramadan)::float8 /
+    nullif(count(distinct p.date_entree) filter (where d.est_ramadan), 0)) / (count(*) filter (where
+    not d.est_ramadan)::float8 / nullif(count(distinct p.date_entree) filter (where not
+    d.est_ramadan), 0))) from marts.fct_passage p join marts.dim_date d on d.date_jour =
+    p.date_entree where p.type_passage <> 'U')::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Baisse relative de l'activité programmée par jour ouvert pendant le Ramadan.
+- id: feries-jours
+  valeur: 36
+  unite: jours
+  type: sql
+  commande: >-
+    select count(*) from marts.dim_date where est_ferie and date_jour between '2024-01-01' and
+    '2026-06-30'
+  portee: periode-entiere
+  note: >-
+    Jours fériés compris dans la période des données.
+- id: feries-programme-passages
+  valeur: 0
+  unite: passages
+  type: sql
+  commande: >-
+    select count(*) from marts.fct_passage p join marts.dim_date d on d.date_jour = p.date_entree
+    where p.type_passage <> 'U' and d.est_ferie
+  portee: periode-entiere
+  note: >-
+    Une absence, et la même commande trouve 1 065 passages aux urgences ces mêmes jours :
+    l'établissement ferme son activité programmée, il n'arrête pas d'accueillir.
+- id: feries-urgences-moyenne
+  valeur: 29.5833
+  unite: jours (moyenne)
+  type: sql
+  commande: >-
+    select round((select count(*)::float8 / count(distinct p.date_entree) from marts.fct_passage p
+    join marts.dim_date d on d.date_jour = p.date_entree where p.type_passage = 'U' and
+    d.est_ferie)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Passages aux urgences par jour férié.
+- id: feries-urgences-hors-moyenne
+  valeur: 30.0171
+  unite: jours (moyenne)
+  type: sql
+  commande: >-
+    select round((select count(*)::float8 / count(distinct p.date_entree) from marts.fct_passage p
+    join marts.dim_date d on d.date_jour = p.date_entree where p.type_passage = 'U' and not
+    d.est_ferie)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Passages aux urgences par jour non férié — le terme de comparaison.
+- id: honores-total
+  valeur: 10280
+  unite: rendez-vous
+  type: sql
+  commande: >-
+    select count(*) from marts.fct_rendez_vous where est_honore
+  portee: periode-entiere
+  note: >-
+    Rendez-vous à l'état honoré, fiche patient présente ou non.
+- id: honores-avec-fiche
+  valeur: 10256
+  unite: rendez-vous
+  type: sql
+  commande: >-
+    select count(*) from marts.fct_rendez_vous r where r.est_honore and exists (select 1 from
+    marts.dim_patient d where d.n_ipp = r.n_ipp)
+  portee: periode-entiere
+  note: >-
+    Population de la partition d'artefact. Un rendez-vous dont la fiche est absente n'a pas de marge
+    disponible calculable, et ne peut donc être rangé dans aucune des deux parts.
+- id: honores-sans-fiche
+  valeur: 24
+  unite: rendez-vous
+  type: sql
+  commande: >-
+    select count(*) from marts.fct_rendez_vous r where r.est_honore and not exists (select 1 from
+    marts.dim_patient d where d.n_ipp = r.n_ipp)
+  portee: periode-entiere
+  note: >-
+    Le reste exact de la partition. Les fiches correspondantes sont en quarantaine, ce que `honores-
+    sans-fiche-en-quarantaine` mesure.
+- id: honores-sans-fiche-en-quarantaine
+  valeur: 24
+  unite: rendez-vous
+  type: sql
+  commande: >-
+    select count(*) from marts.fct_rendez_vous r where r.est_honore and not exists (select 1 from
+    marts.dim_patient d where d.n_ipp = r.n_ipp) and exists (select 1 from quarantaine.patients q
+    where q.n_ipp = r.n_ipp)
+  portee: periode-entiere
+  note: >-
+    Cause mesurée des rendez-vous honorés sans fiche, et non supposée.
+- id: artefact-nombre
+  valeur: 6845
+  unite: rendez-vous
+  type: sql
+  commande: >-
+    with p as (select n_ipp, min(date_attribution) as creation from marts.dim_patient group by
+    n_ipp) select count(*) from marts.fct_rendez_vous r join p using (n_ipp) where r.est_honore and
+    r.date_prise = p.creation
+  portee: periode-entiere
+  note: >-
+    Rendez-vous honorés dont le délai égale la marge disponible, c'est-à-dire dont la date de prise
+    est la date de création de la fiche.
+- id: artefact-part
+  valeur: 66.7414
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((with p as (select n_ipp, min(date_attribution) as creation from marts.dim_patient
+    group by n_ipp) select 100.0 * count(*) filter (where r.date_prise = p.creation) / count(*) from
+    marts.fct_rendez_vous r join p using (n_ipp) where r.est_honore)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Dénominateur — les honorés dont la fiche est présente, soit 10 256 et non 10 280.
+- id: complement-nombre
+  valeur: 3411
+  unite: rendez-vous
+  type: sql
+  commande: >-
+    with p as (select n_ipp, min(date_attribution) as creation from marts.dim_patient group by
+    n_ipp) select count(*) from marts.fct_rendez_vous r join p using (n_ipp) where r.est_honore and
+    r.date_prise <> p.creation
+  portee: periode-entiere
+  note: >-
+    L'autre part de la partition. Sa somme avec `artefact-nombre` vaut `honores-avec-fiche`, et
+    aucun rendez-vous ne relève des deux.
+- id: delai-mediane-ensemble
+  valeur: 17.0
+  unite: jours (moyenne)
+  type: sql
+  commande: >-
+    select percentile_cont(0.5) within group (order by delai_obtention_jours) from
+    marts.fct_rendez_vous where est_honore and delai_obtention_jours > 0
+  portee: periode-entiere
+  note: >-
+    Médiane du délai sur tous les honorés à délai strictement positif, activités confondues.
+- id: delai-mediane-complement
+  valeur: 16.0
+  unite: jours (moyenne)
+  type: sql
+  commande: >-
+    with p as (select n_ipp, min(date_attribution) as creation from marts.dim_patient group by
+    n_ipp) select percentile_cont(0.5) within group (order by r.delai_obtention_jours) from
+    marts.fct_rendez_vous r join p using (n_ipp) where r.est_honore and r.delai_obtention_jours > 0
+    and r.date_prise <> p.creation
+  portee: periode-entiere
+  note: >-
+    La même médiane sur le seul complément de l'artefact.
+- id: part-jour-meme
+  valeur: 8.6673
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select 100.0 * count(*) filter (where est_jour_meme) / count(*) from
+    marts.fct_rendez_vous where est_honore)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Part des rendez-vous honorés pris pour le jour même. Dénominateur — tous les honorés.
+- id: rdv-en-instance
+  valeur: 432
+  unite: rendez-vous
+  type: sql
+  commande: >-
+    select count(*) from marts.fct_rendez_vous where not (est_honore or est_absence or est_annule)
+  portee: periode-entiere
+  note: >-
+    Le quatrième état, qui n'a pas de drapeau propre — aucune des trois significations établies ne
+    le couvre.
+- id: absences-total
+  valeur: 2496
+  unite: rendez-vous
+  type: sql
+  commande: >-
+    select count(*) from marts.fct_rendez_vous where est_absence
+  portee: periode-entiere
+  note: >-
+    Rendez-vous confirmés puis non honorés.
+- id: annulations-total
+  valeur: 961
+  unite: rendez-vous
+  type: sql
+  commande: >-
+    select count(*) from marts.fct_rendez_vous where est_annule
+  portee: periode-entiere
+  note: >-
+    Rendez-vous annulés, distincts des absences par un état et par un couple de champs d'annulation.
+- id: taux-absenteisme-global
+  valeur: 17.6159
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select 100.0 * count(*) filter (where est_absence) / count(*) from
+    marts.fct_rendez_vous)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Dénominateur — tous les rendez-vous, les quatre états compris.
+- id: taux-annulation-global
+  valeur: 6.7824
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select 100.0 * count(*) filter (where est_annule) / count(*) from
+    marts.fct_rendez_vous)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Même dénominateur que `taux-absenteisme-global`.
+- id: annulations-avec-agent
+  valeur: 961
+  unite: rendez-vous
+  type: sql
+  commande: >-
+    select count(*) from marts.fct_rendez_vous where est_annule and agent_annulation is not null and
+    date_annulation is not null
+  portee: periode-entiere
+  note: >-
+    Annulations portant le couple de champs qui les sépare des absences. Une absence n'en porte
+    aucun, ce que `absences-avec-agent-annulation` mesure dans l'autre sens.
+- id: absences-avec-agent-annulation
+  valeur: 0
+  unite: rendez-vous
+  type: sql
+  commande: >-
+    select count(*) from marts.fct_rendez_vous where est_absence and (agent_annulation is not null
+    or date_annulation is not null)
+  portee: periode-entiere
+  note: >-
+    Le témoin dans l'autre sens. Une absence qui porterait un agent ou une date d'annulation
+    ruinerait la distinction.
+- id: relation-inter-ensemble
+  valeur: -0.4878
+  unite: corrélation
+  type: sql
+  commande: >-
+    select round((with p as (select n_ipp, min(date_attribution) as creation from marts.dim_patient
+    group by n_ipp), b as (select r.code_activite, r.delai_obtention_jours::float8 as d,
+    r.est_absence::int::float8 as a from marts.fct_rendez_vous r join p using (n_ipp) where
+    (r.est_honore or r.est_absence) and r.delai_obtention_jours > 0), g as (select code_activite,
+    percentile_cont(0.5) within group (order by d) as med, avg(a) as taux from b group by 1) select
+    corr(med, taux) from g)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Corrélation entre le délai médian et la part d'absences, sur les huit activités — huit points,
+    jamais 11 837. C'est une comparaison ENTRE activités.
+- id: relation-intra-ensemble
+  valeur: 0.0782
+  unite: corrélation
+  type: sql
+  commande: >-
+    select round((with p as (select n_ipp, min(date_attribution) as creation from marts.dim_patient
+    group by n_ipp), b as (select r.code_activite, r.delai_obtention_jours::float8 as d,
+    r.est_absence::int::float8 as a from marts.fct_rendez_vous r join p using (n_ipp) where
+    (r.est_honore or r.est_absence) and r.delai_obtention_jours > 0), c as (select d - avg(d) over
+    (partition by code_activite) as dc, a - avg(a) over (partition by code_activite) as ac from b)
+    select corr(dc, ac) from c)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    La même relation À L'INTÉRIEUR des activités, l'activité étant retirée des deux grandeurs par
+    centrage. Population — 11 837 rendez-vous, jamais huit points.
+- id: relation-brute-ensemble
+  valeur: 0.028
+  unite: corrélation
+  type: sql
+  commande: >-
+    select round((with p as (select n_ipp, min(date_attribution) as creation from marts.dim_patient
+    group by n_ipp), b as (select r.delai_obtention_jours::float8 as d, r.est_absence::int::float8
+    as a from marts.fct_rendez_vous r join p using (n_ipp) where (r.est_honore or r.est_absence) and
+    r.delai_obtention_jours > 0) select corr(d, a) from b)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    La même relation sans distinguer les activités. Même population que `relation-intra-ensemble`,
+    et c'est le centrage seul qui les sépare.
+- id: relation-inter-complement
+  valeur: -0.2946
+  unite: corrélation
+  type: sql
+  commande: >-
+    select round((with p as (select n_ipp, min(date_attribution) as creation from marts.dim_patient
+    group by n_ipp), b as (select r.code_activite, r.delai_obtention_jours::float8 as d,
+    r.est_absence::int::float8 as a from marts.fct_rendez_vous r join p using (n_ipp) where
+    (r.est_honore or r.est_absence) and r.delai_obtention_jours > 0 and not (r.est_honore and
+    r.date_prise = p.creation)), g as (select code_activite, percentile_cont(0.5) within group
+    (order by d) as med, avg(a) as taux from b group by 1) select corr(med, taux) from g)::numeric,
+    4)
+  portee: periode-entiere
+  note: >-
+    Sur le complément de l'artefact. La part d'absences y a un AUTRE dénominateur — les honorés
+    d'artefact en sont retirés, les absences non — et son niveau n'est pas comparable.
+- id: relation-intra-complement
+  valeur: 0.123
+  unite: corrélation
+  type: sql
+  commande: >-
+    select round((with p as (select n_ipp, min(date_attribution) as creation from marts.dim_patient
+    group by n_ipp), b as (select r.code_activite, r.delai_obtention_jours::float8 as d,
+    r.est_absence::int::float8 as a from marts.fct_rendez_vous r join p using (n_ipp) where
+    (r.est_honore or r.est_absence) and r.delai_obtention_jours > 0 and not (r.est_honore and
+    r.date_prise = p.creation)), c as (select d - avg(d) over (partition by code_activite) as dc, a
+    - avg(a) over (partition by code_activite) as ac from b) select corr(dc, ac) from c)::numeric,
+    4)
+  portee: periode-entiere
+  note: >-
+    La relation interne sur le seul complément de l'artefact.
+- id: relation-brute-complement
+  valeur: 0.0695
+  unite: corrélation
+  type: sql
+  commande: >-
+    select round((with p as (select n_ipp, min(date_attribution) as creation from marts.dim_patient
+    group by n_ipp), b as (select r.delai_obtention_jours::float8 as d, r.est_absence::int::float8
+    as a from marts.fct_rendez_vous r join p using (n_ipp) where (r.est_honore or r.est_absence) and
+    r.delai_obtention_jours > 0 and not (r.est_honore and r.date_prise = p.creation)) select corr(d,
+    a) from b)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    La relation sans distinction d'activité, sur le seul complément.
+- id: relation-effectif-ensemble
+  valeur: 11837
+  unite: rendez-vous
+  type: sql
+  commande: >-
+    with p as (select n_ipp, min(date_attribution) as creation from marts.dim_patient group by
+    n_ipp) select count(*) from marts.fct_rendez_vous r join p using (n_ipp) where (r.est_honore or
+    r.est_absence) and r.delai_obtention_jours > 0
+  portee: periode-entiere
+  note: >-
+    Population des trois formes de la relation sur l'ensemble.
+- id: relation-effectif-complement
+  valeur: 5636
+  unite: rendez-vous
+  type: sql
+  commande: >-
+    with p as (select n_ipp, min(date_attribution) as creation from marts.dim_patient group by
+    n_ipp) select count(*) from marts.fct_rendez_vous r join p using (n_ipp) where (r.est_honore or
+    r.est_absence) and r.delai_obtention_jours > 0 and not (r.est_honore and r.date_prise =
+    p.creation)
+  portee: periode-entiere
+  note: >-
+    Population des trois mêmes formes sur le complément de l'artefact.
+- id: relation-activites-ecart-positif
+  valeur: 8
+  unite: activités
+  type: sql
+  commande: >-
+    with b as (select code_activite, delai_obtention_jours::float8 as d, est_absence as a from
+    marts.fct_rendez_vous where (est_honore or est_absence) and delai_obtention_jours > 0), g as
+    (select code_activite, percentile_cont(0.5) within group (order by d) filter (where a) -
+    percentile_cont(0.5) within group (order by d) filter (where not a) as ecart from b group by 1)
+    select count(*) from g where ecart > 0
+  portee: periode-entiere
+  note: >-
+    Activités dont la médiane du délai des absences dépasse celle des honorés. Sur huit activités —
+    la même commande sans le filtre en compte huit.
+- id: urgences-part-consultation-ordinaire
+  valeur: 62.6827
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select 100.0 * count(*) filter (where niveau_tri in ('4', '5')) / count(*) from
+    marts.fct_passage_urgence)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Part des passages classés aux deux niveaux de tri dont la cible de délai est la plus longue. Le
+    classement des niveaux vient des cibles de la configuration, jamais de leur numéro.
+- id: urgences-part-mode-principal
+  valeur: 71.674
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select 100.0 * count(*) filter (where mode_arrivee = 'MP') / count(*) from
+    marts.fct_passage_urgence)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Part du mode d'arrivée le plus fréquent. Le code s'affiche nu — aucune source du registre
+    n'établit sa signification.
+- id: urgences-part-retour-domicile
+  valeur: 79.9159
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select 100.0 * count(*) filter (where orientation_sortie = 'RD') / count(*) from
+    marts.fct_passage_urgence)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Part des passages orientés vers le retour à domicile. Le libellé du code est documenté.
+- id: urgences-part-hospitalisation
+  valeur: 5.8808
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select 100.0 * count(*) filter (where orientation_sortie = 'HO') / count(*) from
+    marts.fct_passage_urgence)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Part des passages orientés vers une hospitalisation. Dénominateur — les passages aux urgences,
+    jamais les hospitalisations.
+- id: urgences-part-transfert
+  valeur: 12.3538
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select 100.0 * count(*) filter (where orientation_sortie = 'TR') / count(*) from
+    marts.fct_passage_urgence)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Part des passages orientés vers un transfert.
+- id: urgences-heure-pointe
+  valeur: 10
+  unite: heures
+  type: sql
+  commande: >-
+    select extract(hour from date_heure_arrivee)::int from marts.fct_passage_urgence group by 1
+    order by count(*) desc limit 1
+  portee: periode-entiere
+  note: >-
+    Heure d'arrivée la plus chargée aux urgences.
+- id: urgences-heure-creux
+  valeur: 2
+  unite: heures
+  type: sql
+  commande: >-
+    select extract(hour from date_heure_arrivee)::int from marts.fct_passage_urgence group by 1
+    order by count(*) limit 1
+  portee: periode-entiere
+  note: >-
+    Heure d'arrivée la moins chargée aux urgences.
+- id: urgences-rapport-pointe-creux
+  valeur: 2.7983
+  unite: proportion
+  type: sql
+  commande: >-
+    select round((with h as (select extract(hour from date_heure_arrivee)::int as heure, count(*) as
+    n from marts.fct_passage_urgence group by 1) select max(n)::float8 / min(n) from h)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Rapport entre l'heure la plus chargée et la moins chargée aux urgences. À comparer au rapport de
+    l'activité programmée, qui vaut l'infini — six heures y portent zéro passage.
+- id: source-part-non-urgentes
+  valeur: 64
+  unite: '%'
+  type: python
+  commande: >-
+    int([s for s in yaml.safe_load((R/'docs/sources/sources.yml').read_text(encoding='utf-8')) if
+    s['id']=='S-12'][0]['utilise_pour'].split('consultations non urgentes ')[1].split(' %')[0])
+  portee: independant-des-donnees
+  note: >-
+    Part des consultations non urgentes aux urgences au niveau national, telle que la source S-12 la
+    donne. C'est ce qui ÉTABLIT ; l'indicateur mesuré ne fait que démontrer qu'il se calcule.
+- id: source-part-non-appropriees
+  valeur: 0.307
+  unite: proportion
+  type: python
+  commande: >-
+    [p['valeur'] for p in
+    yaml.safe_load((R/'generator/config/urgences.yml').read_text(encoding='utf-8'))['parametres'] if
+    p['nom']=='part_passages_consultation_ordinaire'][0]
+  portee: independant-des-donnees
+  note: >-
+    Part des consultations non appropriées mesurée par S-13 sur 410 patients d'un hôpital
+    provincial. Elle ne mesure PAS la même chose que `source-part-non-urgentes`, et le générateur ne
+    l'applique à aucune colonne.
+- id: injecte-part-deux-derniers-niveaux
+  valeur: 0.63
+  unite: proportion
+  type: python
+  commande: >-
+    sum([p['valeur'] for p in
+    yaml.safe_load((R/'generator/config/urgences.yml').read_text(encoding='utf-8'))['parametres'] if
+    p['nom']=='repartition_niveaux_tri'][0][n] for n in ('4', '5'))
+  portee: independant-des-donnees
+  note: >-
+    Somme des parts injectées des deux niveaux de tri aux cibles de délai les plus longues. C'est le
+    paramètre que la mesure retrouve, et c'est pourquoi elle ne démontre rien d'autre.
+- id: facturation-montant-total
+  valeur: 6519554.3
+  unite: dirhams
+  type: sql
+  commande: >-
+    select sum(montant_total)::float8 from marts.fct_facturation
+  portee: periode-entiere
+  note: >-
+    Montant facturé sur la période, tous types d'épisode confondus.
+- id: facturation-factures
+  valeur: 21066
+  unite: factures
+  type: sql
+  commande: >-
+    select count(*) from marts.fct_facturation
+  portee: periode-entiere
+  note: >-
+    Factures émises. À ne pas confondre avec les lignes de facture, dix fois plus nombreuses.
+- id: facturation-part-organisme
+  valeur: 46.0882
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select 100.0 * sum(part_organisme) / sum(montant_total) from
+    marts.fct_facturation)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Part du montant facturé prise en charge par un organisme. Dénominateur — le montant facturé,
+    jamais le nombre de factures.
+- id: facturation-part-patient
+  valeur: 53.9118
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select 100.0 * sum(part_patient) / sum(montant_total) from
+    marts.fct_facturation)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Le complément du précédent, mesuré séparément et non déduit.
+- id: encaissements-montant
+  valeur: 5500289.87
+  unite: dirhams
+  type: sql
+  commande: >-
+    select sum(montant)::float8 from marts.fct_encaissement
+  portee: periode-entiere
+  note: >-
+    Montant encaissé sur la période. Un encaissement n'est pas un recouvrement de créance : les deux
+    populations diffèrent.
+- id: taux-encaissement
+  valeur: 84.366
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select 100.0 * (select sum(montant) from marts.fct_encaissement) / (select
+    sum(montant_total) from marts.fct_facturation))::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Montant encaissé rapporté au montant facturé. À NE PAS CONFONDRE avec `recouvrement-taux-
+    global`, qui porte sur les seules créances et vaut quatre fois moins.
+- id: recouvrement-taux-global
+  valeur: 21.57
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select 100.0 * sum(montant_recouvre) / sum(montant_du) from
+    marts.agg_recouvrement)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Montant recouvré rapporté au montant dû, sur les seules créances nées. Population — les
+    créances, jamais les factures. Voir `taux-encaissement`, qui mesure autre chose.
+- id: recouvrement-taux-minimal
+  valeur: 12.5796
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((with t as (select type_debiteur, 100.0 * sum(montant_recouvre) / sum(montant_du)
+    as taux from marts.agg_recouvrement group by 1) select min(taux) from t)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Le plus bas des quatre taux de recouvrement par type de débiteur. L'écart au plus haut est ce
+    que le rapport commente.
+- id: recouvrement-taux-maximal
+  valeur: 49.5462
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((with t as (select type_debiteur, 100.0 * sum(montant_recouvre) / sum(montant_du)
+    as taux from marts.agg_recouvrement group by 1) select max(taux) from t)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Le plus haut des quatre taux de recouvrement par type de débiteur.
+- id: recouvrement-creances
+  valeur: 5486
+  unite: créances
+  type: sql
+  commande: >-
+    select sum(n_creances)::int from marts.agg_recouvrement
+  portee: periode-entiere
+  note: >-
+    Créances nées sur la période, à leur instantané le plus récent — l'agrégat retient une seule
+    ligne par créance, ce qui interdit de surcompter le montant dû.
+- id: recouvrement-montant-du
+  valeur: 1192714.4
+  unite: dirhams
+  type: sql
+  commande: >-
+    select sum(montant_du)::float8 from marts.agg_recouvrement
+  portee: periode-entiere
+  note: >-
+    Montant total des créances nées. Bien inférieur au montant facturé — toute facture ne donne pas
+    lieu à créance.
+- id: recouvrement-montant-restant
+  valeur: 935446.49
+  unite: dirhams
+  type: sql
+  commande: >-
+    select sum(montant_restant)::float8 from marts.agg_recouvrement
+  portee: periode-entiere
+  note: >-
+    Montant restant dû à la date de référence des données.
+- id: recouvrement-relances
+  valeur: 1014
+  unite: relances
+  type: sql
+  commande: >-
+    select sum(n_relances)::int from marts.agg_recouvrement
+  portee: periode-entiere
+  note: >-
+    Relances émises sur les créances nées.
+- id: recouvrement-taux-aboutissement
+  valeur: 38.4615
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select 100.0 * sum(n_relances_abouties) / sum(n_relances) from
+    marts.agg_recouvrement)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Relances ayant abouti, complètement ou partiellement, rapportées aux relances émises.
+    Dénominateur — les relances, jamais les créances.
+- id: creances-part-au-dela-un-an
+  valeur: 56.2678
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((with c as (select montant_restant, (select max(date_extraction) from
+    intermediate.int_creances) - date_naissance_creance as age, row_number() over (partition by
+    n_creance order by date_extraction desc) as rg from intermediate.int_creances) select 100.0 *
+    coalesce(sum(montant_restant) filter (where age >= 365), 0) / nullif(sum(montant_restant), 0)
+    from c where rg = 1 and montant_restant > 0)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Part du montant restant portée par des créances d'un an et plus. Dénominateur — le montant
+    restant des seules créances non soldées. Le `coalesce` du numérateur est mesuré et non
+    décoratif : sur une fenêtre de trois mois, aucune créance n'a un an, la somme filtrée est nulle
+    au sens de l'absence, et la commande rendait alors un néant là où zéro pour cent est la
+    réponse juste.
+- id: quarantaine-lignes-total-analyse
+  valeur: 106
+  unite: lignes
+  type: sql
+  commande: >-
+    select sum(lignes)::int from (select nom_table, max(lignes_quarantaine) as lignes from
+    marts.agg_qualite_donnees group by 1) t
+  portee: periode-entiere
+  note: >-
+    Lignes mises en quarantaine, toutes tables confondues. Le maximum par table, jamais la somme des
+    colonnes — le taux est celui de la table et se répète sur chacune de ses colonnes.
+- id: qualite-taux-quarantaine-maximal
+  valeur: 0.2955
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select 100.0 * max(taux_quarantaine) from marts.agg_qualite_donnees)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Le plus haut taux de quarantaine parmi les tables de la couche intermédiaire.
+- id: qualite-lignes-examinees
+  valeur: 346149
+  unite: lignes
+  type: sql
+  commande: >-
+    select sum(lignes)::int from (select nom_table, max(lignes_examinees) as lignes from
+    marts.agg_qualite_donnees group by 1) t
+  portee: periode-entiere
+  note: >-
+    Lignes examinées par le contrôle de complétude, toutes tables confondues.
+- id: grappes-taille-maximale
+  valeur: 2
+  unite: grappes
+  type: sql
+  commande: >-
+    select max(taille_grappe) from linkage.grappes_identite
+  portee: periode-entiere
+  note: >-
+    Taille de la plus grande grappe. La même commande avec `min` rend 1 : la distribution n'a que
+    deux valeurs.
+- id: cible-delai-niveau-1
+  valeur: 1
+  unite: minutes
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/urgences.yml'').read_text(encoding=''utf-8''))[''parametres''] if p[''nom'']==''delai_pec_par_niveau''][0][''1'']'
+  portee: independant-des-donnees
+  note: >-
+    Cible de délai avant prise en charge du niveau de tri le plus grave, telle que la configuration
+    la porte, adossée à S-14. Une cible n'est pas une mesure.
+- id: cible-delai-niveau-2
+  valeur: 20
+  unite: minutes
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/urgences.yml'').read_text(encoding=''utf-8''))[''parametres''] if p[''nom'']==''delai_pec_par_niveau''][0][''2'']'
+  portee: independant-des-donnees
+  note: >-
+    Cible de délai du deuxième niveau de tri.
+- id: cible-delai-niveau-3
+  valeur: 75
+  unite: minutes
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/urgences.yml'').read_text(encoding=''utf-8''))[''parametres''] if p[''nom'']==''delai_pec_par_niveau''][0][''3'']'
+  portee: independant-des-donnees
+  note: >-
+    Cible de délai du troisième niveau. La source en documente six et la nomenclature du projet cinq
+    : cette cible-ci est la moyenne des deux valeurs sources fusionnées.
+- id: cible-delai-niveau-4
+  valeur: 120
+  unite: minutes
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/urgences.yml'').read_text(encoding=''utf-8''))[''parametres''] if p[''nom'']==''delai_pec_par_niveau''][0][''4'']'
+  portee: independant-des-donnees
+  note: >-
+    Cible de délai du quatrième niveau de tri.
+- id: cible-delai-niveau-5
+  valeur: 240
+  unite: minutes
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/urgences.yml'').read_text(encoding=''utf-8''))[''parametres''] if p[''nom'']==''delai_pec_par_niveau''][0][''5'']'
+  portee: independant-des-donnees
+  note: >-
+    Cible de délai du niveau de tri le moins grave.
+- id: injecte-ramadan-coefficient
+  valeur: 0.75
+  unite: proportion
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/temporel.yml'').read_text(encoding=''utf-8''))[''parametres''] if p[''nom'']==''effet_ramadan''][0][''coefficient_programme'']'
+  portee: independant-des-donnees
+  note: >-
+    Coefficient multiplicatif appliqué à l'activité programmée pendant le Ramadan. L'amplitude
+    injectée ; la baisse mesurée est `ramadan-baisse`.
+- id: injecte-ferie-coefficient
+  valeur: 0.0
+  unite: proportion
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/temporel.yml'').read_text(encoding=''utf-8''))[''parametres''] if p[''nom'']==''effet_calendaire''][0][''coefficient_ferie_programme'']'
+  portee: independant-des-donnees
+  note: >-
+    Coefficient appliqué à l'activité programmée les jours fériés. Nul : l'activité est annulée, non
+    réduite.
+- id: injecte-hebdo-rapport
+  valeur: 3.0
+  unite: proportion
+  type: python
+  commande: 'round([p[''valeur''] for p in yaml.safe_load((R/''generator/config/temporel.yml'').read_text(encoding=''utf-8''))[''parametres''] if p[''nom'']==''profil_hebdomadaire''][0][''programme''][0] / [p[''valeur''] for p in yaml.safe_load((R/''generator/config/temporel.yml'').read_text(encoding=''utf-8''))[''parametres''] if p[''nom'']==''profil_hebdomadaire''][0][''programme''][5], 4)'
+  portee: independant-des-donnees
+  note: >-
+    Rapport injecté entre le coefficient du premier jour de la semaine et celui du sixième. C'est
+    l'amplitude que le rapport confronte au rapport mesuré des moyennes par jour.
+- id: injecte-taux-annulation
+  valeur: 0.07
+  unite: proportion
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/rendez_vous.yml'').read_text(encoding=''utf-8''))[''parametres''] if p[''nom'']==''taux_annulation''][0]'
+  portee: independant-des-donnees
+  note: >-
+    Part des rendez-vous annulés, telle que la configuration la pose.
+- id: injecte-part-jour-meme
+  valeur: 0.06
+  unite: proportion
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/rendez_vous.yml'').read_text(encoding=''utf-8''))[''parametres''] if p[''nom'']==''part_rdv_jour_meme''][0]'
+  portee: independant-des-donnees
+  note: >-
+    Part des rendez-vous tirés pour le jour même. La part MESURÉE la dépasse, et l'écart s'explique
+    : `jour-meme-part-marge-nulle`.
+- id: injecte-taux-doublons
+  valeur: 0.04
+  unite: proportion
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/defauts.yml'').read_text(encoding=''utf-8''))[''parametres''] if p[''nom'']==''taux_doublons''][0]'
+  portee: independant-des-donnees
+  note: >-
+    Part des personnes portant deux fiches patient, telle que la configuration la pose.
+- id: injecte-pente-absenteisme
+  valeur: 0.012
+  unite: proportion
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/rendez_vous.yml'').read_text(encoding=''utf-8''))[''parametres''] if p[''nom'']==''pente_absenteisme_delai''][0]'
+  portee: independant-des-donnees
+  note: >-
+    Pente par jour du biais appliqué au délai des seules lignes d'absence. Elle ne fixe pas le
+    NOMBRE d'absences, et son amplitude ne se compare donc pas directement à une corrélation.
+- id: injecte-correlation-parametres
+  valeur: -0.4918
+  unite: corrélation
+  type: python
+  commande: 'round((lambda d, a: (lambda x, y, n: (sum(x[i]*y[i] for i in range(n))/n - sum(x)/n*sum(y)/n) / ((sum(v*v for v in x)/n - (sum(x)/n)**2)**0.5 * (sum(v*v for v in y)/n - (sum(y)/n)**2)**0.5))([d[k] for k in sorted(d)], [a[k] for k in sorted(d)], len(d)))([p[''valeur''] for p in yaml.safe_load((R/''generator/config/rendez_vous.yml'').read_text(encoding=''utf-8''))[''parametres''] if p[''nom'']==''delai_rdv_par_specialite''][0], [p[''valeur''] for p in yaml.safe_load((R/''generator/config/rendez_vous.yml'').read_text(encoding=''utf-8''))[''parametres''] if p[''nom'']==''taux_absenteisme_par_specialite''][0]), 4)'
+  portee: independant-des-donnees
+  note: >-
+    Corrélation entre les deux tables de paramètres elles-mêmes — délai médian et taux d'absentéisme
+    par activité — calculée sur leurs huit valeurs. C'est l'amplitude injectée que `relation-inter-
+    ensemble` retrouve sur les données produites.
+- id: jour-meme-marge-nulle
+  valeur: 644
+  unite: rendez-vous
+  type: sql
+  commande: >-
+    with p as (select n_ipp, min(date_attribution) as creation from marts.dim_patient group by
+    n_ipp) select count(*) from marts.fct_rendez_vous r join p using (n_ipp) where r.est_honore and
+    r.est_jour_meme and r.date_rendez_vous <= p.creation
+  portee: periode-entiere
+  note: >-
+    Rendez-vous honorés du jour même dont la marge disponible est nulle ou négative — la date du
+    rendez-vous n'est pas postérieure à la création de la fiche. Ce sont ceux que le générateur
+    ramène au jour même sans tirer le paramètre.
+- id: jour-meme-part-marge-nulle
+  valeur: 72.2783
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((with p as (select n_ipp, min(date_attribution) as creation from marts.dim_patient
+    group by n_ipp) select 100.0 * count(*) filter (where r.date_rendez_vous <= p.creation) /
+    count(*) from marts.fct_rendez_vous r join p using (n_ipp) where r.est_honore and
+    r.est_jour_meme)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Part des rendez-vous du jour même qui viennent de la marge nulle et non du tirage. C'est
+    l'explication de l'écart entre `injecte-part-jour-meme` et `part-jour-meme`.
+- id: doublons-part-mesuree
+  valeur: 3.9878
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select 100.0 * count(*) filter (where taille_grappe > 1) / 2 / count(distinct
+    grappe_id) from linkage.grappes_identite)::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Part des personnes estimées portant deux fiches. Numérateur — les grappes de plus d'une fiche ;
+    dénominateur — les grappes, c'est-à-dire les personnes, jamais les identifiants.
+- id: activites-distinctes
+  valeur: 8
+  unite: activités
+  type: sql
+  commande: >-
+    select count(*) from marts.dim_activite
+  portee: periode-entiere
+  note: >-
+    Codes d'activité distincts de la dimension. C'est le nombre de points de toute grandeur donnée «
+    par activité » dans ce chapitre.
+- id: hebdo-rapport-mesure
+  valeur: 3.0061
+  unite: proportion
+  type: sql
+  commande: >-
+    select round((with j as (select d.jour_semaine_iso as rang, count(*)::float8 / count(distinct
+    p.date_entree) as moyenne from marts.fct_passage p join marts.dim_date d on d.date_jour =
+    p.date_entree where p.type_passage <> 'U' group by 1) select (select moyenne from j where rang =
+    1) / (select moyenne from j where rang = 6))::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Rapport mesuré entre la moyenne du premier jour de la semaine et celle du sixième, pour
+    l'activité programmée. À confronter à `injecte-hebdo-rapport`.
+- id: delai-rapport-extremes
+  valeur: 8.6
+  unite: proportion
+  type: sql
+  commande: >-
+    with m as (select code_activite, percentile_cont(0.5) within group (order by
+    delai_obtention_jours) as med from marts.fct_rendez_vous where est_honore and
+    delai_obtention_jours > 0 group by 1) select max(med) / min(med) from m
+  portee: periode-entiere
+  note: >-
+    Rapport entre la médiane de délai la plus haute et la plus basse, sur les huit activités.
+    Population — les honorés à délai strictement positif.
+- id: flux-heures-vides-programme
+  valeur: 12
+  unite: heures
+  type: sql
+  commande: >-
+    with h as (select g.heure, count(p.n_passage) as n from generate_series(0, 23) as g(heure) left
+    join marts.fct_passage p on extract(hour from p.date_heure_entree)::int = g.heure and
+    p.type_passage <> 'U' group by g.heure) select count(*)::int from h where n = 0
+  portee: periode-entiere
+  note: >-
+    Heures de la journée sans aucun passage programmé. La même commande sur le flux des urgences en
+    compte zéro, ce qui est le témoin qui rend cette absence lisible.
+- id: qualite-tables
+  valeur: 11
+  unite: tables
+  type: sql
+  commande: >-
+    select count(distinct nom_table) from marts.agg_qualite_donnees
+  portee: periode-entiere
+  note: >-
+    Tables de la couche intermédiaire couvertes par le contrôle de complétude.
+- id: qualite-tables-sans-quarantaine
+  valeur: 9
+  unite: tables
+  type: sql
+  commande: >-
+    select count(*)::int from (select nom_table from marts.agg_qualite_donnees group by 1 having
+    max(lignes_quarantaine) = 0) t
+  portee: periode-entiere
+  note: >-
+    Tables dont aucune ligne n'est rejetée à l'ingestion. Une absence, et elle n'est un résultat que
+    parce que les deux autres tables en rejettent.
+
+# Séries — un jeu de données par entrée, produit par une commande et lu par la composition
+#
+# MÊME RÈGLE DE PREUVE QUE LES SCALAIRES, ÉTENDUE À CE QUI NE TIENT PAS EN UN NOMBRE. Un graphique
+# ou un tableau dont les données seraient tapées dans la source de composition serait exactement ce
+# que ce registre existe pour empêcher. Une série est donc une commande, son résultat est un
+# fichier de données, et le rapport l'appelle par son identifiant : \serie{identifiant}.
+#
+# Champs propres aux séries, en plus de ceux d'un scalaire :
+#   fichier    chemin du fichier de données, relatif à `report/` ;
+#   colonnes   les en-têtes, dans l'ordre — ce que `--formes` confronte à ce que la commande rend ;
+#   lignes     le nombre de lignes de données, en-tête exclu ;
+#   empreinte  l'empreinte SHA-256 du fichier que la commande produit.
+#
+# DEUX LIENS, VÉRIFIÉS PAR DEUX CODES DISTINCTS. `mesurer.py --verifier` confronte l'empreinte du
+# registre à ce que la COMMANDE produit ; `tests/test_registre_des_chiffres.py` la confronte au
+# FICHIER que la composition lit. Retoucher un fichier à la main rompt le second lien ; modifier
+# une valeur du registre sans toucher à sa commande rompt le premier.
+series:
+- id: flux-mensuel
+  fichier: figures/flux-mensuel.csv
+  colonnes: [annee, programme, urgences]
+  lignes: 30
+  empreinte: 7dfbfe32216854a206633770a7c3c0378856f636218d1febcb4c99047d8a595e
+  type: sql
+  commande: |
+    select round((extract(year from date_entree) + (extract(month from date_entree) - 1) / 12.0)::numeric, 6) as annee,
+      count(*) filter (where type_passage <> 'U') as programme,
+      count(*) filter (where type_passage = 'U') as urgences
+    from marts.fct_passage group by 1 order by 1
+  portee: periode-entiere
+  note: >-
+    Passages par mois, ventilés entre activité programmée (types C et H de fct_passage) et
+    urgences (type U). L'abscisse est l'année décimale — année + (mois - 1) / 12 — pour que l'axe
+    porte des graduations d'année sans qu'aucune étiquette de mois ait à être tapée dans la
+    source.
+- id: flux-horaire
+  fichier: figures/flux-horaire.csv
+  colonnes: [heure, programme, urgences]
+  lignes: 24
+  empreinte: 59457ff4efc5436399dc32a7793f0c7b75297801879cd54af7a4bcc1a0dd9059
+  type: sql
+  commande: |
+    select extract(hour from date_heure_entree)::int as heure,
+      count(*) filter (where type_passage <> 'U') as programme,
+      count(*) filter (where type_passage = 'U') as urgences
+    from marts.fct_passage group by 1 order by 1
+  portee: periode-entiere
+  note: >-
+    Passages par heure d'entrée, sur toute la période et non par jour. Mêmes deux populations que
+    flux-mensuel. Les effectifs se cumulent sur les 912 jours de la période : ce ne sont pas des
+    passages par heure et par jour.
+- id: delais-repartition
+  fichier: figures/delais-repartition.csv
+  colonnes: [jours, artefact, complement]
+  lignes: 91
+  empreinte: bec3541792ec7264c3ebf4ac76470975c81de98ee44054a1c26e475b9e1636bb
+  type: sql
+  commande: |
+    with p as (select n_ipp, min(date_attribution) as creation from marts.dim_patient group by n_ipp),
+    h as (select r.delai_obtention_jours as d, (r.date_prise = p.creation) as art
+          from marts.fct_rendez_vous r join p using (n_ipp) where r.est_honore),
+    b as (select generate_series(0, 90) as seuil)
+    select b.seuil as jours,
+      round((100.0 * count(*) filter (where h.art and h.d <= b.seuil) / nullif(count(*) filter (where h.art), 0))::numeric, 4) as artefact,
+      round((100.0 * count(*) filter (where not h.art and h.d <= b.seuil) / nullif(count(*) filter (where not h.art), 0))::numeric, 4) as complement
+    from b cross join h group by b.seuil order by b.seuil
+  portee: periode-entiere
+  note: >-
+    Part cumulée, en pourcentage, des rendez-vous honorés dont le délai d'obtention ne dépasse pas
+    le seuil en abscisse. Deux courbes, sur les deux sous-populations de la partition d'artefact :
+    dénominateurs 6 845 et 3 411, jamais 10 256. Les rendez-vous honorés dont la fiche patient est
+    en quarantaine en sont exclus, faute de date de création de fiche à laquelle comparer la date
+    de prise.
+- id: delais-par-activite
+  fichier: figures/delais-par-activite.csv
+  colonnes: [code, honores, mediane, decile9, complement, mediane_complement, decile9_complement]
+  lignes: 8
+  empreinte: 3b9b29973fc88cebaba800060abebdcd1aced9dcf5932e6853d1ce8b3937e3fb
+  type: sql
+  commande: |
+    with p as (select n_ipp, min(date_attribution) as creation from marts.dim_patient group by n_ipp),
+    h as (select r.code_activite, r.delai_obtention_jours as d, (r.date_prise = p.creation) as art
+          from marts.fct_rendez_vous r join p using (n_ipp) where r.est_honore)
+    select code_activite as code, count(*) as honores,
+      round(percentile_cont(0.5) within group (order by d) filter (where d > 0)::numeric, 1) as mediane,
+      round(percentile_cont(0.9) within group (order by d) filter (where d > 0)::numeric, 1) as decile9,
+      count(*) filter (where not art) as complement,
+      round(percentile_cont(0.5) within group (order by d) filter (where d > 0 and not art)::numeric, 1) as mediane_complement,
+      round(percentile_cont(0.9) within group (order by d) filter (where d > 0 and not art)::numeric, 1) as decile9_complement
+    from h group by 1 order by 3
+  portee: periode-entiere
+  note: >-
+    Médiane et neuvième décile du délai d'obtention par activité, sur les rendez-vous honorés à
+    délai STRICTEMENT POSITIF — population retenue par l'enregistrement de décision sur la
+    conformité du délai, le délai nul étant une décision de construction et non un tirage. Les
+    colonnes `mediane` et `decile9` portent l'ensemble, les deux dernières le seul complément de
+    l'artefact. `honores` et `complement` comptent en revanche tous les honorés, délai nul
+    compris.
+- id: absenteisme-par-activite
+  fichier: figures/absenteisme-par-activite.csv
+  colonnes: [code, mediane, absences, mediane_complement, absences_complement]
+  lignes: 8
+  empreinte: 70e52091a5ede80b8742d3227d7a0cbe08550c788367cb595f7e1ebd5849728e
+  type: sql
+  commande: |
+    with p as (select n_ipp, min(date_attribution) as creation from marts.dim_patient group by n_ipp),
+    b as (select r.code_activite, r.delai_obtention_jours::float8 as d, r.est_absence::int::float8 as a,
+                 (r.est_honore and r.date_prise = p.creation) as art
+          from marts.fct_rendez_vous r join p using (n_ipp)
+          where (r.est_honore or r.est_absence) and r.delai_obtention_jours > 0)
+    select code_activite as code,
+      round(percentile_cont(0.5) within group (order by d)::numeric, 1) as mediane,
+      round((100 * avg(a))::numeric, 4) as absences,
+      round(percentile_cont(0.5) within group (order by d) filter (where not art)::numeric, 1) as mediane_complement,
+      round((100 * avg(a) filter (where not art))::numeric, 4) as absences_complement
+    from b group by 1 order by 2
+  portee: periode-entiere
+  note: >-
+    Un point par activité : médiane du délai en abscisse, part des absences en ordonnée.
+    Population : rendez-vous honorés ou absents, à délai strictement positif, fiche patient
+    présente. La part d'absences du complément a un AUTRE dénominateur que celle de l'ensemble —
+    les honorés d'artefact en sont retirés, les absences non — et son niveau n'est donc pas
+    comparable ; seule la relation entre les deux colonnes l'est.
+- id: urgences-par-niveau
+  fichier: figures/urgences-par-niveau.csv
+  colonnes: [niveau, passages, part, mediane, decile9]
+  lignes: 5
+  empreinte: a06468a28dececa25521d101002f1bb7a8e92431a95cd2993c09efa9aa986638
+  type: sql
+  commande: |
+    select niveau_tri::int as niveau, count(*) as passages,
+      round((100.0 * count(*) / sum(count(*)) over ())::numeric, 4) as part,
+      round(percentile_cont(0.5) within group (order by delai_pec_minutes)::numeric, 1) as mediane,
+      round(percentile_cont(0.9) within group (order by delai_pec_minutes)::numeric, 1) as decile9
+    from marts.fct_passage_urgence group by 1 order by 1
+  portee: periode-entiere
+  note: >-
+    Passages aux urgences par niveau de tri : effectif, part des passages, médiane et neuvième
+    décile du délai avant prise en charge médicale, en minutes. Aucun passage n'est sans délai
+    mesuré. Les cinq codes de niveau s'affichent nus : le registre des libellés les classe non
+    documentés, la source ne distinguant que trois groupes de gravité là où les données portent
+    cinq niveaux.
+- id: facturation-par-type
+  fichier: figures/facturation-par-type.csv
+  colonnes: [episode, factures, montant, part, organisme]
+  lignes: 3
+  empreinte: be26d50d97ab89d3a8cdae281a7e400ccc71eb3cc8a4e8819c5943136b5fd3e4
+  type: sql
+  commande: |
+    select type_episode as episode, count(*) as factures,
+      round(sum(montant_total)::numeric, 2) as montant,
+      round((100.0 * sum(montant_total) / sum(sum(montant_total)) over ())::numeric, 4) as part,
+      round((100.0 * sum(part_organisme) / sum(montant_total))::numeric, 4) as organisme
+    from marts.fct_facturation group by 1 order by 3 desc
+  portee: periode-entiere
+  note: >-
+    Montants facturés par type d'épisode : effectif de factures, montant total, part du montant
+    total, et part prise en charge par un organisme rapportée au montant du type. Les trois codes
+    s'affichent nus : le registre des libellés les classe non documentés.
+- id: anciennete-creances
+  fichier: figures/anciennete-creances.csv
+  colonnes: [jours, part]
+  lignes: 29
+  empreinte: 759be86f53523025f88323d2a6895cde86827aa004e42ddbd07eb8c47ec2e207
+  type: sql
+  commande: |
+    with c as (select montant_restant,
+                 (select max(date_extraction) from intermediate.int_creances) - date_naissance_creance as age,
+                 row_number() over (partition by n_creance order by date_extraction desc) as rg
+               from intermediate.int_creances),
+    r as (select age, montant_restant from c where rg = 1 and montant_restant > 0),
+    b as (select generate_series(0, coalesce((select max(age) from r), 0), 30) as seuil)
+    select b.seuil as jours,
+      round((100.0 * sum(r.montant_restant) filter (where r.age > b.seuil) / nullif(sum(r.montant_restant), 0))::numeric, 4) as part
+    from b cross join r group by b.seuil order by b.seuil
+  portee: periode-entiere
+  note: >-
+    Part du montant restant dû, en pourcentage, porté par des créances plus anciennes que le seuil
+    en abscisse. Dénominateur : le montant restant des seules créances dont le restant est
+    strictement positif, à leur instantané le plus récent. L'âge se compte depuis la date
+    d'extraction la plus récente des créances, et non depuis l'horodatage de l'instantané — celui-
+    ci n'est pas peuplé partout où ce registre s'exécute.
+- id: qualite-par-table
+  fichier: figures/qualite-par-table.csv
+  colonnes: [objet, colonnes, incompletes, completude_minimale, quarantaine, taux_quarantaine]
+  lignes: 11
+  empreinte: 697950363eb698c0cad946a16bf12b7fd50686280cebc373f56f398512454627
+  type: sql
+  commande: |
+    select nom_table as objet, count(*) as colonnes,
+      count(*) filter (where taux_completude < 1) as incompletes,
+      round((100 * min(taux_completude))::numeric, 4) as completude_minimale,
+      max(lignes_quarantaine) as quarantaine,
+      round((100 * max(taux_quarantaine))::numeric, 4) as taux_quarantaine
+    from marts.agg_qualite_donnees group by 1 order by 6 desc, 1
+  portee: periode-entiere
+  note: >-
+    Par table de la couche intermédiaire : nombre de colonnes, nombre de colonnes incomplètes,
+    complétude de la colonne la moins renseignée, lignes mises en quarantaine et taux de
+    quarantaine. Le taux de quarantaine est celui de la table, identique sur toutes ses colonnes :
+    `max` l'extrait sans le sommer.
+- id: completude-champs
+  fichier: figures/completude-champs.csv
+  colonnes: [rang, completude]
+  lignes: 43
+  empreinte: a45e99e94440ddbfe954533ddd4f309136e900ac3268b067365bfd1f765b8db6
+  type: sql
+  commande: |
+    select row_number() over (order by taux_completude, nom_table, colonne) as rang,
+      round((100 * taux_completude)::numeric, 4) as completude
+    from marts.agg_qualite_donnees where taux_completude < 1 order by rang
+  portee: periode-entiere
+  note: >-
+    Taux de renseignement des seules colonnes incomplètes, rangées par ordre croissant. L'abscisse
+    est un rang, non un identifiant de colonne : la courbe donne la FORME de la distribution, et
+    le rapport nomme dans sa prose les colonnes des deux extrémités.

@@ -1,4 +1,4 @@
-"""Rend le registre des chiffres en commandes LaTeX, une par entrée.
+"""Rend le registre des chiffres en commandes LaTeX, une par entrée — scalaires ET séries.
 
 Le rapport n'écrit jamais une valeur : il écrit `\\chiffre{identifiant}`, et la valeur vient d'ici.
 Un identifiant inconnu produit une erreur de compilation nommant l'identifiant, plutôt qu'un blanc
@@ -6,6 +6,12 @@ silencieux dans le texte.
 
 Le formatage est fait ici, une fois : les entiers reçoivent une espace fine insécable tous les trois
 chiffres, comme l'usage typographique français le demande, et les décimaux une virgule.
+
+UNE SÉRIE S'APPELLE DE LA MÊME FAÇON, ET C'EST TOUT L'INTÉRÊT : `\\serie{identifiant}` s'étend au
+chemin du fichier de données, celui que `\\addplot table` et `\\pgfplotstabletypeset` reçoivent. Un
+identifiant de série inconnu arrête la composition en le nommant, exactement comme un scalaire
+inconnu. Aucune convention de plus n'est créée : un seul registre, un seul fichier produit, deux
+commandes qui se lisent pareil.
 """
 
 from __future__ import annotations
@@ -35,20 +41,45 @@ ENTETE = r"""% Fichier produit mécaniquement à partir de docs/chiffres/registr
   \fi
 }
 
+% Le chemin du fichier de données d'une série, relatif au répertoire de composition. Aucune donnée
+% n'est tapée dans une source du rapport : un graphique et un tableau lisent ce fichier, que seule
+% la commande consignée au registre écrit.
+\newcommand{\serie}[1]{%
+  \ifcsname serie@#1\endcsname
+    \csname serie@#1\endcsname
+  \else
+    \GenericError{}{Serie inconnue : #1}{}{Cet identifiant n'existe pas au registre des chiffres.}%
+  \fi
+}
+
 """
 
 
 def formater(valeur, unite: str) -> str:
-    """Un entier prend ses séparateurs de milliers ; un décimal prend la virgule."""
+    """Un nombre prend ses séparateurs de milliers ; un décimal prend en plus la virgule.
+
+    TROIS RÈGLES, ET LES TROIS SONT MESURÉES SUR LE RENDU. La partie entière d'un décimal reçoit le
+    même groupement que celle d'un entier — sans quoi une même page écrivait « 21 066 factures » et
+    « 6519554,3 dirhams ». Un nombre négatif reçoit le signe MOINS — écrit sans accolade, pour que
+    le motif du contrôle qui lit ce fichier reste capable d'y délimiter la valeur — et non le trait
+    d'union, qui est un autre caractère et se compose plus court. Un zéro de fin est retiré, mais
+    jamais au point de manger un zéro significatif de la partie entière.
+    """
     if isinstance(valeur, bool):
         return str(valeur)
+    if not isinstance(valeur, (int, float)):
+        return str(valeur)
+
+    signe = "$-$" if valeur < 0 else ""
+    absolue = abs(valeur)
     if isinstance(valeur, int):
-        chiffres = f"{valeur:,}".replace(",", r"\,")
-        return chiffres
-    if isinstance(valeur, float):
-        texte = repr(valeur).rstrip("0").rstrip(".")
-        return texte.replace(".", ",")
-    return str(valeur)
+        return signe + f"{absolue:,}".replace(",", r"\,")
+
+    texte = repr(absolue)
+    entiere, _, decimale = texte.partition(".")
+    decimale = decimale.rstrip("0")
+    entiere = f"{int(entiere):,}".replace(",", r"\,")
+    return signe + (entiere + "," + decimale if decimale else entiere)
 
 
 def rendre(registre: dict) -> str:
@@ -58,6 +89,15 @@ def rendre(registre: dict) -> str:
         lignes.append(
             r"\expandafter\def\csname chiffre@" + entree["id"] + r"\endcsname{" + valeur + "}"
         )
+    lignes.append("")
+    for serie in registre.get("series", []):
+        lignes.append(
+            r"\expandafter\def\csname serie@"
+            + serie["id"]
+            + r"\endcsname{"
+            + serie["fichier"]
+            + "}"
+        )
     return "\n".join(lignes) + "\n"
 
 
@@ -65,7 +105,10 @@ def main() -> None:
     with SOURCE.open(encoding="utf-8") as fichier:
         registre = yaml.safe_load(fichier)
     CIBLE.write_text(rendre(registre), encoding="utf-8")
-    print(f"{len(registre['chiffres'])} chiffre(s) rendus dans {CIBLE.name}")
+    print(
+        f"{len(registre['chiffres'])} chiffre(s) et {len(registre.get('series', []))} série(s) "
+        f"rendus dans {CIBLE.name}"
+    )
 
 
 if __name__ == "__main__":

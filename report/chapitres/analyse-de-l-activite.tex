@@ -1,16 +1,627 @@
 % Ce chapitre repose sur :
-%   DOC: (aucun)
-%   OBS: (aucun)
+%   DOC: s12, s13, s14, s20, s26, s27, s30
+%   OBS: REL-RDV.C02, REL-RDV.C07, REL-RDV.C08, REL-RDV.R08, REL-RDV.R11
 %   HYP: (aucun)
-%   CHI: (aucun)
-%   SECTIONS: 4
+%   CHI: flux-passages-total, flux-programme-total, flux-jours-ouverts, flux-programme-moyenne,
+%   CHI: flux-urgences-moyenne, flux-lundi-moyenne, flux-samedi-moyenne, flux-dimanche-programme,
+%   CHI: flux-heure-pointe, flux-passages-heure-pointe, ramadan-jours, ramadan-jours-ouverts,
+%   CHI: ramadan-programme-moyenne, ramadan-hors-moyenne, ramadan-baisse, feries-jours,
+%   CHI: feries-programme-passages, feries-urgences-moyenne, feries-urgences-hors-moyenne,
+%   CHI: periode-debut, periode-fin, periode-jours, injecte-ramadan-coefficient,
+%   CHI: injecte-ferie-coefficient, injecte-hebdo-rapport, honores-total, honores-avec-fiche,
+%   CHI: honores-sans-fiche, honores-sans-fiche-en-quarantaine, artefact-nombre, artefact-part,
+%   CHI: complement-nombre, delai-mediane-ensemble, delai-mediane-complement, part-jour-meme,
+%   CHI: injecte-part-jour-meme, jour-meme-marge-nulle, jour-meme-part-marge-nulle,
+%   CHI: source-rendez-vous-lignes, rdv-en-instance, absences-total, annulations-total,
+%   CHI: taux-absenteisme-global, taux-annulation-global, injecte-taux-annulation,
+%   CHI: annulations-avec-agent, absences-avec-agent-annulation, relation-inter-ensemble,
+%   CHI: relation-intra-ensemble, relation-brute-ensemble, relation-inter-complement,
+%   CHI: relation-intra-complement, relation-brute-complement, relation-effectif-ensemble,
+%   CHI: relation-effectif-complement, relation-activites-ecart-positif,
+%   CHI: injecte-correlation-parametres, injecte-pente-absenteisme, passages-urgences-produits,
+%   CHI: urgences-part-consultation-ordinaire, urgences-part-mode-principal,
+%   CHI: urgences-part-retour-domicile, urgences-part-hospitalisation, urgences-part-transfert,
+%   CHI: urgences-heure-pointe, urgences-heure-creux, urgences-rapport-pointe-creux,
+%   CHI: source-part-non-urgentes, source-part-non-appropriees, injecte-part-deux-derniers-niveaux,
+%   CHI: cible-delai-niveau-1, cible-delai-niveau-2, cible-delai-niveau-3, cible-delai-niveau-4,
+%   CHI: cible-delai-niveau-5, facturation-montant-total, facturation-factures,
+%   CHI: facturation-part-organisme, facturation-part-patient, encaissements-montant,
+%   CHI: taux-encaissement, recouvrement-taux-global, recouvrement-taux-minimal,
+%   CHI: recouvrement-taux-maximal, recouvrement-creances, recouvrement-montant-du,
+%   CHI: recouvrement-montant-restant, recouvrement-relances, recouvrement-taux-aboutissement,
+%   CHI: creances-part-au-dela-un-an, qualite-colonnes, qualite-colonnes-incompletes,
+%   CHI: qualite-colonne-vide, qualite-lignes-examinees, quarantaine-lignes-total-analyse,
+%   CHI: qualite-taux-quarantaine-maximal, identifiants-distincts, personnes-estimees,
+%   CHI: grappes-multiples, grappes-taille-maximale, doublons-part-mesuree, injecte-taux-doublons,
+%   CHI: collision-groupes-nom, collision-groupes-piece, activites-distinctes,
+%   CHI: delai-rapport-extremes, flux-heures-vides-programme, hebdo-rapport-mesure,
+%   CHI: qualite-tables, qualite-tables-sans-quarantaine
+%   SER: flux-mensuel, flux-horaire, delais-repartition, delais-par-activite,
+%   SER: absenteisme-par-activite, urgences-par-niveau, facturation-par-type,
+%   SER: anciennete-creances, qualite-par-table, completude-champs
+%   SECTIONS: 6
 
 \chapter{Analyse de l'activité}\label{chap:activite}
 
-\section{Les indicateurs de séjour}
+\textbf{Les chiffres commentés dans ce chapitre proviennent du jeu de données généré. Ils
+illustrent ce que la chaîne permet de mesurer, non l'activité réelle du service.} Cette phrase ne
+sera pas répétée ; elle vaut pour chacune des pages qui suivent.
 
-\section{Les rendez-vous et le délai d'obtention}
+Deux conventions de lecture en découlent. La première : \textbf{chaque grandeur en volume absolu
+porte un renvoi à la section de sensibilité} (§\ref{sec:sensibilite}), qui mesure de combien ce
+volume dépendrait d'un autre choix de calibration ; les grandeurs en taux, en délai et en part n'en
+portent pas, un rapport étant insensible à l'échelle qui le produit. La seconde : \textbf{chaque
+résultat sépare ce qu'il démontre de ce qu'il n'établit pas.} Un résultat qui reproduit une
+relation injectée démontre que la chaîne sait la retrouver, et rien de plus ; un résultat qui ne
+correspond à aucune relation injectée est un effet des autres choix du générateur, et n'établit
+rien du tout. Une section terminale porte cette correspondance dans les deux sens, relation par
+relation et conclusion par conclusion.
+
+La période couverte va du \chiffre{periode-debut} au \chiffre{periode-fin}, soit
+\chiffre{periode-jours} jours.
+
+\section{Les flux de patients}
+
+Le fait de passage réunit \chiffre{flux-passages-total} lignes (§\ref{sec:sensibilite}), dont
+\chiffre{flux-programme-total} relèvent de l'activité programmée — consultation externe et
+hospitalisation — et le reste des urgences. La séparation se lit sur le code de type de passage,
+jamais sur les libellés des codes, qu'aucune source du registre ne documente.
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  width=12cm, height=5.4cm,
+  xlabel={année}, ylabel={passages par mois},
+  ymin=0, xtick={2024,2024.5,2025,2025.5,2026,2026.5},
+  xticklabels={2024, , 2025, , 2026, },
+  grid=major, grid style={gray!25},
+  every axis plot/.append style={thick},
+  legend style={at={(0.5,-0.32)}, anchor=north, legend columns=2, font=\footnotesize,
+    draw=gray!40},
+]
+\addplot[color=black, mark=none] table[x=annee, y=urgences, col sep=comma] {\serie{flux-mensuel}};
+\addlegendentry{urgences}
+\addplot[color=black, dashed, mark=none] table[x=annee, y=programme, col sep=comma]
+  {\serie{flux-mensuel}};
+\addlegendentry{activité programmée}
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\footnotesize Passages par mois, sur les trente mois de la période.
+\end{center}
+
+\conclusion{C-01} \textbf{Les deux flux ne se ressemblent pas dans le temps.} Celui des urgences
+est plat d'un bout à l'autre — le service accueille \chiffre{flux-urgences-moyenne} passages par
+jour, tous les jours de la période sans exception. Celui de l'activité programmée oscille de mois
+en mois, avec des creux marqués. Sa moyenne, \chiffre{flux-programme-moyenne} passages par jour
+ouvert, se rapporte aux \chiffre{flux-jours-ouverts} jours qui portent au moins un passage
+programmé, et non aux \chiffre{periode-jours} jours de la période : rapportée à ceux-ci elle serait
+mécaniquement plus basse d'un cinquième, sans qu'aucune activité ait changé. \emph{Cette conclusion
+ne vient d'aucune relation injectée ; elle est un effet des paramètres de volumétrie et n'établit
+rien sur le service.}
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  width=12cm, height=5cm, ybar, bar width=3.4pt,
+  xlabel={heure d'entrée}, ylabel={passages},
+  xmin=-0.8, xmax=23.8, ymin=0, xtick={0,3,6,9,12,15,18,21},
+  grid=major, grid style={gray!25},
+  legend style={at={(0.5,-0.34)}, anchor=north, legend columns=2, font=\footnotesize,
+    draw=gray!40},
+]
+\addplot[fill=gray!30, draw=gray!60] table[x=heure, y=urgences, col sep=comma]
+  {\serie{flux-horaire}};
+\addlegendentry{urgences}
+\addplot[fill=black, draw=black] table[x=heure, y=programme, col sep=comma] {\serie{flux-horaire}};
+\addlegendentry{activité programmée}
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\footnotesize Passages par heure d'entrée, cumulés sur la période entière.
+\end{center}
+
+\conclusion{C-02} \textbf{L'activité programmée tient dans une amplitude d'ouverture, les urgences
+non.} La première culmine à \chiffre{flux-heure-pointe} heures, avec
+\chiffre{flux-passages-heure-pointe} passages (§\ref{sec:sensibilite}), et
+\chiffre{flux-heures-vides-programme} heures de la journée n'en portent aucun. Les secondes n'ont
+aucune heure vide, et cette absence-là n'est lisible que parce que la même requête en trouve douze
+sur l'autre flux. \emph{Cette conclusion reproduit la
+relation R-04 et ne démontre que la capacité de la chaîne à produire un profil horaire par flux.}
+
+\conclusion{C-03} \textbf{La charge programmée décroît du premier au sixième jour de la semaine et
+s'annule au septième.} Elle vaut \chiffre{flux-lundi-moyenne} passages par jour de premier rang
+contre \chiffre{flux-samedi-moyenne} par jour de sixième rang — un rapport de trois — et
+\chiffre{flux-dimanche-programme} passage au septième. Cette dernière absence n'est un résultat que
+parce que la même requête en trouve aux six autres rangs. \emph{Reproduit R-05 : le rapport injecté
+entre les deux coefficients vaut \chiffre{injecte-hebdo-rapport}, le rapport mesuré
+\chiffre{hebdo-rapport-mesure}.}
+
+\conclusion{C-04} \textbf{Le Ramadan abaisse l'activité programmée sans l'interrompre.} Sur les
+\chiffre{ramadan-jours} jours de Ramadan compris dans la période — dont
+\chiffre{ramadan-jours-ouverts} portent une activité programmée — la moyenne tombe à
+\chiffre{ramadan-programme-moyenne} passages par jour ouvert contre
+\chiffre{ramadan-hors-moyenne} hors Ramadan, soit \chiffre{ramadan-baisse}~\% de moins.
+\emph{Reproduit R-06, dont le coefficient injecté vaut \chiffre{injecte-ramadan-coefficient} : la
+baisse attendue est d'un quart, la baisse mesurée lui est inférieure d'environ un point, l'écart
+venant de ce que les jours ouverts de Ramadan ne se répartissent pas comme les autres sur les rangs
+de la semaine.} Seules les dates du Ramadan viennent d'une source \cite{s26} ; l'ampleur est posée.
+
+\conclusion{C-05} \textbf{Un jour férié n'est pas un jour creux : c'est un jour fermé.} Les
+\chiffre{feries-jours} jours fériés de la période portent \chiffre{feries-programme-passages}
+passage programmé, quand les urgences y reçoivent \chiffre{feries-urgences-moyenne} passages par
+jour contre \chiffre{feries-urgences-hors-moyenne} les autres jours — l'écart est de moins d'un
+demi-passage. \emph{Reproduit R-07, dont le coefficient férié injecté vaut
+\chiffre{injecte-ferie-coefficient} pour l'activité programmée : l'annulation est exacte, et
+l'invariance des urgences l'est aussi.}
+
+\section{Les délais d'obtention de rendez-vous}
+
+Le délai d'obtention est l'écart entre la date de création du rendez-vous et la date du rendez-vous
+lui-même, soit l'écart entre deux champs relevés au poste, la date de
+création\releve{REL-RDV.C02} et la date du rendez-vous\releve{REL-RDV.R08}. C'est la variable
+centrale de ce chapitre, et elle demande d'abord un avertissement.
+
+\textbf{Une part majoritaire du délai est un artefact de construction, et non un tirage.} Le
+générateur, lorsqu'il place un rendez-vous honoré, tire un délai dans une loi log-normale puis le
+\emph{plafonne à la marge disponible} — le nombre de jours écoulés entre la création de la fiche du
+patient et le rendez-vous — et il ouvre le premier rendez-vous d'un patient au jour même de la
+création de sa fiche. Dans les deux cas, le délai obtenu n'est plus celui de la loi : il est
+exactement la marge disponible.
+
+Sur les \chiffre{honores-total} rendez-vous honorés, \chiffre{honores-avec-fiche} ont une fiche
+patient en vigueur et peuvent donc être rangés ; les \chiffre{honores-sans-fiche} autres n'en ont
+pas, et la cause est mesurée et non supposée — leurs \chiffre{honores-sans-fiche-en-quarantaine}
+fiches sont en quarantaine. Sur cette population de \chiffre{honores-avec-fiche},
+\chiffre{artefact-nombre} rendez-vous portent un délai égal à la marge disponible, soit
+\chiffre{artefact-part}~\%, et \chiffre{complement-nombre} ne le portent pas. \textbf{La partition
+est exhaustive et disjointe par décompte} : les deux parts somment à \chiffre{honores-avec-fiche},
+et aucun rendez-vous n'appartient aux deux, l'appartenance se décidant sur une égalité de dates.
+\textbf{Toute relation qui met en jeu le délai est donc donnée deux fois dans ce chapitre} — sur
+l'ensemble et sur le seul complément.
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  width=11cm, height=5.2cm,
+  xlabel={délai d'obtention, en jours}, ylabel={part cumulée, en \%},
+  xmin=0, xmax=90, ymin=0, ymax=105,
+  grid=major, grid style={gray!25},
+  every axis plot/.append style={thick},
+  legend style={at={(0.5,-0.36)}, anchor=north, legend columns=2, font=\footnotesize,
+    draw=gray!40},
+]
+\addplot[color=black, mark=none] table[x=jours, y=artefact, col sep=comma]
+  {\serie{delais-repartition}};
+\addlegendentry{délai égal à la marge disponible}
+\addplot[color=black, dashed, mark=none] table[x=jours, y=complement, col sep=comma]
+  {\serie{delais-repartition}};
+\addlegendentry{complément}
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\footnotesize Répartition cumulée du délai d'obtention sur les deux parts de la partition.
+Dénominateurs distincts : \chiffre{artefact-nombre} et \chiffre{complement-nombre}.
+\end{center}
+
+\conclusion{C-06} \textbf{Les deux courbes se superposent presque.} La médiane vaut
+\chiffre{delai-mediane-ensemble} jours sur l'ensemble et \chiffre{delai-mediane-complement} sur le
+complément : un jour d'écart. L'artefact déplace la queue de la distribution, pas son centre — et
+c'est ce qui rend les médianes de ce chapitre utilisables malgré lui. \emph{Cette conclusion ne
+vient d'aucune relation injectée ; elle est un effet du mécanisme de plafonnement, et n'établit
+rien sur le service.}
+
+\begin{center}
+\footnotesize
+\pgfplotstabletypeset[
+  col sep=comma,
+  columns/code/.style={column name={Activité}, string type},
+  columns/honores/.style={column name={Honorés}, int detect, 1000 sep={\,}},
+  columns/mediane/.style={column name={Médiane}, fixed, fixed zerofill, precision=1},
+  columns/decile9/.style={column name={9\textsuperscript{e} décile}, fixed, fixed zerofill,
+    precision=1},
+  columns/complement/.style={column name={Complément}, int detect, 1000 sep={\,}},
+  columns/mediane_complement/.style={column name={Médiane}, fixed, fixed zerofill, precision=1},
+  columns/decile9_complement/.style={column name={9\textsuperscript{e} décile}, fixed,
+    fixed zerofill, precision=1},
+  every head row/.style={before row=\toprule, after row=\midrule},
+  every last row/.style={after row=\bottomrule},
+]{\serie{delais-par-activite}}
+\end{center}
+
+\begin{center}
+\footnotesize Délai d'obtention par activité, en jours, sur les rendez-vous honorés à délai
+strictement positif. Les trois premières colonnes portent l'ensemble, les trois dernières le seul
+complément de l'artefact. Les codes d'activité renvoient à la nomenclature nationale des
+spécialités médicales \cite{s30} : 4 cardiologie, 11 dermatologie, 14 gynéco-obstétrique,
+20 médecine générale, 21 médecine interne, 28 ophtalmologie, 29 oto-rhino-laryngologie,
+30 pédiatrie.
+\end{center}
+
+\conclusion{C-07} \textbf{Le classement des activités par délai est stable d'une sous-population à
+l'autre}, et l'écart entre les deux médianes ne dépasse jamais un jour sur aucune activité. Le
+rapport entre la médiane la plus haute et la plus basse vaut \chiffre{delai-rapport-extremes}.
+\emph{Reproduit R-03 : la forme log-normale et le classement des médianes sont l'un et l'autre
+imposés par les paramètres. L'activité la plus engorgée est celle dont on a fixé la médiane la plus
+haute, et aucune conclusion d'organisation ne peut s'en déduire.}
+
+\conclusion{C-08} \textbf{La part des rendez-vous pris pour le jour même dépasse le paramètre qui
+la fixe, et l'écart s'explique.} Elle vaut \chiffre{part-jour-meme}~\% des honorés quand le
+paramètre injecté vaut \chiffre{injecte-part-jour-meme}. La cause est mesurée :
+\chiffre{jour-meme-marge-nulle} de ces rendez-vous, soit
+\chiffre{jour-meme-part-marge-nulle}~\% d'entre eux, ont une marge disponible nulle ou négative —
+la fiche du patient n'existait pas avant le jour du rendez-vous — et le générateur les ramène au
+jour même sans consulter le paramètre. \emph{Reproduit R-17 par excès, et l'écart est un résultat :
+la moitié la plus visible du phénomène ne vient pas du paramètre qui prétend le régler.} Que le
+phénomène existe est établi par le poste, où un rendez-vous observé portait une seconde d'écart
+entre sa création et son heure\releve{REL-RDV.C02} ; sa fréquence, elle, n'est pas établie.
+
+\section{L'absentéisme et les annulations}
+
+Le fait de rendez-vous porte \chiffre{source-rendez-vous-lignes} lignes
+(§\ref{sec:sensibilite}) réparties sur quatre états\releve{REL-RDV.R11} :
+\chiffre{honores-total} honorés, \chiffre{absences-total} absences, \chiffre{annulations-total}
+annulations et \chiffre{rdv-en-instance} en instance. Ce dernier état ne recouvre aucune des trois
+significations établies et ne reçoit donc aucun drapeau propre.
+
+\conclusion{C-09} \textbf{Le taux d'absentéisme global vaut \chiffre{taux-absenteisme-global}~\% et
+le taux d'annulation \chiffre{taux-annulation-global}~\%}, tous deux rapportés à l'ensemble des
+rendez-vous, les quatre états compris. \emph{Reproduit R-02 pour le premier et R-16 pour le second,
+dont le paramètre vaut \chiffre{injecte-taux-annulation} : le taux d'annulation mesuré le retrouve
+à deux dixièmes de point. Le classement des activités par absentéisme est imposé de la même
+manière.}
+
+\conclusion{C-10} \textbf{L'annulation et l'absence se distinguent par un couple de champs, et la
+distinction tient.} Une annulation porte un agent d'annulation\releve{REL-RDV.C07} et une date
+d'annulation\releve{REL-RDV.C08} : \chiffre{annulations-avec-agent} des
+\chiffre{annulations-total} annulations les portent toutes deux. Une absence n'en porte aucun :
+\chiffre{absences-avec-agent-annulation} absence en porte un. Le second décompte n'est un résultat
+que parce que le premier, mesuré par la même requête, n'est pas nul. \emph{Cette distinction n'est
+pas une relation injectée — R-16 le dit explicitement : elle relève du modèle de données, et c'est
+donc l'une des rares conclusions de ce chapitre que la chaîne établit vraiment.}
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  width=11cm, height=5.4cm,
+  xlabel={délai médian d'obtention, en jours}, ylabel={part des absences, en \%},
+  xmin=0, xmax=52, ymin=0,
+  grid=major, grid style={gray!25},
+  legend style={at={(0.5,-0.36)}, anchor=north, legend columns=2, font=\footnotesize,
+    draw=gray!40},
+]
+\addplot[only marks, mark=*, mark size=2pt, color=black] table[x=mediane, y=absences,
+  col sep=comma] {\serie{absenteisme-par-activite}};
+\addlegendentry{ensemble}
+\addplot[only marks, mark=square, mark size=2.4pt, color=black] table[x=mediane_complement,
+  y=absences_complement, col sep=comma] {\serie{absenteisme-par-activite}};
+\addlegendentry{complément}
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\footnotesize Une activité par point. La part des absences du complément a un autre dénominateur
+que celle de l'ensemble — les honorés d'artefact en sont retirés, les absences non — et son niveau
+n'est donc pas comparable ; seule la pente des deux nuages l'est.
+\end{center}
+
+\conclusion{C-11} \textbf{La relation entre délai et absentéisme change de signe selon la forme
+qu'on lui donne, et c'est le résultat central de ce chapitre.} Trois formes, sur la même population
+de \chiffre{relation-effectif-ensemble} rendez-vous dont l'issue est connue et le délai strictement
+positif. \emph{Entre activités} — huit points, un par activité — la corrélation vaut
+\chiffre{relation-inter-ensemble} : les spécialités les plus attendues sont celles où l'on se
+présente le plus. \emph{À l'intérieur des activités}, l'activité étant retirée des deux grandeurs
+par centrage, elle vaut \chiffre{relation-intra-ensemble} : à spécialité donnée, un rendez-vous
+lointain se manque plus souvent. \emph{Sans distinguer les activités}, elle vaut
+\chiffre{relation-brute-ensemble} : le rangement des activités efface presque entièrement la
+relation interne.
+
+\textbf{Les trois ne concordent pas, et cela s'explique plutôt que cela ne se choisit.} La
+troisième forme est un mélange des deux premières, dominé par la seconde parce que la variance de
+l'issue entre activités est faible devant sa variance à l'intérieur de chacune. Montrer la première
+seule ferait conclure qu'attendre ne fait pas manquer son rendez-vous ; montrer la deuxième seule
+ferait disparaître l'effet de composition au lieu de l'expliquer. \emph{Reproduit R-01 et R-21 à la
+fois, et les deux sont circulaires. La corrélation entre les deux tables de paramètres elles-mêmes
+vaut \chiffre{injecte-correlation-parametres}, et la mesure sur les données produites la retrouve à
+quatre millièmes ; la pente injectée à l'intérieur des spécialités vaut
+\chiffre{injecte-pente-absenteisme} par jour, et l'écart de médiane entre absences et honorés est
+positif sur \chiffre{relation-activites-ecart-positif} des \chiffre{activites-distinctes}
+activités.}
+
+\conclusion{C-12} \textbf{Sur le complément de l'artefact, les trois formes se déplacent, et toutes
+dans le même sens.} Sur \chiffre{relation-effectif-complement} rendez-vous, la forme entre
+activités s'affaiblit à \chiffre{relation-inter-complement}, la forme interne se renforce à
+\chiffre{relation-intra-complement}, et la forme brute à \chiffre{relation-brute-complement}.
+\textbf{Retirer l'artefact rapproche donc les trois mesures de la relation injectée}, ce qui était
+attendu : les délais retirés ne venaient pas du tirage mais d'une marge, et ils diluaient le signal
+sans le porter. \emph{Cette conclusion ne vient d'aucune relation injectée ; c'est une propriété du
+mécanisme de plafonnement, et elle n'établit rien sur le service.}
 
 \section{Les urgences}
 
+Le service des urgences reçoit \chiffre{passages-urgences-produits} passages sur la période
+(§\ref{sec:sensibilite}), soit \chiffre{flux-urgences-moyenne} par jour. C'est le seul volume
+absolu du modèle qu'aucune source ne publie, et la section de sensibilité mesure ce que vaudrait
+tout ce qui suit sous une autre calibration.
+
+\conclusion{C-13} \textbf{Le profil horaire des urgences est un renflement diurne, pas un pic.} La
+pointe est à \chiffre{urgences-heure-pointe} heures, le creux à \chiffre{urgences-heure-creux}, et
+le rapport de l'un à l'autre vaut \chiffre{urgences-rapport-pointe-creux}. Le graphique de la
+première section le montre en regard de l'activité programmée, dont le rapport correspondant est
+infini : \chiffre{flux-heures-vides-programme} heures y portent zéro passage. \emph{Reproduit R-04, dont la seconde moitié pose
+vingt-quatre poids horaires strictement positifs pour ce flux.}
+
+\begin{center}
+\footnotesize
+\pgfplotstabletypeset[
+  col sep=comma,
+  columns/niveau/.style={column name={Niveau de tri}, int detect},
+  columns/passages/.style={column name={Passages}, int detect, 1000 sep={\,}},
+  columns/part/.style={column name={Part (\%)}, fixed, fixed zerofill, precision=2},
+  columns/mediane/.style={column name={Médiane (min)}, fixed, fixed zerofill, precision=1},
+  columns/decile9/.style={column name={9\textsuperscript{e} décile (min)}, fixed, fixed zerofill,
+    precision=1},
+  every head row/.style={before row=\toprule, after row=\midrule},
+  every last row/.style={after row=\bottomrule},
+]{\serie{urgences-par-niveau}}
+\end{center}
+
+\begin{center}
+\footnotesize Passages et délai avant prise en charge médicale, par niveau de tri. Les cinq codes
+s'affichent nus : la source qui décrit la nomenclature ne distingue que trois groupes de gravité
+\cite{s12} là où les données en portent cinq, et la correspondance d'un code à un groupe n'est donc
+pas établie.
+\end{center}
+
+\conclusion{C-14} \textbf{La pyramide de gravité est régulière et le délai croît avec le numéro du
+niveau.} Les cibles de délai que la calibration retient, adossées à l'échelle de tri publiée
+\cite{s14}, valent \chiffre{cible-delai-niveau-1}, \chiffre{cible-delai-niveau-2},
+\chiffre{cible-delai-niveau-3}, \chiffre{cible-delai-niveau-4} et \chiffre{cible-delai-niveau-5}
+minutes. \textbf{Chacune des cinq médianes du tableau reste sous la cible de son niveau, et chacun
+des cinq neuvièmes déciles la dépasse} : la moitié des patients est vue dans les temps, le dernier
+dixième largement au-delà. \emph{Reproduit R-09 pour la répartition et R-10 pour les délais ; le
+taux de respect de la cible est lui aussi un paramètre, et l'indicateur de conformité est donc un
+paramètre affiché, non une performance mesurée.}
+
+\conclusion{C-15} \textbf{L'orientation de sortie est très majoritairement le retour à domicile}, à
+\chiffre{urgences-part-retour-domicile}~\%, devant le transfert à
+\chiffre{urgences-part-transfert}~\% et l'hospitalisation à
+\chiffre{urgences-part-hospitalisation}~\%. Le mode d'arrivée le plus fréquent porte
+\chiffre{urgences-part-mode-principal}~\% des passages ; son code s'affiche nu, aucune source
+n'établissant sa signification. Les cinq issues du passage, elles, sont nommées par le règlement
+intérieur \cite{s27}. \emph{Reproduit R-11 : le taux de transfert et le taux d'hospitalisation sont
+imposés.}
+
+\conclusion{C-16} \textbf{La part des passages relevant d'une consultation ordinaire vaut
+\chiffre{urgences-part-consultation-ordinaire}~\%}, mesurée comme la part des deux niveaux de tri
+dont la cible de délai est la plus longue — le classement des niveaux venant de ces cibles et non
+de leur numéro. \textbf{Ce qui établit ce constat est une source, pas cette mesure.} Le recueil
+national donne \chiffre{source-part-non-urgentes}~\% de consultations non urgentes dans le public
+\cite{s12} ; une étude en établissement provincial mesure une part de consultations non appropriées
+de \chiffre{source-part-non-appropriees} \cite{s13}. \textbf{Les deux
+sources ne mesurent pas la même grandeur} — non urgent au sens du tri et non approprié au sens du
+recours sont deux notions distinctes — et l'écart entre elles est plus grand que celui de l'une à
+notre mesure. \emph{Reproduit R-09 : la part injectée des deux derniers niveaux vaut
+\chiffre{injecte-part-deux-derniers-niveaux}, et la mesure la retrouve. Ce que la chaîne démontre
+est qu'elle sait calculer cette part ; ce qui justifierait une filière courte est la source, jamais
+le nombre mesuré ici.}
+
 \section{La facturation et le recouvrement}
+
+\begin{center}
+\footnotesize
+\pgfplotstabletypeset[
+  col sep=comma,
+  columns/episode/.style={column name={Type d'épisode}, string type},
+  columns/factures/.style={column name={Factures}, int detect, 1000 sep={\,}},
+  columns/montant/.style={column name={Montant}, fixed, fixed zerofill, precision=2,
+    1000 sep={\,}},
+  columns/part/.style={column name={Part (\%)}, fixed, fixed zerofill, precision=2},
+  columns/organisme/.style={column name={Part organisme (\%)}, fixed, fixed zerofill,
+    precision=2},
+  every head row/.style={before row=\toprule, after row=\midrule},
+  every last row/.style={after row=\bottomrule},
+]{\serie{facturation-par-type}}
+\end{center}
+
+\begin{center}
+\footnotesize Montants facturés par type d'épisode, en dirhams. Les trois codes s'affichent nus :
+la taxonomie réglementaire des modes d'utilisation de l'hôpital est établie sans être énumérée
+\cite{s27}.
+\end{center}
+
+\conclusion{C-17} \textbf{Le montant facturé ne suit pas le volume.} Le type d'épisode le moins
+nombreux porte la majorité du montant, et le plus nombreux un quart. Sur
+\chiffre{facturation-factures} factures et \chiffre{facturation-montant-total} dirhams
+(§\ref{sec:sensibilite}), la part prise en charge par un organisme vaut
+\chiffre{facturation-part-organisme}~\% et la part restant au patient
+\chiffre{facturation-part-patient}~\% — les deux mesurées séparément, la seconde n'étant pas
+déduite de la première. \emph{Cette conclusion ne vient d'aucune relation injectée ; elle est un
+effet conjoint des tarifs et de la clé de couverture, et n'établit rien sur le service.}
+
+\conclusion{C-18} \textbf{Un taux de recouvrement n'a de sens qu'avec sa population, et l'écart est
+de plusieurs dizaines de points.} Sur les \chiffre{recouvrement-creances} créances nées, portant
+\chiffre{recouvrement-montant-du} dirhams, le taux global vaut
+\chiffre{recouvrement-taux-global}~\% et va de \chiffre{recouvrement-taux-minimal}~\% à
+\chiffre{recouvrement-taux-maximal}~\% selon le type de débiteur. \textbf{Ce taux ne doit pas être
+confondu avec le taux d'encaissement}, qui rapporte les \chiffre{encaissements-montant} dirhams
+encaissés au montant facturé et vaut \chiffre{taux-encaissement}~\% : les deux grandeurs portent
+sur des populations différentes, et la seconde vaut près de quatre fois la première. \emph{Reproduit R-20 : les
+taux de facturation et de recouvrement par type d'épisode sont imposés, et toute priorisation des
+relances qui s'en déduirait serait circulaire.}
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  width=11cm, height=4.8cm,
+  xlabel={ancienneté de la créance, en jours}, ylabel={part du restant dû, en \%},
+  xmin=0, ymin=0, ymax=105,
+  grid=major, grid style={gray!25},
+  every axis plot/.append style={thick},
+]
+\addplot[color=black, mark=none] table[x=jours, y=part, col sep=comma]
+  {\serie{anciennete-creances}};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\footnotesize Part du montant restant dû portée par des créances plus anciennes que l'abscisse.
+Dénominateur : le montant restant des seules créances non soldées.
+\end{center}
+
+\conclusion{C-19} \textbf{Le restant dû est vieux.} Sur \chiffre{recouvrement-montant-restant}
+dirhams restant à recouvrer, \chiffre{creances-part-au-dela-un-an}~\% sont portés par des créances
+d'un an et plus. Les \chiffre{recouvrement-relances} relances émises aboutissent, complètement ou
+partiellement, dans \chiffre{recouvrement-taux-aboutissement}~\% des cas — un rendement rapporté
+aux relances, jamais aux créances. \emph{Reproduit R-20, dont la conséquence porte explicitement
+l'ancienneté des créances.}
+
+\section{La qualité du fichier patient}
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  width=11cm, height=4.8cm,
+  xlabel={colonnes incomplètes, rangées par complétude croissante},
+  ylabel={taux de renseignement, en \%},
+  xmin=0, ymin=0, ymax=105,
+  grid=major, grid style={gray!25},
+  every axis plot/.append style={thick},
+]
+\addplot[color=black, mark=*, mark size=1pt] table[x=rang, y=completude, col sep=comma]
+  {\serie{completude-champs}};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\footnotesize Les seules colonnes incomplètes, rangées par complétude croissante. L'abscisse est un
+rang, non un identifiant de colonne.
+\end{center}
+
+\conclusion{C-20} \textbf{L'incomplétude se concentre.} Sur \chiffre{qualite-colonnes} colonnes des
+couches aval, \chiffre{qualite-colonnes-incompletes} sont incomplètes et
+\chiffre{qualite-colonne-vide} est entièrement vide ; la courbe monte lentement puis se redresse,
+ce qui signifie qu'un petit nombre de colonnes concentre presque tout le défaut de saisie.
+\emph{Reproduit R-15 : le classement des champs par complétude est imposé, et une recommandation de
+saisie obligatoire fondée sur ce classement serait circulaire.}
+
+\begin{center}
+\footnotesize
+\pgfplotstabletypeset[
+  col sep=comma,
+  % Les noms de table portent des soulignements, qui sont des caractères actifs en mode texte.
+  % `string replace*` les échappe à la lecture, sans toucher au fichier de données.
+  columns/objet/.style={column name={Table}, string type, string replace*={_}{\textunderscore}},
+  columns/colonnes/.style={column name={Colonnes}, int detect},
+  columns/incompletes/.style={column name={Incomplètes}, int detect},
+  columns/completude_minimale/.style={column name={Complétude minimale (\%)}, fixed,
+    fixed zerofill, precision=2},
+  columns/quarantaine/.style={column name={Quarantaine}, int detect, 1000 sep={\,}},
+  columns/taux_quarantaine/.style={column name={Taux (\%)}, fixed, fixed zerofill, precision=2},
+  every head row/.style={before row=\toprule, after row=\midrule},
+  every last row/.style={after row=\bottomrule},
+]{\serie{qualite-par-table}}
+\end{center}
+
+\begin{center}
+\footnotesize Complétude et quarantaine par table de la couche intermédiaire.
+\end{center}
+
+\conclusion{C-21} \textbf{La quarantaine est marginale et concentrée sur deux tables.} Sur
+\chiffre{qualite-lignes-examinees} lignes examinées, \chiffre{quarantaine-lignes-total-analyse}
+sont rejetées à l'ingestion, et le taux le plus élevé d'une table vaut
+\chiffre{qualite-taux-quarantaine-maximal}~\%. \chiffre{qualite-tables-sans-quarantaine} tables sur \chiffre{qualite-tables} n'en rejettent
+aucune.
+\emph{Cette conclusion ne vient d'aucune relation injectée ; elle est un effet des défauts de forme
+que le générateur sème, et n'établit rien sur la qualité d'une extraction réelle.}
+
+\conclusion{C-22} \textbf{Une personne n'est pas un identifiant, et le fichier le montre.} Le
+fichier porte \chiffre{identifiants-distincts} identifiants patient distincts pour
+\chiffre{personnes-estimees} personnes estimées, l'écart venant de \chiffre{grappes-multiples}
+grappes réunissant plus d'une fiche ; aucune n'en réunit plus de
+\chiffre{grappes-taille-maximale}. La part des personnes portant deux fiches vaut
+\chiffre{doublons-part-mesuree}~\%. Par collision exacte, \chiffre{collision-groupes-nom} groupes
+partagent nom et date de naissance et \chiffre{collision-groupes-piece} partagent une pièce
+d'identité. \emph{Reproduit R-14, dont le paramètre vaut \chiffre{injecte-taux-doublons} : la
+mesure le retrouve à un centième de point près. Que le phénomène existe est établi par une source
+\cite{s20} ; son ampleur ne l'est pas, et la performance du rapprochement mesurée au chapitre
+précédent l'est contre cette distribution injectée.}
+
+\section*{Ce que le chapitre reproduit, et ce qu'il n'établit pas}
+\addcontentsline{toc}{section}{Ce que le chapitre reproduit, et ce qu'il n'établit pas}
+
+\textbf{Premier sens} : toute relation du registre des relations injectées est reprise par une
+conclusion de ce chapitre, avec l'amplitude injectée en regard de l'amplitude mesurée, ou déclarée
+non reprise avec son motif.
+
+{\footnotesize
+% Un tableau long, et non un tableau ordinaire : vingt et une lignes ne tiennent pas dans le
+% reste d'une page, et un tableau ordinaire les reporte en bloc en laissant la page presque vide.
+\begin{longtable}{@{}llp{0.255\linewidth}p{0.255\linewidth}@{}}
+\toprule
+Relation & Conclusion & Amplitude injectée & Amplitude mesurée \\
+\midrule
+\endfirsthead
+\toprule
+Relation & Conclusion & Amplitude injectée & Amplitude mesurée \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\relreprise{R-01}{C-11}{pente de \chiffre{injecte-pente-absenteisme} par jour, interne à la spécialité}{corrélation interne positive, écart de médiane positif sur \chiffre{relation-activites-ecart-positif} activités}
+\relreprise{R-02}{C-09}{taux d'absentéisme fixé par activité}{\chiffre{taux-absenteisme-global}~\% en global, classement par activité retrouvé}
+\relreprise{R-03}{C-07}{loi log-normale, médiane fixée par activité}{rapport de \chiffre{delai-rapport-extremes} entre les extrêmes, écart sous le jour entre sous-populations}
+\relreprise{R-04}{C-02, C-13}{fenêtre de pointe posée, poids tous positifs aux urgences}{pointe à \chiffre{flux-heure-pointe} h, \chiffre{flux-heures-vides-programme} heures vides côté programmé, aucune aux urgences}
+\relreprise{R-05}{C-03}{rapport de \chiffre{injecte-hebdo-rapport} entre le premier et le sixième jour}{\chiffre{hebdo-rapport-mesure}}
+\relreprise{R-06}{C-04}{coefficient de \chiffre{injecte-ramadan-coefficient} pendant le Ramadan}{baisse de \chiffre{ramadan-baisse}~\%, un point sous le coefficient}
+\relreprise{R-07}{C-05}{coefficient de \chiffre{injecte-ferie-coefficient} les jours fériés pour le programmé}{\chiffre{feries-programme-passages} passage programmé, urgences invariantes}
+\relnonreprise{R-08}{aucune grandeur de ce chapitre ne ventile par régime de couverture : la dimension d'organisme payeur n'est référencée par aucun fait}
+\relreprise{R-09}{C-14, C-16}{part de \chiffre{injecte-part-deux-derniers-niveaux} pour les deux niveaux aux cibles les plus longues}{\chiffre{urgences-part-consultation-ordinaire}~\%}
+\relreprise{R-10}{C-14}{cibles de \chiffre{cible-delai-niveau-1} à \chiffre{cible-delai-niveau-5} min, respect fixé}{chaque médiane sous sa cible, chaque neuvième décile au-dessus}
+\relreprise{R-11}{C-15}{répartition fixée des cinq issues}{\chiffre{urgences-part-retour-domicile}~\% de retour à domicile, transfert devant hospitalisation}
+\relnonreprise{R-12}{aucune conclusion de ce chapitre ne croise le champ d'origine avec le niveau de tri ; la relation est traitée au chapitre de conception du jeu de données}
+\relnonreprise{R-13}{aucune colonne d'âge ni de tranche d'âge n'est calculée dans les couches aval : le chapitre n'a aucune grandeur démographique à analyser}
+\relreprise{R-14}{C-22}{taux de doublons de \chiffre{injecte-taux-doublons}}{\chiffre{doublons-part-mesuree}~\%}
+\relreprise{R-15}{C-20}{taux de champs manquants fixé par colonne}{\chiffre{qualite-colonnes-incompletes} colonnes incomplètes, dont \chiffre{qualite-colonne-vide} entièrement vide}
+\relreprise{R-16}{C-09}{taux d'annulation de \chiffre{injecte-taux-annulation}}{\chiffre{taux-annulation-global}~\%}
+\relreprise{R-17}{C-08}{part de \chiffre{injecte-part-jour-meme} pour le jour même}{\chiffre{part-jour-meme}~\%, l'excès venant de la marge nulle}
+\relnonreprise{R-18}{aucune page ne donne la part des patients adressés à voir, et ce chapitre n'ouvre aucune section sur l'adressage}
+\relnonreprise{R-19}{le laboratoire n'entre dans aucune des six sections de ce chapitre ; le ratio est traité au chapitre de conception du jeu de données}
+\relreprise{R-20}{C-18, C-19}{taux de facturation et de recouvrement fixés par type}{de \chiffre{recouvrement-taux-minimal} à \chiffre{recouvrement-taux-maximal}~\% selon le débiteur ; \chiffre{creances-part-au-dela-un-an}~\% du restant dû a un an}
+\relreprise{R-21}{C-11}{corrélation de \chiffre{injecte-correlation-parametres} entre les deux tables de paramètres}{\chiffre{relation-inter-ensemble}}
+\end{longtable}
+}
+
+\textbf{Second sens} : toute conclusion renvoie à une relation injectée, ou est déclarée comme n'en
+venant pas — auquel cas elle est un effet des autres choix du générateur et \textbf{n'établit
+rien}.
+
+\begin{center}
+\footnotesize
+\begin{tabular}{@{}lp{0.72\linewidth}@{}}
+\toprule
+Conclusion & Ce dont elle vient \\
+\midrule
+\conclusionhors{C-01}{d'aucune relation : effet des paramètres de volumétrie et du calendrier}
+\conclusionhors{C-06}{d'aucune relation : effet du mécanisme de plafonnement du délai}
+\conclusionhors{C-10}{d'aucune relation : R-16 déclare que la distinction relève du modèle de données. C'est ce que la chaîne établit vraiment}
+\conclusionhors{C-12}{d'aucune relation : propriété du mécanisme de plafonnement, mesurée sur le complément}
+\conclusionhors{C-17}{d'aucune relation : effet conjoint des tarifs et de la clé de couverture}
+\conclusionhors{C-21}{d'aucune relation : effet des défauts de forme semés à l'ingestion}
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Aucune conclusion de ce chapitre n'établit un fait sur le service}, qu'elle reproduise une
+relation injectée ou qu'elle n'en reproduise aucune. Ce que le chapitre démontre, et c'est tout ce
+qu'il démontre, est que la chaîne produit ces grandeurs à partir d'une extraction, les ventile, et
+sépare ce qui vient d'un paramètre de ce qui n'en vient pas.
