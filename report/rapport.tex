@@ -23,11 +23,35 @@
 \usepackage{booktabs}
 \usepackage{fancyhdr}
 
-% Tracé vectoriel, pour la seule courbe de précision et de rappel. Le paquet est présent dans
-% toute distribution complète, et l'image de composition de l'intégration continue en porte une :
-% le choix est mesuré, non supposé.
+% Tracé vectoriel. Le paquet est présent dans toute distribution complète, et l'image de
+% composition de l'intégration continue en porte une : le choix est mesuré, non supposé.
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
+
+% Les nombres des graduations et des tableaux composés suivent l'usage français : virgule
+% décimale, espace fine insécable aux milliers. Sans cette ligne, pgfplots écrit « 1,000 » là où
+% le rendu du registre des chiffres écrit « 1 000 », et deux conventions typographiques
+% coexisteraient dans la même page.
+\pgfplotsset{/pgf/number format/.cd, use comma, 1000 sep={\,}}
+
+% La mise en tableau d'un fichier de données, du même paquet — mesuré : `tlmgr search --file
+% --global pgfplotstable.sty` rend `pgfplots: texmf-dist/tex/latex/pgfplots/pgfplotstable.sty`.
+% Aucune distribution qui porte l'un ne peut manquer l'autre, et c'est ce qui permet à un tableau
+% de chiffres de venir d'une commande plutôt que d'être tapé.
+\usepackage{pgfplotstable}
+
+% ------------------------------------------------------------------------------------------
+% La correspondance entre relations injectées et conclusions.
+%
+% Trois commandes, et un contrôle les lit DANS LES DEUX SENS : toute relation du registre des
+% relations injectées est reprise par une conclusion ou déclarée non reprise avec son motif, et
+% toute conclusion renvoie à une relation ou déclare qu'elle n'en vient pas. Une ligne retirée
+% d'un côté ou de l'autre fait rougir ce contrôle en nommant l'orpheline.
+% ------------------------------------------------------------------------------------------
+\newcommand{\conclusion}[1]{\textbf{#1.}}
+\newcommand{\relreprise}[4]{#1 & #2 & #3 & #4 \\}
+\newcommand{\relnonreprise}[2]{#1 & --- & \multicolumn{2}{p{0.55\linewidth}}{#2} \\}
+\newcommand{\conclusionhors}[2]{#1 & #2 \\}
 
 \usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
 \addbibresource{biblio.bib}
