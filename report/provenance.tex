@@ -1,0 +1,33 @@
+% --- les trois étiquettes de provenance -------------------------------------------------------
+% La prose porte les mêmes étiquettes que les colonnes de l'entrepôt, et pour la même raison :
+% un lecteur doit pouvoir dire, sur n'importe quelle affirmation, d'où elle vient.
+%
+%   DOC  une entrée du registre des sources l'étaye. Elle se cite par \cite{...}, et la clé
+%        renvoie au fichier bibliographique produit à partir du registre.
+%   OBS  un relevé d'observation l'étaye. Aucune source publiée ne la porte : elle a été vue.
+%   HYP  aucune des deux. C'est une convention posée, et le rapport la déclare comme telle.
+%
+% Chaque fichier de chapitre déclare en tête l'ensemble de ce sur quoi il repose, sous ces trois
+% étiquettes, et un contrôle vérifie que la déclaration coïncide exactement avec ce que le fichier
+% porte — dans les deux sens.
+
+% Un relevé d'observation. L'argument est son identifiant, court et stable ; il n'est pas composé.
+\newcommand{\releve}[1]{\textsuperscript{\,[obs.]}}
+
+% Une convention posée. Même forme, même règle.
+\newcommand{\convention}[1]{\textsuperscript{\,[conv.]}}
+
+% --- ce qui reste à rédiger --------------------------------------------------------------------
+% Un paragraphe qui relève de la rédaction personnelle et que le squelette ne peut pas écrire.
+% Le premier argument est son identifiant d'observation, le second ce qu'il portera.
+%
+% La marque est VISIBLE à la compilation, toujours : un rapport remis en la portant se voit à
+% l'œil. Le contrôle, lui, s'appuie sur l'état déclaré du document — il rougit en état de remise
+% et s'abstient en état de brouillon, où un paragraphe non encore écrit est normal.
+\newcommand{\aRediger}[2]{%
+  \par\medskip\noindent\fbox{%
+    \begin{minipage}{0.95\linewidth}%
+      \textbf{À rédiger} — #2%
+    \end{minipage}%
+  }\par\medskip%
+}
