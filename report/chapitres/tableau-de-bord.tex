@@ -1,15 +1,300 @@
 % Ce chapitre repose sur :
-%   DOC: (aucun)
-%   OBS: (aucun)
+%   DOC: s30
+%   OBS: REL-DEM.P05
 %   HYP: (aucun)
-%   CHI: (aucun)
-%   SER: (aucune)
-%   SECTIONS: 3
+%   CHI: tdb-pages, tdb-pages-pilotage, tdb-pages-methode, tdb-indicateurs,
+%   CHI: tdb-indicateurs-pilotage, tdb-indicateurs-methode, tdb-graphiques,
+%   CHI: tdb-page-plus-chargee, tdb-filtrabilite-oui, tdb-filtrabilite-sous-reserve,
+%   CHI: tdb-filtrabilite-non, tdb-recalcules-depuis-faits, instantane-tables,
+%   CHI: instantane-objets-copies, instantane-lignes, instantane-volume,
+%   CHI: instantane-duree-rafraichissement, instantane-lectures-temoin,
+%   CHI: instantane-erreurs-dimension, instantane-erreurs-completude,
+%   CHI: instantane-fenetre-dimension, instantane-fenetre-completude,
+%   CHI: instantane-rapport-cout-lecture, instantane-rapport-hors-completude,
+%   CHI: tdb-erreurs-lecture-tolerees, rotation-affichee-avant, rotation-affichee,
+%   CHI: trot-publie, irot-publie, irot-affiche, tom-affiche, tom-publie, dms-affichee,
+%   CHI: dms-publie, facteur-annualisation, tolerance-indicateurs-sejour,
+%   CHI: exigences-rubriques, exigences-calculables, exigences-non-calculables,
+%   CHI: exigences-sans-objet, exigences-champs-manquants, exigences-ecart-maximal
+%   SER: tableau-de-bord-par-page, instantane-objets, exigences-restitution
+%   SECTIONS: 4
 
-\chapter{Le tableau de bord}
+\chapter{Le tableau de bord}\label{chap:tableau-de-bord}
 
-\section{La composition des pages}
+\textbf{Ce chapitre ne porte aucune capture d'écran.} Les figures qui suivent sont des maquettes
+redessinées et des graphiques composés, et ce choix est une décision, non une commodité. Deux
+contrôles du dépôt interdisent toute image du système d'information, et sont verts depuis l'origine
+du projet ; les amender pour illustrer serait le premier relâchement de l'ensemble. Une capture
+lisible d'une page dense n'existe pas à la taille dont ce chapitre dispose. Et une reconstitution
+composée se relit dans une comparaison de versions, ce qu'une image ne fait pas — le rapport s'en
+est déjà servi deux fois, pour les écrans du logiciel observé et pour les schémas de la chaîne.
 
-\section{Le registre des indicateurs}
+\section{Conception et ergonomie}
 
-\section{Ce que l'écran déclare de ses propres limites}
+\textbf{Le destinataire est le responsable du service d'accueil et d'admission}, non un analyste.
+Il en découle trois arbitrages, et chacun est visible à l'écran.
+
+\textbf{Un.} Chaque indicateur affiche sa définition en une phrase, la décision qu'elle sert, et ce
+dont sa valeur est recalculée. \chiffre{tdb-recalcules-depuis-faits} des
+\chiffre{tdb-indicateurs} indicateurs sont recalculés depuis les faits, comme la règle du cadrage
+le demande ; les autres sont des écarts assumés, et l'écran les nomme plutôt que de les taire.
+
+\textbf{Deux.} La lecture ne dépend pas du calendrier de la chaîne. Le tableau de bord ne lit ni la
+couche analytique ni les tables sources : il lit un schéma dédié de tables figées, daté, que la
+chaîne reconstruit puis substitue d'un bloc.
+
+\textbf{Trois.} Les pages se répartissent en deux sections nommées par leur \emph{public}, et non
+par leur sujet.
+
+\textbf{Le motif du schéma figé n'est pas le coût des lectures, et l'écrire ainsi serait faux.} Ce
+coût a été mesuré : lire les indicateurs de toutes les pages contre les vues coûte
+\chiffre{instantane-rapport-cout-lecture} fois ce qu'il en coûte contre des tables copiées. Ce
+rapport moyen est trompeur — il est porté par une minorité d'indicateurs, et retirer la seule page
+la plus coûteuse le ramène à \chiffre{instantane-rapport-hors-completude}. Un gain inégal de cet
+ordre ne justifierait pas un schéma de plus à maintenir.
+
+\textbf{Le motif est qu'un lecteur voit une erreur pendant la reconstruction.} Un témoin
+concurrent, lisant en boucle pendant une reconstruction complète, a compté
+\chiffre{instantane-erreurs-dimension} lectures en erreur sur
+\chiffre{instantane-lectures-temoin} tentatives contre une dimension simple, et
+\chiffre{instantane-erreurs-completude} sur autant de tentatives contre la vue la plus coûteuse à
+produire. Le message est le même dans les deux cas, et il ne dit pas une attente mais une absence :
+l'objet n'existe plus, pendant \chiffre{instantane-fenetre-dimension} seconde dans le premier cas
+et \chiffre{instantane-fenetre-completude} dans le second. La cause a été isolée par une expérience
+dédiée : la suppression d'une vue de sauvegarde emporte en cascade les vues construites au-dessus
+d'elle, qui ne réapparaissent qu'à leur propre rang dans l'ordre de reconstruction. \textbf{Le critère
+retenu est asymétrique} : le nombre d'échecs de lecture tolérés est de
+\chiffre{tdb-erreurs-lecture-tolerees}, sous toute charge et sans classe d'erreur exceptée, parce
+qu'un utilisateur le subit sans recours ; un échec de substitution, lui, est
+journalisé et relançable, et la transaction qui l'enveloppe laisse l'instantané dans sa génération
+précédente, complète.
+
+\textbf{La séparation en deux sections ne repose pas sur un critère de complexité, mais sur l'objet
+du nombre.} Un indicateur reste opérationnel si sa valeur peut changer une décision du service ; il
+passe en méthode s'il décrit la chaîne — sa performance, sa provenance, ses paramètres — et non
+l'activité. Un indicateur dont l'objet est le jeu de données lui-même ne peut, par construction,
+informer aucune décision de service. La règle a été appliquée aux décisions servies que chaque
+entrée du registre déclare déjà, et non décrétée page par page : elle donne
+\chiffre{tdb-indicateurs-pilotage} indicateurs en pilotage et \chiffre{tdb-indicateurs-methode} en
+méthode, sans qu'aucune décision servie ait manqué de trancher. Les deux intitulés nomment le
+public — « Pilotage du service » et « Évaluation de la chaîne » — parce que « Qualité » ou
+« Technique » désigneraient un domaine et laisseraient un responsable se demander si la seconde
+section le concerne.
+
+\section{Les pages, en deux sections}
+
+Le tableau de bord compte \chiffre{tdb-pages} pages, dont \chiffre{tdb-pages-pilotage} en pilotage
+et \chiffre{tdb-pages-methode} en méthode, portant \chiffre{tdb-indicateurs} indicateurs et
+\chiffre{tdb-graphiques} tracés. Toutes partagent le même agencement.
+
+\begin{center}
+\begin{tabular}{@{}c@{}}
+\fbox{\begin{minipage}{0.94\linewidth}\small
+\begin{minipage}[t]{0.30\linewidth}\centering
+\fbox{\begin{minipage}{0.90\linewidth}\centering\footnotesize
+\textbf{barre latérale}\\[3pt]
+\dotfill\\[1pt]
+intitulé de section\\
+$\cdot$ \quad $\cdot$ \quad $\cdot$ \quad $\cdot$\\[3pt]
+\dotfill\\[1pt]
+intitulé de section\\
+$\cdot$ \quad $\cdot$
+\end{minipage}}
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.66\linewidth}\centering
+\fbox{\begin{minipage}{0.94\linewidth}\centering\footnotesize
+titre de la page \hfill état et date de l'instantané\end{minipage}}\\[3pt]
+\fbox{\begin{minipage}{0.94\linewidth}\centering\footnotesize
+zone de filtre de période\end{minipage}}\\[3pt]
+\fbox{\begin{minipage}{0.94\linewidth}\centering\footnotesize
+\textbf{bloc d'indicateur} : libellé, définition, filtrabilité, source de la valeur\\[2pt]
+\fbox{\begin{minipage}{0.86\linewidth}\centering\footnotesize tableau ou tracé\end{minipage}}
+\end{minipage}}\\[3pt]
+\fbox{\begin{minipage}{0.94\linewidth}\centering\footnotesize
+bloc d'indicateur \quad ($\ldots$)\end{minipage}}
+\end{minipage}
+\end{minipage}}
+\end{tabular}
+\end{center}
+
+\begin{center}
+\footnotesize Agencement commun aux pages. Aucune donnée n'y figure : la maquette montre des zones,
+non un écran rempli.
+\end{center}
+
+\begin{center}
+\footnotesize
+\pgfplotstabletypeset[
+  col sep=comma,
+  columns/page/.style={column name={Page}, string type,
+    string replace*={_}{\textunderscore}},
+  columns/section/.style={column name={Section}, string type},
+  columns/indicateurs/.style={column name={Indicateurs}, int detect},
+  columns/graphiques/.style={column name={Tracés}, int detect},
+  every head row/.style={before row=\toprule, after row=\midrule},
+  every last row/.style={after row=\bottomrule},
+]{\serie{tableau-de-bord-par-page}}
+\end{center}
+
+\begin{center}
+\footnotesize Les pages, dans l'ordre du registre des indicateurs, avec leur section, le nombre
+d'indicateurs qu'elles portent et le nombre de tracés que leur fichier appelle.
+\end{center}
+
+\textbf{Section de pilotage, et la décision que chaque page sert.} \emph{Activité} dimensionne les
+plages d'ouverture et les effectifs sur la charge observée. \emph{Rendez-vous} ouvre ou ferme des
+créneaux sur les activités dont le délai s'écarte des autres, et sépare l'annulation, qui laisse
+réaffecter le créneau, de l'absence, qui le perd. \emph{Urgences} dimensionne l'accueil et le tri,
+et mesure la part relevant d'une consultation ordinaire, dont dépend l'ouverture d'une filière
+courte. \emph{Séjours} répartit les lits entre unités, repère les dossiers de sortie non clôturés
+avant qu'ils ne faussent les durées, et porte les quatre indicateurs que la statistique nationale
+attend. \emph{Facturation et recouvrement} — la plus chargée, avec
+\chiffre{tdb-page-plus-chargee} indicateurs — détecte les factures dont le total ne s'accorde pas à
+leurs lignes et priorise le recouvrement par ancienneté et par débiteur. \emph{Qualité des données}
+cible l'effort de saisie sur les champs les moins renseignés. \emph{Données}, enfin, est la seule
+sans aucun tracé, et c'est délibéré : les autres répondent à « combien », celle-ci répond à
+« lesquels » — elle donne les lignes derrière les chiffres, pour agir sur des dossiers plutôt que
+sur une moyenne.
+
+\textbf{Section d'évaluation de la chaîne, et pourquoi ces pages ne servent aucune décision de
+service.} \emph{Rapprochement d'identités} donne la courbe de précision et de rappel, l'apport du
+rapprochement probabiliste sur une collision exacte, et le seuil effectivement appliqué. Ces trois
+grandeurs décrivent un modèle, non une file d'attente : elles servent à déplacer un seuil ou à
+renoncer à une méthode, décisions qui appartiennent à qui construit la chaîne.
+\emph{Provenance et paramètres} porte la part du modèle qui repose sur l'observation et celle qui
+repose sur l'hypothèse, et les deux mesures du croisement entre délai et absentéisme — celle qui
+compare les activités entre elles et celle qui mesure l'écart à l'intérieur de chacune. Ces deux
+dernières sont marquées circulaires au registre des relations injectées : leur valeur est fixée par
+construction, et aucune décision de service ne peut s'y adosser. \textbf{Aucun indicateur circulaire
+n'est classé en pilotage}, et cette absence n'est pas un hasard de rédaction : elle est une
+conséquence de la règle, vérifiée par un contrôle.
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  width=11cm, height=4.6cm, ymode=log,
+  xlabel={objets copiés, rangés par effectif décroissant},
+  ylabel={lignes copiées},
+  xmin=0, xmax=25,
+  grid=major, grid style={gray!25},
+  every axis plot/.append style={thick},
+]
+\addplot[color=black, mark=*, mark size=1.2pt] table[x=rang, y=lignes, col sep=comma]
+  {\serie{instantane-objets}};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\footnotesize Les \chiffre{instantane-objets-copies} objets que le tableau de bord lit, par
+effectif. L'abscisse est un rang, non un nom d'objet.
+\end{center}
+
+\textbf{Ce que les pages lisent tient en \chiffre{instantane-tables} tables}, dont
+\chiffre{instantane-objets-copies} copies et deux tables de service portant l'état et les
+paramètres. L'ensemble pèse \chiffre{instantane-volume} octets pour
+\chiffre{instantane-lignes} lignes, et se reconstruit en
+\chiffre{instantane-duree-rafraichissement} secondes. Les effectifs s'étalent sur quatre ordres de
+grandeur, du fait de passage à l'agrégat de doublons, ce qui explique que le gain de lecture soit
+si inégal d'un indicateur à l'autre.
+
+\textbf{Une divergence apparente qu'il faut nommer, faute de quoi un lecteur y verrait une
+incohérence.} Le registre des indicateurs déclare des objets de la couche analytique, quand les
+pages lisent le schéma figé. \textbf{Ce n'est pas un défaut mais un invariant écrit et contrôlé} :
+le registre nomme la couche analytique parce que c'est là qu'un objet est produit par un modèle,
+documenté et testé ; les pages lisent le schéma figé pour la raison donnée plus haut. L'invariant
+qui les relie est le nom de table, privé de son schéma, et un contrôle le vérifie page par page en
+recueillant les requêtes réellement émises plutôt qu'en analysant le code.
+
+\section{Guide d'utilisation}
+
+\textbf{Lire un indicateur.} Chaque bloc porte son libellé, sa définition en une phrase, une
+mention de filtrabilité et la source de sa valeur. La mention de filtrabilité n'est pas décorative :
+\chiffre{tdb-filtrabilite-oui} indicateurs se restreignent à une période sans réserve,
+\chiffre{tdb-filtrabilite-sous-reserve} s'y restreignent au moyen d'une date qui n'est pas celle
+qu'un lecteur attendrait — et l'écran dit laquelle et pourquoi —, et
+\chiffre{tdb-filtrabilite-non} ne s'y restreignent pas du tout. Ces derniers portent l'un des trois
+motifs admis : l'objet n'a aucune colonne temporelle, la grandeur est annualisée et la restreindre
+serait méthodologiquement faux, ou la date existe dans une couche que le filtre n'atteint pas.
+
+\textbf{Filtrer.} Le filtre de période est porté par la page et non par l'application : une page
+dont aucun indicateur n'est filtrable n'en affiche pas, et le dit. La page des données porte en
+outre des filtres de service et d'activité, et un sélecteur de table.
+
+\textbf{Exporter.} La page des données télécharge la sélection courante en un fichier tabulaire.
+Son format n'est pas redécidé là : il est celui des livrables de la chaîne — séparateur virgule,
+encodage universel avec marque d'ordre d'octets, pour qu'un tableur ouvrant le fichier par
+double-clic n'abîme pas les accents.
+
+\textbf{Le paragraphe qui manque à la plupart des rapports de ce genre.} Un indicateur
+réglementaire affiché a été faux, et longtemps. Le taux de rotation valait
+\chiffre{rotation-affichee-avant} à l'écran là où la statistique nationale publie
+\chiffre{trot-publie} : faux d'un facteur voisin de deux et demi, soit exactement
+\chiffre{facteur-annualisation}, le rapport de la durée de la période à l'année de référence. La
+page ne l'annualisait pas, alors même que le registre déclarait la grandeur annualisée et que
+l'écran affichait, à côté du chiffre, que cette grandeur rapporte un volume à une année de
+référence.
+
+\textbf{Aucun contrôle ne pouvait le voir, et c'est cela qu'il faut retenir.} Ceux qui portaient sur
+ces grandeurs interrogeaient la couche analytique, quand la page interroge le schéma figé. Celui qui
+portait sur la page retranscrivait sa formule et se comparait à elle : une comparaison vraie par
+construction, incapable de départager une formule juste d'une formule fausse. Elle est restée verte
+pendant toute la durée du défaut.
+
+Le contrôle qui a remplacé cette seconde mesure ne retranscrit rien. Il appelle la page, avec ses
+propres paramètres et par son propre point de lecture, et confronte ses quatre sorties à deux
+références qui ne peuvent pas bouger avec elle : les valeurs publiées, lues hors du code, et une
+implémentation écrite séparément dans un autre langage contre un autre schéma. Les quatre valeurs
+affichées valent aujourd'hui \chiffre{tom-affiche}~\% d'occupation contre \chiffre{tom-publie}~\%
+publiés, \chiffre{dms-affichee} jours de durée moyenne contre \chiffre{dms-publie},
+\chiffre{rotation-affichee} de rotation contre \chiffre{trot-publie}, et
+\chiffre{irot-affiche} jours d'intervalle contre \chiffre{irot-publie} — les quatre sous la
+tolérance relative de \chiffre{tolerance-indicateurs-sejour} que le contrôle porte.
+\textbf{Une seconde mesure n'a de valeur que si elle peut être fausse quand la première l'est}, et
+c'est la leçon que ce chapitre lègue au lecteur autant qu'au projet.
+
+\section{Correspondance avec les exigences du profil de restitution}
+
+Le logiciel observé porte un profil applicatif dédié aux rapports et aux
+statistiques\releve{REL-DEM.P05}. Ce que ce profil doit produire n'est pas défini par le règlement
+intérieur : la liste se lit dans la nomenclature nationale \cite{s30}, dont un inventaire exhaustif
+établit que quatre tableaux seulement descendent à l'établissement nommé. Ces quatre donnent la
+liste exacte des indicateurs attendus, et c'est elle qui justifie le contenu du tableau de bord.
+
+\begin{center}
+\footnotesize
+\pgfplotstabletypeset[
+  col sep=tab, string type,
+  columns/indicateur/.style={column name={Indicateur}, column type={p{3.0cm}}},
+  columns/classement/.style={column name={Classement}, column type={p{3.7cm}}},
+  columns/tables/.style={column name={Tables mobilisées}, column type={p{3.9cm}},
+    string replace*={_}{\textunderscore}},
+  columns/champ/.style={column name={Champ manquant}, column type={p{3.1cm}}},
+  every head row/.style={before row=\toprule, after row=\midrule},
+  every last row/.style={after row=\bottomrule},
+]{\serie{exigences-restitution}}
+\end{center}
+
+\begin{center}
+\footnotesize Les \chiffre{exigences-rubriques} rubriques que la nomenclature nationale attend d'un
+établissement nommé, confrontées à ce que la chaîne produit.
+\end{center}
+
+\textbf{Trois classements, et la distinction entre les deux derniers est la seule qui compte.}
+\emph{Non calculable faute de champ} désigne un manque du système d'information et fonde une
+recommandation ; \emph{sans objet pour ce site} désigne une activité que l'établissement n'exerce
+pas, et c'est un constat. Les confondre ferait reprocher au logiciel une absence de champ là où
+c'est l'hôpital qui n'a pas l'activité. Le décompte donne \chiffre{exigences-calculables} rubriques
+calculables, \chiffre{exigences-non-calculables} non calculables et
+\chiffre{exigences-sans-objet} sans objet : leur somme vaut quinze et non
+\chiffre{exigences-rubriques}, la rubrique des laboratoires recevant un classement mixte qui
+n'entre dans aucun des trois.
+
+\textbf{Les champs manquants sont au nombre de \chiffre{exigences-champs-manquants}, et la
+correspondance est de un à un.} C'est l'ampleur de l'écart produit qui les départage : le référentiel
+des médecins vient nettement en tête, son absence produisant un écart de
+\chiffre{exigences-ecart-maximal}~\% sur un indicateur par ailleurs calculable au numérateur, là où
+les deux autres rendent le leur simplement absent. L'absence de chacun est vérifiée par deux chemins
+indépendants — le registre des champs et le catalogue de la base — tous deux éprouvés au préalable
+contre des noms de colonnes dont l'existence est certaine.

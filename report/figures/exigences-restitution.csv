@@ -1,0 +1,17 @@
+indicateur	classement	tables	champ
+Capacité litière existante	non calculable faute de champ	aucune	table de structure de l'établissement
+Capacité litière fonctionnelle	calculable	source.mouvements	—
+Admissions	calculable	marts.fct_sejour	—
+Journées d'hospitalisation	calculable	marts.fct_sejour	—
+Taux d'occupation moyen	calculable	marts.fct_sejour + capacité	—
+Durée moyenne de séjour	calculable	marts.fct_sejour	—
+Taux de rotation	calculable	marts.fct_sejour + capacité	—
+Intervalle de rotation	calculable	marts.fct_sejour + capacité	—
+Consultations spécialisées externes	calculable	marts.fct_passage	—
+Consultations par médecin	non calculable faute de champ	marts.fct_passage (numérateur seul)	référentiel des médecins
+Passages aux urgences	calculable	marts.fct_passage_urgence	—
+Accouchements	non calculable faute de champ	aucune ne convient	marqueur d'accouchement
+Taux de césarienne	sans objet pour ce site	aucune	—
+Interventions chirurgicales	sans objet pour ce site	aucune	—
+Activité des laboratoires	calculable pour trois catégories, le total et les prélèvements ; sans objet pour trois catégories	source.lignes_facture	—
+Activité d'imagerie	calculable	source.lignes_facture	—

@@ -1963,6 +1963,398 @@ chiffres:
   note: >-
     Tables dont aucune ligne n'est rejetée à l'ingestion. Une absence, et elle n'est un résultat que
     parce que les deux autres tables en rejettent.
+- id: tdb-pages
+  valeur: 9
+  unite: pages
+  type: python
+  commande: 'len(yaml.safe_load((R/''dashboard/indicateurs.yml'').read_text(encoding=''utf-8''))[''pages''])'
+  portee: independant-des-donnees
+  note: >-
+    Pages du tableau de bord, comptées au registre des indicateurs. Le fichier de navigation en
+    déclare autant, et un contrôle confronte les deux listes dans les deux sens.
+- id: tdb-pages-pilotage
+  valeur: 7
+  unite: pages
+  type: python
+  commande: 'len({e[''page''] for e in yaml.safe_load((R/''dashboard/indicateurs.yml'').read_text(encoding=''utf-8''))[''indicateurs''] if e[''section'']==''pilotage''})'
+  portee: independant-des-donnees
+  note: >-
+    Pages dont les indicateurs relèvent de la section de pilotage.
+- id: tdb-pages-methode
+  valeur: 2
+  unite: pages
+  type: python
+  commande: 'len({e[''page''] for e in yaml.safe_load((R/''dashboard/indicateurs.yml'').read_text(encoding=''utf-8''))[''indicateurs''] if e[''section'']==''methode''})'
+  portee: independant-des-donnees
+  note: >-
+    Pages dont les indicateurs relèvent de la section d'évaluation de la chaîne. Aucune page ne
+    porte des indicateurs des deux sections, ce que la somme avec tdb-pages-pilotage vérifie.
+- id: tdb-indicateurs
+  valeur: 40
+  unite: indicateurs
+  type: python
+  commande: 'len(yaml.safe_load((R/''dashboard/indicateurs.yml'').read_text(encoding=''utf-8''))[''indicateurs''])'
+  portee: independant-des-donnees
+  note: >-
+    Entrées du registre des indicateurs. Un indicateur affiché sans entrée est interdit, et une
+    entrée sans indicateur affiché aussi.
+- id: tdb-indicateurs-pilotage
+  valeur: 34
+  unite: indicateurs
+  type: python
+  commande: 'len([e for e in yaml.safe_load((R/''dashboard/indicateurs.yml'').read_text(encoding=''utf-8''))[''indicateurs''] if e[''section'']==''pilotage''])'
+  portee: independant-des-donnees
+  note: >-
+    Indicateurs classés en pilotage par la règle de partage, jamais décrétés.
+- id: tdb-indicateurs-methode
+  valeur: 6
+  unite: indicateurs
+  type: python
+  commande: 'len([e for e in yaml.safe_load((R/''dashboard/indicateurs.yml'').read_text(encoding=''utf-8''))[''indicateurs''] if e[''section'']==''methode''])'
+  portee: independant-des-donnees
+  note: >-
+    Indicateurs classés en méthode. Leur somme avec tdb-indicateurs-pilotage égale tdb-indicateurs.
+- id: tdb-graphiques
+  valeur: 23
+  unite: graphiques
+  type: python
+  commande: 'sum((R/''dashboard/pages''/(p+''.py'')).read_text(encoding=''utf-8'').count(g) for p in yaml.safe_load((R/''dashboard/indicateurs.yml'').read_text(encoding=''utf-8''))[''pages''] for g in (''st.line_chart'',''st.bar_chart'',''st.area_chart'',''st.scatter_chart''))'
+  portee: independant-des-donnees
+  note: >-
+    Appels de tracé dans les neuf fichiers de page, les quatre formes employées comptées. Une page
+    n'en porte aucun, et c'est un résultat : la page des données ne montre pas de courbe.
+- id: tdb-page-plus-chargee
+  valeur: 8
+  unite: indicateurs
+  type: python
+  commande: 'max(len([e for e in yaml.safe_load((R/''dashboard/indicateurs.yml'').read_text(encoding=''utf-8''))[''indicateurs''] if e[''page'']==p]) for p in yaml.safe_load((R/''dashboard/indicateurs.yml'').read_text(encoding=''utf-8''))[''pages''])'
+  portee: independant-des-donnees
+  note: >-
+    Indicateurs de la page la plus chargée. C'est le nombre de lectures d'une rafale du modèle de
+    charge de l'instantané.
+- id: tdb-filtrabilite-oui
+  valeur: 24
+  unite: indicateurs
+  type: python
+  commande: 'len([e for e in yaml.safe_load((R/''dashboard/indicateurs.yml'').read_text(encoding=''utf-8''))[''indicateurs''] if e[''filtrabilite'']==''oui''])'
+  portee: independant-des-donnees
+  note: >-
+    Indicateurs qui se restreignent à une période sans réserve.
+- id: tdb-filtrabilite-sous-reserve
+  valeur: 5
+  unite: indicateurs
+  type: python
+  commande: 'len([e for e in yaml.safe_load((R/''dashboard/indicateurs.yml'').read_text(encoding=''utf-8''))[''indicateurs''] if e[''filtrabilite'']==''oui_sous_reserve''])'
+  portee: independant-des-donnees
+  note: >-
+    Indicateurs qui se restreignent, mais dont la date employée n'est pas celle qu'un lecteur
+    attendrait.
+- id: tdb-filtrabilite-non
+  valeur: 11
+  unite: indicateurs
+  type: python
+  commande: 'len([e for e in yaml.safe_load((R/''dashboard/indicateurs.yml'').read_text(encoding=''utf-8''))[''indicateurs''] if e[''filtrabilite'']==''non''])'
+  portee: independant-des-donnees
+  note: >-
+    Indicateurs qui ne se restreignent pas, chacun avec l'un des trois motifs déclarés.
+- id: tdb-recalcules-depuis-faits
+  valeur: 28
+  unite: indicateurs
+  type: python
+  commande: 'len([e for e in yaml.safe_load((R/''dashboard/indicateurs.yml'').read_text(encoding=''utf-8''))[''indicateurs''] if e[''recalcule_depuis'']==''faits''])'
+  portee: independant-des-donnees
+  note: >-
+    Indicateurs recalculés depuis les faits, comme la règle du cadrage le demande. Les autres sont
+    les écarts assumés, visibles au registre plutôt que relégués ailleurs.
+- id: instantane-tables
+  valeur: 26
+  unite: tables
+  type: sql
+  commande: >-
+    select count(*)::int from information_schema.tables where table_schema = 'instantane'
+  portee: periode-entiere
+  note: >-
+    Tables du schéma d'instantané, les deux tables de service comprises. À ne pas confondre avec
+    instantane-objets-copies, qui ne compte que les copies.
+- id: instantane-objets-copies
+  valeur: 24
+  unite: tables
+  type: sql
+  commande: >-
+    select count(*)::int from instantane.instantane_etat
+  portee: periode-entiere
+  note: >-
+    Objets copiés depuis la couche modélisée, le rapprochement et la couche intermédiaire, chacun
+    daté par la table d'état. Les deux tables de service ne s'y comptent pas.
+- id: instantane-lignes
+  valeur: 216277
+  unite: lignes
+  type: sql
+  commande: >-
+    select sum(lignes)::int from instantane.instantane_etat
+  portee: periode-entiere
+  note: >-
+    Lignes copiées, tous objets confondus, telles que la table d'état les enregistre.
+- id: instantane-volume
+  valeur: 32710656
+  unite: octets
+  type: sql
+  commande: >-
+    select sum(pg_total_relation_size(c.oid))::int from pg_class c join pg_namespace n on n.oid =
+    c.relnamespace where n.nspname = 'instantane' and c.relkind = 'r'
+  portee: periode-entiere
+  note: >-
+    Volume occupé par le schéma d'instantané, index compris, mesuré au catalogue.
+- id: instantane-lectures-temoin
+  valeur: 200
+  unite: lectures
+  type: python
+  commande: 'int([l for l in (R/''docs/decisions/0043-instantane-schema-dedie-du-tableau-de-bord.md'').read_text(encoding=''utf-8'').splitlines() if l.startswith(''| une dimension simple |'')][0].split(''|'')[2].strip())'
+  portee: independant-des-donnees
+  note: >-
+    Lectures tentées par le témoin concurrent sur chacune des deux vues observées, pendant une
+    reconstruction complète. Valeur lue dans l'enregistrement de décision qui la porte : la mesure
+    exige de rejouer un rafraîchissement, que ce travail n'exécute pas.
+- id: instantane-erreurs-dimension
+  valeur: 7
+  unite: lectures
+  type: python
+  commande: 'int([l for l in (R/''docs/decisions/0043-instantane-schema-dedie-du-tableau-de-bord.md'').read_text(encoding=''utf-8'').splitlines() if l.startswith(''| une dimension simple |'')][0].split(''|'')[4].replace(''*'','''').strip())'
+  portee: independant-des-donnees
+  note: >-
+    Lectures en erreur sur une dimension simple pendant la reconstruction. C'EST LA MESURE QUI
+    MOTIVE L'INSTANTANÉ : le lecteur ne patiente pas, l'objet n'existe pas.
+- id: instantane-erreurs-completude
+  valeur: 6
+  unite: lectures
+  type: python
+  commande: 'int([l for l in (R/''docs/decisions/0043-instantane-schema-dedie-du-tableau-de-bord.md'').read_text(encoding=''utf-8'').splitlines() if l.startswith(''| la vue de complétude'')][0].split(''|'')[4].replace(''*'','''').strip())'
+  portee: independant-des-donnees
+  note: >-
+    Lectures en erreur sur la vue la plus coûteuse à produire, sur le même nombre de tentatives.
+- id: instantane-fenetre-dimension
+  valeur: 0.352
+  unite: secondes
+  type: python
+  commande: 'float([l for l in (R/''docs/decisions/0043-instantane-schema-dedie-du-tableau-de-bord.md'').read_text(encoding=''utf-8'').splitlines() if l.startswith(''| une dimension simple |'')][0].split(''|'')[5].replace(''*'','''').replace('' s'','''').strip().replace('','',''.''))'
+  portee: independant-des-donnees
+  note: >-
+    Durée pendant laquelle la dimension observée n'existe plus, mesurée par le témoin.
+- id: instantane-fenetre-completude
+  valeur: 0.284
+  unite: secondes
+  type: python
+  commande: 'float([l for l in (R/''docs/decisions/0043-instantane-schema-dedie-du-tableau-de-bord.md'').read_text(encoding=''utf-8'').splitlines() if l.startswith(''| la vue de complétude'')][0].split(''|'')[5].replace(''*'','''').replace('' s'','''').strip().replace('','',''.''))'
+  portee: independant-des-donnees
+  note: >-
+    Même durée sur la seconde vue observée.
+- id: instantane-rapport-cout-lecture
+  valeur: 4.08
+  unite: proportion
+  type: python
+  commande: 'float((R/''docs/decisions/0043-instantane-schema-dedie-du-tableau-de-bord.md'').read_text(encoding=''utf-8'').split(''soit un rapport de '')[1].split('' '')[0].replace('','',''.''))'
+  portee: independant-des-donnees
+  note: >-
+    Rapport entre le coût de lecture des indicateurs contre les vues et contre les tables copiées.
+    CE N'EST PAS LE MOTIF de l'instantané, et l'écrire ainsi serait faux.
+- id: instantane-rapport-hors-completude
+  valeur: 3.03
+  unite: proportion
+  type: python
+  commande: 'float((R/''docs/decisions/0043-instantane-schema-dedie-du-tableau-de-bord.md'').read_text(encoding=''utf-8'').split(''le rapport global tombe à '')[1].split('' '')[0].replace('','',''.''))'
+  portee: independant-des-donnees
+  note: >-
+    Le même rapport, une seule page retirée. L'écart avec instantane-rapport-cout-lecture montre que
+    le gain est porté par une minorité d'indicateurs, non réparti sur l'ensemble.
+- id: instantane-duree-rafraichissement
+  valeur: 5.203
+  unite: secondes
+  type: python
+  commande: 'float((R/''docs/decisions/0043-instantane-schema-dedie-du-tableau-de-bord.md'').read_text(encoding=''utf-8'').split(''est mesuré à '')[1].split('' s '')[0].replace('','',''.''))'
+  portee: independant-des-donnees
+  note: >-
+    Durée de construction de la copie, mesurée à la décision. Lue dans l'enregistrement, la mesure
+    exigeant un rafraîchissement.
+- id: rotation-affichee-avant
+  valeur: 74.5
+  unite: proportion
+  type: python
+  commande: 'float((R/''docs/decisions/0056-convention-unique-des-indicateurs-de-sejour-affiches.md'').read_text(encoding=''utf-8'').split(''Le taux de rotation affiché valait donc **'')[1].split(''**'')[0].replace('','',''.''))'
+  portee: independant-des-donnees
+  note: >-
+    Taux de rotation tel que la page l'affichait avant correction. Valeur lue dans l'enregistrement
+    de décision : le défaut n'existe plus dans le code, et rien d'autre ne le porte.
+- id: trot-publie
+  valeur: 29.9
+  unite: proportion
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/volumetrie.yml'').read_text(encoding=''utf-8''))[''parametres''] if p[''nom'']==''trot_publie''][0]'
+  portee: releve-2024
+  note: >-
+    Taux de rotation publié par la source statistique nationale pour cet établissement.
+- id: irot-publie
+  valeur: 5.6
+  unite: jours (moyenne)
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/volumetrie.yml'').read_text(encoding=''utf-8''))[''parametres''] if p[''nom'']==''irot_publie''][0]'
+  portee: releve-2024
+  note: >-
+    Intervalle de rotation publié par la même source.
+- id: tolerance-indicateurs-sejour
+  valeur: 0.03
+  unite: proportion
+  type: python
+  commande: 'float([l for l in (R/''tests/test_indicateurs_sejour.py'').read_text(encoding=''utf-8'').splitlines() if l.startswith(''TOLERANCE_RELATIVE = '')][0].split(''= '')[1])'
+  portee: independant-des-donnees
+  note: >-
+    Tolérance relative sous laquelle les quatre indicateurs affichés sont confrontés aux valeurs
+    publiées. Lue dans le contrôle qui la porte, jamais recopiée.
+- id: tom-affiche
+  valeur: 53.3639
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((with p as (select max(valeur::numeric) filter (where
+    nom='capacite_litiere_fonctionnelle') as capacite, max(valeur::numeric) filter (where
+    nom='jours_annee_reference') as jours_annee, max(valeur::numeric) filter (where
+    nom='nombre_jours_periode') as jours_periode from instantane.instantane_parametres), b as
+    (select (select max(date_reference_donnees) from instantane.instantane_etat) as censure), m as
+    (select sum(extract(epoch from (coalesce(date_heure_sortie, ((select censure from b) + time
+    '23:59:59') at time zone 'UTC') - date_heure_admission)) / 86400.0) as journees from
+    instantane.fct_sejour) select 100 * (select journees from m) * (select jours_annee from p) /
+    (select jours_periode from p) / ((select jours_annee from p) * (select capacite from
+    p)))::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Taux d'occupation moyen TEL QUE LA PAGE L'AFFICHE : requête rejouée sur le schéma d'instantané,
+    séjours non clos censurés à la date de référence, annualisation sur la période déclarée. À
+    confronter à tom-publie, non à une seconde écriture de la même formule.
+- id: dms-affichee
+  valeur: 6.5326
+  unite: jours (moyenne)
+  type: sql
+  commande: >-
+    select round((with p as (select max(valeur::numeric) filter (where nom='jours_annee_reference')
+    as jours_annee, max(valeur::numeric) filter (where nom='nombre_jours_periode') as jours_periode
+    from instantane.instantane_parametres), b as (select (select max(date_reference_donnees) from
+    instantane.instantane_etat) as censure), m as (select count(*) as sejours, sum(extract(epoch
+    from (coalesce(date_heure_sortie, ((select censure from b) + time '23:59:59') at time zone
+    'UTC') - date_heure_admission)) / 86400.0) as journees from instantane.fct_sejour) select
+    (select journees from m) / (select sejours from m))::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Durée moyenne de séjour telle que la page l'affiche. L'annualisation se simplifie ici, le
+    rapport portant deux grandeurs annualisées du même facteur.
+- id: rotation-affichee
+  valeur: 29.8163
+  unite: proportion
+  type: sql
+  commande: >-
+    select round((with p as (select max(valeur::numeric) filter (where
+    nom='capacite_litiere_fonctionnelle') as capacite, max(valeur::numeric) filter (where
+    nom='jours_annee_reference') as jours_annee, max(valeur::numeric) filter (where
+    nom='nombre_jours_periode') as jours_periode from instantane.instantane_parametres) select
+    (select count(*) from instantane.fct_sejour)::numeric * (select jours_annee from p) / (select
+    jours_periode from p) / (select capacite from p))::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Taux de rotation tel que la page l'affiche APRÈS correction. C'est la valeur que rotation-
+    affichee-avant valait à un facteur voisin de deux et demi près.
+- id: irot-affiche
+  valeur: 5.709
+  unite: jours (moyenne)
+  type: sql
+  commande: >-
+    select round((with p as (select max(valeur::numeric) filter (where
+    nom='capacite_litiere_fonctionnelle') as capacite, max(valeur::numeric) filter (where
+    nom='jours_annee_reference') as jours_annee, max(valeur::numeric) filter (where
+    nom='nombre_jours_periode') as jours_periode from instantane.instantane_parametres), b as
+    (select (select max(date_reference_donnees) from instantane.instantane_etat) as censure), m as
+    (select count(*) as sejours, sum(extract(epoch from (coalesce(date_heure_sortie, ((select
+    censure from b) + time '23:59:59') at time zone 'UTC') - date_heure_admission)) / 86400.0) as
+    journees from instantane.fct_sejour) select ((select jours_annee from p) * (select capacite from
+    p) - (select journees from m) * (select jours_annee from p) / (select jours_periode from p)) /
+    ((select sejours from m)::numeric * (select jours_annee from p) / (select jours_periode from
+    p)))::numeric, 4)
+  portee: periode-entiere
+  note: >-
+    Intervalle de rotation tel que la page l'affiche.
+- id: facteur-annualisation
+  valeur: 2.4986
+  unite: proportion
+  type: sql
+  commande: >-
+    select round((max(valeur::numeric) filter (where nom='nombre_jours_periode') /
+    max(valeur::numeric) filter (where nom='jours_annee_reference'))::numeric, 4) from
+    instantane.instantane_parametres
+  portee: periode-entiere
+  note: >-
+    Rapport de la durée de période à l'année de référence, lu dans la table de paramètres de
+    l'instantané. C'est exactement le facteur dont le taux de rotation affiché était faux.
+- id: exigences-rubriques
+  valeur: 16
+  unite: rubriques
+  type: python
+  commande: 'len((R/''docs/exigences_statistiques.md'').read_text(encoding=''utf-8'').split(''| indicateur | définition en une ligne |'')[1].split(chr(10)+chr(10))[0].splitlines()[2:])'
+  portee: independant-des-donnees
+  note: >-
+    Rubriques du tableau de correspondance avec la nomenclature nationale. UNE DE PLUS que les
+    quinze classées : l'activité des laboratoires reçoit un classement mixte et n'entre dans aucun
+    des trois décomptes.
+- id: exigences-calculables
+  valeur: 10
+  unite: rubriques
+  type: python
+  commande: 'len([l for l in (R/''docs/exigences_statistiques.md'').read_text(encoding=''utf-8'').split(''| indicateur | définition en une ligne |'')[1].split(chr(10)+chr(10))[0].splitlines()[2:] if l.split(''|'')[3].replace(''*'','''').strip()==''calculable''])'
+  portee: independant-des-donnees
+  note: >-
+    Rubriques que la chaîne calcule. Le classement est lu au tableau, jamais recopié du décompte.
+- id: exigences-non-calculables
+  valeur: 3
+  unite: rubriques
+  type: python
+  commande: 'len([l for l in (R/''docs/exigences_statistiques.md'').read_text(encoding=''utf-8'').split(''| indicateur | définition en une ligne |'')[1].split(chr(10)+chr(10))[0].splitlines()[2:] if l.split(''|'')[3].replace(''*'','''').strip()==''non calculable faute de champ''])'
+  portee: independant-des-donnees
+  note: >-
+    Rubriques qu'un champ manquant du système d'information empêche de calculer. Chacune fonde une
+    recommandation.
+- id: exigences-sans-objet
+  valeur: 2
+  unite: rubriques
+  type: python
+  commande: 'len([l for l in (R/''docs/exigences_statistiques.md'').read_text(encoding=''utf-8'').split(''| indicateur | définition en une ligne |'')[1].split(chr(10)+chr(10))[0].splitlines()[2:] if l.split(''|'')[3].replace(''*'','''').strip()==''sans objet pour ce site''])'
+  portee: independant-des-donnees
+  note: >-
+    Rubriques que l'établissement n'exerce pas. C'est un constat sur l'établissement, jamais un
+    reproche au logiciel.
+- id: exigences-champs-manquants
+  valeur: 3
+  unite: familles
+  type: python
+  commande: 'len({l.split(''|'')[5].replace(''*'','''').strip() for l in (R/''docs/exigences_statistiques.md'').read_text(encoding=''utf-8'').split(''| indicateur | définition en une ligne |'')[1].split(chr(10)+chr(10))[0].splitlines()[2:] if l.split(''|'')[5].replace(''*'','''').strip() not in (''—'','''')})'
+  portee: independant-des-donnees
+  note: >-
+    Champs manquants distincts, dédoublonnés depuis la colonne du tableau. La correspondance avec
+    les rubriques bloquées est de un à un.
+- id: exigences-ecart-maximal
+  valeur: 60.1718
+  unite: '%'
+  type: python
+  commande: 'max(float(l.split(''|'')[8].replace(''*'','''').replace(''%'','''').replace(chr(160),'''').replace('' '','''').replace('','',''.'')) for l in (R/''docs/exigences_statistiques.md'').read_text(encoding=''utf-8'').split(''| indicateur | définition en une ligne |'')[1].split(chr(10)+chr(10))[0].splitlines()[2:] if ''%'' in l.split(''|'')[8])'
+  portee: independant-des-donnees
+  note: >-
+    Le plus grand écart entre valeur calculée et valeur relevée, toutes rubriques confondues. Il
+    porte sur la rubrique qu'un champ manquant laisse sans dénominateur.
+- id: tdb-erreurs-lecture-tolerees
+  valeur: 0
+  unite: lectures
+  type: python
+  commande: '0'
+  portee: independant-des-donnees
+  note: >-
+    Échecs de lecture tolérés pendant un rafraîchissement, sous toute charge et sans classe d'erreur
+    exceptée. Le critère est ASYMÉTRIQUE : un échec d'échange, lui, est journalisé et relançable. La
+    commande est la constante elle-même, faute d'artefact qui la porte ailleurs.
 
 # Séries — un jeu de données par entrée, produit par une commande et lu par la composition
 #
@@ -2180,3 +2572,44 @@ series:
     Taux de renseignement des seules colonnes incomplètes, rangées par ordre croissant. L'abscisse
     est un rang, non un identifiant de colonne : la courbe donne la FORME de la distribution, et
     le rapport nomme dans sa prose les colonnes des deux extrémités.
+- id: tableau-de-bord-par-page
+  fichier: figures/tableau-de-bord-par-page.csv
+  colonnes: [page, section, indicateurs, graphiques]
+  lignes: 9
+  empreinte: 0ba7b302881861a1a90787ba979286e8a706cd49da68389c5f037ce0580710df
+  type: python
+  commande: '[(p, [e[''section''] for e in yaml.safe_load((R/''dashboard/indicateurs.yml'').read_text(encoding=''utf-8''))[''indicateurs''] if e[''page'']==p][0], len([e for e in yaml.safe_load((R/''dashboard/indicateurs.yml'').read_text(encoding=''utf-8''))[''indicateurs''] if e[''page'']==p]), sum((R/''dashboard/pages''/(p+''.py'')).read_text(encoding=''utf-8'').count(g) for g in (''st.line_chart'',''st.bar_chart'',''st.area_chart'',''st.scatter_chart''))) for p in yaml.safe_load((R/''dashboard/indicateurs.yml'').read_text(encoding=''utf-8''))[''pages'']]'
+  portee: independant-des-donnees
+  note: >-
+    Une ligne par page du tableau de bord, dans l'ordre du registre des indicateurs : sa section,
+    le nombre d'indicateurs qu'elle porte et le nombre de tracés que son fichier appelle. La
+    section est celle de ses indicateurs, aucune page n'en portant des deux.
+- id: instantane-objets
+  fichier: figures/instantane-objets.csv
+  colonnes: [rang, lignes]
+  lignes: 24
+  empreinte: c061d3486a24ba6bdbc2c67edda07fad2a42b176acbb3aada3ad30416ab07287
+  type: sql
+  commande: |
+    select row_number() over (order by lignes desc, objet) as rang, lignes
+    from instantane.instantane_etat order by rang
+  portee: periode-entiere
+  note: >-
+    Lignes copiées par objet de l'instantané, rangées par effectif décroissant. L'abscisse est un
+    rang, non un nom d'objet : la courbe donne la FORME de la distribution, et la prose nomme les
+    objets des deux extrémités. Les deux tables de service n'y figurent pas — la table d'état ne
+    se décrit pas elle-même.
+- id: exigences-restitution
+  fichier: figures/exigences-restitution.csv
+  colonnes: [indicateur, classement, tables, champ]
+  lignes: 16
+  empreinte: b31f1efaedc0f9ee7c7664e454bfcaf465e89d05552f03fed26a910980bb6cea
+  separateur: tabulation
+  type: python
+  commande: '[tuple(c.strip().replace(''**'','''').replace(chr(96),'''').replace(''*'','''') for c in (l.split(''|'')[1], l.split(''|'')[3], l.split(''|'')[4], l.split(''|'')[5])) for l in (R/''docs/exigences_statistiques.md'').read_text(encoding=''utf-8'').split(''| indicateur | définition en une ligne |'')[1].split(chr(10)+chr(10))[0].splitlines()[2:]]'
+  portee: independant-des-donnees
+  note: >-
+    Le tableau de correspondance avec la nomenclature nationale, lu dans le document qui le porte
+    et jamais recopié : indicateur, classement, tables mobilisées, champ manquant. Le séparateur
+    est la tabulation, les cellules portant virgules et points-virgules. Les marques de mise en
+    forme du document sont retirées, son texte ne l'est pas.
