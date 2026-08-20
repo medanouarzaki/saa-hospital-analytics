@@ -142,7 +142,13 @@ dans `docs/sources/`.
 
 ## Contrôles
 
-L'intégration continue exécute 5 jobs : style et garde-fou de collecte, la matrice des contrôles,
-la provenance des colonnes, l'entrepôt dbt, et la chaîne complète jusqu'au tableau de bord. Les
-contrôles n'affirment aucune volumétrie écrite d'avance : chaque attendu est une égalité entre deux
-mesures calculées séparément.
+L'intégration continue exécute 6 jobs : style et garde-fou de collecte, la matrice des contrôles,
+la provenance des colonnes, l'entrepôt dbt, la chaîne complète jusqu'au tableau de bord, et la
+composition du rapport et de la présentation. Les contrôles n'affirment aucune volumétrie écrite
+d'avance : chaque attendu est une égalité entre deux mesures calculées séparément.
+
+Le rapport et la présentation sont composés à chaque exécution et publiés en artefacts. **La
+compilation qui fait foi est celle de l'intégration continue** : aucun PDF n'est versé au dépôt, et
+une distribution locale ne sert qu'à relire. Les sources vivent sous `report/` et `slides/` ; les
+noms de personnes ne figurent que dans `report/marqueurs.tex`, dont un contrôle vérifie qu'aucun
+n'est resté vide.

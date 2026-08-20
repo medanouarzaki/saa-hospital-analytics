@@ -44,6 +44,17 @@ rapport*.md
 *.fls
 *.fdb_latexmk
 *.synctex.gz
+# Auxiliaires propres à beamer : la table de navigation, les notes de
+# diapositive et les blocs verbatim extraits. Mesuré : `git status` les faisait
+# apparaître après la première compilation de la présentation.
+*.nav
+*.snm
+*.vrb
+# Les PDF produits : la compilation qui fait foi est celle de l'intégration
+# continue, qui les publie en artefacts. Un PDF commis serait une seconde vérité,
+# périmée dès la première modification d'une source.
+report/*.pdf
+slides/*.pdf
 
 # Images
 *.heic

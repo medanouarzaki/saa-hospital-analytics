@@ -78,6 +78,11 @@ jobs:
       # est donc l'emplacement qui n'en démarre aucune.
       - run: uv run pytest tests/test_index_des_decisions.py -v
 
+      # Les marqueurs nominatifs du rapport, et la structure de ses sources. Les deux lisent des
+      # FICHIERS, jamais le PDF : leurs propriétés ne dépendent pas de la compilation, et leur place
+      # n'est donc pas le travail qui compile.
+      - run: uv run pytest tests/test_marqueurs_nominatifs.py tests/test_structure_du_rapport.py -v
+
   tests-matrice:
     runs-on: ubuntu-latest
     strategy:
@@ -507,3 +512,51 @@ jobs:
       # dépôt, qu'il lit sur l'arbre de travail. La fenêtre réduite que ce job charge ne le
       # gêne pas : il porte sur la FORME de chaque valeur, jamais sur leur nombre.
       - run: uv run pytest tests/test_disjonction_structurelle.py -v
+
+  # La compilation du rapport et de la présentation, et leur publication en artefacts.
+  #
+  # La chaîne typographique n'est PAS installée étape par étape : `xu-cheng/latex-action` exécute la
+  # compilation dans une image qui porte déjà une distribution TeX Live complète. Installer une
+  # distribution par le gestionnaire de paquets de l'exécuteur prendrait plusieurs minutes à chaque
+  # exécution, quand le groupe le plus long de la matrice est déjà à seize minutes ; une image
+  # préconstruite ne coûte que son téléchargement.
+  #
+  # Ce travail ne démarre aucun service et ne lit aucune base : il ne dépend d'aucun autre et
+  # s'exécute en parallèle des neuf autres.
+  document:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # `args` reprend la valeur par défaut de l'action, citée dans sa documentation :
+      # `-pdf -file-line-error -halt-on-error -interaction=nonstopmode`. Elle est écrite ici plutôt
+      # qu'héritée pour que `-halt-on-error` soit visible : c'est lui qui fait échouer le travail sur
+      # la première erreur de compilation, au lieu de produire un PDF amputé.
+      #
+      # `latexmk` appelle `biber` de lui-même dès qu'il voit le fichier de contrôle que biblatex
+      # produit ; aucune étape de bibliographie n'est donc à écrire.
+      - name: Compiler le rapport
+        uses: xu-cheng/latex-action@6549dc21effb2730855a1281407ecfcececc6c1b # v4.1.0
+        with:
+          root_file: rapport.tex
+          working_directory: report
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+
+      - name: Compiler la présentation
+        uses: xu-cheng/latex-action@6549dc21effb2730855a1281407ecfcececc6c1b # v4.1.0
+        with:
+          root_file: presentation.tex
+          working_directory: slides
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rapport
+          path: report/rapport.pdf
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: presentation
+          path: slides/presentation.pdf
+          if-no-files-found: error
