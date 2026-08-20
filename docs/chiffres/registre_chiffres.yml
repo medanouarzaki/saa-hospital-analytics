@@ -395,12 +395,11 @@ chiffres:
 - id: versions-de-fiches
   valeur: 25842
   unite: versions
-  motif_non_emploi: >-
-    Le rapport n'emploie plus cette entrée : elle porte le même décompte que
-    `identifiants-distincts`, sous un angle qui prêtait à confusion. Elle est conservée parce
-    que sa commande mesure autre chose — les lignes de version courante de la dimension, et non
-    les identifiants distincts de la table entière — et que leur coïncidence cesserait si un
-    identifiant perdait sa version courante, ce que trois contrôles interdisent aujourd'hui.
+  motif_non_emploi: 'Le rapport n''emploie plus cette entrée : elle porte le même décompte que `identifiants-distincts`,
+    sous un angle qui prêtait à confusion. Elle est conservée parce que sa commande mesure autre chose
+    — les lignes de version courante de la dimension, et non les identifiants distincts de la table entière
+    — et que leur coïncidence cesserait si un identifiant perdait sa version courante, ce que trois contrôles
+    interdisent aujourd''hui.'
   type: sql
   commande: select count(*) from marts.dim_patient where est_courante
   portee: periode-entiere
@@ -679,3 +678,244 @@ chiffres:
   type: python
   commande: len(list((R/'tests').glob('test_*.py')))
   portee: independant-des-donnees
+- id: paires-possibles
+  valeur: 333891561
+  unite: paires
+  type: sql
+  commande: select (count(*)::bigint*(count(*)-1)/2)::bigint from marts.dim_patient where est_courante
+  portee: periode-entiere
+  note: Nombre de paires que comparerait une comparaison exhaustive, sur les fiches de version courante.
+    Dénominateur des taux de réduction du blocage.
+- id: paires-candidates
+  valeur: 5014
+  unite: paires
+  type: sql
+  commande: select count(*) from linkage.paires_candidates
+  portee: periode-entiere
+  note: Paires retenues par l'union des quatre règles de blocage. Numérateur comparé à paires-possibles.
+- id: blocage-nom-adresse
+  valeur: 2371
+  unite: paires
+  type: sql
+  commande: select count(*) from linkage.paires_candidates where regle_blocage = 'nom_famille_adresse'
+  portee: periode-entiere
+  note: Paires attribuées à cette règle. Une paire porte la règle qui l'a produite ; la somme des quatre
+    égale paires-candidates.
+- id: blocage-nom-telephone
+  valeur: 1843
+  unite: paires
+  type: sql
+  commande: select count(*) from linkage.paires_candidates where regle_blocage = 'nom_famille_telephone'
+  portee: periode-entiere
+  note: Paires attribuées à cette règle. Une paire porte la règle qui l'a produite ; la somme des quatre
+    égale paires-candidates.
+- id: blocage-piece-identite
+  valeur: 767
+  unite: paires
+  type: sql
+  commande: select count(*) from linkage.paires_candidates where regle_blocage = 'piece_identite'
+  portee: periode-entiere
+  note: Paires attribuées à cette règle. Une paire porte la règle qui l'a produite ; la somme des quatre
+    égale paires-candidates.
+- id: blocage-parents-naissance
+  valeur: 33
+  unite: paires
+  type: sql
+  commande: select count(*) from linkage.paires_candidates where regle_blocage = 'parents_date_naissance'
+  portee: periode-entiere
+  note: Paires attribuées à cette règle. Une paire porte la règle qui l'a produite ; la somme des quatre
+    égale paires-candidates.
+- id: comparaisons-modele
+  valeur: 12
+  unite: comparaisons
+  type: python
+  commande: len(__import__('json').loads((R/'linkage/modele_estime.json').read_text(encoding='utf-8'))['comparisons'])
+  portee: independant-des-donnees
+  note: Comparaisons par champ déclarées au modèle estimé, chacune avec ses niveaux.
+- id: vt-paires-injectees
+  valeur: 996
+  unite: paires
+  type: python
+  commande: len(yaml.safe_load(Path(__import__('os').environ.get('VERITE_TERRAIN_PATIENTS',
+    str(R/'generator/output/scenario_30/verite_terrain.yml'))).read_text(encoding='utf-8'))['doublons']['paires'])
+  portee: periode-entiere
+  note: Paires de doublons INJECTÉES par le générateur, avant tout chargement. Population de référence
+    avant filtrage par la quarantaine.
+- id: vt-paires-presentes
+  valeur: 991
+  unite: paires
+  type: sql
+  commande: select max(nb_paires_verite_terrain) from linkage.evaluation
+  portee: periode-entiere
+  note: 'Paires de vérité terrain dont LES DEUX fiches ont survécu au chargement. C''est le dénominateur
+    du rappel : une paire dont une fiche est en quarantaine ne peut pas être retrouvée, et l''imputer
+    au rapprochement serait faux.'
+- id: seuil-retenu
+  valeur: 0.5
+  unite: probabilité
+  type: sql
+  commande: select distinct seuil from linkage.grappes_identite
+  portee: periode-entiere
+  note: Seuil de probabilité appliqué au regroupement livré.
+- id: precision-seuil-retenu
+  valeur: 1.0
+  unite: proportion
+  type: sql
+  commande: select precision_valeur from linkage.evaluation where seuil = (select distinct seuil from
+    linkage.grappes_identite)
+  portee: periode-entiere
+  note: Mesuré AU NIVEAU DE LA PAIRE, sur les paires de vérité terrain présentes (vt-paires-presentes)
+    et les paires prédites au seuil retenu. Ce n'est pas une métrique de grappe.
+- id: rappel-seuil-retenu
+  valeur: 1.0
+  unite: proportion
+  type: sql
+  commande: select rappel from linkage.evaluation where seuil = (select distinct seuil from linkage.grappes_identite)
+  portee: periode-entiere
+  note: Mesuré AU NIVEAU DE LA PAIRE, sur les paires de vérité terrain présentes (vt-paires-presentes)
+    et les paires prédites au seuil retenu. Ce n'est pas une métrique de grappe.
+- id: f-mesure-seuil-retenu
+  valeur: 1.0
+  unite: proportion
+  type: sql
+  commande: select f_mesure from linkage.evaluation where seuil = (select distinct seuil from linkage.grappes_identite)
+  portee: periode-entiere
+  note: Mesuré AU NIVEAU DE LA PAIRE, sur les paires de vérité terrain présentes (vt-paires-presentes)
+    et les paires prédites au seuil retenu. Ce n'est pas une métrique de grappe.
+- id: balayage-points
+  valeur: 74
+  unite: points
+  type: python
+  commande: len(list(__import__('csv').DictReader((R/'linkage/courbe_precision_rappel.csv').open(encoding='utf-8'))))
+  portee: independant-des-donnees
+  note: Points du balayage de seuils versé au dépôt.
+- id: balayage-points-f-parfaite
+  valeur: 61
+  unite: points
+  type: python
+  commande: sum(1 for l in __import__('csv').DictReader((R/'linkage/courbe_precision_rappel.csv').open(encoding='utf-8'))
+    if float(l['f_mesure'])==1.0)
+  portee: independant-des-donnees
+  note: Points du balayage où précision et rappel valent tous deux 1. Mesure l'étendue du plateau.
+- id: baseline-f-mesure
+  valeur: 0.9076682316118936
+  unite: proportion
+  type: python
+  commande: '[float(l[''f_mesure_baseline_collision_exacte'']) for l in __import__(''csv'').DictReader((R/''linkage/ablation.csv'').open(encoding=''utf-8''))
+    if l[''variante'']==''complet''][0]'
+  portee: independant-des-donnees
+  note: F-mesure de la référence par collision exacte, au niveau de la paire, sur le même dénominateur
+    que f-mesure-seuil-retenu.
+- id: ablation-ecart-complet
+  valeur: 270.868434285775
+  unite: poids
+  type: python
+  commande: '[float(l[''ecart'']) for l in __import__(''csv'').DictReader((R/''linkage/ablation.csv'').open(encoding=''utf-8''))
+    if l[''variante'']==''complet''][0]'
+  portee: independant-des-donnees
+  note: 'Marge de séparation : poids minimal d''une paire vraie moins poids maximal d''une paire non vraie.
+    Positive, un seuil sépare les deux populations ; négative, aucun ne le fait.'
+- id: ablation-ecart-variante-a
+  valeur: -2.6554053556955406
+  unite: poids
+  type: python
+  commande: '[float(l[''ecart'']) for l in __import__(''csv'').DictReader((R/''linkage/ablation.csv'').open(encoding=''utf-8''))
+    if l[''variante'']==''A_sans_champs_recopies''][0]'
+  portee: independant-des-donnees
+  note: Même grandeur que ablation-ecart-complet, sur la variante privant le modèle des champs recopiés
+    d'une fiche à l'autre.
+- id: ablation-ecart-variante-c
+  valeur: -9.571871091053188
+  unite: poids
+  type: python
+  commande: '[float(l[''ecart'']) for l in __import__(''csv'').DictReader((R/''linkage/ablation.csv'').open(encoding=''utf-8''))
+    if l[''variante'']==''C_les_deux_retraits''][0]'
+  portee: independant-des-donnees
+  note: Même grandeur, sur la variante cumulant les deux retraits.
+- id: ablation-f-variante-c
+  valeur: 0.9984856133266027
+  unite: proportion
+  type: python
+  commande: '[float(l[''f_mesure'']) for l in __import__(''csv'').DictReader((R/''linkage/ablation.csv'').open(encoding=''utf-8''))
+    if l[''variante'']==''C_les_deux_retraits''][0]'
+  portee: independant-des-donnees
+  note: F-mesure de la variante C, au même dénominateur que f-mesure-seuil-retenu.
+- id: ablation-comparaisons-variante-a
+  valeur: 6
+  unite: comparaisons
+  type: python
+  commande: int([float(l['nb_comparaisons_presentes']) for l in __import__('csv').DictReader((R/'linkage/ablation.csv').open(encoding='utf-8'))
+    if l['variante']=='A_sans_champs_recopies'][0])
+  portee: independant-des-donnees
+  note: Comparaisons restantes après retrait, à comparer à comparaisons-modele.
+- id: qualite-colonnes
+  valeur: 175
+  unite: colonnes
+  type: sql
+  commande: select count(*) from marts.agg_qualite_donnees
+  portee: periode-entiere
+  note: Colonnes suivies par l'agrégat de qualité, une ligne par colonne de couche intermédiaire.
+- id: qualite-colonnes-incompletes
+  valeur: 43
+  unite: colonnes
+  type: sql
+  commande: select count(*) from marts.agg_qualite_donnees where taux_completude < 1
+  portee: periode-entiere
+  note: 'Colonnes dont le taux de renseignement est strictement inférieur à 1. Dénominateur : qualite-colonnes.'
+- id: qualite-colonne-vide
+  valeur: 1
+  unite: colonnes
+  type: sql
+  commande: select count(*) from marts.agg_qualite_donnees where taux_completude = 0
+  portee: periode-entiere
+  note: 'Colonnes jamais renseignées. Un décompte de 1 n''est pas un défaut de chargement : c''est une
+    colonne que le service ne remplit pas.'
+- id: collision-groupes-nom
+  valeur: 361
+  unite: groupes
+  type: sql
+  commande: select nombre_groupes from marts.agg_doublons_identite where critere = 'nom_date_naissance'
+  portee: periode-entiere
+  note: Groupes de fiches partageant exactement nom, premier nom de famille et date de naissance.
+- id: collision-groupes-piece
+  valeur: 767
+  unite: groupes
+  type: sql
+  commande: select nombre_groupes from marts.agg_doublons_identite where critere = 'piece_identite'
+  portee: periode-entiere
+  note: Groupes partageant exactement type et numéro de pièce d'identité.
+- id: collision-vides-piece
+  valeur: 268
+  unite: fiches
+  type: sql
+  commande: select patients_valeur_vide from marts.agg_doublons_identite where critere = 'piece_identite'
+  portee: periode-entiere
+  note: Fiches sans pièce d'identité, donc invisibles à ce critère de collision exacte.
+- id: grappes-exactes-restreint
+  valeur: 991
+  unite: grappes
+  type: sql
+  commande: select nb_grappes_exactes_restreint from linkage.evaluation where seuil = (select distinct
+    seuil from linkage.grappes_identite)
+  portee: periode-entiere
+  note: 'Grappes exactement retrouvées, sur le PÉRIMÈTRE RESTREINT aux identifiants impliqués dans au
+    moins une paire de vérité terrain. Dénominateur : vt-paires-presentes.'
+- id: grappes-exactes-global
+  valeur: 24851
+  unite: grappes
+  type: sql
+  commande: select nb_grappes_exactes_global from linkage.evaluation where seuil = (select distinct seuil
+    from linkage.grappes_identite)
+  portee: periode-entiere
+  note: 'Grappes exactement retrouvées sur la population ENTIÈRE, singletons compris. Dénominateur : personnes-estimees.
+    À ne pas confondre avec grappes-exactes-restreint : les deux comptent des grappes, sur deux populations
+    différentes.'
+- id: sur-fusionnes-global
+  valeur: 0
+  unite: fiches
+  type: sql
+  commande: select nb_enregistrements_sur_fusionnes_global from linkage.evaluation where seuil = (select
+    distinct seuil from linkage.grappes_identite)
+  portee: periode-entiere
+  note: Fiches réunies à tort dans une grappe trop grande, sur la population entière. Métrique SECONDAIRE,
+    au niveau de la grappe ; la métrique primaire est au niveau de la paire.

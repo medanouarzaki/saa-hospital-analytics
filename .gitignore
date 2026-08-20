@@ -44,6 +44,11 @@ rapport*.md
 *.fls
 *.fdb_latexmk
 *.synctex.gz
+# Résidus d'une compilation interrompue : `latexmk` renomme ainsi les fichiers auxiliaires
+# quand pdflatex échoue avant de les avoir écrits en entier. Deux lots successifs les ont vus
+# apparaître à l'index après une mutation destinée à faire échouer la composition, et ont dû
+# les supprimer à la main avant de commiter.
+*-SAVE-ERROR
 # Auxiliaires propres à beamer : la table de navigation, les notes de
 # diapositive et les blocs verbatim extraits. Mesuré : `git status` les faisait
 # apparaître après la première compilation de la présentation.
