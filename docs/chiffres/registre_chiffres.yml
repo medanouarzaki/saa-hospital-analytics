@@ -392,14 +392,23 @@ chiffres:
   type: sql
   commande: select count(*) from source.patients
   portee: periode-entiere
-- id: personnes-distinctes
+- id: versions-de-fiches
   valeur: 25842
-  unite: personnes
+  unite: versions
+  motif_non_emploi: >-
+    Le rapport n'emploie plus cette entrée : elle porte le même décompte que
+    `identifiants-distincts`, sous un angle qui prêtait à confusion. Elle est conservée parce
+    que sa commande mesure autre chose — les lignes de version courante de la dimension, et non
+    les identifiants distincts de la table entière — et que leur coïncidence cesserait si un
+    identifiant perdait sa version courante, ce que trois contrôles interdisent aujourd'hui.
   type: sql
   commande: select count(*) from marts.dim_patient where est_courante
   portee: periode-entiere
-  note: 'Personnes en version courante. À NE PAS CONFONDRE avec le décompte de fiches produites : une
-    personne peut porter plusieurs fiches.'
+  note: 'Lignes de version courante de la dimension patient. Cette entrée s''appelait « personnes-distinctes
+    » et portait l''unité « personnes » : c''était FAUX, et c''était la troisième occurrence dans ce projet
+    de la confusion entre personnes et identifiants. La valeur est un décompte d''identifiants, non de
+    personnes — voir identifiants-distincts, qui porte la même valeur sous le bon nom, et personnes-estimees,
+    qui compte les personnes.'
 - id: urgences-scenario-retenu
   valeur: 30
   unite: passages/jour
@@ -417,10 +426,9 @@ chiffres:
 - id: urgences-scenario-median
   valeur: 30
   unite: passages/jour
-  motif_non_emploi: >-
-    Le scénario médian de la fourchette et le scénario retenu portent la même valeur, et le rapport
-    n'emploie que `urgences-scenario-retenu`. L'entrée est conservée parce qu'elle mesure une autre
-    grandeur — le deuxième élément de la liste des trois scénarios — et que leur coïncidence
+  motif_non_emploi: Le scénario médian de la fourchette et le scénario retenu portent la même valeur,
+    et le rapport n'emploie que `urgences-scenario-retenu`. L'entrée est conservée parce qu'elle mesure
+    une autre grandeur — le deuxième élément de la liste des trois scénarios — et que leur coïncidence
     cesserait si la fourchette changeait.
   type: python
   commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/volumetrie.yml'').read_text(encoding=''utf-8''))[''parametres'']
@@ -552,3 +560,122 @@ chiffres:
   commande: select count(distinct f.n_facture) from source.factures f join source.creances c on c.n_facture
     = f.n_facture
   portee: periode-entiere
+- id: partitions-par-table
+  valeur: 912
+  unite: partitions
+  type: sql
+  commande: select count(distinct date_extraction) from source.patients
+  portee: periode-entiere
+  note: Une partition par date d'extraction et par table. Le décompte est celui de la table des patients
+    ; le partitionnement est le même pour les onze.
+- id: source-colonnes-texte
+  valeur: 175
+  unite: colonnes
+  type: sql
+  commande: select count(*) from information_schema.columns where table_schema='source' and data_type='text'
+  portee: periode-entiere
+  note: 'Toutes les colonnes de la couche source sont de type texte, sans contrainte : le décompte égale
+    celui des colonnes de la couche.'
+- id: seuil-quarantaine
+  valeur: 0.05
+  unite: proportion
+  type: python
+  commande: yaml.safe_load((R/'ingestion/controles.yml').read_text(encoding='utf-8'))['seuil_quarantaine']['valeur']
+  portee: independant-des-donnees
+- id: plancher-rejets
+  valeur: 2
+  unite: lignes
+  type: python
+  commande: yaml.safe_load((R/'ingestion/controles.yml').read_text(encoding='utf-8'))['plancher_rejets_bloquants']['valeur']
+  portee: independant-des-donnees
+- id: modeles-intermediate
+  valeur: 11
+  unite: modèles
+  type: python
+  commande: len(list((R/'dbt/models/intermediate').glob('*.sql')))
+  portee: independant-des-donnees
+- id: modeles-marts
+  valeur: 19
+  unite: modèles
+  type: python
+  commande: len(list((R/'dbt/models/marts').glob('*.sql')))
+  portee: independant-des-donnees
+- id: modeles-total
+  valeur: 30
+  unite: modèles
+  type: python
+  commande: len(list((R/'dbt/models').rglob('*.sql')))
+  portee: independant-des-donnees
+- id: dimensions
+  valeur: 6
+  unite: dimensions
+  type: sql
+  commande: select count(*) from information_schema.tables where table_schema='marts' and table_name like
+    'dim\_%'
+  portee: periode-entiere
+- id: faits
+  valeur: 6
+  unite: faits
+  type: sql
+  commande: select count(*) from information_schema.tables where table_schema='marts' and table_name like
+    'fct\_%'
+  portee: periode-entiere
+- id: agregats
+  valeur: 8
+  unite: agrégats
+  type: sql
+  commande: select count(*) from information_schema.tables where table_schema='marts' and table_name like
+    'agg\_%'
+  portee: periode-entiere
+- id: dim-patient-lignes
+  valeur: 29107
+  unite: lignes
+  type: sql
+  commande: select count(*) from marts.dim_patient
+  portee: periode-entiere
+  note: 'LIGNES de la dimension, c''est-à-dire VERSIONS : une fiche modifiée en porte plusieurs. À ne
+    confondre ni avec identifiants-distincts ni avec personnes-estimees.'
+- id: dim-patient-fiches-plusieurs-versions
+  valeur: 3265
+  unite: identifiants
+  type: sql
+  commande: select count(*) from (select n_ipp from marts.dim_patient group by n_ipp having count(*)>1)
+    t
+  portee: periode-entiere
+  note: Identifiants portant plus d'une version dans la dimension historisée.
+- id: identifiants-distincts
+  valeur: 25842
+  unite: identifiants
+  type: sql
+  commande: select count(distinct n_ipp) from marts.dim_patient
+  portee: periode-entiere
+  note: 'IDENTIFIANTS patient distincts. Ce n''est PAS un décompte de personnes : le jeu injecte des doublons
+    d''identité, une même personne pouvant porter deux identifiants. Voir personnes-estimees.'
+- id: personnes-estimees
+  valeur: 24851
+  unite: personnes
+  type: sql
+  commande: select count(distinct grappe_id) from linkage.grappes_identite
+  portee: periode-entiere
+  note: 'PERSONNES estimées par le rapprochement probabiliste : une grappe par personne. C''est la seule
+    des trois grandeurs qui compte des personnes. Voir identifiants-distincts et dim-patient-lignes.'
+- id: grappes-multiples
+  valeur: 991
+  unite: grappes
+  type: sql
+  commande: select count(*) from (select grappe_id from linkage.grappes_identite group by grappe_id having
+    count(*)>1) t
+  portee: periode-entiere
+  note: 'Grappes réunissant plus d''un identifiant : l''écart entre identifiants-distincts et personnes-estimees.'
+- id: taches-graphe
+  valeur: 12
+  unite: tâches
+  type: python
+  commande: (R/'airflow/saa_daily.py').read_text(encoding='utf-8').count('task_id=')
+  portee: independant-des-donnees
+- id: fichiers-de-controle
+  valeur: 72
+  unite: fichiers
+  type: python
+  commande: len(list((R/'tests').glob('test_*.py')))
+  portee: independant-des-donnees
