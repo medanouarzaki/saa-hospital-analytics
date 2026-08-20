@@ -1,0 +1,186 @@
+% Ce chapitre repose sur :
+%   DOC: s30
+%   OBS: presentation-du-besoin, rattachement-du-travail, organisation-en-phases
+%   HYP: (aucun)
+%   SECTIONS: 6
+
+\chapter{Cadrage et méthodologie}\label{chap:cadrage}
+
+\section{Le besoin exprimé}
+
+Le travail répond à un cahier de charges portant sur l'activité du service d'accueil et
+d'admission dans son ensemble, et non sur le seul processus observable depuis un poste. Ce
+périmètre est déterminant pour la suite : il oblige à documenter quatre processus auxquels
+l'observation directe n'a pas donné accès, et il explique la place que tient dans ce projet la
+reconstruction par voie documentaire.
+
+Le document lui-même ne figure pas au dépôt et n'a pas vocation à y figurer. Ce qui y figure, en
+revanche, ce sont trois de ses exigences, consignées à l'endroit où elles ont été mises en défaut :
+tout indicateur affiché doit être recalculé depuis les tables de faits, le tableau de bord ne doit
+lire que la base, et les valeurs affichées doivent être lisibles par un lecteur qui ne connaît pas
+les codes du système d'origine.
+
+Les trois sont tenues en partie et manquées en partie, et les écarts sont écrits plutôt que
+contournés. Six indicateurs ne sont pas recalculés depuis les faits, dont cinq parce qu'aucune table
+de faits ne porte la matière — il n'existe ni fait des créances ni fait des relances — et un parce
+que le recalcul changerait sa valeur en changeant sa population. La capacité litière, dont dépendent
+quatre indicateurs de séjour, n'est lisible nulle part dans la base et transite par une table de
+paramètres portant sa provenance. Enfin quatre dimensions sur six affichent leur code nu, faute de
+libellé qu'une source établisse — et l'abstention est délibérée : un code nu est illisible et le
+montre, un libellé inventé est lisible et le cache.
+
+\aRediger{presentation-du-besoin}{la façon dont le besoin a été présenté au début du stage, et ce
+que l'encadrement a précisé oralement sur les attentes et les priorités}\releve{presentation-du-besoin}
+
+\section{Périmètre d'observation}
+
+Le système d'information cloisonne l'accès par profil applicatif, et le service n'accorde à un
+stagiaire qu'un seul des cinq profils que porte l'écran de démarrage. \textbf{Un processus a donc été
+observé, quatre ont été reconstruits par voie documentaire.} Ce n'est pas une commodité : c'est la
+contrainte à partir de laquelle tout le dispositif de provenance a été bâti.
+
+Une observation et une reconstruction n'ont pas la même valeur, et les confondre reviendrait à
+présenter comme vu ce qui a été déduit. Le projet ne les confond pas : \textbf{chaque colonne du modèle de
+données porte une étiquette de provenance, et l'exigence de preuve diffère par étiquette.}
+
+\begin{center}
+\begin{tabular}{@{}p{1.6cm}p{5.0cm}p{1.6cm}p{5.5cm}@{}}
+\toprule
+Étiquette & Sens & Entrées & Ce que la preuve doit être \\
+\midrule
+\texttt{OBS} & champ observé à l'écran & \textbf{81} & une référence de relevé, et le libellé reproduit à l'identique \\
+\addlinespace
+\texttt{DOC} & champ déduit d'une source & \textbf{72} & un identifiant du registre des sources \\
+\addlinespace
+\texttt{HYP} & champ posé sans preuve externe & \textbf{22} & la mention explicite qu'aucune preuve n'existe \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\footnotesize Les trois étiquettes de provenance et leur exigence de preuve, sur les 175 colonnes de
+la couche source.
+\end{center}
+
+\medskip
+
+Les vingt-deux colonnes hypothétiques portent toutes la mention d'absence de preuve externe, et ce
+décompte est mesuré, non supposé. La proportion elle-même est un résultat : \textbf{un peu moins de la
+moitié des colonnes est observée}, et le lecteur sait laquelle.
+
+Le même dispositif s'étend à la prose du présent rapport. Chaque affirmation y relève d'une des trois
+mêmes catégories — une source documentaire, un relevé d'observation, une convention posée —, chaque
+fichier de chapitre déclare en tête ce sur quoi il repose, et un contrôle vérifie que la déclaration
+coïncide exactement avec ce que le fichier porte, dans les deux sens.
+
+\textbf{Aucune image du système d'information n'entre dans ce rapport, et le motif tient en une
+phrase :} les écrans d'un dossier patient en production affichent des identifiants de session, des
+libellés de compte et la structure des dossiers d'un établissement réel, et le dépôt de ce projet est
+public. Ce que les images auraient montré, le relevé de champs le porte sous une forme plus
+exploitable — quatre écrans, cent quarante-trois éléments, chacun avec son identifiant, son libellé
+exact, son type apparent et sa valeur observée le cas échéant. Deux schémas d'écran redessinés
+restituent l'agencement des blocs, sans aucun contenu. La règle est tenue par deux dispositifs
+indépendants : une exclusion dans la configuration du gestionnaire de versions, et un contrôle
+bloquant qui échoue si un fichier suivi porte une extension d'image sous le répertoire du rapport ou
+à la racine — le premier seul ne protégerait pas d'une indexation forcée.
+
+\section{La contrainte de confidentialité et la décision de générer}
+
+Une décision de cadrage domine tout le projet : \textbf{aucune donnée réelle ne sort du service.} Elle
+n'est pas négociable et elle n'a pas été négociée. Elle interdit d'extraire un échantillon, fût-il
+anonymisé, et elle interdit donc de bâtir une chaîne de données sur des lignes venues du système
+observé.
+
+La conséquence est qu'un jeu de données est produit. Sa volumétrie n'est pas inventée : elle est
+relevée par établissement nommé dans le recueil statistique national \cite{s30} et mise à l'échelle
+de la période. Ses relations internes ne sont pas davantage improvisées — elles sont injectées
+délibérément, une par une, et chacune est consignée avec son paramètre, son statut de provenance et
+sa conséquence sur ce que le tableau de bord donne à voir.
+
+\textbf{Ce que la génération permet.} Elle permet de démontrer une chaîne complète sur des volumes
+réalistes, d'y injecter des défauts dont on connaît la vérité terrain, et donc de mesurer ce qu'un
+traitement retrouve. Un rapprochement probabiliste évalué contre des doublons dont on sait
+lesquels sont vrais est mesurable ; le même rapprochement sur des données réelles ne le serait pas.
+
+\textbf{Ce qu'elle interdit de conclure, et c'est le point le plus important de cette section.} Aucune
+grandeur produite par la chaîne n'est une mesure de l'établissement. Une relation injectée se
+retrouve nécessairement à la sortie : la lire comme un résultat serait circulaire. Le projet écrit
+cette limite là où elle se lit — le registre des relations injectées porte, pour chacune, ce que la
+page affiche et ce qu'on n'a pas le droit d'en conclure. Le chapitre de recommandations en tire une
+conséquence de forme, en séparant systématiquement ce qui établit un constat de ce qu'un indicateur
+démontre.
+
+\section{Démarche}
+
+Deux principes gouvernent le travail, et l'un et l'autre se lisent dans le dépôt plutôt que dans une
+déclaration d'intention.
+
+\textbf{Mesurer avant de corriger.} Aucune correction n'est proposée avant que sa cause soit
+mesurée, et aucun chiffre n'est écrit sans la commande qui le produit. Le principe se prolonge
+au-delà de l'écriture : les enregistrements de décision portent, pour plusieurs d'entre eux, une
+prémisse explicitement datée et la consigne de la re-mesurer avant toute modification qui la
+mettrait en jeu. Une décision n'y est jamais présentée comme définitive, mais comme vraie sous des
+conditions nommées.
+
+\textbf{Vérifier par mutation.} Une propriété nouvellement affirmée n'est pas tenue pour vérifiée
+parce qu'un contrôle est vert : le contrôle est délibérément mis en défaut, on s'assure qu'il
+rougit, et l'état initial est restauré. Un contrôle vert qui reste vert quand on casse ce qu'il
+surveille ne surveille rien.
+
+La méthode a payé, et il faut dire ce qu'elle a trouvé plutôt que d'en vanter le principe. Elle a
+révélé qu'un contrôle de correspondance passait par accident sur un fichier dépourvu de déclaration
+— ensemble déclaré vide contre ensemble porté vide —, ce qui a fait ajouter l'exigence d'une
+déclaration explicite. Elle a révélé ensuite que le retrait d'une section entière à l'intérieur d'un
+chapitre n'était détecté que si cette section emportait une source qu'aucune autre ne portait :
+mesuré sur huit sections, six étaient détectées et deux ne l'étaient pas, ce qui a fait déclarer le
+décompte de sections. Elle a enfin établi qu'une vérification prévue ne pouvait pas mordre — le
+convertisseur bibliographique ne lisant jamais le champ que la mutation visait —, cas où la
+vérification est remplacée par celle qui a un sens plutôt que forcée.
+
+\aRediger{rattachement-du-travail}{le rattachement du travail effectué aux phases du projet, et ce
+que chaque phase a produit}\releve{rattachement-du-travail}
+
+\section{Outils et justification}
+
+Chaque brique de la pile technique est retenue pour un motif écrit, et non par habitude.
+
+\begin{center}
+\begin{tabular}{@{}p{3.4cm}p{4.0cm}p{6.4cm}@{}}
+\toprule
+Brique & Rôle & Motif du choix \\
+\midrule
+Serveur de base de données relationnelle & couche de persistance & un moteur client-serveur, non un moteur embarqué : trois services attaquent la même base par le réseau, avec des identifiants distincts, et le chargement écrit pendant que le tableau de bord lit \\
+\addlinespace
+Schéma en étoile & couche analytique & des faits entourés de dimensions, forme que l'interrogation analytique exploite et que le dossier doit démontrer \\
+\addlinespace
+Outil de transformation déclaratif & modélisation & matérialisation en vues, configuration de connexion hors dépôt, macros de conversion adossées aux formats mesurés à l'extraction \\
+\addlinespace
+Bibliothèque de rapprochement probabiliste & identités & un modèle de vraisemblance dont les paramètres s'estiment sur les données, plutôt qu'une collision exacte qui ne retrouve que l'identique \\
+\addlinespace
+Moteur en mémoire pour le rapprochement & exécution & le rapprochement écrit des tables intermédiaires nombreuses ; les tenir hors du serveur évite d'y laisser des résidus \\
+\addlinespace
+Orchestrateur de graphes de tâches & ordonnancement & le conteneur ordonnance sans exécuter : les tâches sont des commandes qui s'exécutent dans l'environnement du projet \\
+\addlinespace
+Bibliothèque d'application web analytique & tableau de bord & un service qui lit un schéma dédié, rafraîchi par échange de noms en une transaction \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\footnotesize Pile technique et motif de chaque choix. Chacun est consigné dans un enregistrement
+de décision distinct, avec la mesure qui l'a tranché et ce qui l'aurait invalidé.
+\end{center}
+
+\medskip
+
+Deux traits de cette liste méritent d'être relevés. Le premier est que le motif d'un choix n'est
+presque jamais la performance : c'est la propriété que le dossier doit démontrer, ou la contrainte
+qu'il faut ne pas violer. Le second est que chaque enregistrement porte une rubrique disant ce qui
+aurait invalidé la décision — un choix qu'on ne sait pas décrire comme réfutable n'est pas un choix,
+c'est une préférence.
+
+\section{Organisation du projet en phases}
+
+\aRediger{organisation-en-phases}{les phases du projet, nommées par ce qu'elles font, avec pour
+chacune son objectif et ses livrables, suivies d'une figure restituant leurs dépendances — aucun
+calendrier, aucun relevé de jours}\releve{organisation-en-phases}
