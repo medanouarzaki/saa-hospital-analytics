@@ -76,3 +76,4 @@ chaque exécution.
 | [0060](0060-le-tableau-de-bord-est-lance-par-le-module-et-non-par-l-executable.md) | Le service d'affichage est lancé par `python -m streamlit`, jamais par l'exécutable |
 | [0061](0061-les-grandeurs-decimales-sont-converties-a-l-affichage-seulement.md) | Une grandeur décimale est convertie en nombre à virgule pour être tracée, et là seulement |
 | [0062](0062-l-etat-declare-du-document-et-ses-marqueurs-nominatifs.md) | Le document déclare son état, et cet état dit ce que ses marqueurs nominatifs doivent porter |
+| [0063](0063-la-prose-du-rapport-porte-les-memes-etiquettes-de-provenance-que-les-colonnes.md) | La prose du rapport porte les mêmes étiquettes de provenance que les colonnes de l'entrepôt |
