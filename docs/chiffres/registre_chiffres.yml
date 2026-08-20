@@ -1697,12 +1697,15 @@ chiffres:
     select round((with c as (select montant_restant, (select max(date_extraction) from
     intermediate.int_creances) - date_naissance_creance as age, row_number() over (partition by
     n_creance order by date_extraction desc) as rg from intermediate.int_creances) select 100.0 *
-    sum(montant_restant) filter (where age >= 365) / sum(montant_restant) from c where rg = 1 and
-    montant_restant > 0)::numeric, 4)
+    coalesce(sum(montant_restant) filter (where age >= 365), 0) / nullif(sum(montant_restant), 0)
+    from c where rg = 1 and montant_restant > 0)::numeric, 4)
   portee: periode-entiere
   note: >-
     Part du montant restant portée par des créances d'un an et plus. Dénominateur — le montant
-    restant des seules créances non soldées.
+    restant des seules créances non soldées. Le `coalesce` du numérateur est mesuré et non
+    décoratif : sur une fenêtre de trois mois, aucune créance n'a un an, la somme filtrée est nulle
+    au sens de l'absence, et la commande rendait alors un néant là où zéro pour cent est la
+    réponse juste.
 - id: quarantaine-lignes-total-analyse
   valeur: 106
   unite: lignes
