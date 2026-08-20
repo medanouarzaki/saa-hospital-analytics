@@ -77,3 +77,4 @@ chaque exécution.
 | [0061](0061-les-grandeurs-decimales-sont-converties-a-l-affichage-seulement.md) | Une grandeur décimale est convertie en nombre à virgule pour être tracée, et là seulement |
 | [0062](0062-l-etat-declare-du-document-et-ses-marqueurs-nominatifs.md) | Le document déclare son état, et cet état dit ce que ses marqueurs nominatifs doivent porter |
 | [0063](0063-la-prose-du-rapport-porte-les-memes-etiquettes-de-provenance-que-les-colonnes.md) | La prose du rapport porte les mêmes étiquettes de provenance que les colonnes de l'entrepôt |
+| [0064](0064-le-releve-de-champs-est-la-troisieme-etiquette-de-la-provenance-de-la-prose.md) | Le relevé de champs est la troisième étiquette de la provenance de la prose, et son sens manquant est écrit |
