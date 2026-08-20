@@ -15,6 +15,17 @@
   \fi
 }
 
+% Le chemin du fichier de données d'une série, relatif au répertoire de composition. Aucune donnée
+% n'est tapée dans une source du rapport : un graphique et un tableau lisent ce fichier, que seule
+% la commande consignée au registre écrit.
+\newcommand{\serie}[1]{%
+  \ifcsname serie@#1\endcsname
+    \csname serie@#1\endcsname
+  \else
+    \GenericError{}{Serie inconnue : #1}{}{Cet identifiant n'existe pas au registre des chiffres.}%
+  \fi
+}
+
 
 \expandafter\def\csname chiffre@source-patients-lignes\endcsname{29\,107}
 \expandafter\def\csname chiffre@source-rendez-vous-lignes\endcsname{14\,169}
@@ -103,7 +114,7 @@
 \expandafter\def\csname chiffre@personnes-estimees\endcsname{24\,851}
 \expandafter\def\csname chiffre@grappes-multiples\endcsname{991}
 \expandafter\def\csname chiffre@taches-graphe\endcsname{12}
-\expandafter\def\csname chiffre@fichiers-de-controle\endcsname{72}
+\expandafter\def\csname chiffre@fichiers-de-controle\endcsname{73}
 \expandafter\def\csname chiffre@paires-possibles\endcsname{333\,891\,561}
 \expandafter\def\csname chiffre@paires-candidates\endcsname{5\,014}
 \expandafter\def\csname chiffre@blocage-nom-adresse\endcsname{2\,371}
@@ -121,8 +132,8 @@
 \expandafter\def\csname chiffre@balayage-points-f-parfaite\endcsname{61}
 \expandafter\def\csname chiffre@baseline-f-mesure\endcsname{0,9076682316118936}
 \expandafter\def\csname chiffre@ablation-ecart-complet\endcsname{270,868434285775}
-\expandafter\def\csname chiffre@ablation-ecart-variante-a\endcsname{-2,6554053556955406}
-\expandafter\def\csname chiffre@ablation-ecart-variante-c\endcsname{-9,571871091053188}
+\expandafter\def\csname chiffre@ablation-ecart-variante-a\endcsname{$-$2,6554053556955406}
+\expandafter\def\csname chiffre@ablation-ecart-variante-c\endcsname{$-$9,571871091053188}
 \expandafter\def\csname chiffre@ablation-f-variante-c\endcsname{0,9984856133266027}
 \expandafter\def\csname chiffre@ablation-comparaisons-variante-a\endcsname{6}
 \expandafter\def\csname chiffre@qualite-colonnes\endcsname{175}
@@ -134,3 +145,111 @@
 \expandafter\def\csname chiffre@grappes-exactes-restreint\endcsname{991}
 \expandafter\def\csname chiffre@grappes-exactes-global\endcsname{24\,851}
 \expandafter\def\csname chiffre@sur-fusionnes-global\endcsname{0}
+\expandafter\def\csname chiffre@flux-passages-total\endcsname{40\,650}
+\expandafter\def\csname chiffre@flux-programme-total\endcsname{13\,290}
+\expandafter\def\csname chiffre@flux-jours-ouverts\endcsname{749}
+\expandafter\def\csname chiffre@flux-programme-moyenne\endcsname{17,7437}
+\expandafter\def\csname chiffre@flux-urgences-moyenne\endcsname{30}
+\expandafter\def\csname chiffre@flux-lundi-moyenne\endcsname{23,1969}
+\expandafter\def\csname chiffre@flux-samedi-moyenne\endcsname{7,7165}
+\expandafter\def\csname chiffre@flux-dimanche-programme\endcsname{0}
+\expandafter\def\csname chiffre@flux-heure-pointe\endcsname{9}
+\expandafter\def\csname chiffre@flux-passages-heure-pointe\endcsname{2\,470}
+\expandafter\def\csname chiffre@ramadan-jours\endcsname{89}
+\expandafter\def\csname chiffre@ramadan-jours-ouverts\endcsname{76}
+\expandafter\def\csname chiffre@ramadan-programme-moyenne\endcsname{13,8289}
+\expandafter\def\csname chiffre@ramadan-hors-moyenne\endcsname{18,1857}
+\expandafter\def\csname chiffre@ramadan-baisse\endcsname{23,9572}
+\expandafter\def\csname chiffre@feries-jours\endcsname{36}
+\expandafter\def\csname chiffre@feries-programme-passages\endcsname{0}
+\expandafter\def\csname chiffre@feries-urgences-moyenne\endcsname{29,5833}
+\expandafter\def\csname chiffre@feries-urgences-hors-moyenne\endcsname{30,0171}
+\expandafter\def\csname chiffre@honores-total\endcsname{10\,280}
+\expandafter\def\csname chiffre@honores-avec-fiche\endcsname{10\,256}
+\expandafter\def\csname chiffre@honores-sans-fiche\endcsname{24}
+\expandafter\def\csname chiffre@honores-sans-fiche-en-quarantaine\endcsname{24}
+\expandafter\def\csname chiffre@artefact-nombre\endcsname{6\,845}
+\expandafter\def\csname chiffre@artefact-part\endcsname{66,7414}
+\expandafter\def\csname chiffre@complement-nombre\endcsname{3\,411}
+\expandafter\def\csname chiffre@delai-mediane-ensemble\endcsname{17}
+\expandafter\def\csname chiffre@delai-mediane-complement\endcsname{16}
+\expandafter\def\csname chiffre@part-jour-meme\endcsname{8,6673}
+\expandafter\def\csname chiffre@rdv-en-instance\endcsname{432}
+\expandafter\def\csname chiffre@absences-total\endcsname{2\,496}
+\expandafter\def\csname chiffre@annulations-total\endcsname{961}
+\expandafter\def\csname chiffre@taux-absenteisme-global\endcsname{17,6159}
+\expandafter\def\csname chiffre@taux-annulation-global\endcsname{6,7824}
+\expandafter\def\csname chiffre@annulations-avec-agent\endcsname{961}
+\expandafter\def\csname chiffre@absences-avec-agent-annulation\endcsname{0}
+\expandafter\def\csname chiffre@relation-inter-ensemble\endcsname{$-$0,4878}
+\expandafter\def\csname chiffre@relation-intra-ensemble\endcsname{0,0782}
+\expandafter\def\csname chiffre@relation-brute-ensemble\endcsname{0,028}
+\expandafter\def\csname chiffre@relation-inter-complement\endcsname{$-$0,2946}
+\expandafter\def\csname chiffre@relation-intra-complement\endcsname{0,123}
+\expandafter\def\csname chiffre@relation-brute-complement\endcsname{0,0695}
+\expandafter\def\csname chiffre@relation-effectif-ensemble\endcsname{11\,837}
+\expandafter\def\csname chiffre@relation-effectif-complement\endcsname{5\,636}
+\expandafter\def\csname chiffre@relation-activites-ecart-positif\endcsname{8}
+\expandafter\def\csname chiffre@urgences-part-consultation-ordinaire\endcsname{62,6827}
+\expandafter\def\csname chiffre@urgences-part-mode-principal\endcsname{71,674}
+\expandafter\def\csname chiffre@urgences-part-retour-domicile\endcsname{79,9159}
+\expandafter\def\csname chiffre@urgences-part-hospitalisation\endcsname{5,8808}
+\expandafter\def\csname chiffre@urgences-part-transfert\endcsname{12,3538}
+\expandafter\def\csname chiffre@urgences-heure-pointe\endcsname{10}
+\expandafter\def\csname chiffre@urgences-heure-creux\endcsname{2}
+\expandafter\def\csname chiffre@urgences-rapport-pointe-creux\endcsname{2,7983}
+\expandafter\def\csname chiffre@source-part-non-urgentes\endcsname{64}
+\expandafter\def\csname chiffre@source-part-non-appropriees\endcsname{0,307}
+\expandafter\def\csname chiffre@injecte-part-deux-derniers-niveaux\endcsname{0,63}
+\expandafter\def\csname chiffre@facturation-montant-total\endcsname{6\,519\,554,3}
+\expandafter\def\csname chiffre@facturation-factures\endcsname{21\,066}
+\expandafter\def\csname chiffre@facturation-part-organisme\endcsname{46,0882}
+\expandafter\def\csname chiffre@facturation-part-patient\endcsname{53,9118}
+\expandafter\def\csname chiffre@encaissements-montant\endcsname{5\,500\,289,87}
+\expandafter\def\csname chiffre@taux-encaissement\endcsname{84,366}
+\expandafter\def\csname chiffre@recouvrement-taux-global\endcsname{21,57}
+\expandafter\def\csname chiffre@recouvrement-taux-minimal\endcsname{12,5796}
+\expandafter\def\csname chiffre@recouvrement-taux-maximal\endcsname{49,5462}
+\expandafter\def\csname chiffre@recouvrement-creances\endcsname{5\,486}
+\expandafter\def\csname chiffre@recouvrement-montant-du\endcsname{1\,192\,714,4}
+\expandafter\def\csname chiffre@recouvrement-montant-restant\endcsname{935\,446,49}
+\expandafter\def\csname chiffre@recouvrement-relances\endcsname{1\,014}
+\expandafter\def\csname chiffre@recouvrement-taux-aboutissement\endcsname{38,4615}
+\expandafter\def\csname chiffre@creances-part-au-dela-un-an\endcsname{56,2678}
+\expandafter\def\csname chiffre@quarantaine-lignes-total-analyse\endcsname{106}
+\expandafter\def\csname chiffre@qualite-taux-quarantaine-maximal\endcsname{0,2955}
+\expandafter\def\csname chiffre@qualite-lignes-examinees\endcsname{346\,149}
+\expandafter\def\csname chiffre@grappes-taille-maximale\endcsname{2}
+\expandafter\def\csname chiffre@cible-delai-niveau-1\endcsname{1}
+\expandafter\def\csname chiffre@cible-delai-niveau-2\endcsname{20}
+\expandafter\def\csname chiffre@cible-delai-niveau-3\endcsname{75}
+\expandafter\def\csname chiffre@cible-delai-niveau-4\endcsname{120}
+\expandafter\def\csname chiffre@cible-delai-niveau-5\endcsname{240}
+\expandafter\def\csname chiffre@injecte-ramadan-coefficient\endcsname{0,75}
+\expandafter\def\csname chiffre@injecte-ferie-coefficient\endcsname{0}
+\expandafter\def\csname chiffre@injecte-hebdo-rapport\endcsname{3}
+\expandafter\def\csname chiffre@injecte-taux-annulation\endcsname{0,07}
+\expandafter\def\csname chiffre@injecte-part-jour-meme\endcsname{0,06}
+\expandafter\def\csname chiffre@injecte-taux-doublons\endcsname{0,04}
+\expandafter\def\csname chiffre@injecte-pente-absenteisme\endcsname{0,012}
+\expandafter\def\csname chiffre@injecte-correlation-parametres\endcsname{$-$0,4918}
+\expandafter\def\csname chiffre@jour-meme-marge-nulle\endcsname{644}
+\expandafter\def\csname chiffre@jour-meme-part-marge-nulle\endcsname{72,2783}
+\expandafter\def\csname chiffre@doublons-part-mesuree\endcsname{3,9878}
+\expandafter\def\csname chiffre@activites-distinctes\endcsname{8}
+\expandafter\def\csname chiffre@hebdo-rapport-mesure\endcsname{3,0061}
+\expandafter\def\csname chiffre@delai-rapport-extremes\endcsname{8,6}
+\expandafter\def\csname chiffre@flux-heures-vides-programme\endcsname{12}
+\expandafter\def\csname chiffre@qualite-tables\endcsname{11}
+\expandafter\def\csname chiffre@qualite-tables-sans-quarantaine\endcsname{9}
+
+\expandafter\def\csname serie@flux-mensuel\endcsname{figures/flux-mensuel.csv}
+\expandafter\def\csname serie@flux-horaire\endcsname{figures/flux-horaire.csv}
+\expandafter\def\csname serie@delais-repartition\endcsname{figures/delais-repartition.csv}
+\expandafter\def\csname serie@delais-par-activite\endcsname{figures/delais-par-activite.csv}
+\expandafter\def\csname serie@absenteisme-par-activite\endcsname{figures/absenteisme-par-activite.csv}
+\expandafter\def\csname serie@urgences-par-niveau\endcsname{figures/urgences-par-niveau.csv}
+\expandafter\def\csname serie@facturation-par-type\endcsname{figures/facturation-par-type.csv}
+\expandafter\def\csname serie@anciennete-creances\endcsname{figures/anciennete-creances.csv}
+\expandafter\def\csname serie@qualite-par-table\endcsname{figures/qualite-par-table.csv}
+\expandafter\def\csname serie@completude-champs\endcsname{figures/completude-champs.csv}

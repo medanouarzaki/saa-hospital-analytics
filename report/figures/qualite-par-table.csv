@@ -1,0 +1,12 @@
+objet,colonnes,incompletes,completude_minimale,quarantaine,taux_quarantaine
+int_rendez_vous,28,13,0.0000,42,0.2955
+int_patients,46,12,0.9860,64,0.2194
+int_creances,9,0,100.0000,0,0.0000
+int_encaissements,8,0,100.0000,0,0.0000
+int_factures,15,0,100.0000,0,0.0000
+int_lignes_facture,12,0,100.0000,0,0.0000
+int_mouvements,13,9,5.9429,0,0.0000
+int_passages,13,3,25.3629,0,0.0000
+int_passages_urgences,15,5,0.3143,0,0.0000
+int_prises_en_charge,10,1,99.5983,0,0.0000
+int_relances,6,0,100.0000,0,0.0000

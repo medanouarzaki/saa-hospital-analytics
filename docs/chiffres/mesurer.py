@@ -12,6 +12,19 @@ prouver : elle génère une fenêtre de trois mois, où les valeurs de la pério
 pas. Une comparaison y rougirait toujours, et un contrôle rouge en permanence n'est plus un
 contrôle.
 
+LES SÉRIES SUIVENT LA MÊME RÈGLE, ET ELLES SONT LE MOTIF DE CE QUI SUIT. Un graphique ou un tableau
+dont les données seraient tapées dans la source de composition serait exactement ce que ce registre
+existe pour empêcher : un nombre que plus rien ne rattache à une mesure. Une série est donc, comme
+un scalaire, une commande — mais son résultat est un FICHIER DE DONNÉES que la composition lit. Le
+registre porte l'empreinte de ce fichier, et deux liens la chaînent de bout en bout :
+
+    commande  ==(--verifier)==>  empreinte du registre  ==(le contrôle du registre)==>  fichier lu
+
+Aucun des deux liens n'est vérifié par le code qui vérifie l'autre. Retoucher un fichier de données
+à la main rompt le second ; modifier une valeur du registre sans toucher à sa commande rompt le
+premier. `--ecrire-series` est le SEUL chemin d'écriture de ces fichiers, et il n'écrit que ce que
+les commandes rendent.
+
 Aucune valeur de connexion n'est imprimée. Aucune instruction de modification n'est émise : les
 commandes du registre sont des lectures, et la propriété est vérifiée avant exécution.
 """
@@ -19,6 +32,7 @@ commandes du registre sont des lectures, et la propriété est vérifiée avant 
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
 import re
 import sys
@@ -30,10 +44,20 @@ import yaml
 RACINE = Path(__file__).resolve().parent.parent.parent
 REGISTRE = Path(__file__).resolve().parent / "registre_chiffres.yml"
 APPLIQUER_DDL = RACINE / "ingestion" / "appliquer_ddl.py"
+# Les fichiers de données des séries siègent sous `report/`, à côté de ce qui les lit. Le chemin
+# consigné au registre est relatif à ce répertoire, comme l'argument que `\addplot table` reçoit.
+RACINE_SERIES = RACINE / "report"
 
-# Une commande du registre est une LECTURE. Le motif refuse tout ce qui n'ouvre pas sur `select`,
-# et la garde est appliquée avant d'ouvrir la connexion.
-_LECTURE = re.compile(r"^\s*select\b", re.IGNORECASE)
+# Une commande du registre est une LECTURE. Deux conditions, et non plus une seule : la commande
+# ouvre sur `select` ou sur `with` — les séries ont des expressions de table communes, et refuser
+# `with` les aurait toutes écartées — ET elle ne porte aucun mot-clé de modification. La seconde
+# condition est celle qui compte depuis que `with` est admis : `with x as (delete ... returning)`
+# ouvre bien sur `with` et écrit. La garde est appliquée avant d'ouvrir la connexion.
+_LECTURE = re.compile(r"^\s*(?:select|with)\b", re.IGNORECASE)
+_MODIFICATION = re.compile(
+    r"\b(?:insert|update|delete|drop|alter|truncate|create|grant|revoke|copy|merge)\b",
+    re.IGNORECASE,
+)
 
 TYPES_ATTENDUS = {
     "lignes": int,
@@ -69,6 +93,14 @@ TYPES_ATTENDUS = {
     "agrégats": int,
     "identifiants": int,
     "grappes": int,
+    "heures": int,
+    "minutes": int,
+    "rendez-vous": int,
+    "activités": int,
+    "créances": int,
+    "relances": int,
+    "corrélation": float,
+    "dirhams": float,
     "tâches": int,
     "versions": int,
     "%": float,
@@ -98,6 +130,29 @@ def connexion() -> psycopg.Connection:
     )
 
 
+def rendre_serie(colonnes: list[str], lignes: list[tuple]) -> str:
+    """Le texte EXACT du fichier de données. Une seule fonction le produit, et c'est elle dont
+    l'empreinte fait foi : le rendu ne peut donc pas diverger entre l'écriture et la vérification.
+    """
+    sortie = [",".join(colonnes)]
+    sortie.extend(",".join(str(valeur) for valeur in ligne) for ligne in lignes)
+    return "\n".join(sortie) + "\n"
+
+
+def empreinte(texte: str) -> str:
+    return hashlib.sha256(texte.encode("utf-8")).hexdigest()
+
+
+def executer_series(series: list[dict], curseur) -> dict[str, tuple[list[str], list[tuple]]]:
+    obtenues = {}
+    for serie in series:
+        curseur.execute(serie["commande"])
+        lignes = curseur.fetchall()
+        colonnes = [description.name for description in curseur.description]
+        obtenues[serie["id"]] = (colonnes, lignes)
+    return obtenues
+
+
 def charger_registre() -> dict:
     with REGISTRE.open(encoding="utf-8") as fichier:
         return yaml.safe_load(fichier)
@@ -125,7 +180,12 @@ def executer(entrees: list[dict], curseur) -> dict[str, object]:
 
 
 def refuser_les_ecritures(entrees: list[dict]) -> list[str]:
-    return [e["id"] for e in entrees if e["type"] == "sql" and not _LECTURE.match(e["commande"])]
+    return [
+        e["id"]
+        for e in entrees
+        if e["type"] == "sql"
+        and (not _LECTURE.match(e["commande"]) or _MODIFICATION.search(e["commande"]))
+    ]
 
 
 def main(arguments: list[str] | None = None) -> int:
@@ -134,24 +194,40 @@ def main(arguments: list[str] | None = None) -> int:
         description=(
             "Rejoue les commandes du registre des chiffres. `--verifier` compare les valeurs "
             "obtenues aux valeurs consignées et n'a de sens que sur la période entière ; "
-            "`--formes` vérifie seulement que chaque commande s'exécute et rend le type attendu."
+            "`--formes` vérifie seulement que chaque commande s'exécute et rend le type attendu ; "
+            "`--ecrire-series` réécrit les fichiers de données des séries, et il est le seul "
+            "chemin par lequel ces fichiers s'écrivent."
         ),
     )
     groupe = analyseur.add_mutually_exclusive_group(required=True)
     groupe.add_argument("--verifier", action="store_true", help="comparer les valeurs consignées")
     groupe.add_argument("--formes", action="store_true", help="n'exécuter que, sans comparer")
+    groupe.add_argument(
+        "--ecrire-series", action="store_true", help="réécrire les fichiers de données des séries"
+    )
     options = analyseur.parse_args(arguments)
 
     registre = charger_registre()
     entrees = registre["chiffres"]
+    series = registre.get("series", [])
 
-    ecritures = refuser_les_ecritures(entrees)
+    ecritures = refuser_les_ecritures(entrees) + refuser_les_ecritures(series)
     if ecritures:
         print("commandes qui ne sont pas des lectures : " + ", ".join(ecritures))
         return 2
 
     with connexion() as conn, conn.cursor() as curseur:
         obtenues = executer(entrees, curseur)
+        series_obtenues = executer_series(series, curseur)
+        if options.ecrire_series:
+            for serie in series:
+                colonnes, lignes = series_obtenues[serie["id"]]
+                cible = RACINE_SERIES / serie["fichier"]
+                cible.parent.mkdir(parents=True, exist_ok=True)
+                texte = rendre_serie(colonnes, lignes)
+                cible.write_text(texte, encoding="utf-8")
+                print(f"{serie['id']} : {len(lignes)} ligne(s), empreinte {empreinte(texte)}")
+            return 0
         if options.verifier:
             ancrages = []
             for ancre in registre["ancrage"]:
@@ -182,9 +258,21 @@ def main(arguments: list[str] | None = None) -> int:
                     f"{entree['id']} : la commande rend {type(obtenu).__name__}, "
                     f"{attendu.__name__} attendu pour l'unité « {entree['unite']} »"
                 )
+        for serie in series:
+            colonnes, lignes = series_obtenues[serie["id"]]
+            if colonnes != list(serie["colonnes"]):
+                fautes.append(
+                    f"{serie['id']} : la commande rend les colonnes {colonnes}, "
+                    f"{list(serie['colonnes'])} déclarées au registre"
+                )
+            elif not lignes:
+                fautes.append(f"{serie['id']} : la commande ne rend aucune ligne")
         for ligne in fautes:
             print(ligne)
-        print(f"{len(entrees)} commande(s) exécutée(s), {len(fautes)} de forme inattendue")
+        print(
+            f"{len(entrees)} commande(s) et {len(series)} série(s) exécutée(s), "
+            f"{len(fautes)} de forme inattendue"
+        )
         return 1 if fautes else 0
 
     ecarts = []
@@ -192,9 +280,19 @@ def main(arguments: list[str] | None = None) -> int:
         consignee, obtenue = normaliser(entree["valeur"]), obtenues[entree["id"]]
         if consignee != obtenue:
             ecarts.append(f"{entree['id']} : consigné {consignee}, mesuré {obtenue}")
+    for serie in series:
+        colonnes, lignes = series_obtenues[serie["id"]]
+        obtenue = empreinte(rendre_serie(colonnes, lignes))
+        if obtenue != serie["empreinte"]:
+            ecarts.append(
+                f"{serie['id']} : le fichier que la commande produit a pour empreinte {obtenue}, "
+                f"le registre consigne {serie['empreinte']} — la commande et le registre divergent"
+            )
     for ligne in ecarts:
         print(ligne)
-    print(f"{len(entrees)} entrée(s) confrontée(s), {len(ecarts)} écart(s)")
+    print(
+        f"{len(entrees)} entrée(s) et {len(series)} série(s) confrontée(s), {len(ecarts)} écart(s)"
+    )
     return 1 if ecarts else 0
 
 
