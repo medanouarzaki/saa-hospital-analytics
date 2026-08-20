@@ -1,0 +1,89 @@
+% Fichier produit mécaniquement à partir de docs/chiffres/registre_chiffres.yml.
+% Ne pas modifier à la main : docs/chiffres/generer_chiffres_tex.py le réécrit.
+%
+% Le rapport n'écrit aucune valeur en clair. Il écrit \chiffre{identifiant}, et la valeur vient
+% d'ici, mesurée par la commande que le registre porte en regard de cet identifiant.
+%
+% Un identifiant inconnu déclenche une erreur de compilation qui le nomme : un chiffre absent doit
+% arrêter la composition, jamais laisser un blanc dans une phrase.
+
+\newcommand{\chiffre}[1]{%
+  \ifcsname chiffre@#1\endcsname
+    \csname chiffre@#1\endcsname
+  \else
+    \GenericError{}{Chiffre inconnu : #1}{}{Cet identifiant n'existe pas au registre des chiffres.}%
+  \fi
+}
+
+
+\expandafter\def\csname chiffre@source-patients-lignes\endcsname{29\,107}
+\expandafter\def\csname chiffre@source-rendez-vous-lignes\endcsname{14\,169}
+\expandafter\def\csname chiffre@source-passages-lignes\endcsname{40\,650}
+\expandafter\def\csname chiffre@source-passages-urgences-lignes\endcsname{27\,360}
+\expandafter\def\csname chiffre@source-mouvements-lignes\endcsname{6\,310}
+\expandafter\def\csname chiffre@source-prises-en-charge-lignes\endcsname{16\,430}
+\expandafter\def\csname chiffre@source-factures-lignes\endcsname{21\,066}
+\expandafter\def\csname chiffre@source-lignes-facture-lignes\endcsname{160\,936}
+\expandafter\def\csname chiffre@source-encaissements-lignes\endcsname{23\,231}
+\expandafter\def\csname chiffre@source-creances-lignes\endcsname{5\,876}
+\expandafter\def\csname chiffre@source-relances-lignes\endcsname{1\,014}
+\expandafter\def\csname chiffre@source-lignes-total\endcsname{346\,149}
+\expandafter\def\csname chiffre@source-tables\endcsname{11}
+\expandafter\def\csname chiffre@quarantaine-patients-lignes\endcsname{64}
+\expandafter\def\csname chiffre@quarantaine-rendez-vous-lignes\endcsname{42}
+\expandafter\def\csname chiffre@quarantaine-lignes-total\endcsname{106}
+\expandafter\def\csname chiffre@colonnes-source-registre\endcsname{175}
+\expandafter\def\csname chiffre@colonnes-source-obs\endcsname{81}
+\expandafter\def\csname chiffre@colonnes-source-doc\endcsname{72}
+\expandafter\def\csname chiffre@colonnes-source-hyp\endcsname{22}
+\expandafter\def\csname chiffre@colonnes-source-catalogue\endcsname{175}
+\expandafter\def\csname chiffre@colonnes-source-catalogue-obs\endcsname{81}
+\expandafter\def\csname chiffre@colonnes-source-catalogue-doc\endcsname{72}
+\expandafter\def\csname chiffre@colonnes-source-catalogue-hyp\endcsname{22}
+\expandafter\def\csname chiffre@colonnes-aval-total\endcsname{398}
+\expandafter\def\csname chiffre@colonnes-aval-decrites\endcsname{398}
+\expandafter\def\csname chiffre@colonnes-intermediate\endcsname{175}
+\expandafter\def\csname chiffre@colonnes-marts\endcsname{223}
+\expandafter\def\csname chiffre@parametres-total\endcsname{256}
+\expandafter\def\csname chiffre@parametres-fichiers\endcsname{25}
+\expandafter\def\csname chiffre@parametres-obs\endcsname{5}
+\expandafter\def\csname chiffre@parametres-doc\endcsname{52}
+\expandafter\def\csname chiffre@parametres-hyp\endcsname{199}
+\expandafter\def\csname chiffre@capacite-fonctionnelle\endcsname{40}
+\expandafter\def\csname chiffre@journees-2024\endcsname{7\,851}
+\expandafter\def\csname chiffre@admissions-2024\endcsname{1\,197}
+\expandafter\def\csname chiffre@consultations-2024\endcsname{4\,142}
+\expandafter\def\csname chiffre@prelevements-2024\endcsname{9\,625}
+\expandafter\def\csname chiffre@examens-2024\endcsname{49\,597}
+\expandafter\def\csname chiffre@interventions-2024\endcsname{0}
+\expandafter\def\csname chiffre@tom-publie\endcsname{53,8}
+\expandafter\def\csname chiffre@dms-publie\endcsname{6,6}
+\expandafter\def\csname chiffre@periode-jours\endcsname{912}
+\expandafter\def\csname chiffre@periode-debut\endcsname{2024-01-01}
+\expandafter\def\csname chiffre@periode-fin\endcsname{2026-06-30}
+\expandafter\def\csname chiffre@sejours-produits\endcsname{2\,980}
+\expandafter\def\csname chiffre@consultations-produites\endcsname{10\,310}
+\expandafter\def\csname chiffre@passages-urgences-produits\endcsname{27\,360}
+\expandafter\def\csname chiffre@patients-produits\endcsname{29\,107}
+\expandafter\def\csname chiffre@personnes-distinctes\endcsname{25\,842}
+\expandafter\def\csname chiffre@urgences-scenario-retenu\endcsname{30}
+\expandafter\def\csname chiffre@urgences-borne-basse\endcsname{14}
+\expandafter\def\csname chiffre@urgences-scenario-median\endcsname{30}
+\expandafter\def\csname chiffre@urgences-borne-haute\endcsname{54}
+\expandafter\def\csname chiffre@defaut-taux-doublons\endcsname{0,04}
+\expandafter\def\csname chiffre@defaut-dates-aberrantes\endcsname{0,003}
+\expandafter\def\csname chiffre@defaut-ages-incoherents\endcsname{0,005}
+\expandafter\def\csname chiffre@defaut-rdv-doublon-creneau\endcsname{0,012}
+\expandafter\def\csname chiffre@defaut-factures-sans-pec\endcsname{0,03}
+\expandafter\def\csname chiffre@defaut-familles\endcsname{13}
+\expandafter\def\csname chiffre@part-sexe-masculin\endcsname{0,497}
+\expandafter\def\csname chiffre@part-urbain\endcsname{0,639}
+\expandafter\def\csname chiffre@part-sans-couverture\endcsname{0,2}
+\expandafter\def\csname chiffre@part-couverture-principale\endcsname{0,5}
+\expandafter\def\csname chiffre@tranches-age\endcsname{6}
+\expandafter\def\csname chiffre@niveaux-tri\endcsname{5}
+\expandafter\def\csname chiffre@part-tri-niveau-4\endcsname{0,41}
+\expandafter\def\csname chiffre@part-tri-niveau-5\endcsname{0,22}
+\expandafter\def\csname chiffre@part-sejours-depuis-urgences\endcsname{0,57}
+\expandafter\def\csname chiffre@mouvements-lits-distincts\endcsname{40}
+\expandafter\def\csname chiffre@factures-avec-creance\endcsname{5\,486}
