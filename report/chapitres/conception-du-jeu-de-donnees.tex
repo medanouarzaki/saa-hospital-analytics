@@ -5,25 +5,26 @@
 %   OBS: REL-RDV.C02, REL-RDV.C05, REL-RDV.C07, REL-RDV.C08, REL-RDV.R01, REL-RDV.R02, REL-RDV.R03,
 %   OBS: REL-RDV.R08, REL-RDV.R10, REL-RDV.R11, REL-RDV.R12
 %   HYP: (aucun)
-%   CHI: source-patients-lignes, source-rendez-vous-lignes, source-passages-lignes,
-%   CHI: source-passages-urgences-lignes, source-mouvements-lignes, source-prises-en-charge-lignes,
-%   CHI: source-factures-lignes, source-lignes-facture-lignes, source-encaissements-lignes,
-%   CHI: source-creances-lignes, source-relances-lignes, source-lignes-total, source-tables,
-%   CHI: quarantaine-patients-lignes, quarantaine-rendez-vous-lignes, quarantaine-lignes-total,
-%   CHI: colonnes-source-registre, colonnes-source-obs, colonnes-source-doc, colonnes-source-hyp,
-%   CHI: colonnes-source-catalogue, colonnes-source-catalogue-obs, colonnes-source-catalogue-doc,
-%   CHI: colonnes-source-catalogue-hyp, colonnes-aval-total, colonnes-aval-decrites,
-%   CHI: colonnes-intermediate, colonnes-marts, parametres-total, parametres-fichiers, parametres-obs,
-%   CHI: parametres-doc, parametres-hyp, capacite-fonctionnelle, journees-2024, admissions-2024,
-%   CHI: consultations-2024, prelevements-2024, examens-2024, interventions-2024, tom-publie,
-%   CHI: dms-publie, periode-jours, periode-debut, periode-fin, sejours-produits,
-%   CHI: consultations-produites, passages-urgences-produits, patients-produits, personnes-distinctes,
-%   CHI: urgences-scenario-retenu, urgences-borne-basse, urgences-borne-haute, defaut-taux-doublons,
-%   CHI: defaut-dates-aberrantes, defaut-ages-incoherents, defaut-rdv-doublon-creneau,
-%   CHI: defaut-factures-sans-pec, defaut-familles, part-sexe-masculin, part-urbain,
-%   CHI: part-sans-couverture, part-couverture-principale, tranches-age, niveaux-tri,
-%   CHI: part-tri-niveau-4, part-tri-niveau-5, part-sejours-depuis-urgences, mouvements-lits-distincts,
-%   CHI: factures-avec-creance
+%   CHI: admissions-2024, capacite-fonctionnelle, colonnes-aval-decrites, colonnes-aval-total,
+%   CHI: colonnes-intermediate, colonnes-marts, colonnes-source-catalogue,
+%   CHI: colonnes-source-catalogue-doc, colonnes-source-catalogue-hyp, colonnes-source-catalogue-obs,
+%   CHI: colonnes-source-doc, colonnes-source-hyp, colonnes-source-obs, colonnes-source-registre,
+%   CHI: consultations-2024, consultations-produites, defaut-ages-incoherents, defaut-dates-aberrantes,
+%   CHI: defaut-factures-sans-pec, defaut-familles, defaut-rdv-doublon-creneau, defaut-taux-doublons,
+%   CHI: dim-patient-fiches-plusieurs-versions, dms-publie, examens-2024, factures-avec-creance,
+%   CHI: grappes-multiples, identifiants-distincts, interventions-2024, journees-2024,
+%   CHI: mouvements-lits-distincts, niveaux-tri, parametres-doc, parametres-fichiers, parametres-hyp,
+%   CHI: parametres-obs, parametres-total, part-couverture-principale, part-sans-couverture,
+%   CHI: part-sejours-depuis-urgences, part-sexe-masculin, part-tri-niveau-4, part-tri-niveau-5,
+%   CHI: part-urbain, passages-urgences-produits, patients-produits, periode-debut, periode-fin,
+%   CHI: periode-jours, personnes-estimees, prelevements-2024, quarantaine-lignes-total,
+%   CHI: quarantaine-patients-lignes, quarantaine-rendez-vous-lignes, sejours-produits,
+%   CHI: source-creances-lignes, source-encaissements-lignes, source-factures-lignes,
+%   CHI: source-lignes-facture-lignes, source-lignes-total, source-mouvements-lignes,
+%   CHI: source-passages-lignes, source-passages-urgences-lignes, source-patients-lignes,
+%   CHI: source-prises-en-charge-lignes, source-relances-lignes, source-rendez-vous-lignes,
+%   CHI: source-tables, tom-publie, tranches-age, urgences-borne-basse, urgences-borne-haute,
+%   CHI: urgences-scenario-retenu
 %   SECTIONS: 8
 \chapter{Conception du jeu de données}\label{chap:jeu-de-donnees}
 
@@ -40,12 +41,19 @@ une entité distincte de l'épisode : il précède la consultation, et il peut n
 
 Trois traits de ce modèle méritent d'être posés d'emblée, parce qu'ils commandent tout le reste.
 
-\textbf{La personne et l'identifiant ne se confondent pas.} La couche produite porte
-\chiffre{patients-produits} fiches pour \chiffre{personnes-distinctes} personnes, et l'écart est le
-défaut d'identité injecté. Confondre les deux décomptes est l'erreur la plus facile à commettre sur
-ce jeu de données, et elle a été commise : une valeur fausse a circulé dans les documents de travail
-de ce projet pour cette seule raison. Le modèle les sépare donc explicitement, et le registre des
-chiffres porte deux identifiants distincts qui ne se substituent pas l'un à l'autre.
+\textbf{La personne, l'identifiant et la version sont trois grandeurs, non deux.} La couche produite
+porte \chiffre{patients-produits} lignes de fiche patient, qui sont des \emph{versions} — une fiche
+modifiée en produit plusieurs. Ces versions se répartissent sur \chiffre{identifiants-distincts}
+\emph{identifiants} distincts, dont \chiffre{dim-patient-fiches-plusieurs-versions} en portent plus
+d'une. Et ces identifiants désignent \chiffre{personnes-estimees} \emph{personnes} estimées, parce
+que le jeu injecte des doublons d'identité : \chiffre{grappes-multiples} grappes réunissent plus d'un
+identifiant.
+
+Confondre ces trois décomptes est l'erreur la plus facile à commettre sur ce jeu de données, et elle
+a été commise trois fois dans les documents de travail de ce projet — la dernière fois dans le
+registre des chiffres lui-même, où une entrée portait l'unité « personnes » sur un décompte
+d'identifiants. Le registre porte désormais trois identifiants distincts, chacun avec la note qui
+renvoie aux deux autres.
 
 \textbf{Le rendez-vous et l'épisode sont deux entités.} Un rendez-vous non honoré n'a pas d'épisode,
 et c'est précisément ce qui rend l'absentéisme mesurable : si le rendez-vous n'existait que par la
