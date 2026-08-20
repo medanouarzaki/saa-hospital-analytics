@@ -281,3 +281,34 @@ Observation du 2026-07-28.
 | REL-RDV.L01 | Service | colonne | sans_objet | aucune valeur observée |
 | REL-RDV.L02 | Agenda | colonne | sans_objet | aucune valeur observée |
 | REL-RDV.L03 | Activité | colonne | sans_objet | aucune valeur observée |
+
+## Champs non employés
+
+17 champ(s) qu'aucune entrée du registre des champs n'invoque et qu'aucun chapitre du rapport ne cite. Chacun porte le motif de son groupe.
+
+**Motif.** Boutons de la barre d'outils de la fiche patient. Ils déclenchent une opération et ne portent aucune donnée de dossier : aucune colonne n'en dérive, et les tableaux du rapport ne les reprennent pas. Leur relevé est conservé parce qu'il atteste l'agencement de l'écran, restitué par un schéma structurel.
+
+| id |
+|---|
+| REL-PAT.B01 |
+| REL-PAT.B02 |
+| REL-PAT.B03 |
+| REL-PAT.B04 |
+| REL-PAT.B05 |
+| REL-PAT.B06 |
+| REL-PAT.B07 |
+| REL-PAT.B08 |
+| REL-PAT.B09 |
+| REL-PAT.B10 |
+
+**Motif.** Boutons de la barre d'outils de l'écran de prise de rendez-vous. Même raison que pour la fiche patient : une action, aucune donnée.
+
+| id |
+|---|
+| REL-RDV.B01 |
+| REL-RDV.B02 |
+| REL-RDV.B03 |
+| REL-RDV.B04 |
+| REL-RDV.B05 |
+| REL-RDV.B06 |
+| REL-RDV.B07 |

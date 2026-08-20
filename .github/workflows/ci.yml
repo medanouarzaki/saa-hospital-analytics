@@ -88,6 +88,10 @@ jobs:
       # donc ici, avec les deux précédents, et non dans le travail qui compile.
       - run: uv run pytest tests/test_provenance_des_chapitres.py -v
 
+      # Le rendu Markdown du relevé de champs, confronté à ce que son générateur produit. Il ne lit que
+      # deux fichiers et n'ouvre aucune base : sa place est ici.
+      - run: uv run pytest tests/test_releve_markdown_synchrone.py -v
+
   tests-matrice:
     runs-on: ubuntu-latest
     strategy:
