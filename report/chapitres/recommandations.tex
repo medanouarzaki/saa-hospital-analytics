@@ -1,0 +1,216 @@
+% Ce chapitre repose sur :
+%   DOC: s12, s13, s20, s24, s30
+%   OBS: REL-PAT.H12, REL-PAT.H14, REL-IPP.O03, REL-IPP.R12
+%   HYP: absentéisme-par-spécialité, complétude-par-champ, ancienneté-des-créances,
+%   HYP: répartition-des-niveaux-de-tri
+%   SECTIONS: 5
+
+\chapter{Recommandations}\label{chap:recommandations}
+
+Ce chapitre propose cinq actions. Chacune tient en un bloc de forme fixe, et ce bloc sépare deux
+choses que l'on confond ordinairement.
+
+\textbf{Ce qui établit le constat} est ce qui autorise à dire qu'un problème existe. Sur un jeu de
+données produit pour ce projet, cela ne peut pas être une valeur affichée par le tableau de bord :
+les relations qui gouvernent ces valeurs y ont été injectées, et les relire à la sortie serait
+circulaire. Le constat vient donc d'une source extérieure au jeu — un rapport de contrôle, une
+publication statistique, une observation au poste — ou bien il n'existe pas, et le rapport le dit.
+
+\textbf{Ce que l'indicateur démontre} est autre chose, et ce n'est pas rien : il démontre que la
+chaîne de données sait produire le nombre, à la maille utile, à partir des tables. Le jour où elle
+sera branchée sur les données réelles du service, le nombre sera un constat. Aujourd'hui, il est une
+capacité.
+
+\textbf{Aucun effort n'est chiffré et aucun effet n'est quantifié.} Un effort en jours et un gain en
+points seraient des nombres sans mesure qui les produise, et ce rapport ne s'en autorise pas. Chaque
+bloc dit ce que l'action suppose — quel champ existe déjà, quel processus change — et par quelle
+mesure on constaterait son effet. L'effet lui-même, lorsqu'il est énoncé, l'est comme une attente.
+
+\section{Sur les rendez-vous}
+
+\textbf{Le constat.} Le délai d'obtention d'un rendez-vous varie fortement d'une spécialité à
+l'autre, et une part des créneaux est perdue par des patients qui ne se présentent pas. Le rapport
+de la Cour des comptes consacré au centre hospitalier établit l'un et l'autre pour cet établissement
+même : il relève des délais moyens de rendez-vous par spécialité, et l'absence de tout état
+comparatif entre rendez-vous demandés et consultations réalisées \cite{s20}. L'ordre de grandeur de
+l'absentéisme ambulatoire est documenté par ailleurs — une moyenne mondiale de 23,5~\% et une
+fourchette de 23 à 33~\% selon les contextes \cite{s24}.
+
+\textbf{Ce que l'indicateur démontre.} Le tableau de bord calcule le délai d'obtention en médiane et
+au quatre-vingt-dixième centile par activité, le taux d'absence et le taux d'annulation par
+activité. Il démontre que ces quatre grandeurs se produisent depuis le fait des rendez-vous, à la
+maille où une décision se prend. Leurs valeurs, en revanche, sont fixées par des paramètres
+injectés\convention{absentéisme-par-spécialité} : le classement des spécialités par absentéisme est
+imposé, et aucune conclusion sur la force du lien entre délai et absence ne peut en être tirée.
+
+\textbf{L'action.} Rappeler les patients dont le rendez-vous approche, en commençant par les
+activités où le délai est le plus long, et ajuster le nombre de créneaux ouverts au taux d'absence
+mesuré sur chaque activité une fois la chaîne branchée sur les données réelles.
+
+\textbf{Ce qu'elle suppose.} Le canal existe déjà : la fiche patient porte quatre lignes de
+téléphone, une adresse électronique, et deux cases d'avertissement — l'une par message court,
+l'autre par courrier électronique\releve{REL-PAT.H12}. Le relevé note que ces cases existent et ne
+sont pas exploitées par le service\releve{REL-PAT.H14}. L'action ne demande donc aucun développement
+logiciel : elle demande que le champ soit renseigné à l'admission et qu'un envoi soit déclenché.
+
+\textbf{L'effet attendu et sa mesure.} On attend une baisse du taux d'absence sur les activités
+ciblées, et une réduction du délai médian sur ces mêmes activités par récupération des créneaux
+perdus. La mesure existe : le taux d'absence et le délai d'obtention par activité, comparés avant et
+après, à activité constante. La distinction entre absence et annulation, que le système enregistre
+par un couple de champs distinct, permet de vérifier que la baisse vient bien des absences et non
+d'un report de qualification.
+
+\section{Sur les urgences}
+
+\textbf{Le constat.} Une part importante des passages aux urgences relève d'une consultation
+ordinaire. L'avis du Conseil Économique, Social et Environnemental l'établit à l'échelle nationale :
+sur les 6~482~185 consultations et soins d'urgence assurés chaque année par le secteur public,
+\textbf{64~\% sont des consultations non urgentes} et 10~\% seulement des urgences vitales
+\cite{s12}. Une étude conduite dans un hôpital provincial marocain mesure 30,7~\% de consultations
+non appropriées sur 410 patients \cite{s13}. Les deux sources concordent sur l'existence du
+phénomène ; elles divergent sur son ampleur, l'une comptant les motifs de recours et l'autre le
+caractère approprié de la venue.
+
+\textbf{Ce que l'indicateur démontre.} Le tableau de bord calcule la part des passages classés aux
+deux niveaux de tri les moins graves, le délai de prise en charge médicale par niveau, la durée de
+passage et l'orientation de sortie. Il démontre que la file d'attente se décrit par niveau de
+gravité et que le délai s'y mesure. La pyramide de gravité affichée est en revanche
+imposée\convention{répartition-des-niveaux-de-tri}, y compris la part relevant d'une consultation
+ordinaire : c'est un paramètre, non une observation.
+
+\textbf{L'action.} Ouvrir une filière courte pour les deux niveaux de tri les moins graves, prise en
+charge séparément de la file principale, et réorienter en amont vers les établissements de soins de
+santé primaires les venues qui relèvent d'eux.
+
+\textbf{Ce qu'elle suppose.} Un tri formalisé à l'accueil, dont le résultat est enregistré : sans
+niveau de tri saisi, ni la filière ni sa mesure n'existent. Elle suppose aussi une capacité d'accueil
+en amont, que ce rapport ne mesure pas.
+
+\textbf{L'effet attendu et sa mesure.} On attend une baisse du délai de prise en charge des niveaux
+les plus graves, la file courte cessant de les précéder. La mesure est le délai de prise en charge
+médicale par niveau de tri, en médiane et au quatre-vingt-dixième centile : c'est sur les niveaux
+graves qu'il faut la lire, et non sur la moyenne d'ensemble, qu'une filière courte améliore
+mécaniquement.
+
+\section{Sur la facturation et le recouvrement}
+
+\textbf{Le constat.} Il est établi pour cet établissement, et par une source extérieure au jeu de
+données. La Cour des comptes relève \textbf{50~876~365 dirhams de créances non recouvrées} au
+31 décembre 2016, \textbf{57~\% des dossiers non facturés} en 2015, et \textbf{3~477 consultations
+payées sur 160~659} aux urgences en 2016 \cite{s20}. Deux problèmes distincts s'y lisent : des
+créances qui vieillissent sans être recouvrées, et des épisodes de soin qui ne donnent lieu à aucune
+facture.
+
+\textbf{Ce que l'indicateur démontre.} Le tableau de bord calcule le taux de recouvrement des
+créances, leur répartition par tranche d'ancienneté, l'aboutissement des relances, le taux
+d'encaissement, et le nombre d'épisodes sans facture rattachée par famille et par mois. Il démontre
+que la chaîne sait rapprocher un épisode de sa facture et une facture de son encaissement — ce qui
+est précisément ce dont l'absence était relevée. Les montants et l'ancienneté affichés sont
+imposés\convention{ancienneté-des-créances}, et la priorisation qu'on en tirerait serait circulaire.
+
+\textbf{L'action.} Prioriser les relances par ancienneté décroissante et par type de débiteur, et
+produire chaque mois la liste des épisodes sans facture rattachée pour reprise par le service.
+
+\textbf{Ce qu'elle suppose.} Que l'épisode et la facture portent une clé commune exploitable, ce que
+le modèle de données démontre possible. Elle suppose surtout un changement de processus et non
+d'outil : la créance naît au service d'accueil, où la facture est établie et le règlement encaissé à
+la sortie, tandis que le recouvrement relève du pôle administratif — la liste doit donc traverser
+cette frontière pour servir.
+
+\textbf{L'effet attendu et sa mesure.} On attend une hausse du taux de recouvrement et une baisse de
+la part des créances les plus anciennes. La mesure du rendement de la relance existe — nombre de
+relances émises, nombre ayant abouti, et leur rapport — et elle doit être lue avant d'augmenter le
+volume des relances plutôt qu'après.
+
+\section{Sur la qualité du fichier patient}
+
+\textbf{Le constat, et il commence par ce qu'on ne sait pas.} Le système n'expose pas quels champs
+de la fiche patient sont obligatoires à la saisie et quels champs sont facultatifs. L'observation au
+poste ne l'a pas relevé, et le relevé de champs le déclare explicitement : le caractère obligatoire
+ou facultatif n'a été relevé sur aucun écran, et n'est donc affirmé nulle part. Recommander de rendre
+certains champs obligatoires supposerait de savoir lesquels ne le sont pas. \textbf{C'est le premier
+constat, et il fonde la première action.}
+
+Le second constat est établi, lui, et par le système lui-même : une même personne y possède
+plusieurs dossiers. L'écran de recherche d'identifiant porte un onglet de recherche pondérée sur
+l'index maître des patients\releve{REL-IPP.O03}, et ses résultats s'accompagnent d'une colonne de
+probabilité\releve{REL-IPP.R12}. Un système qui offre de chercher un patient par similarité admet
+que la recherche exacte ne suffit pas. Le rapport de la Cour des comptes le confirme de l'extérieur,
+relevant l'attribution de plusieurs identifiants au même patient et recommandant l'enregistrement de
+la pièce d'identité \cite{s20}.
+
+\textbf{Ce que l'indicateur démontre.} Le tableau de bord calcule le taux de renseignement de chaque
+colonne de chaque table, le taux de mise en quarantaine, le nombre de groupes de patients partageant
+exactement les mêmes valeurs d'identité, et le nombre de grappes formées par le rapprochement
+probabiliste. Il démontre que la complétude se mesure colonne par colonne et que l'ampleur du
+doublon se chiffre. Le classement des champs par complétude est en revanche
+imposé\convention{complétude-par-champ}, et — contrairement aux trois recommandations précédentes —
+\textbf{aucune source extérieure ne vient l'établir}. C'est la recommandation la moins appuyée du
+chapitre, et il vaut mieux l'écrire que le taire.
+
+\textbf{L'action, en deux temps.} D'abord établir quels champs sont facultatifs, par relevé du
+paramétrage du système ou à défaut par mesure de la complétude réelle sur un extrait ; puis rendre
+obligatoires ceux qui portent l'identité et le contact. Ensuite, déplacer le contrôle de doublon :
+le rapprochement doit s'exécuter au moment où l'identifiant est créé, et non après coup sur un
+fichier déjà pollué.
+
+\textbf{Ce qu'elle suppose.} Pour le second temps, presque rien : la fonction existe déjà dans le
+produit installé, sous la forme de la recherche pondérée relevée à l'écran. Ce qui manque n'est pas
+l'outil mais son insertion dans le geste d'accueil — la recherche doit être obligatoire avant
+création, non facultative après.
+
+\textbf{L'effet attendu et sa mesure.} On attend une baisse du nombre de groupes d'identité formés
+par collision exacte, et une hausse du taux de renseignement des champs rendus obligatoires. Les deux
+mesures existent, et la seconde vérifie la première : un champ rendu obligatoire mais renseigné par
+une valeur de remplissage se verrait à la complétude sans améliorer le rapprochement.
+
+\section{Sur les indicateurs que le système ne permet pas de produire}
+
+\textbf{Cette recommandation ne dépend d'aucune donnée générée}, et c'est la seule du chapitre dans
+ce cas. Elle porte sur des champs absents, fait qui ne se lit pas dans des valeurs mais dans une
+confrontation entre ce que la statistique nationale attend d'un hôpital nommé et ce que la chaîne
+peut calculer.
+
+\textbf{Le constat.} Le recueil statistique national publie, pour chaque établissement nommé, une
+liste précise d'indicateurs \cite{s30}. Trois d'entre eux ne sont pas calculables, et pour chacun le
+champ manquant se nomme.
+
+\begin{center}
+\begin{tabular}{@{}p{4.4cm}p{4.6cm}p{5.0cm}@{}}
+\toprule
+Indicateur attendu & Champ manquant & Ce qu'il débloquerait \\
+\midrule
+Capacité litière existante & une table de structure de l'établissement, portant les lits installés & la distinction entre lits installés et lits en service, et le suivi de son évolution \\
+\addlinespace
+Consultations par médecin & un référentiel des médecins affectés & le rapport de l'activité à l'effectif, seul indicateur de productivité que la nomenclature attende \\
+\addlinespace
+Accouchements & un marqueur d'accouchement sur le séjour & le décompte des accouchements, et le taux de césarienne s'il devenait pertinent \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\footnotesize Les trois indicateurs attendus par la statistique nationale que la chaîne ne peut pas
+produire, et le champ dont l'absence l'en empêche.
+\end{center}
+
+\medskip
+
+\textbf{Une distinction gouverne ce tableau et doit être respectée.} Un indicateur non calculable
+faute de champ est un défaut du système d'information, et il appelle une recommandation. Un
+indicateur sans objet pour ce site est une propriété de l'établissement, et il n'appelle aucun
+reproche au logiciel : les interventions chirurgicales et le taux de césarienne relèvent de cette
+seconde catégorie, l'établissement n'exerçant pas d'activité chirurgicale. Confondre les deux
+reprocherait au produit une absence de champ là où c'est l'hôpital qui n'a pas l'activité.
+
+\textbf{L'action.} Ajouter les trois champs, en commençant par le référentiel des médecins, dont
+dépend le seul indicateur de productivité attendu.
+
+\textbf{Ce qu'elle suppose.} Une intervention sur le paramétrage du produit ou une demande à
+l'éditeur, selon que les champs existent et ne sont pas alimentés ou qu'ils n'existent pas — ce que
+l'observation conduite ici ne permet pas de trancher.
+
+\textbf{L'effet attendu et sa mesure.} On attend que les trois indicateurs deviennent calculables,
+et l'effet se constate sans ambiguïté : la valeur existe ou elle n'existe pas. La confrontation entre
+la nomenclature attendue et ce que la chaîne produit, déjà conduite une fois, se refait à l'identique
+et donne la réponse.

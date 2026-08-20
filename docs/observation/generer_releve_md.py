@@ -50,6 +50,30 @@ def rendre_ecran(ecran: dict) -> list[str]:
     return lignes
 
 
+def rendre_non_employes(groupes: list[dict]) -> list[str]:
+    """Les champs relevés que rien n'emploie, et le motif de leur non-emploi.
+
+    Sans cette section, le rendu serait incomplet au regard de sa source : la clé existe dans le
+    relevé depuis que le sens manquant de la traçabilité a été écrit, et le rendu ne la portait pas.
+    """
+    lignes = ["## Champs non employés", ""]
+    total = sum(len(groupe["champs"]) for groupe in groupes)
+    lignes.append(
+        f"{total} champ(s) qu'aucune entrée du registre des champs n'invoque et qu'aucun chapitre "
+        "du rapport ne cite. Chacun porte le motif de son groupe."
+    )
+    lignes.append("")
+    for groupe in groupes:
+        lignes.append(f"**Motif.** {' '.join(groupe['motif'].split())}")
+        lignes.append("")
+        lignes.append("| id |")
+        lignes.append("|---|")
+        for identifiant in groupe["champs"]:
+            lignes.append(f"| {identifiant} |")
+        lignes.append("")
+    return lignes
+
+
 def main() -> None:
     with SOURCE.open(encoding="utf-8") as f:
         data = yaml.safe_load(f)
@@ -64,6 +88,10 @@ def main() -> None:
     ]
     for ecran in data["ecrans"]:
         lignes.extend(rendre_ecran(ecran))
+
+    groupes = data.get("champs_non_employes")
+    if groupes:
+        lignes.extend(rendre_non_employes(groupes))
 
     CIBLE.write_text("\n".join(lignes).rstrip("\n") + "\n", encoding="utf-8")
 
