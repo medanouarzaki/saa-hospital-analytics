@@ -316,12 +316,6 @@ jobs:
       # la fournit plus tôt, et l'ordre des étapes la rend ici explicite.
       - run: uv run pytest tests/test_documentation_couches_aval.py -v
 
-      # Les commandes du registre des chiffres, exécutées SANS comparer leurs valeurs. L'exécuteur
-      # génère une fenêtre de trois mois là où le registre est mesuré sur la période entière : aucune
-      # comparaison de valeurs n'y a de sens, et une comparaison rougirait toujours. Ce que ce mode
-      # prouve, et c'est déjà beaucoup, est qu'aucune commande n'a été cassée par une évolution du
-      # schéma. Mesuré : 1,1 seconde pour les soixante commandes.
-      - run: uv run python3 docs/chiffres/mesurer.py --formes
 
       - run: uv run pytest tests/test_dim_patient.py -v
 
@@ -347,6 +341,17 @@ jobs:
       - run: uv run python -m linkage.evaluation
 
       - run: uv run pytest tests/test_linkage_evaluation.py -v
+
+      # Les commandes du registre des chiffres, exécutées SANS comparer leurs valeurs. L'exécuteur
+      # génère une fenêtre de trois mois là où le registre est mesuré sur la période entière : aucune
+      # comparaison de valeurs n'y a de sens, et une comparaison rougirait toujours. Ce que ce mode
+      # prouve, et c'est déjà beaucoup, est qu'aucune commande n'a été cassée par une évolution du
+      # schéma.
+      #
+      # PLACÉ ICI, ET PAS PLUS TÔT : le registre lit maintenant linkage.grappes_identite et
+      # linkage.evaluation, que l'étape ci-dessus est la première à peupler. Mesuré — placé après la
+      # construction dimensionnelle seulement, ce contrôle échouait sur une table encore vide.
+      - run: uv run python3 docs/chiffres/mesurer.py --formes
 
       # Aucune étape de chaîne ne doit modifier un fichier SUIVI. `git diff --exit-code` « exits
       # with 1 if there were differences and 0 means no differences » (aide de la version

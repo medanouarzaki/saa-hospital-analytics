@@ -736,7 +736,8 @@ chiffres:
   valeur: 996
   unite: paires
   type: python
-  commande: len(yaml.safe_load((R/'generator/output/scenario_30/verite_terrain.yml').read_text(encoding='utf-8'))['doublons']['paires'])
+  commande: len(yaml.safe_load(Path(__import__('os').environ.get('VERITE_TERRAIN_PATIENTS',
+    str(R/'generator/output/scenario_30/verite_terrain.yml'))).read_text(encoding='utf-8'))['doublons']['paires'])
   portee: periode-entiere
   note: Paires de doublons INJECTÉES par le générateur, avant tout chargement. Population de référence
     avant filtrage par la quarantaine.
