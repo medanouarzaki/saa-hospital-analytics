@@ -39,6 +39,11 @@ RENDU = RACINE / "report" / "chiffres.tex"
 # de composition, qui est celui que `\addplot table` reçoit tel quel.
 RACINE_SERIES = RACINE / "report"
 
+# Les deux séparateurs de colonnes admis, repris du rendu qui écrit ces fichiers. Le nom est
+# déclaré au registre ; l'écrire ici en clair plutôt que le lire ferait diverger le contrôle du
+# rendu au premier séparateur ajouté, et c'est pourquoi la table est confrontée par mutation.
+SEPARATEURS = {"virgule": ",", "tabulation": "\t"}
+
 # Un commentaire LaTeX s'ouvre sur un pourcentage non échappé.
 _COMMENTAIRE = re.compile(r"(?<!\\)(?:\\\\)*%")
 
@@ -417,7 +422,7 @@ def test_le_fichier_de_donnees_est_celui_que_la_commande_produit() -> None:
             continue
         texte = chemin.read_text(encoding="utf-8")
         lignes = texte.rstrip("\n").split("\n")
-        entete = lignes[0].split(",")
+        entete = lignes[0].split(SEPARATEURS[serie.get("separateur", "virgule")])
         if entete != list(serie["colonnes"]):
             fautes.append(
                 f"{serie['id']} : l'en-tête du fichier est {entete}, "

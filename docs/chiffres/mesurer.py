@@ -62,6 +62,13 @@ _MODIFICATION = re.compile(
 TYPES_ATTENDUS = {
     "lignes": int,
     "tables": int,
+    "pages": int,
+    "indicateurs": int,
+    "graphiques": int,
+    "lectures": int,
+    "rubriques": int,
+    "octets": int,
+    "secondes": float,
     "colonnes": int,
     "paramètres": int,
     "fichiers": int,
@@ -130,12 +137,24 @@ def connexion() -> psycopg.Connection:
     )
 
 
-def rendre_serie(colonnes: list[str], lignes: list[tuple]) -> str:
+# Les deux séparateurs de colonnes admis, nommés plutôt qu'écrits. La virgule est celle de toutes
+# les séries de mesures ; la tabulation existe pour les séries dont les cellules sont du TEXTE, où
+# une virgule et un point-virgule se rencontrent tous deux à l'intérieur d'une cellule. Le nom est
+# déclaré au registre, lu par le rendu et par le contrôle, et repris en clair dans la source de
+# composition — trois endroits, une seule décision.
+SEPARATEURS = {"virgule": ",", "tabulation": "\t"}
+
+
+def separateur_de(serie: dict) -> str:
+    return SEPARATEURS[serie.get("separateur", "virgule")]
+
+
+def rendre_serie(colonnes: list[str], lignes: list[tuple], separateur: str = ",") -> str:
     """Le texte EXACT du fichier de données. Une seule fonction le produit, et c'est elle dont
     l'empreinte fait foi : le rendu ne peut donc pas diverger entre l'écriture et la vérification.
     """
-    sortie = [",".join(colonnes)]
-    sortie.extend(",".join(str(valeur) for valeur in ligne) for ligne in lignes)
+    sortie = [separateur.join(colonnes)]
+    sortie.extend(separateur.join(str(valeur) for valeur in ligne) for ligne in lignes)
     return "\n".join(sortie) + "\n"
 
 
@@ -144,11 +163,25 @@ def empreinte(texte: str) -> str:
 
 
 def executer_series(series: list[dict], curseur) -> dict[str, tuple[list[str], list[tuple]]]:
+    """Les deux types de commande, comme pour les scalaires — l'asymétrie n'avait pas de motif.
+
+    UNE COMMANDE `sql` NOMME SES COLONNES, UNE COMMANDE `python` NE LE PEUT PAS. La première rend
+    des noms de colonnes que le serveur porte, et le registre les confronte à ce qu'il déclare ;
+    la seconde rend une liste de lignes, et les colonnes viennent alors de la déclaration seule.
+    Ce que `--formes` peut prouver diffère donc selon le type, et le dire ici évite de croire que
+    les deux sont contrôlés pareil : sur une série `python`, c'est la LARGEUR de chaque ligne qui
+    est confrontée au nombre de colonnes déclarées, faute de noms à comparer.
+    """
+    espace = {"yaml": yaml, "R": RACINE, "Path": Path}
     obtenues = {}
     for serie in series:
-        curseur.execute(serie["commande"])
-        lignes = curseur.fetchall()
-        colonnes = [description.name for description in curseur.description]
+        if serie["type"] == "sql":
+            curseur.execute(serie["commande"])
+            lignes = curseur.fetchall()
+            colonnes = [description.name for description in curseur.description]
+        else:
+            lignes = [tuple(ligne) for ligne in eval(serie["commande"], espace)]  # noqa: S307
+            colonnes = list(serie["colonnes"])
         obtenues[serie["id"]] = (colonnes, lignes)
     return obtenues
 
@@ -224,7 +257,7 @@ def main(arguments: list[str] | None = None) -> int:
                 colonnes, lignes = series_obtenues[serie["id"]]
                 cible = RACINE_SERIES / serie["fichier"]
                 cible.parent.mkdir(parents=True, exist_ok=True)
-                texte = rendre_serie(colonnes, lignes)
+                texte = rendre_serie(colonnes, lignes, separateur_de(serie))
                 cible.write_text(texte, encoding="utf-8")
                 print(f"{serie['id']} : {len(lignes)} ligne(s), empreinte {empreinte(texte)}")
             return 0
@@ -260,13 +293,21 @@ def main(arguments: list[str] | None = None) -> int:
                 )
         for serie in series:
             colonnes, lignes = series_obtenues[serie["id"]]
-            if colonnes != list(serie["colonnes"]):
+            attendues = list(serie["colonnes"])
+            if colonnes != attendues:
                 fautes.append(
                     f"{serie['id']} : la commande rend les colonnes {colonnes}, "
-                    f"{list(serie['colonnes'])} déclarées au registre"
+                    f"{attendues} déclarées au registre"
                 )
             elif not lignes:
                 fautes.append(f"{serie['id']} : la commande ne rend aucune ligne")
+            else:
+                largeurs = {len(ligne) for ligne in lignes}
+                if largeurs != {len(attendues)}:
+                    fautes.append(
+                        f"{serie['id']} : lignes de largeur {sorted(largeurs)}, "
+                        f"{len(attendues)} colonne(s) déclarée(s)"
+                    )
         for ligne in fautes:
             print(ligne)
         print(
@@ -282,7 +323,7 @@ def main(arguments: list[str] | None = None) -> int:
             ecarts.append(f"{entree['id']} : consigné {consignee}, mesuré {obtenue}")
     for serie in series:
         colonnes, lignes = series_obtenues[serie["id"]]
-        obtenue = empreinte(rendre_serie(colonnes, lignes))
+        obtenue = empreinte(rendre_serie(colonnes, lignes, separateur_de(serie)))
         if obtenue != serie["empreinte"]:
             ecarts.append(
                 f"{serie['id']} : le fichier que la commande produit a pour empreinte {obtenue}, "
