@@ -1,0 +1,554 @@
+# Registre des chiffres — un nombre du rapport par entrée, une entrée par nombre
+#
+# Règle de preuve. AUCUN NOMBRE N'EST TAPÉ DANS LE RAPPORT. Chaque valeur qu'un
+# chapitre affirme vit ici, avec la commande exacte qui la produit, et le texte
+# l'appelle par son identifiant. Un nombre écrit en clair dans une source du
+# rapport est un nombre que plus rien ne rattache à une mesure.
+#
+# Le motif est mesuré et non théorique : cinq valeurs ont circulé dans les
+# documents de ce projet sans être rattachées à une commande, et les cinq
+# étaient fausses ou périmées — un total de lignes décrivant une génération
+# écrasée, un décompte de personnes confondu avec un décompte d'identifiants,
+# un mot recouvrant deux grandeurs différentes, un décompte de paramètres
+# dépassé, et un taux d'occupation qu'aucun artefact ne portait.
+#
+# Champs de chaque entrée :
+#   id        identifiant employé par le rapport, en minuscules et tirets ;
+#   valeur    la valeur consignée, telle que la commande l'a rendue ;
+#   unite     l'unité ou le format d'affichage ;
+#   type      `sql` ou `python` — comment la commande s'exécute ;
+#   commande  la commande EXACTE, reproductible telle quelle ;
+#   portee    `periode-entiere`, `releve-2024` ou `independant-des-donnees` ;
+#   note      facultative, et obligatoire quand deux entrées peuvent être confondues.
+#
+# ANCRAGE. Le registre s'ancre sur les DONNÉES, non sur un horodatage de
+# constitution : c'est l'état de la base auquel les valeurs correspondent, et
+# c'est ce qu'une remesure compare d'abord. Un ancrage qui diffère invalide
+# toutes les entrées de portée `periode-entiere` sans qu'aucune soit fausse.
+#
+# CE QUE L'INTÉGRATION CONTINUE NE PEUT PAS PROUVER. L'exécuteur génère une
+# fenêtre de trois mois ; ces valeurs sont mesurées sur la période entière.
+# Aucune comparaison de valeurs n'y est possible. Voir docs/chiffres/mesurer.py
+# et l'enregistrement de décision correspondant.
+
+ancrage:
+- objet: source.patients
+  lignes: 29107
+  commande: select count(*) from source.patients
+- objet: quarantaine.patients
+  lignes: 64
+  commande: select count(*) from quarantaine.patients
+- objet: marts.dim_patient
+  lignes: 29107
+  commande: select count(*) from marts.dim_patient
+- objet: marts.dim_patient courantes
+  lignes: 25842
+  commande: select count(*) from marts.dim_patient where est_courante
+- objet: marts.fct_sejour
+  lignes: 2980
+  commande: select count(*) from marts.fct_sejour
+- objet: marts.fct_rendez_vous
+  lignes: 14169
+  commande: select count(*) from marts.fct_rendez_vous
+- objet: marts.fct_passage_urgence
+  lignes: 27360
+  commande: select count(*) from marts.fct_passage_urgence
+chiffres:
+- id: source-patients-lignes
+  valeur: 29107
+  unite: lignes
+  type: sql
+  commande: select count(*) from source.patients
+  portee: periode-entiere
+- id: source-rendez-vous-lignes
+  valeur: 14169
+  unite: lignes
+  type: sql
+  commande: select count(*) from source.rendez_vous
+  portee: periode-entiere
+- id: source-passages-lignes
+  valeur: 40650
+  unite: lignes
+  type: sql
+  commande: select count(*) from source.passages
+  portee: periode-entiere
+- id: source-passages-urgences-lignes
+  valeur: 27360
+  unite: lignes
+  type: sql
+  commande: select count(*) from source.passages_urgences
+  portee: periode-entiere
+- id: source-mouvements-lignes
+  valeur: 6310
+  unite: lignes
+  type: sql
+  commande: select count(*) from source.mouvements
+  portee: periode-entiere
+- id: source-prises-en-charge-lignes
+  valeur: 16430
+  unite: lignes
+  type: sql
+  commande: select count(*) from source.prises_en_charge
+  portee: periode-entiere
+- id: source-factures-lignes
+  valeur: 21066
+  unite: lignes
+  type: sql
+  commande: select count(*) from source.factures
+  portee: periode-entiere
+- id: source-lignes-facture-lignes
+  valeur: 160936
+  unite: lignes
+  type: sql
+  commande: select count(*) from source.lignes_facture
+  portee: periode-entiere
+- id: source-encaissements-lignes
+  valeur: 23231
+  unite: lignes
+  type: sql
+  commande: select count(*) from source.encaissements
+  portee: periode-entiere
+- id: source-creances-lignes
+  valeur: 5876
+  unite: lignes
+  type: sql
+  commande: select count(*) from source.creances
+  portee: periode-entiere
+- id: source-relances-lignes
+  valeur: 1014
+  unite: lignes
+  type: sql
+  commande: select count(*) from source.relances
+  portee: periode-entiere
+- id: source-lignes-total
+  valeur: 346149
+  unite: lignes
+  type: sql
+  commande: select sum(n)::bigint from (select count(*) as n from source.patients union all select count(*)
+    from source.rendez_vous union all select count(*) from source.passages union all select count(*) from
+    source.passages_urgences union all select count(*) from source.mouvements union all select count(*)
+    from source.prises_en_charge union all select count(*) from source.factures union all select count(*)
+    from source.lignes_facture union all select count(*) from source.encaissements union all select count(*)
+    from source.creances union all select count(*) from source.relances) t
+  portee: periode-entiere
+- id: source-tables
+  valeur: 11
+  unite: tables
+  type: sql
+  commande: select count(*) from information_schema.tables where table_schema='source' and table_type='BASE
+    TABLE'
+  portee: periode-entiere
+- id: quarantaine-patients-lignes
+  valeur: 64
+  unite: lignes
+  type: sql
+  commande: select count(*) from quarantaine.patients
+  portee: periode-entiere
+- id: quarantaine-rendez-vous-lignes
+  valeur: 42
+  unite: lignes
+  type: sql
+  commande: select count(*) from quarantaine.rendez_vous
+  portee: periode-entiere
+- id: quarantaine-lignes-total
+  valeur: 106
+  unite: lignes
+  type: sql
+  commande: select sum(n)::bigint from (select count(*) as n from quarantaine.patients union all select
+    count(*) from quarantaine.rendez_vous) t
+  portee: periode-entiere
+  note: Les neuf autres tables de quarantaine sont vides ; la somme porte sur les deux qui ne le sont
+    pas.
+- id: colonnes-source-registre
+  valeur: 175
+  unite: colonnes
+  type: python
+  commande: len(yaml.safe_load((R/'docs/champs/registre_champs.yml').read_text(encoding='utf-8')))
+  portee: independant-des-donnees
+- id: colonnes-source-obs
+  valeur: 81
+  unite: colonnes
+  type: python
+  commande: sum(1 for e in yaml.safe_load((R/'docs/champs/registre_champs.yml').read_text(encoding='utf-8'))
+    if e['provenance']=='OBS')
+  portee: independant-des-donnees
+- id: colonnes-source-doc
+  valeur: 72
+  unite: colonnes
+  type: python
+  commande: sum(1 for e in yaml.safe_load((R/'docs/champs/registre_champs.yml').read_text(encoding='utf-8'))
+    if e['provenance']=='DOC')
+  portee: independant-des-donnees
+- id: colonnes-source-hyp
+  valeur: 22
+  unite: colonnes
+  type: python
+  commande: sum(1 for e in yaml.safe_load((R/'docs/champs/registre_champs.yml').read_text(encoding='utf-8'))
+    if e['provenance']=='HYP')
+  portee: independant-des-donnees
+- id: colonnes-source-catalogue
+  valeur: 175
+  unite: colonnes
+  type: sql
+  commande: select count(*) from information_schema.columns where table_schema='source'
+  portee: periode-entiere
+- id: colonnes-source-catalogue-obs
+  valeur: 81
+  unite: colonnes
+  type: sql
+  commande: select count(*) from information_schema.columns c join pg_class p on p.relname=c.table_name
+    join pg_namespace n on n.oid=p.relnamespace and n.nspname=c.table_schema join pg_description d on
+    d.objoid=p.oid and d.objsubid=c.ordinal_position where c.table_schema='source' and d.description like
+    'provenance=OBS;%'
+  portee: periode-entiere
+- id: colonnes-source-catalogue-doc
+  valeur: 72
+  unite: colonnes
+  type: sql
+  commande: select count(*) from information_schema.columns c join pg_class p on p.relname=c.table_name
+    join pg_namespace n on n.oid=p.relnamespace and n.nspname=c.table_schema join pg_description d on
+    d.objoid=p.oid and d.objsubid=c.ordinal_position where c.table_schema='source' and d.description like
+    'provenance=DOC;%'
+  portee: periode-entiere
+- id: colonnes-source-catalogue-hyp
+  valeur: 22
+  unite: colonnes
+  type: sql
+  commande: select count(*) from information_schema.columns c join pg_class p on p.relname=c.table_name
+    join pg_namespace n on n.oid=p.relnamespace and n.nspname=c.table_schema join pg_description d on
+    d.objoid=p.oid and d.objsubid=c.ordinal_position where c.table_schema='source' and d.description like
+    'provenance=HYP;%'
+  portee: periode-entiere
+- id: colonnes-aval-total
+  valeur: 398
+  unite: colonnes
+  type: sql
+  commande: select count(*) from information_schema.columns c join information_schema.tables t on t.table_schema=c.table_schema
+    and t.table_name=c.table_name where c.table_schema in ('intermediate','marts')
+  portee: periode-entiere
+  note: 'Colonnes des couches aval : ce sont celles que le registre de provenance NE COUVRE PAS.'
+- id: colonnes-aval-decrites
+  valeur: 398
+  unite: colonnes
+  type: sql
+  commande: select count(*) from information_schema.columns c join information_schema.tables t on t.table_schema=c.table_schema
+    and t.table_name=c.table_name where c.table_schema in ('intermediate','marts')
+  portee: periode-entiere
+  note: 'MEME ENSEMBLE que colonnes-aval-total, décrit autrement : colonnes documentées dans les fichiers
+    de propriétés de la couche de transformation. Deux identifiants parce que le texte dit deux choses
+    différentes du même ensemble.'
+- id: colonnes-intermediate
+  valeur: 175
+  unite: colonnes
+  type: sql
+  commande: select count(*) from information_schema.columns c join information_schema.tables t on t.table_schema=c.table_schema
+    and t.table_name=c.table_name where c.table_schema='intermediate'
+  portee: periode-entiere
+- id: colonnes-marts
+  valeur: 223
+  unite: colonnes
+  type: sql
+  commande: select count(*) from information_schema.columns c join information_schema.tables t on t.table_schema=c.table_schema
+    and t.table_name=c.table_name where c.table_schema='marts'
+  portee: periode-entiere
+- id: parametres-total
+  valeur: 256
+  unite: paramètres
+  type: python
+  commande: sum(len(yaml.safe_load(f.read_text(encoding='utf-8')).get('parametres',[])) for f in sorted((R/'generator/config').glob('*.yml')))
+  portee: independant-des-donnees
+- id: parametres-fichiers
+  valeur: 25
+  unite: fichiers
+  type: python
+  commande: len(list((R/'generator/config').glob('*.yml')))
+  portee: independant-des-donnees
+- id: parametres-obs
+  valeur: 5
+  unite: paramètres
+  type: python
+  commande: sum(1 for f in sorted((R/'generator/config').glob('*.yml')) for p in yaml.safe_load(f.read_text(encoding='utf-8')).get('parametres',[])
+    if p.get('provenance')=='OBS')
+  portee: independant-des-donnees
+- id: parametres-doc
+  valeur: 52
+  unite: paramètres
+  type: python
+  commande: sum(1 for f in sorted((R/'generator/config').glob('*.yml')) for p in yaml.safe_load(f.read_text(encoding='utf-8')).get('parametres',[])
+    if p.get('provenance')=='DOC')
+  portee: independant-des-donnees
+- id: parametres-hyp
+  valeur: 199
+  unite: paramètres
+  type: python
+  commande: sum(1 for f in sorted((R/'generator/config').glob('*.yml')) for p in yaml.safe_load(f.read_text(encoding='utf-8')).get('parametres',[])
+    if p.get('provenance')=='HYP')
+  portee: independant-des-donnees
+- id: capacite-fonctionnelle
+  valeur: 40
+  unite: lits
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/volumetrie.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''capacite_litiere_fonctionnelle''][0]'
+  portee: releve-2024
+- id: journees-2024
+  valeur: 7851
+  unite: journées
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/volumetrie.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''journees_hospitalisation''][0]'
+  portee: releve-2024
+- id: admissions-2024
+  valeur: 1197
+  unite: séjours
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/volumetrie.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''admissions_annuelles''][0]'
+  portee: releve-2024
+- id: consultations-2024
+  valeur: 4142
+  unite: consultations
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/volumetrie.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''consultations_specialisees_externes''][0]'
+  portee: releve-2024
+- id: prelevements-2024
+  valeur: 9625
+  unite: prélèvements
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/volumetrie.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''prelevements_laboratoire''][0]'
+  portee: releve-2024
+- id: examens-2024
+  valeur: 49597
+  unite: examens
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/volumetrie.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''examens_laboratoire_total''][0]'
+  portee: releve-2024
+- id: interventions-2024
+  valeur: 0
+  unite: interventions
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/volumetrie.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''interventions_chirurgicales''][0]'
+  portee: releve-2024
+- id: tom-publie
+  valeur: 53.8
+  unite: '%'
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/volumetrie.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''tom_publie''][0]'
+  portee: releve-2024
+- id: dms-publie
+  valeur: 6.6
+  unite: jours (moyenne)
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/volumetrie.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''dms_publie''][0]'
+  portee: releve-2024
+- id: periode-jours
+  valeur: 912
+  unite: jours
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/periode.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''nombre_jours_periode''][0]'
+  portee: periode-entiere
+- id: periode-debut
+  valeur: '2024-01-01'
+  unite: date
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/periode.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''date_debut''][0]'
+  portee: periode-entiere
+- id: periode-fin
+  valeur: '2026-06-30'
+  unite: date
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/periode.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''date_fin''][0]'
+  portee: periode-entiere
+- id: sejours-produits
+  valeur: 2980
+  unite: séjours
+  type: sql
+  commande: select count(*) from marts.fct_sejour
+  portee: periode-entiere
+- id: consultations-produites
+  valeur: 10310
+  unite: consultations
+  type: sql
+  commande: select count(*) from marts.fct_passage where type_passage='C'
+  portee: periode-entiere
+- id: passages-urgences-produits
+  valeur: 27360
+  unite: passages
+  type: sql
+  commande: select count(*) from marts.fct_passage_urgence
+  portee: periode-entiere
+- id: patients-produits
+  valeur: 29107
+  unite: fiches
+  type: sql
+  commande: select count(*) from source.patients
+  portee: periode-entiere
+- id: personnes-distinctes
+  valeur: 25842
+  unite: personnes
+  type: sql
+  commande: select count(*) from marts.dim_patient where est_courante
+  portee: periode-entiere
+  note: 'Personnes en version courante. À NE PAS CONFONDRE avec le décompte de fiches produites : une
+    personne peut porter plusieurs fiches.'
+- id: urgences-scenario-retenu
+  valeur: 30
+  unite: passages/jour
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/volumetrie.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''passages_urgences_par_jour''][0]'
+  portee: independant-des-donnees
+- id: urgences-borne-basse
+  valeur: 14
+  unite: passages/jour
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/volumetrie.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''scenarios_passages_urgences''][0][0]'
+  portee: independant-des-donnees
+- id: urgences-scenario-median
+  valeur: 30
+  unite: passages/jour
+  motif_non_emploi: >-
+    Le scénario médian de la fourchette et le scénario retenu portent la même valeur, et le rapport
+    n'emploie que `urgences-scenario-retenu`. L'entrée est conservée parce qu'elle mesure une autre
+    grandeur — le deuxième élément de la liste des trois scénarios — et que leur coïncidence
+    cesserait si la fourchette changeait.
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/volumetrie.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''scenarios_passages_urgences''][0][1]'
+  portee: independant-des-donnees
+- id: urgences-borne-haute
+  valeur: 54
+  unite: passages/jour
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/volumetrie.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''scenarios_passages_urgences''][0][2]'
+  portee: independant-des-donnees
+- id: defaut-taux-doublons
+  valeur: 0.04
+  unite: proportion
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/defauts.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''taux_doublons''][0]'
+  portee: independant-des-donnees
+- id: defaut-dates-aberrantes
+  valeur: 0.003
+  unite: proportion
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/defauts.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''taux_dates_aberrantes''][0]'
+  portee: independant-des-donnees
+- id: defaut-ages-incoherents
+  valeur: 0.005
+  unite: proportion
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/defauts.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''taux_ages_incoherents''][0]'
+  portee: independant-des-donnees
+- id: defaut-rdv-doublon-creneau
+  valeur: 0.012
+  unite: proportion
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/defauts.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''taux_rdv_doublon_creneau''][0]'
+  portee: independant-des-donnees
+- id: defaut-factures-sans-pec
+  valeur: 0.03
+  unite: proportion
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/defauts.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''taux_factures_sans_pec''][0]'
+  portee: independant-des-donnees
+- id: defaut-familles
+  valeur: 13
+  unite: familles
+  type: python
+  commande: len(yaml.safe_load((R/'generator/config/defauts.yml').read_text(encoding='utf-8'))['parametres'])
+  portee: independant-des-donnees
+- id: part-sexe-masculin
+  valeur: 0.497
+  unite: proportion
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/demographie.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''repartition_sexe''][0][''M'']'
+  portee: independant-des-donnees
+- id: part-urbain
+  valeur: 0.639
+  unite: proportion
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/demographie.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''repartition_residence''][0][''environnement''][''U'']'
+  portee: independant-des-donnees
+- id: part-sans-couverture
+  valeur: 0.2
+  unite: proportion
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/demographie.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''repartition_couverture''][0][''SANS'']'
+  portee: independant-des-donnees
+- id: part-couverture-principale
+  valeur: 0.5
+  unite: proportion
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/demographie.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''repartition_couverture''][0][''00116'']'
+  portee: independant-des-donnees
+- id: tranches-age
+  valeur: 6
+  unite: tranches
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/demographie.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''structure_age''][0][''tranches''].__len__()'
+  portee: independant-des-donnees
+- id: niveaux-tri
+  valeur: 5
+  unite: niveaux
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/urgences.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''repartition_niveaux_tri''][0].__len__()'
+  portee: independant-des-donnees
+- id: part-tri-niveau-4
+  valeur: 0.41
+  unite: proportion
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/urgences.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''repartition_niveaux_tri''][0][''4'']'
+  portee: independant-des-donnees
+- id: part-tri-niveau-5
+  valeur: 0.22
+  unite: proportion
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/urgences.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''repartition_niveaux_tri''][0][''5'']'
+  portee: independant-des-donnees
+- id: part-sejours-depuis-urgences
+  valeur: 0.57
+  unite: proportion
+  type: python
+  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/urgences.yml'').read_text(encoding=''utf-8''))[''parametres'']
+    if p[''nom'']==''part_sejours_provenant_urgences''][0]'
+  portee: independant-des-donnees
+- id: mouvements-lits-distincts
+  valeur: 40
+  unite: lits
+  type: sql
+  commande: select count(distinct lit) from source.mouvements where lit is not null and lit <> ''
+  portee: periode-entiere
+  note: 'Plancher mesuré de la capacité : un lit fonctionnel n''ayant accueilli aucun patient resterait
+    invisible. À ne pas confondre avec capacite-fonctionnelle, qui est relevée.'
+- id: factures-avec-creance
+  valeur: 5486
+  unite: factures
+  type: sql
+  commande: select count(distinct f.n_facture) from source.factures f join source.creances c on c.n_facture
+    = f.n_facture
+  portee: periode-entiere

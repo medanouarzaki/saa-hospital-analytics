@@ -92,6 +92,12 @@ jobs:
       # deux fichiers et n'ouvre aucune base : sa place est ici.
       - run: uv run pytest tests/test_releve_markdown_synchrone.py -v
 
+      # Le registre des chiffres, confronté au rapport et à son rendu. Ce contrôle n'ouvre aucune base :
+      # il vérifie que chaque nombre appelé existe, que chaque entrée sert ou porte son motif, et que le
+      # rendu correspond au registre. Que les valeurs soient celles que les commandes rendent relève de
+      # `docs/chiffres/mesurer.py --verifier`, qui exige la période entière.
+      - run: uv run pytest tests/test_registre_des_chiffres.py -v
+
   tests-matrice:
     runs-on: ubuntu-latest
     strategy:
@@ -309,6 +315,13 @@ jobs:
       # existent. C'est l'étape ci-dessus qui l'établit — aucun autre emplacement de la chaîne ne
       # la fournit plus tôt, et l'ordre des étapes la rend ici explicite.
       - run: uv run pytest tests/test_documentation_couches_aval.py -v
+
+      # Les commandes du registre des chiffres, exécutées SANS comparer leurs valeurs. L'exécuteur
+      # génère une fenêtre de trois mois là où le registre est mesuré sur la période entière : aucune
+      # comparaison de valeurs n'y a de sens, et une comparaison rougirait toujours. Ce que ce mode
+      # prouve, et c'est déjà beaucoup, est qu'aucune commande n'a été cassée par une évolution du
+      # schéma. Mesuré : 1,1 seconde pour les soixante commandes.
+      - run: uv run python3 docs/chiffres/mesurer.py --formes
 
       - run: uv run pytest tests/test_dim_patient.py -v
 
