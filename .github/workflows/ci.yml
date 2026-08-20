@@ -104,6 +104,12 @@ jobs:
       # sources du rapport, et non dans un emplacement qui démarre un service.
       - run: uv run pytest tests/test_correspondance_relations_conclusions.py -v
 
+      # L'annonce du plan, dans l'introduction générale, confrontée aux chapitres qui existent —
+      # dans les deux sens. La structure est lue DANS LES FICHIERS et non dans le sommaire composé,
+      # précisément pour que ce contrôle s'exécute ici, sur un clone frais et sans distribution
+      # typographique, plutôt que dans le travail qui compile.
+      - run: uv run pytest tests/test_annonce_du_plan.py -v
+
   tests-matrice:
     runs-on: ubuntu-latest
     strategy:
