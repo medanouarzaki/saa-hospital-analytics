@@ -1,0 +1,75 @@
+% Fichier principal du rapport.
+%
+% Moteur : pdflatex, par latexmk. Le choix est mesuré et consigné à
+% docs/decisions/ : babel en français et les polices Latin Modern sont présents
+% dans toute distribution complète, là où xelatex et lualatex exigeraient des
+% polices du système, qui diffèrent entre la machine de développement et
+% l'exécuteur d'intégration continue. La compilation qui fait foi est celle de
+% l'intégration continue.
+%
+% Aucun contenu n'est rédigé dans ce fichier : il n'assemble.
+
+\documentclass[12pt,a4paper]{report}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[french]{babel}
+\usepackage{csquotes}
+
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{microtype}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{fancyhdr}
+
+\usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
+\addbibresource{biblio.bib}
+
+\usepackage[hidelinks]{hyperref}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\leftmark}
+\fancyfoot[C]{\thepage}
+
+\input{marqueurs}
+
+\begin{document}
+
+\input{liminaires/page-de-garde}
+
+\pagenumbering{roman}
+\input{liminaires/remerciements}
+\input{liminaires/resume}
+
+\tableofcontents
+
+\cleardoublepage
+\pagenumbering{arabic}
+
+\input{chapitres/introduction}
+
+\input{chapitres/organisme-d-accueil}
+\input{chapitres/systeme-d-information-hospitalier}
+\input{chapitres/demarche-et-organisation}
+\input{chapitres/conception-du-jeu-de-donnees}
+\input{chapitres/architecture-de-la-chaine}
+\input{chapitres/qualite-et-rapprochement}
+\input{chapitres/analyse-de-l-activite}
+\input{chapitres/tableau-de-bord}
+\input{chapitres/limites-et-perspectives}
+
+\input{chapitres/conclusion}
+
+% Toutes les entrées du registre des sources figurent à la bibliographie, qu'elles
+% soient citées ou non : le fichier bibliographique est produit depuis ce registre,
+% et une entrée qui y figure est une source du projet. C'est aussi ce qui rend la
+% chaîne bibliographique vérifiable dès le squelette — sans cela, un fichier
+% bibliographique cassé passerait inaperçu jusqu'à la première citation.
+\nocite{*}
+\printbibliography[heading=bibintoc,title={Bibliographie}]
+
+\input{annexes}
+
+\end{document}

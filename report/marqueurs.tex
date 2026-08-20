@@ -1,0 +1,59 @@
+% Les marqueurs nominatifs du rapport, et le seul endroit du dépôt où un nom de
+% personne peut figurer. Tout autre fichier les emploie par leur commande, jamais
+% en écrivant la valeur.
+%
+% Un marqueur laissé vide fait échouer un contrôle : c'est la propriété que le
+% critère de terminaison du projet exige, et tests/test_marqueurs_nominatifs.py
+% la vérifie sur CE fichier, jamais sur le PDF produit.
+%
+% Renseigner une valeur, c'est écrire entre les accolades de la commande. Ne pas
+% renommer les commandes : le contrôle les cherche par leur nom.
+
+% --- l'état du document -------------------------------------------------------
+% Deux valeurs, et deux seulement.
+%
+%   brouillon : le rapport n'est pas remis. Les cinq marqueurs nominatifs
+%               ci-dessous sont TOUS vides, et la page de garde porte une mention
+%               visible de version de travail.
+%   remise    : le rapport est remis. Les cinq marqueurs sont TOUS renseignés, et
+%               la mention disparaît.
+%
+% Un contrôle vérifie l'accord entre cet état et les cinq marqueurs : renseigner
+% quatre marqueurs sur cinq est rouge dans les deux états, et c'est l'oubli qui
+% arrive. Passer à la remise ne coûte que ce mot — et le contrôle dira alors quel
+% marqueur manque encore.
+\newcommand{\etatDuDocument}{brouillon}
+
+% --- marqueurs nominatifs : ils portent un nom de personne ---------------------
+\newcommand{\marqueurAuteur}{}
+\newcommand{\marqueurEncadrantAcademique}{}
+\newcommand{\marqueurEncadrantProfessionnel}{}
+\newcommand{\marqueurPresidentJury}{}
+\newcommand{\marqueurExaminateur}{}
+
+% --- marqueurs de contexte : ils ne portent aucun nom de personne --------------
+% Le contrôle ne les exige pas renseignés ; ils sont ici pour que la page de
+% garde n'écrive aucune valeur en dur.
+\newcommand{\marqueurEtablissementFormation}{}
+\newcommand{\marqueurFiliere}{}
+\newcommand{\marqueurAnneeUniversitaire}{}
+\newcommand{\marqueurOrganismeAccueil}{Hôpital Sidi Saïd, Meknès}
+\newcommand{\marqueurDateSoutenance}{}
+
+% --- ce que l'état fait porter au document ------------------------------------
+% Le mécanisme est typographique : le document se suffit, et ne dépend d'aucun
+% contrôle pour dire ce qu'il est. `\siBrouillon{...}` compose son argument en
+% état de brouillon, et rien en état de remise.
+%
+% La comparaison passe par \ifx sur deux commandes développées : c'est la forme
+% que le noyau offre sans paquet supplémentaire, et elle compare les définitions
+% caractère pour caractère.
+\newcommand{\etatBrouillonAttendu}{brouillon}
+\newcommand{\siBrouillon}[1]{%
+  \ifx\etatDuDocument\etatBrouillonAttendu#1\fi%
+}
+
+% La mention elle-même, écrite une fois et employée par les deux documents.
+\newcommand{\mentionVersionDeTravail}{%
+  \siBrouillon{\textbf{Version de travail} — document non remis}%
+}
