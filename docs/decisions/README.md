@@ -96,3 +96,4 @@ chaque exécution.
 | [0080](0080-la-redaction-personnelle-de-la-premiere-tranche.md) | Quatre paragraphes de rédaction personnelle, et un cinquième qui ne peut pas s'écrire |
 | [0081](0081-la-forme-du-document-et-du-depot.md) | La forme du document et du dépôt, et ce qu'un silence de commande cachait |
 | [0082](0082-la-reecriture-des-chapitres-4-a-9.md) | La réécriture des six derniers chapitres, et deux portées qui suivent la matière |
+| [0083](0083-la-page-de-garde-et-les-trois-pages-liminaires.md) | La page de garde reçoit une hiérarchie, et les trois pages liminaires sont écrites |
