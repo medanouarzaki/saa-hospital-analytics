@@ -1,0 +1,131 @@
+% Les emplacements d'image du rapport, et les seules commandes par lesquelles une
+% image entre dans le document.
+%
+% DEUX FAMILLES D'IMAGE SONT ADMISES, ET DEUX SEULEMENT : le logotype de
+% l'établissement de formation, et les captures du tableau de bord PRODUIT PAR CE
+% PROJET. Toute image du système d'information observé reste interdite, sans
+% exception — c'est la décision `0010`, que rien ici n'assouplit.
+% `tests/test_aucune_image.py` tient la propriété sur les fichiers suivis : seuls
+% `report/figures/logos/` et `report/figures/tableau-de-bord/` la portent.
+%
+% LA PLACE EST RÉSERVÉE MAINTENANT ET REMPLIE PLUS TARD. Chaque commande teste
+% l'existence du fichier attendu. S'il existe, elle l'inclut. S'il n'existe pas,
+% elle compose un cadre de la MÊME hauteur ou de la même largeur déclarée, portant
+% la légende et la mention « à insérer ». Le document compose donc à tous les
+% stades, et la pagination ne bouge presque pas à l'insertion — c'est tout
+% l'intérêt du mécanisme, et une commande qui composerait un cadre d'une autre
+% taille que l'image finale l'annulerait.
+%
+% L'ÉCART RÉSIDUEL EST MESURÉ, PAS SUPPOSÉ, ET LA MESURE A CORRIGÉ LE CODE. Le
+% cadre est posé avec `\fboxsep` nul et aligné PAR LE BAS — `\parbox[b]`, comme
+% `\includegraphics`, dont la ligne de base est le bas de l'image. Un premier
+% essai alignait le cadre sur son centre (`\parbox[c]`) : un document témoin
+% composé avec puis sans l'image montrait alors la ligne suivante déplacée de
+% 3,304 pt. Avec l'alignement par le bas, la même mesure donne 0,395 pt — la seule
+% épaisseur du trait inférieur du cadre, soit 0,047 % de la hauteur utile d'une
+% page A4. Un emplacement rempli déplace donc le texte qui le suit d'un vingtième
+% de ligne, et la pagination ne bouge pas.
+%
+% La mesure : composer un document portant `\captureTdb` et un mot repérable
+% après lui, relever `yMin` de ce mot par `pdftotext -bbox`, avec le fichier image
+% en place puis retiré. Les deux relevés sont au rapport de ce lot.
+
+% Le trait du cadre d'attente, et l'absence de marge intérieure. Les deux sont
+% posés localement par chaque commande, jamais globalement : `\fbox` sert ailleurs
+% dans le document — la mention de version de travail en porte un — et lui retirer
+% sa marge partout changerait cette mention-là aussi.
+\newcommand{\cadreDAttenteReglages}{\setlength{\fboxsep}{0pt}\setlength{\fboxrule}{0.4pt}}
+
+% Deux longueurs de travail. Les dimensions ne se calculent pas par juxtaposition
+% dans un argument de macro : `4#1` avec `#1` valant `2.2cm` donnerait `42.2cm`, et
+% `0.625#2` produirait une dimension inexistante. Le calcul passe donc par
+% `\setlength`, qui admet un facteur devant une longueur.
+\newlength{\largeurEmplacement}
+\newlength{\hauteurEmplacement}
+
+% Un cadre d'attente de dimensions imposées. La largeur et la hauteur sont celles
+% que l'image occupera ; le texte est centré dans les deux sens et n'influe pas
+% sur la boîte, `\parbox[c][hauteur][c]` fixant la hauteur indépendamment de son
+% contenu.
+\newcommand{\cadreDAttente}[3]{%
+  {\cadreDAttenteReglages%
+   \fbox{\parbox[b][#2][c]{#1}{\centering\footnotesize\itshape #3\par}}}%
+}
+
+% ------------------------------------------------------------------------------
+% Le logotype de l'établissement de formation.
+%
+%   \logoEcole{hauteur}
+%
+% Le fichier attendu est `figures/logos/ecole.pdf`, ou à défaut
+% `figures/logos/ecole.png` — les deux formats que `pdflatex` inclut sans
+% conversion. Le chemin est relatif au répertoire de composition, comme celui
+% qu'une série passe à `\addplot table`.
+%
+% La largeur du cadre d'attente est fixée à quatre fois la hauteur demandée : un
+% logotype d'école est ordinairement plus large que haut, et c'est la seule
+% grandeur que l'appel ne déclare pas. L'écart de largeur ne déplace rien
+% verticalement — le logotype est seul sur sa ligne, centré —, si bien que la
+% pagination ne dépend que de la hauteur, qui, elle, est déclarée et respectée.
+\newcommand{\logoEcole}[1]{%
+  \IfFileExists{figures/logos/ecole.pdf}{%
+    \includegraphics[height=#1]{figures/logos/ecole.pdf}%
+  }{%
+    \IfFileExists{figures/logos/ecole.png}{%
+      \includegraphics[height=#1]{figures/logos/ecole.png}%
+    }{%
+      \setlength{\hauteurEmplacement}{#1}%
+      \setlength{\largeurEmplacement}{4\hauteurEmplacement}%
+      \cadreDAttente{\largeurEmplacement}{\hauteurEmplacement}{logotype de l'école\\à insérer}%
+    }%
+  }%
+}
+
+% ------------------------------------------------------------------------------
+% Une capture du tableau de bord produit par ce projet.
+%
+%   \captureTdb{fichier}{largeur}{légende}{label}
+%
+% `fichier` est le nom seul, sans répertoire ni extension : la commande le cherche
+% sous `figures/tableau-de-bord/`, en `.png` puis en `.pdf`. Écrire le répertoire à
+% chaque appel l'exposerait à diverger du préfixe que le contrôle tolère.
+%
+% LA HAUTEUR RÉSERVÉE VIENT DE LA LARGEUR, PAR UN RAPPORT ÉCRIT ICI. Une capture
+% n'a pas de hauteur déclarée à l'appel, et le cadre d'attente doit pourtant en
+% avoir une. Le rapport retenu est 16:10, celui d'une fenêtre de navigateur large,
+% et c'est le rapport dans lequel les captures DOIVENT être prises pour que la
+% pagination ne bouge pas. C'est le point aveugle du mécanisme, et il est écrit
+% plutôt que découvert : une capture d'un autre rapport se compose correctement,
+% mais déplace ce qui la suit.
+\newcommand{\rapportHauteurCapture}{0.625}
+
+% La numérotation. Le rapport ne porte aujourd'hui aucun environnement flottant et
+% aucune `\caption` ; un `\label` posé sans compteur renverrait à la section
+% courante, ce qui ferait mentir tout `\ref`. Un compteur propre est donc déclaré,
+% et `\refstepcounter` en fait la cible du `\label` qui suit.
+\newcounter{capturetdb}
+\renewcommand{\thecapturetdb}{\arabic{capturetdb}}
+
+\newcommand{\legendeCapture}[2]{%
+  \begin{center}%
+    \footnotesize Figure~\thecapturetdb~— #1\label{#2}%
+  \end{center}%
+}
+
+\newcommand{\captureTdb}[4]{%
+  \refstepcounter{capturetdb}%
+  \begin{center}%
+    \IfFileExists{figures/tableau-de-bord/#1.png}{%
+      \includegraphics[width=#2]{figures/tableau-de-bord/#1.png}%
+    }{%
+      \IfFileExists{figures/tableau-de-bord/#1.pdf}{%
+        \includegraphics[width=#2]{figures/tableau-de-bord/#1.pdf}%
+      }{%
+        \setlength{\largeurEmplacement}{#2}%
+        \setlength{\hauteurEmplacement}{\rapportHauteurCapture\largeurEmplacement}%
+        \cadreDAttente{\largeurEmplacement}{\hauteurEmplacement}{#3\\capture à insérer}%
+      }%
+    }%
+  \end{center}%
+  \legendeCapture{#3}{#4}%
+}
