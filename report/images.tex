@@ -53,32 +53,96 @@
 }
 
 % ------------------------------------------------------------------------------
-% Le logotype de l'établissement de formation.
+% LES DEUX LOGOTYPES INSTITUTIONNELS.
 %
-%   \logoEcole{hauteur}
+%   \logosInstitutionnels
 %
-% Le fichier attendu est `figures/logos/ecole.pdf`, ou à défaut
-% `figures/logos/ecole.png` — les deux formats que `pdflatex` inclut sans
-% conversion. Le chemin est relatif au répertoire de composition, comme celui
-% qu'une série passe à `\addplot table`.
+% La page de garde en porte DEUX, côte à côte : l'établissement de formation et
+% l'organisme dont il relève. La commande précédente, `\logoEcole{hauteur}`, n'en
+% prenait qu'un et cherchait un fichier `ecole.pdf` ou `ecole.png` qui n'a jamais
+% existé ; elle est remplacée, et non doublée, pour qu'il n'y ait qu'une seule
+% voie par laquelle un logotype entre dans le document.
 %
-% La largeur du cadre d'attente est fixée à quatre fois la hauteur demandée : un
-% logotype d'école est ordinairement plus large que haut, et c'est la seule
-% grandeur que l'appel ne déclare pas. L'écart de largeur ne déplace rien
-% verticalement — le logotype est seul sur sa ligne, centré —, si bien que la
-% pagination ne dépend que de la hauteur, qui, elle, est déclarée et respectée.
-\newcommand{\logoEcole}[1]{%
-  \IfFileExists{figures/logos/ecole.pdf}{%
-    \includegraphics[height=#1]{figures/logos/ecole.pdf}%
-  }{%
-    \IfFileExists{figures/logos/ecole.png}{%
-      \includegraphics[height=#1]{figures/logos/ecole.png}%
+% LES DEUX HAUTEURS NE SONT PAS ÉGALES, ET C'EST MESURÉ. Imposer la même hauteur
+% aux deux ne les équilibre pas : un logotype large et bas paraît plus grand qu'un
+% logotype compact et haut à hauteur égale. L'égalisation porte donc sur la
+% SURFACE OPTIQUE — la surface de la boîte utile, marge transparente exclue.
+%
+%   fichier          dimensions   rapport   boîte utile   marge   encre        hauteur
+%   INSEA-logo.png   1200x1304    0,9202    983x1110      30,3 %  582 421 px   20,0 mm
+%   HCP-logo.png     3790x1088    3,4835    3781x1088      0,2 %  547 086 px   17,2 mm
+%
+% Le calcul : la surface portée à la page vaut la surface en pixels multipliée par
+% le carré de l'échelle, et l'échelle vaut la hauteur déclarée divisée par la
+% hauteur du fichier. Égaliser donne un rapport d'échelles égal à la racine du
+% rapport des surfaces, et le rapport des hauteurs s'en déduit en multipliant par
+% le rapport des hauteurs en pixels.
+%
+% DEUX SURFACES SONT CANDIDATES, ET ELLES NE DONNENT PAS LE MÊME RÉSULTAT. La
+% boîte utile donne un rapport de hauteurs de 2,3267, donc 8,6 mm pour le second
+% logotype ; l'encre — le nombre de pixels réellement opaques — donne 1,1616, donc
+% 17,2 mm. L'écart tient à ceci : la boîte utile de l'INSEA est couverte à 53,4 %,
+% celle du HCP à 13,3 % seulement, parce que ce second logotype est un mot écrit
+% en fin, largement étalé, quand le premier est une marque pleine. La boîte utile
+% créditait donc le HCP d'une surface qu'il n'occupe pas.
+%
+% LA MESURE À L'ENCRE EST RETENUE, ET LE RENDU L'A TRANCHÉE. La page composée avec
+% 8,6 mm a été regardée en image : le second logotype y paraissait nettement plus
+% faible que le premier, et sa ligne « Haut-Commissariat au Plan » n'était plus
+% lisible. À 17,2 mm les deux marques pèsent le même poids à l'œil et les deux
+% textes se lisent. C'est la surface d'encre qui mesure la présence optique, pas
+% le rectangle qui l'entoure.
+%
+% LES DEUX SONT ALIGNÉS SUR LEUR LIGNE MÉDIANE, jamais sur leur base : deux
+% logotypes de hauteurs différentes alignés par le bas paraissent décalés.
+% `\raisebox{-0.5\height}` pose chaque boîte à cheval sur la ligne de base, si
+% bien que les deux milieux se retrouvent à la même hauteur. L'encombrement
+% vertical de la ligne reste celui du plus grand des deux, et il ne dépend pas de
+% la présence des fichiers : les cadres d'attente ont les mêmes dimensions.
+%
+% CENTRER LES BOÎTES NE CENTRE PAS L'ENCRE, et la mesure l'a montré. Le fichier de
+% l'INSEA porte 51 pixels de marge transparente en haut et 143 en bas : son encre
+% est donc plus haute que le centre de sa boîte de 46 pixels, soit 0,706 mm à la
+% hauteur déclarée. Le fichier du HCP, lui, n'a aucune marge verticale. Les deux
+% boîtes alignées, les deux encres l'étaient à 0,76 mm près — relevé sur l'image du
+% PDF, et cohérent avec le calcul. Chaque logotype porte donc une CORRECTION,
+% mesurée sur son fichier, qui ramène sa ligne médiane d'encre sur la ligne de
+% base. La correction s'applique au `\raisebox` extérieur, donc aussi bien à
+% l'image qu'à son cadre d'attente.
+\newcommand{\hauteurLogoEtablissement}{20mm}
+\newcommand{\hauteurLogoTutelle}{17.2mm}
+\newcommand{\ecartEntreLogos}{16mm}
+
+% Un logotype, ou son cadre d'attente aux mêmes dimensions.
+%
+%   \unLogo{base du nom}{hauteur}{rapport largeur/hauteur}{correction}{légende}
+%
+% Le rapport est celui du FICHIER, mesuré sur lui, et non une valeur commode : il
+% ne sert qu'au cadre d'attente, dont la largeur doit être celle qu'occupera
+% l'image pour que retirer un fichier ne déplace rien, ni verticalement ni
+% horizontalement. La correction est la longueur dont il faut descendre la boîte
+% pour que sa médiane d'encre tombe sur la ligne de base ; elle vaut zéro pour un
+% fichier sans marge transparente.
+\newcommand{\unLogo}[5]{%
+  \raisebox{\dimexpr-0.5\height-#4\relax}{%
+    \IfFileExists{figures/logos/#1.pdf}{%
+      \includegraphics[height=#2]{figures/logos/#1.pdf}%
     }{%
-      \setlength{\hauteurEmplacement}{#1}%
-      \setlength{\largeurEmplacement}{4\hauteurEmplacement}%
-      \cadreDAttente{\largeurEmplacement}{\hauteurEmplacement}{logotype de l'école\\à insérer}%
+      \IfFileExists{figures/logos/#1.png}{%
+        \includegraphics[height=#2]{figures/logos/#1.png}%
+      }{%
+        \setlength{\hauteurEmplacement}{#2}%
+        \setlength{\largeurEmplacement}{#3\hauteurEmplacement}%
+        \cadreDAttente{\largeurEmplacement}{\hauteurEmplacement}{#5\\à insérer}%
+      }%
     }%
   }%
+}
+
+\newcommand{\logosInstitutionnels}{%
+  \unLogo{INSEA-logo}{\hauteurLogoEtablissement}{0.9202}{0.706mm}{logotype de l'établissement}%
+  \hspace{\ecartEntreLogos}%
+  \unLogo{HCP-logo}{\hauteurLogoTutelle}{3.4835}{0mm}{logotype de la tutelle}%
 }
 
 % ------------------------------------------------------------------------------
@@ -90,14 +154,36 @@
 % sous `figures/tableau-de-bord/`, en `.png` puis en `.pdf`. Écrire le répertoire à
 % chaque appel l'exposerait à diverger du préfixe que le contrôle tolère.
 %
-% LA HAUTEUR RÉSERVÉE VIENT DE LA LARGEUR, PAR UN RAPPORT ÉCRIT ICI. Une capture
-% n'a pas de hauteur déclarée à l'appel, et le cadre d'attente doit pourtant en
-% avoir une. Le rapport retenu est 16:10, celui d'une fenêtre de navigateur large,
-% et c'est le rapport dans lequel les captures DOIVENT être prises pour que la
-% pagination ne bouge pas. C'est le point aveugle du mécanisme, et il est écrit
-% plutôt que découvert : une capture d'un autre rapport se compose correctement,
-% mais déplace ce qui la suit.
+% LA HAUTEUR RÉSERVÉE VIENT DE LA LARGEUR, PAR UN RAPPORT DÉCLARÉ PAR CAPTURE.
+% Une capture n'a pas de hauteur déclarée à l'appel, et le cadre d'attente doit
+% pourtant en avoir une. Un premier état retenait un rapport UNIQUE de 16:10 pour
+% toutes les captures, en écrivant que c'était le point aveugle du mécanisme :
+% « une capture d'un autre rapport se compose correctement, mais déplace ce qui la
+% suit ». Les trois captures déposées ont démenti la supposition — 2,456, 1,973 et
+% 1,964 au lieu de 1,600 —, et le rapport unique réservait donc de 1,7 à 3,2 cm de
+% trop pour chacune. Le rapport est désormais DÉCLARÉ POUR CHAQUE FICHIER, mesuré
+% sur le fichier lui-même ; la valeur unique ne subsiste que comme défaut, pour une
+% capture non encore déposée et donc non encore mesurable.
+%
+% La déclaration est ici, dans le fichier qui tient les images, et non aux appels :
+% c'est une propriété du fichier image, pas du texte qui l'appelle.
 \newcommand{\rapportHauteurCapture}{0.625}
+
+\newcommand{\declarerCapture}[2]{%
+  \expandafter\gdef\csname rapportCapture@#1\endcsname{#2}%
+}
+\newcommand{\rapportDeLaCapture}[1]{%
+  \ifcsname rapportCapture@#1\endcsname
+    \csname rapportCapture@#1\endcsname
+  \else
+    \rapportHauteurCapture
+  \fi
+}
+
+% Hauteur divisée par largeur, en pixels, de chaque fichier déposé.
+\declarerCapture{page-activite}{0.40724}%  1374/3374
+\declarerCapture{page-donnees}{0.50680}%   1714/3382
+\declarerCapture{page-sejours}{0.50918}%   1720/3378
 
 % La numérotation. Le rapport ne porte aujourd'hui aucun environnement flottant et
 % aucune `\caption` ; un `\label` posé sans compteur renverrait à la section
@@ -112,17 +198,26 @@
   \end{center}%
 }
 
+% L'IMAGE EST POSÉE DANS LA BOÎTE RÉSERVÉE, ET NON À CÔTÉ. La boîte a la hauteur
+% déclarée pour ce fichier ; l'image y entre bornée en largeur ET en hauteur, à
+% rapport conservé. Un fichier dont le rapport dériverait de sa déclaration ne
+% déborderait donc pas de la réservation : il y laisserait un peu de blanc. C'est
+% ce qui rend la pagination indépendante de la présence du fichier, au lieu de la
+% faire dépendre d'une supposition écrite ailleurs.
 \newcommand{\captureTdb}[4]{%
   \refstepcounter{capturetdb}%
+  \setlength{\largeurEmplacement}{#2}%
+  \edef\facteurDeLaCapture{\rapportDeLaCapture{#1}}%
+  \setlength{\hauteurEmplacement}{\facteurDeLaCapture\largeurEmplacement}%
   \begin{center}%
     \IfFileExists{figures/tableau-de-bord/#1.png}{%
-      \includegraphics[width=#2]{figures/tableau-de-bord/#1.png}%
+      \parbox[b][\hauteurEmplacement][c]{\largeurEmplacement}{\centering%
+        \includegraphics[width=\largeurEmplacement,height=\hauteurEmplacement,keepaspectratio]{figures/tableau-de-bord/#1.png}}%
     }{%
       \IfFileExists{figures/tableau-de-bord/#1.pdf}{%
-        \includegraphics[width=#2]{figures/tableau-de-bord/#1.pdf}%
+        \parbox[b][\hauteurEmplacement][c]{\largeurEmplacement}{\centering%
+          \includegraphics[width=\largeurEmplacement,height=\hauteurEmplacement,keepaspectratio]{figures/tableau-de-bord/#1.pdf}}%
       }{%
-        \setlength{\largeurEmplacement}{#2}%
-        \setlength{\hauteurEmplacement}{\rapportHauteurCapture\largeurEmplacement}%
         \cadreDAttente{\largeurEmplacement}{\hauteurEmplacement}{#3\\capture à insérer}%
       }%
     }%
