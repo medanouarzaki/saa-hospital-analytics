@@ -81,8 +81,16 @@ def identifiants_du_registre() -> set[str]:
     return {e["id"] for e in entrees()}
 
 
+# Les fichiers d'annexe qui portent des appels de chiffre. La portée suit la matière : le tableau
+# de correspondance est descendu en annexe avec les trente identifiants qu'il appelle, et sans
+# cette liste ils cesseraient d'être vus. Aucun n'est aujourd'hui exclusif à l'annexe — le
+# décompte des identifiants couverts est identique avant et après le déplacement — mais un
+# identifiant qui le deviendrait serait signalé comme inemployé, donc rouge.
+ANNEXES = ("correspondance_relations.tex",)
+
+
 def fichiers_de_chapitre() -> list[Path]:
-    return sorted(CHAPITRES.glob("*.tex"))
+    return sorted(CHAPITRES.glob("*.tex")) + [RACINE_SERIES / nom for nom in ANNEXES]
 
 
 def appels(source: str) -> set[str]:

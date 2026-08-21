@@ -95,3 +95,4 @@ chaque exécution.
 | [0079](0079-la-reecriture-de-l-encadrement-et-des-trois-premiers-chapitres.md) | La réécriture de l'encadrement, et ce qu'un budget de pages ne commande pas |
 | [0080](0080-la-redaction-personnelle-de-la-premiere-tranche.md) | Quatre paragraphes de rédaction personnelle, et un cinquième qui ne peut pas s'écrire |
 | [0081](0081-la-forme-du-document-et-du-depot.md) | La forme du document et du dépôt, et ce qu'un silence de commande cachait |
+| [0082](0082-la-reecriture-des-chapitres-4-a-9.md) | La réécriture des six derniers chapitres, et deux portées qui suivent la matière |

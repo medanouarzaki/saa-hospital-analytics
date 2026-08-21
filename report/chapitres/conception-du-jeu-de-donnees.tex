@@ -25,14 +25,17 @@
 
 \section{Modèle conceptuel}
 
-Le domaine se ramène à une poignée d'entités et à leurs relations. Une \emph{personne} reçoit un ou
-plusieurs \emph{identifiants patient} — c'est le point où naît le problème d'identité que le
-chapitre~\ref{chap:qualite} traite. À un identifiant se rattachent des \emph{épisodes de soin}, de
-trois familles : la consultation externe, le passage aux urgences et le séjour hospitalier. Un
-épisode donne lieu à une \emph{prise en charge} par un organisme d'assurance, à une \emph{facture},
-et, si celle-ci n'est pas soldée, à une \emph{créance} puis à des \emph{relances}. Le séjour se
-décompose en \emph{mouvements} — admission, mutations internes, sortie. Le rendez-vous, enfin, est
-une entité distincte de l'épisode : il précède la consultation, et il peut ne jamais aboutir.
+Le domaine se ramène à une poignée d'entités. Une \emph{personne} reçoit un ou plusieurs
+\emph{identifiants patient} — c'est là que naît le problème d'identité du
+chapitre~\ref{chap:qualite}.
+
+À un identifiant se rattachent des \emph{épisodes de soin} de trois familles : consultation
+externe, passage aux urgences, séjour hospitalier. Un épisode donne lieu à une \emph{prise en
+charge} par un organisme, à une \emph{facture}, et, si elle n'est pas soldée, à une \emph{créance}
+puis à des \emph{relances}.
+
+Le séjour se décompose en \emph{mouvements} — admission, mutations, sortie. Le rendez-vous est une
+entité distincte de l'épisode : il précède la consultation, et il peut ne jamais aboutir.
 
 Trois traits de ce modèle commandent tout le reste.
 
@@ -274,26 +277,19 @@ retenue : un lit n'ayant accueilli aucun patient resterait invisible, et \textbf
 plancher, pas une capacité.}
 
 \textbf{L'absence d'activité chirurgicale, démontrée.} Le chapitre~\ref{chap:organisme} l'énonce et
-renvoie ici pour sa démonstration. Le recueil statistique porte, pour cet établissement,
-\chiffre{interventions-2024} intervention chirurgicale — et l'affirmation repose sur une
-\emph{absence de ligne} et non sur un zéro imprimé, ce qui demande trois vérifications.
+renvoie ici. Le recueil statistique porte \chiffre{interventions-2024} intervention chirurgicale
+pour cet établissement, et l'affirmation repose sur une \emph{absence de ligne} plutôt que sur un
+zéro imprimé.
 
-La première est une \textbf{recherche exhaustive de dénomination} : le nom de l'établissement a été
-cherché sans distinction de casse sur le texte intégral des deux éditions du recueil, et les trois
-occurrences connues ont été retrouvées aux tableaux qui le mentionnent. Aucune n'existe dans
-l'emprise du tableau des interventions, balayée page par page, variantes de graphie comprises.
+Trois vérifications la soutiennent. Le nom de l'établissement, cherché sans distinction de casse sur
+le texte intégral des deux éditions, ne figure nulle part dans l'emprise du tableau des
+interventions. La somme des lignes visibles de la section provinciale égale exactement le total
+imprimé, ce qui exclut un établissement non listé. Et ces tableaux recensent une activité, non un
+parc d'établissements : y être absent signifie ne pas l'exercer.
 
-La deuxième est un \textbf{contrôle de somme provinciale} : la somme des lignes visibles de la section
-provinciale égale exactement le total imprimé, sur les deux exercices et sur les deux colonnes.
-Aucun établissement non listé ne contribue au total, et l'absence n'est donc pas un artefact
-d'agrégation.
-
-La troisième est une \textbf{cohérence de structure} : la composition des quatre tableaux nominatifs
-varie de l'un à l'autre, un établissement pouvant figurer à l'un et manquer à l'autre. Ces tableaux
-recensent une activité, non un parc d'établissements ; y être absent signifie ne pas l'exercer. Le
-rapport de la Cour des comptes le corrobore de l'extérieur et à huit ans d'écart, décrivant une
-gynéco-obstétrique fonctionnant comme maison d'accouchement, sans gynéco-obstétriciens et en
-l'absence de toute activité chirurgicale, malgré un bloc opératoire équipé \cite{s20}.
+Le rapport de la Cour des comptes le corrobore à huit ans d'écart, décrivant une gynéco-obstétrique
+fonctionnant comme maison d'accouchement, sans gynéco-obstétriciens et sans activité chirurgicale,
+malgré un bloc opératoire équipé \cite{s20}.
 
 \section{Analyse de sensibilité aux passages aux urgences}\label{sec:sensibilite}
 
@@ -364,30 +360,25 @@ Séjours provenant des urgences & \chiffre{part-sejours-depuis-urgences} & \text
 
 \medskip
 
-\textbf{La lecture de ce tableau est celle du décompte de la section précédente} : les distributions
-qui gouvernent l'identité et la couverture sont posées, celles qui gouvernent la gravité des passages
-aux urgences sont documentées. Une conclusion tirée de la pyramide des âges du jeu produit ne dirait
-donc rien du monde ; une conclusion tirée de la répartition par niveau de tri reproduirait une
-échelle publiée, sans davantage prouver qu'elle s'applique ici.
+Les distributions qui gouvernent l'identité et la couverture sont posées ; celles qui gouvernent la
+gravité des passages aux urgences sont documentées.
 
-Une distribution posée n'est pas pour autant arbitraire : elle est choisie plausible, et son effet
-est borné. Une distribution documentée n'est pas transférable pour autant : l'échelle de tri
-employée pour les urgences est française, et rien n'établit qu'un service marocain trie de la même
-façon. \textbf{L'étiquette dit d'où vient la valeur,
-elle ne dit pas qu'elle s'applique.}
+\textbf{L'étiquette dit d'où vient la valeur, elle ne dit pas qu'elle s'applique.} Une conclusion
+tirée de la pyramide des âges ne dirait rien du monde. Une conclusion tirée de la répartition par
+niveau de tri reproduirait une échelle française, sans prouver qu'un service marocain trie de la
+même façon.
 
 Chaque paramètre porte en outre, dans sa configuration, une phrase disant ce qui serait faux si la
-valeur l'était. C'est cette phrase, et non l'étiquette, qui permet de savoir quelle conclusion du
-rapport s'effondrerait — et pour la plupart des paramètres, la réponse est qu'aucune ne
-s'effondrerait, parce que le rapport ne conclut pas sur des valeurs qu'il a posées lui-même.
+valeur l'était.
 
 \section{Défauts injectés et pourquoi}
 
 \textbf{Un jeu de données propre ne permet de démontrer aucun traitement de qualité.} Un
-rapprochement d'identités qui ne trouve rien parce qu'il n'y a rien à trouver ne prouve pas qu'il
-fonctionnerait ; un contrôle d'entrée qui ne rejette aucune ligne ne prouve pas qu'il rejetterait la
-bonne. Les défauts sont donc injectés délibérément, et leur vérité terrain est enregistrée, ce qui
-rend mesurable ce qu'un traitement retrouve.
+rapprochement qui ne trouve rien parce qu'il n'y a rien à trouver ne prouve pas qu'il
+fonctionnerait.
+
+Les défauts sont donc injectés délibérément, et la liste de ceux qui l'ont été est enregistrée. On
+peut alors mesurer ce qu'un traitement retrouve, puisqu'on sait ce qu'il devrait trouver.
 
 \chiffre{defaut-familles} familles de défauts sont injectées. Les principales portent un taux
 explicite : \chiffre{defaut-taux-doublons} pour les doublons d'identité,
@@ -402,15 +393,19 @@ chargement sur \chiffre{source-lignes-total}, soit une part de l'ordre de trois 
 taux est faible, et il doit l'être : un contrôle d'entrée qui rejetterait une ligne sur dix
 signalerait un défaut d'extraction, non un défaut de saisie.
 
-\textbf{Les défauts qui ne se trouvent pas à la quarantaine ne sont pas passés inaperçus.} Ils sont
-ceux qu'un contrôle d'entrée ne peut pas voir, et la distinction est structurante. Une date au
-format invalide se rejette à l'entrée, parce que la ligne ne se convertit pas. Un doublon d'identité
-ne se rejette pas : les deux fiches sont valides, leurs champs sont bien formés, et rien dans la
-ligne prise isolément ne dit qu'une autre ligne désigne la même personne. Sa détection demande de
-comparer les lignes entre elles, ce qui relève du chapitre~\ref{chap:qualite}.
+\textbf{Les défauts absents de la quarantaine ne sont pas passés inaperçus} : ce sont ceux qu'un
+contrôle d'entrée ne peut pas voir.
 
-Cette séparation vaut pour les autres familles. Un âge incohérent avec la date de naissance se voit
-à l'entrée ; un rendez-vous en doublon de créneau ne se voit qu'en confrontant deux lignes ; une
-facture sans prise en charge ne se voit qu'en joignant deux tables. \textbf{Le jeu de données porte
-donc trois classes de défauts — ceux qu'une ligne trahit seule, ceux qu'une comparaison révèle, et
-ceux qu'une jointure découvre — et chaque classe éprouve un traitement différent de la chaîne.}
+Une date au format invalide se rejette à l'entrée, parce que la ligne ne se convertit pas. Un
+doublon d'identité ne se rejette pas : les deux fiches sont valides prises séparément, et rien dans
+l'une ne dit que l'autre désigne la même personne.
+
+\textbf{Le jeu porte donc trois classes de défauts} — ceux qu'une ligne trahit seule, ceux qu'une
+comparaison de deux lignes révèle, et ceux qu'une jointure de deux tables découvre. Chaque classe
+éprouve un traitement différent de la chaîne.
+
+Une quatrième forme échappe aux trois, et le chapitre~\ref{chap:systeme} l'a relevée : un champ
+peut être renseigné et faux. Le numéro de téléphone en est le cas observé — rempli d'un numéro
+inventé lorsque la personne ne connaît pas le sien. Aucun contrôle de forme ne l'attrape, et le
+générateur reproduit cette forme de défaut : une part des numéros produits est syntaxiquement
+valide et ne désigne personne.

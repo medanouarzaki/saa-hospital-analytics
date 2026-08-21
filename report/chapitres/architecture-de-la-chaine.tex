@@ -55,11 +55,13 @@ irreproductible.
 
 La chaîne compte \chiffre{modeles-total} modèles de transformation —
 \chiffre{modeles-intermediate} intermédiaires et \chiffre{modeles-marts} analytiques — et
-\chiffre{taches-graphe} tâches d'orchestration.
+\chiffre{taches-graphe} tâches d'\emph{orchestration}, c'est-à-dire de tâches qu'un ordonnanceur
+déclenche dans un ordre imposé par leurs dépendances.
 
 \textbf{Une sixième étape mérite d'être expliquée, parce qu'elle n'est pas une couche de
 transformation.} Le tableau de bord ne lit pas la couche analytique directement : il lit un schéma
-d'instantané, fait de tables et non de vues. Le motif est mesuré — une reconstruction de la couche
+d'\emph{instantané} — une copie figée et datée de l'état construit —, fait de tables et non de
+vues. Le motif est mesuré — une reconstruction de la couche
 analytique fait disparaître ses vues pendant environ trois dixièmes de seconde, et un lecteur
 concurrent y rencontre une erreur d'objet inexistant, non une attente. Le rafraîchissement construit
 donc des tables neuves sous des noms provisoires, puis échange tous les noms dans \emph{une seule}
@@ -131,7 +133,8 @@ s'échangeraient silencieusement onze fois sur douze sans qu'aucune valeur ne de
 valeur manquante est de même la chaîne vide et jamais l'absence de valeur, ce qui a été mesuré sur
 la base avant d'être écrit dans les macros.
 
-\textbf{Une ligne refusée est mise en quarantaine, jamais supprimée.} Le chargeur applique ses
+\textbf{Une ligne refusée est mise en \emph{quarantaine} — un schéma parallèle où elle est conservée
+avec le motif de son rejet — et jamais supprimée.} Le chargeur applique ses
 contrôles d'entrée, écrit les lignes acceptées dans la couche source et les lignes rejetées dans un
 schéma parallèle, avec le motif du rejet et la partition dont elles proviennent. Sur la période,
 \chiffre{quarantaine-lignes-total} lignes y sont — \chiffre{quarantaine-patients-lignes} fiches
@@ -156,7 +159,9 @@ convertible. Le domaine booléen est exactement composé de deux valeurs et de l
 \section{Modélisation dimensionnelle}
 
 La couche analytique compte \chiffre{modeles-marts} modèles : \chiffre{dimensions} dimensions,
-\chiffre{faits} faits et \chiffre{agregats} agrégats, organisés en étoile.
+\chiffre{faits} faits et \chiffre{agregats} agrégats, organisés en \emph{schéma en étoile} —
+une forme où chaque table d'événements est entourée des tables qui la décrivent, et où toute
+interrogation part du centre pour aller vers les branches.
 
 \begin{center}
 \begin{tabular}{@{}c@{}}
@@ -279,22 +284,25 @@ donne.
 
 \medskip
 
-\textbf{L'idempotence est portée par le chargement, et non par la couche dimensionnelle.} Charger
-une partition commence par supprimer, dans une même transaction, le contenu des deux schémas pour
-cette date, puis insère les lignes acceptées et les lignes rejetées. Recharger le même fichier, ou
-un fichier corrigé, remplace donc exactement le contenu précédent de cette partition — jamais ne
-l'accumule. La propriété est éprouvée par un contrôle qui charge deux fois la même partition et
-compare les décomptes.
+\textbf{Une opération est \emph{idempotente} lorsque la refaire ne change rien : la faire deux fois
+donne le même résultat que la faire une fois.} C'est le chargement qui porte cette propriété ici,
+et non la couche dimensionnelle.
 
-\textbf{Le rattrapage est la conséquence de l'idempotence.} Si une journée manque, la rejouer suffit,
-et l'ordre dans lequel les journées sont chargées est indifférent au résultat. Un second contrôle
-l'établit en chargeant les mêmes partitions dans deux ordres différents et en comparant l'état final.
+Prenons le cas concret. Le fichier du 12 mars a été chargé, puis on s'aperçoit qu'il était
+incomplet ; on le corrige et on le recharge. Le chargement commence par supprimer, dans une même
+transaction, tout ce qui portait la date du 12 mars — dans la couche source comme en quarantaine —
+avant d'insérer. La journée du 12 mars est donc remplacée, jamais dédoublée.
 
-\textbf{Deux tâches manquent volontairement à ce graphe}, et leur absence est une décision. La
-production du schéma et son application à la base n'en font pas partie : ce sont des opérations
-destructrices — les fichiers de définition suppriment leurs tables avant de les recréer — et les
-placer dans un graphe quotidien reviendrait à vider la base chaque nuit. Elles s'exécutent à la
-main, au moment où le modèle change.
+\textbf{Le \emph{rattrapage} en découle : c'est le fait de rejouer une journée manquante sans
+toucher aux autres.} Si les journées du 12, 13 et 14 mars manquent, les charger les rattrape, et
+l'ordre dans lequel on le fait ne change pas l'état final. Deux contrôles l'établissent, l'un en
+chargeant deux fois la même partition, l'autre en chargeant les mêmes partitions dans deux ordres
+différents.
+
+\textbf{Deux tâches manquent volontairement à ce graphe.} La production du schéma et son
+application à la base sont des opérations destructrices — les fichiers de définition suppriment
+leurs tables avant de les recréer — et les placer dans un graphe quotidien reviendrait à vider la
+base chaque nuit. Elles s'exécutent à la main, au moment où le modèle change.
 
 \textbf{La construction des modèles s'exécute sur un seul fil.} Les modèles se lisent les uns les
 autres pendant leur construction, et un parallélisme y produit des lectures d'objets en cours de

@@ -47,12 +47,11 @@ ordre ne justifierait pas un schéma de plus à maintenir.
 concurrent, lisant en boucle pendant une reconstruction complète, a compté
 \chiffre{instantane-erreurs-dimension} lectures en erreur sur
 \chiffre{instantane-lectures-temoin} tentatives contre une dimension simple, et
-\chiffre{instantane-erreurs-completude} sur autant de tentatives contre la vue la plus coûteuse à
-produire. Le message ne dit pas une attente mais une absence : l'objet n'existe plus, pendant
+\chiffre{instantane-erreurs-completude} contre la vue la plus coûteuse à produire.
+
+Le message ne dit pas une attente mais une absence : l'objet n'existe plus, pendant
 \chiffre{instantane-fenetre-dimension} seconde dans le premier cas et
-\chiffre{instantane-fenetre-completude} dans le second. La cause est isolée : la suppression d'une
-vue de sauvegarde emporte en cascade les vues construites au-dessus d'elle. \textbf{Le critère
-retenu est asymétrique} : le nombre d'échecs de lecture tolérés est de
+\chiffre{instantane-fenetre-completude} dans le second. \textbf{Le critère retenu est asymétrique} : le nombre d'échecs de lecture tolérés est de
 \chiffre{tdb-erreurs-lecture-tolerees}, sous toute charge et sans classe d'erreur exceptée, parce
 qu'un utilisateur le subit sans recours ; un échec de substitution, lui, est
 journalisé et relançable, et la transaction qui l'enveloppe laisse l'instantané dans sa génération
@@ -108,6 +107,13 @@ bloc d'indicateur \quad ($\ldots$)\end{minipage}}
 non un écran rempli.
 \end{center}
 
+\medskip
+
+La capture ci-dessous montre cet agencement rempli, sur la page ouverte par défaut.
+
+\captureTdb{page-activite}{0.92\linewidth}{La page \emph{Activité}, première de la section de
+pilotage : le volume d'événements par jour, ventilé par famille}{fig:tdb-activite}
+
 \begin{center}
 \footnotesize
 \pgfplotstabletypeset[
@@ -127,26 +133,21 @@ non un écran rempli.
 d'indicateurs qu'elles portent et le nombre de tracés que leur fichier appelle.
 \end{center}
 
-\textbf{Section de pilotage, et la décision que chaque page sert.} \emph{Activité} dimensionne les
-plages d'ouverture et les effectifs sur la charge observée. \emph{Rendez-vous} ouvre ou ferme des
-créneaux sur les activités dont le délai s'écarte des autres, et sépare l'annulation, qui laisse
-réaffecter le créneau, de l'absence, qui le perd. \emph{Urgences} dimensionne l'accueil et le tri,
-et mesure la part relevant d'une consultation ordinaire, dont dépend l'ouverture d'une filière
-courte. \emph{Séjours} répartit les lits entre unités, repère les dossiers de sortie non clôturés
-avant qu'ils ne faussent les durées, et porte les quatre indicateurs que la statistique nationale
-attend. \emph{Facturation et recouvrement} — la plus chargée, avec
-\chiffre{tdb-page-plus-chargee} indicateurs — détecte les factures dont le total ne s'accorde pas à
-leurs lignes et priorise le recouvrement par ancienneté et par débiteur. \emph{Qualité des données}
-cible l'effort de saisie sur les champs les moins renseignés. \emph{Données}, enfin, est la seule
-sans aucun tracé, et c'est délibéré : les autres répondent à « combien », celle-ci répond à
-« lesquels » — elle donne les lignes derrière les chiffres, pour agir sur des dossiers plutôt que
-sur une moyenne.
+\textbf{Section de pilotage : chaque page sert une décision.} \emph{Activité} dimensionne les
+plages d'ouverture et les effectifs. \emph{Rendez-vous} ouvre ou ferme des créneaux, et sépare
+l'annulation, qui laisse réaffecter le créneau, de l'absence, qui le perd. \emph{Urgences}
+dimensionne l'accueil et le tri. \emph{Séjours} répartit les lits et porte les quatre indicateurs
+que la statistique nationale attend. \emph{Facturation et recouvrement} — la plus chargée, avec
+\chiffre{tdb-page-plus-chargee} indicateurs — priorise le recouvrement par ancienneté et par
+débiteur. \emph{Qualité des données} cible l'effort de saisie sur les champs les moins renseignés.
 
-\textbf{Section d'évaluation de la chaîne, et pourquoi ces pages ne servent aucune décision de
-service.} \emph{Rapprochement d'identités} donne la courbe de précision et de rappel, l'apport du
-rapprochement probabiliste sur une collision exacte, et le seuil effectivement appliqué. Ces trois
-grandeurs décrivent un modèle, non une file d'attente : elles servent à déplacer un seuil ou à
-renoncer à une méthode, décisions qui appartiennent à qui construit la chaîne.
+\emph{Données}, enfin, est la seule sans aucun tracé, et c'est délibéré : les autres répondent à
+« combien », celle-ci répond à « lesquels ».
+
+\textbf{Section d'évaluation de la chaîne : ces pages ne servent aucune décision de service.}
+\emph{Rapprochement d'identités} donne la courbe de précision et de rappel, l'apport du
+rapprochement probabiliste sur une collision exacte, et le seuil appliqué. Ces grandeurs décrivent
+un modèle, non une file d'attente.
 \emph{Provenance et paramètres} porte la part du modèle qui repose sur l'observation et celle qui
 repose sur l'hypothèse, et les deux mesures du croisement entre délai et absentéisme — celle qui
 compare les activités entre elles et celle qui mesure l'écart à l'intérieur de chacune. Ces deux
@@ -192,22 +193,23 @@ est le nom de table, privé de son schéma.
 \section{Guide d'utilisation}
 
 \textbf{Lire un indicateur.} Chaque bloc porte son libellé, sa définition en une phrase, une
-mention de filtrabilité et la source de sa valeur. La mention de filtrabilité n'est pas décorative :
-\chiffre{tdb-filtrabilite-oui} indicateurs se restreignent à une période sans réserve,
-\chiffre{tdb-filtrabilite-sous-reserve} s'y restreignent au moyen d'une date qui n'est pas celle
-qu'un lecteur attendrait — et l'écran dit laquelle et pourquoi —, et
-\chiffre{tdb-filtrabilite-non} ne s'y restreignent pas du tout. Ces derniers portent l'un des trois
-motifs admis : l'objet n'a aucune colonne temporelle, la grandeur est annualisée et la restreindre
-serait méthodologiquement faux, ou la date existe dans une couche que le filtre n'atteint pas.
+mention de filtrabilité et la source de sa valeur.
+
+La filtrabilité n'est pas décorative : \chiffre{tdb-filtrabilite-oui} indicateurs se restreignent à
+une période sans réserve, \chiffre{tdb-filtrabilite-sous-reserve} au moyen d'une date qui n'est pas
+celle qu'un lecteur attendrait, et \chiffre{tdb-filtrabilite-non} pas du tout — l'écran dit alors
+lequel des trois motifs s'applique.
 
 \textbf{Filtrer.} Le filtre de période est porté par la page et non par l'application : une page
 dont aucun indicateur n'est filtrable n'en affiche pas, et le dit. La page des données porte en
 outre des filtres de service et d'activité, et un sélecteur de table.
 
-\textbf{Exporter.} La page des données télécharge la sélection courante en un fichier tabulaire.
-Son format n'est pas redécidé là : il est celui des livrables de la chaîne — séparateur virgule,
-encodage universel avec marque d'ordre d'octets, pour qu'un tableur ouvrant le fichier par
-double-clic n'abîme pas les accents.
+\textbf{Exporter.} La page des données télécharge la sélection courante en un fichier tabulaire, au
+format des livrables de la chaîne : séparateur virgule, encodage universel avec marque d'ordre
+d'octets, pour qu'un tableur ouvrant le fichier par double-clic n'abîme pas les accents.
+
+\captureTdb{page-donnees}{0.92\linewidth}{La page \emph{Données} : les trois filtres, le sélecteur
+de table, le décompte des lignes retenues et le bouton de téléchargement}{fig:tdb-donnees}
 
 \textbf{Le paragraphe qui manque à la plupart des rapports de ce genre.} Un indicateur
 réglementaire affiché a été faux, et longtemps. Le taux de rotation valait
@@ -224,11 +226,10 @@ portait sur la page retranscrivait sa formule et se comparait à elle : une comp
 construction, incapable de départager une formule juste d'une formule fausse. Elle est restée verte
 pendant toute la durée du défaut.
 
-Le contrôle qui a remplacé cette seconde mesure ne retranscrit rien. Il appelle la page, avec ses
-propres paramètres et par son propre point de lecture, et confronte ses quatre sorties à deux
-références qui ne peuvent pas bouger avec elle : les valeurs publiées, lues hors du code, et une
-implémentation écrite séparément dans un autre langage contre un autre schéma. Les quatre valeurs
-affichées valent aujourd'hui \chiffre{tom-affiche}~\% d'occupation contre \chiffre{tom-publie}~\%
+Le contrôle qui a remplacé cette seconde mesure ne retranscrit rien : il appelle la page et
+confronte ses sorties à deux références qui ne peuvent pas bouger avec elle — les valeurs publiées,
+et une implémentation écrite séparément dans un autre langage. Les quatre valeurs affichées valent
+aujourd'hui \chiffre{tom-affiche}~\% d'occupation contre \chiffre{tom-publie}~\%
 publiés, \chiffre{dms-affichee} jours de durée moyenne contre \chiffre{dms-publie},
 \chiffre{rotation-affichee} de rotation contre \chiffre{trot-publie}, et
 \chiffre{irot-affiche} jours d'intervalle contre \chiffre{irot-publie} — les quatre sous la
@@ -247,11 +248,9 @@ liste exacte des indicateurs attendus, et c'est elle qui justifie le contenu du 
 \footnotesize
 \pgfplotstabletypeset[
   col sep=tab, string type,
-  columns/indicateur/.style={column name={Indicateur}, column type={p{3.0cm}}},
-  columns/classement/.style={column name={Classement}, column type={p{3.7cm}}},
-  columns/tables/.style={column name={Tables mobilisées}, column type={p{3.9cm}},
-    string replace*={_}{\textunderscore}},
-  columns/champ/.style={column name={Champ manquant}, column type={p{3.1cm}}},
+  columns={indicateur,classement},
+  columns/indicateur/.style={column name={Rubrique attendue}, column type={p{6.4cm}}},
+  columns/classement/.style={column name={État}, column type={p{6.4cm}}},
   every head row/.style={before row=\toprule, after row=\midrule},
   every last row/.style={after row=\bottomrule},
 ]{\serie{exigences-restitution}}
@@ -259,23 +258,25 @@ liste exacte des indicateurs attendus, et c'est elle qui justifie le contenu du 
 
 \begin{center}
 \footnotesize Les \chiffre{exigences-rubriques} rubriques que la nomenclature nationale attend d'un
-établissement nommé, confrontées à ce que la chaîne produit.
+établissement nommé, et l'état de chacune. Les tables mobilisées et le champ manquant de chaque
+rubrique non calculable figurent au registre des indicateurs.
 \end{center}
 
-\textbf{Trois classements, et la distinction entre les deux derniers est la seule qui compte.}
-\emph{Non calculable faute de champ} désigne un manque du système d'information et fonde une
-recommandation ; \emph{sans objet pour ce site} désigne une activité que l'établissement n'exerce
-pas, et c'est un constat. Les confondre ferait reprocher au logiciel une absence de champ là où
-c'est l'hôpital qui n'a pas l'activité. Le décompte donne \chiffre{exigences-calculables} rubriques
-calculables, \chiffre{exigences-non-calculables} non calculables et
-\chiffre{exigences-sans-objet} sans objet : leur somme vaut quinze et non
-\chiffre{exigences-rubriques}, la rubrique des laboratoires recevant un classement mixte qui
-n'entre dans aucun des trois.
+\medskip
 
-\textbf{Les champs manquants sont au nombre de \chiffre{exigences-champs-manquants}, et la
-correspondance est de un à un.} C'est l'ampleur de l'écart produit qui les départage : le référentiel
-des médecins vient nettement en tête, son absence produisant un écart de
-\chiffre{exigences-ecart-maximal}~\% sur un indicateur par ailleurs calculable au numérateur, là où
-les deux autres rendent le leur simplement absent. L'absence de chacun est vérifiée par deux chemins
-indépendants — le registre des champs et le catalogue de la base — tous deux éprouvés au préalable
-contre des noms de colonnes dont l'existence est certaine.
+\captureTdb{page-sejours}{0.92\linewidth}{La page \emph{Séjours} : les quatre indicateurs
+réglementaires annualisés, chacun affichant la source de sa valeur}{fig:tdb-sejours}
+
+\textbf{Une distinction compte plus que les autres} : \emph{non calculable faute de champ} désigne
+un manque du système d'information et fonde une recommandation ; \emph{sans objet pour ce site}
+désigne une activité que l'établissement n'exerce pas. Les confondre ferait reprocher au logiciel ce
+qui relève de l'hôpital.
+
+Le décompte donne \chiffre{exigences-calculables} rubriques calculables,
+\chiffre{exigences-non-calculables} non calculables et \chiffre{exigences-sans-objet} sans objet ;
+la rubrique des laboratoires reçoit un classement mixte qui n'entre dans aucun des trois.
+
+\textbf{Les champs manquants sont au nombre de \chiffre{exigences-champs-manquants}, et chacun
+bloque une rubrique et une seule.} Le référentiel des médecins vient en tête : son absence produit
+un écart de \chiffre{exigences-ecart-maximal}~\% sur un indicateur par ailleurs calculable au
+numérateur, là où les deux autres rendent le leur simplement absent.
