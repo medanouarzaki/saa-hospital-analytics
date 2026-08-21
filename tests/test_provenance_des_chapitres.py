@@ -74,6 +74,15 @@ ANNEXES_PRINCIPAL = REPORT / "annexes.tex"
 # décision, pas un oubli, et `EXCLUS` la rend visible plutôt que silencieuse.
 ANNEXES = ("releve_des_ecrans.tex",)
 EXCLUS = ("dictionnaire_donnees.tex",)
+
+# Les paragraphes qui relèvent de la rédaction personnelle et que le squelette ne peut pas écrire.
+# Ils sont marqués `\aRediger{...}` dans les sources et composent un cadre VISIBLE à la lecture.
+#
+# CETTE LISTE EST LA PROPRIÉTÉ, PAS UN COMMENTAIRE. Elle est confrontée aux fichiers dans les deux
+# sens : un paragraphe écrit sans être retiré d'ici est rouge, un emplacement ajouté sans être
+# déclaré ici l'est aussi. Elle se vide à mesure que le rapport s'écrit, et le jour où elle est
+# vide, plus aucun paragraphe n'attend.
+EMPLACEMENTS_ATTENDUS = ("apport-personnel",)
 BIBLIO = REPORT / "biblio.bib"
 MARQUEURS = REPORT / "marqueurs.tex"
 SOURCES = RACINE / "docs" / "sources" / "sources.yml"
@@ -364,19 +373,48 @@ def test_toute_entree_citable_est_citee_ou_declaree_non_employee() -> None:
     )
 
 
-def test_aucun_paragraphe_ne_reste_a_rediger() -> None:
-    etat = etat_du_document()
-    restants = []
+def emplacements_a_rediger() -> dict[str, str]:
+    """Les paragraphes encore marqués « à rédiger », par identifiant, avec leur fichier."""
+    trouves: dict[str, str] = {}
     for chemin in fichiers_de_chapitre():
         actif = partie_active(chemin.read_text(encoding="utf-8"))
-        for identifiant in sorted(_A_REDIGER.findall(actif)):
-            restants.append(f"{chemin.name} : « {identifiant} »")
-    if etat != "remise":
-        # Abstention explicite : en brouillon, un paragraphe non encore écrit est normal, et la
-        # marque est visible à la compilation pour que personne ne l'oublie.
-        return
-    assert not restants, "état « remise » : des paragraphes restent à rédiger :\n  " + "\n  ".join(
-        restants
+        for identifiant in _A_REDIGER.findall(actif):
+            trouves[identifiant] = chemin.name
+    return trouves
+
+
+def test_les_emplacements_a_rediger_sont_exactement_ceux_qui_sont_declares() -> None:
+    """Le décompte des paragraphes de rédaction personnelle, dans les deux sens.
+
+    LA PROPRIÉTÉ NE S'ABSTIENT PLUS. Elle était auparavant conditionnée à l'état `remise`, que le
+    fichier des marqueurs ne déclarera jamais : elle ne mordait donc plus jamais, et un
+    emplacement retiré comme un emplacement ajouté passaient tous deux en silence.
+
+    Ce qu'elle vérifie maintenant est plus utile qu'une exigence d'absence : l'ensemble des
+    emplacements restants est celui que `EMPLACEMENTS_ATTENDUS` déclare, ni plus ni moins. Écrire
+    un paragraphe sans retirer son identifiant de la liste est rouge ; en ajouter un sans le
+    déclarer l'est aussi.
+
+    Elle n'exige donc pas que la liste soit vide. Elle exige qu'elle soit VRAIE, et le jour où le
+    dernier paragraphe sera écrit, la liste vidée dira que le rapport est complet de ce côté-là.
+    """
+    portes = emplacements_a_rediger()
+    attendus = set(EMPLACEMENTS_ATTENDUS)
+
+    ecrits = sorted(attendus - set(portes))
+    assert not ecrits, (
+        f"emplacements déclarés attendus et absents des fichiers : {ecrits} — s'ils ont été "
+        "écrits, retirez-les de EMPLACEMENTS_ATTENDUS"
+    )
+
+    surnumeraires = sorted(
+        f"{identifiant} ({fichier})"
+        for identifiant, fichier in portes.items()
+        if identifiant not in attendus
+    )
+    assert not surnumeraires, (
+        f"emplacements « à rédiger » non déclarés : {surnumeraires} — ajoutez-les à "
+        "EMPLACEMENTS_ATTENDUS, ou écrivez le paragraphe"
     )
 
 

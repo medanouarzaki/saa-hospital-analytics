@@ -1,10 +1,11 @@
 % Ce chapitre repose sur :
 %   DOC: s06, s07, s08, s09, s10
-%   OBS: REL-DEM.I01, REL-DEM.I02, REL-DEM.P02, REL-IPP.O01, REL-IPP.O02, REL-IPP.O03, REL-IPP.O04
-%   OBS: REL-IPP.R12, REL-PAT.A01, REL-PAT.D01, REL-PAT.D02, REL-PAT.D03, REL-PAT.D04, REL-PAT.D09
-%   OBS: REL-PAT.D10, REL-PAT.D11, REL-PAT.H06, REL-PAT.H08, REL-PAT.H12, REL-PAT.H14, REL-PAT.H15
-%   OBS: REL-PAT.N01, REL-PAT.N02, REL-RDV.C02, REL-RDV.C07, REL-RDV.C08, REL-RDV.R01, REL-RDV.R02
-%   OBS: REL-RDV.R03, REL-RDV.R08, REL-RDV.R11, REL-RDV.R12
+%   OBS: REL-DEM.I01, REL-DEM.I02, REL-DEM.P02, REL-IPP.O01, REL-IPP.O02, REL-IPP.O03
+%   OBS: REL-IPP.O04, REL-IPP.R12, REL-PAT.A01, REL-PAT.D01, REL-PAT.D02, REL-PAT.D03
+%   OBS: REL-PAT.D04, REL-PAT.D09, REL-PAT.D10, REL-PAT.D11, REL-PAT.H06, REL-PAT.H08
+%   OBS: REL-PAT.H12, REL-PAT.H14, REL-PAT.H15, REL-PAT.N01, REL-PAT.N02, REL-RDV.C02
+%   OBS: REL-RDV.C07, REL-RDV.C08, REL-RDV.R01, REL-RDV.R02, REL-RDV.R03, REL-RDV.R08
+%   OBS: REL-RDV.R11, REL-RDV.R12, aucune-collision-observee, saisie-de-patients-de-test, saisie-telephone-invente
 %   HYP: (aucun)
 %   CHI: (aucun)
 %   SER: (aucune)
@@ -52,7 +53,7 @@ les habilitations cloisonnent l'accès. Un seul a été ouvert au poste ; les qu
 relevés qu'à l'écran de démarrage.
 
 \begin{center}
-\begin{tabular}{@{}p{4.3cm}p{4.6cm}p{3.1cm}p{2.2cm}@{}}
+\begin{tabular}{@{}p{4.3cm}p{4.0cm}p{2.9cm}p{2.9cm}@{}}
 \toprule
 Profil & Processus porté & Module & Établi par \\
 \midrule
@@ -86,6 +87,10 @@ L'observation a porté sur un poste du service, sur le profil \texttt{MSM - GEST
 28 juillet 2026. Quatre écrans ont été parcourus : l'écran de démarrage, la recherche d'identifiant
 patient, la fiche patient et l'écran de prise de rendez-vous. Cent quarante-trois éléments y ont
 été relevés.
+
+L'observation n'a pas été passive. Des patients de test ont été saisis dans le système pour
+comprendre ce qui distingue les cas, et les cas rencontrés étaient variés : patient déjà présent
+dans la base ou patient à créer, types de couverture différents\releve{saisie-de-patients-de-test}.
 
 Chaque élément est consigné avec un identifiant stable, le bloc de l'écran auquel il appartient,
 son libellé reproduit à l'identique, son type apparent, et la valeur affichée lorsqu'une valeur
@@ -298,10 +303,12 @@ valeur observée désigne un adressage par une autre structure hospitalière\rel
 bloc de contrôle des modifications porte quatre couples d'auteur et d'horodatage — création,
 modification, confirmation, annulation — dont la portée est traitée à la section suivante.
 
-\section{Trois observations exploitables}
+\section{Les observations exploitables}
 
-Trois relevés de cet écran dépassent la description : ils fondent une grandeur, une distinction et
-un diagnostic que le reste du rapport reprend. Chacun est une observation, et rien d'autre.
+Quatre observations dépassent la description : elles fondent une grandeur, une distinction, un
+diagnostic et une mise en garde que le reste du rapport reprend. Les trois premières se lisent sur
+un écran ; la quatrième vient de la saisie elle-même. Chacune est une observation, et rien
+d'autre.
 
 \textbf{L'écart entre la création et le rendez-vous est le délai
 d'obtention}\releve{REL-RDV.C02}. Le bloc de contrôle des modifications horodate la création ; le
@@ -329,10 +336,26 @@ recherche exacte ne suffit pas. Elle ne suffit pas parce qu'une même personne y
 dossiers.
 
 La fonction existe dans le produit installé. Ce que le relevé ne dit pas, c'est si le service
-l'emploie. Le chapitre~\ref{chap:qualite} construit un rapprochement probabiliste sur ce constat,
-et le confronte à une collision exacte pour mesurer ce que la similarité apporte.
+l'emploie, ni combien de dossiers sont concernés.
 
-Une quatrième observation, mineure et têtue, court à travers les trois précédentes : les
+Une réserve s'impose, et elle est forte : \textbf{aucune recherche conduite au poste n'a rendu
+plusieurs résultats proches d'un même patient}\releve{aucune-collision-observee}. Le problème n'a
+pas été constaté sur place. Il est établi par l'existence de la fonction dans l'outil, et par le
+rapport d'audit consacré à l'établissement.
+
+Le chapitre~\ref{chap:qualite} construit un rapprochement probabiliste sur ce constat, et le
+confronte à une collision exacte.
+
+\textbf{Un champ renseigné n'est pas un champ juste}\releve{saisie-telephone-invente}. Certains
+champs restent vides en pratique, jugés non essentiels à la rapidité de la saisie. Le numéro de
+téléphone, lui, ne reste pas vide : il est parfois rempli d'un numéro inventé, lorsqu'une personne
+âgée ne connaît pas le sien.
+
+Cette observation ne se lit sur aucun écran, et elle porte loin. Le taux de renseignement d'une
+colonne mesure ce qui a été saisi, jamais ce qui est vrai, et le rapport ne confond nulle part les
+deux.
+
+Une dernière observation, mineure et têtue, court à travers les précédentes : les
 horodatages s'affichent au format mois-jour-année avec un indicateur de méridien, dans une
 interface par ailleurs française\releve{REL-RDV.R08}. La date observée le montre sans ambiguïté —
 le quantième vaut vingt-huit, ce qui exclut toute lecture jour-mois.
@@ -343,11 +366,11 @@ format, et la conversion doit être écrite une fois et vérifiée. Faute de quo
 s'échangent silencieusement onze fois sur douze sans qu'aucune valeur ne devienne invalide. C'est
 une contrainte de chargement, reprise au chapitre~\ref{chap:architecture}.
 
-Ces quatre observations partagent une propriété qui gouverne la suite. Aucune ne résulte d'un
-entretien ni d'une documentation : chacune est lisible sur un écran, sous un identifiant que le
-lecteur retrouve à l'annexe~\ref{annexe:releve}.
+Ces observations partagent une propriété qui gouverne la suite. Aucune ne vient d'un entretien ni
+d'une documentation : les trois premières se lisent sur un écran, sous un identifiant que le
+lecteur retrouve à l'annexe~\ref{annexe:releve}, et la quatrième vient de la saisie.
 
 Elles ne disent rien de la fréquence des situations qu'elles révèlent — un seul rendez-vous a été
 observé, et un cas n'est pas une distribution. Ce qu'elles établissent est qu'une grandeur est
-calculable, qu'une distinction est enregistrée et qu'un format s'impose. C'est ce dont la
-modélisation a besoin : non pas des valeurs, mais la certitude que les champs existent.
+calculable, qu'une distinction est enregistrée, qu'un champ renseigné peut être faux et qu'un
+format s'impose.

@@ -1,6 +1,6 @@
 % Ce chapitre repose sur :
 %   DOC: s01, s03, s05, s12, s20, s27, s28, s29, s30
-%   OBS: composition-du-service
+%   OBS: REL-DEM.P01, REL-DEM.P02, REL-DEM.P03, REL-DEM.P04, REL-DEM.P05
 %   HYP: pyramide-des-ages
 %   CHI: (aucun)
 %   SER: (aucune)
@@ -183,6 +183,39 @@ La seconde est d'établir les statistiques et de gérer l'information hospitali�
 propre du service, et non une fonction déléguée à une cellule tierce. Un tableau de bord alimenté
 par les données du service ne s'ajoute donc pas à ses attributions : il en sert une.
 
-\aRediger{composition-du-service}{la composition réelle de l'équipe, l'organisation des postes et
-l'organigramme du service, tels qu'ils ont été observés — relevé d'observation, qu'aucune source
-publiée ne porte}\releve{composition-du-service}
+Ce que le service fait au quotidien se lit aussi dans l'outil qu'il emploie. L'écran de connexion
+du système d'information propose cinq profils applicatifs, et chacun ouvre un jeu de modules
+distinct\releve{REL-DEM.P02}. Les profils ne sont donc pas cinq vues d'un même écran : ils
+découpent l'activité du service en cinq processus.
+
+La figure ci-dessous met ce découpage en regard des missions que le règlement prescrit.
+
+\begin{center}
+\begin{tabular}{@{}p{6.6cm}c p{6.4cm}@{}}
+\toprule
+Mission prescrite, article~35 & & Profil applicatif qui la porte \\
+\midrule
+Admettre et orienter les patients & $\leftrightarrow$ & \texttt{MSM - URGENCE}\releve{REL-DEM.P04} \\
+\addlinespace
+Organiser l'accueil et les rendez-vous & $\leftrightarrow$ & \texttt{MSM - GESTION DE RDV}\releve{REL-DEM.P02} \\
+\addlinespace
+Établir la facturation des prestations & $\leftrightarrow$ & \texttt{MSM - FACTURATION SAA}\releve{REL-DEM.P01} \\
+\addlinespace
+Recouvrer les sommes dues à l'hôpital & $\leftrightarrow$ & \texttt{MSM - RECOUVREMENT}\releve{REL-DEM.P03} \\
+\addlinespace
+Établir les statistiques et gérer l'information hospitalière & $\leftrightarrow$ & \texttt{MSM RAPPORTS ET STATISTIQUES}\releve{REL-DEM.P05} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\footnotesize Les cinq processus du service, entre les missions que le règlement intérieur
+prescrit \cite{s27} et les profils applicatifs relevés à l'écran de connexion. Aucune ligne n'est
+supposée : chaque profil est reproduit sous son libellé exact.
+\end{center}
+
+\medskip
+
+L'observation conduite pour ce travail a porté sur un poste et sur un seul de ces cinq profils,
+celui des rendez-vous : les quatre autres exigent des habilitations qu'un stagiaire ne reçoit
+pas.
