@@ -70,6 +70,6 @@ réécriture d'historique sur un dépôt déjà cloné ne retire rien.
 ## Ce que cette décision ne peut pas voir
 
 **Le contrôle lit l'arbre suivi, jamais l'historique.** Un nom déjà commis dans une révision
-antérieure lui est invisible, et aucune vérification de ce lot ne l'a cherché. **Il ne voit pas non
+antérieure lui est invisible, et aucune vérification faite ici ne l'a cherché. **Il ne voit pas non
 plus l'intérieur d'une image** : un nom lisible sur une capture déposée sous
 `report/figures/tableau-de-bord/` passerait les deux dispositifs — celui-ci et `0075`.

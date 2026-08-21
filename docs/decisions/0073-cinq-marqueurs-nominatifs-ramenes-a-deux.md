@@ -62,7 +62,7 @@ retrait des trois marqueurs.
 **Le contrôle des marqueurs lit `report/marqueurs.tex`, où les deux noms sont désormais TOUJOURS
 vides** — ils viennent de `report/noms.tex`, qui n'est pas suivi (`0074`). En état de remise, le
 contrôle exigera donc que `marqueurs.tex` porte les noms, c'est-à-dire exactement ce que `0074`
-interdit. **Les deux décisions se contredisent au moment de la bascule**, et ce lot ne la fait pas.
-Le lot qui basculera l'état devra trancher : écrire les noms dans le fichier suivi, ou déplacer la
+interdit. **Les deux décisions se contredisent au moment de la bascule**, et ce travail ne la fait pas.
+Le travail qui basculera l'état devra trancher : écrire les noms dans le fichier suivi, ou déplacer la
 propriété sur le fichier injecté, que ce contrôle ne lit pas. C'est consigné ici plutôt que découvert
 le jour de la remise.

@@ -31,7 +31,7 @@ l'établit.
 ### 2. Le périmètre du contrôle devient le dépôt entier
 
 C'est une **extension de portée**, pas seulement un ajout de tolérance, et elle est éprouvée par
-mutation : la même image suivie sous `dashboard/` est rouge avec le contrôle de ce lot et **verte
+mutation : la même image suivie sous `dashboard/` est rouge avec le contrôle actuel et **verte
 avec celui d'avant**, sur le même index.
 
 ### 3. La liste des extensions s'étend, sauf à `.pdf`
@@ -69,7 +69,7 @@ dont la ligne de base est le bas de l'image — la même mesure donne **0,395 pt
 du trait inférieur du cadre. Un emplacement rempli déplace donc le texte qui le suit d'un vingtième
 de ligne.
 
-`graphicx` est chargé, et le choix est mesuré de deux façons : `kpsewhich` le trouve dans le lot
+`graphicx` est chargé, et le choix est mesuré de deux façons : `kpsewhich` le trouve dans l'ensemble
 `graphics`, et surtout `pgfcore.sty` porte à sa ligne 10 `\RequirePackage{graphicx}` — `pgfplots`,
 déjà chargé, le tire à lui. **L'image de composition de l'intégration continue le compose donc déjà
 à chaque exécution verte**, sans que rien ne l'ait demandé.
@@ -94,5 +94,5 @@ fichier.** Une capture prise à un autre rapport se compose correctement, mais d
 suit. Aucun contrôle ne vérifie le rapport d'une image déposée.
 
 **Aucune image n'est encore appelée dans le corps du rapport.** `\captureTdb` est éprouvée sur un
-document témoin hors du dépôt, jamais sur une page du rapport — ce lot ne touche à aucune prose de
+document témoin hors du dépôt, jamais sur une page du rapport — rien ici ne touche à aucune prose de
 chapitre.

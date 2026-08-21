@@ -36,14 +36,14 @@ est l'usage académique normal, et ce n'est pas un appareil de défense.
 
 Le document composé **passe de 99 à 98 pages**, et la cause est isolée : la même compilation faite
 sur la révision d'origine avec ce seul fichier remplacé rend 98 pages. Les trente-neuf exposants
-retirés valaient une page. Aucune autre modification de ce lot ne change la pagination — le titre
+retirés valaient une page. Aucune autre modification de ce travail ne change la pagination — le titre
 corrigé, le logotype en emplacement réservé et les lignes conditionnelles de la page de garde
 laissent le document à 98 pages.
 
 ## Ce qui a été écarté
 
 **Retirer les appels des fichiers de chapitre.** Écarté, et c'est le point de la décision : les
-retirer aurait supprimé l'appareil, pas son impression. Un lot ultérieur qui voudrait le rétablir
+retirer aurait supprimé l'appareil, pas son impression. Un travail ultérieur qui voudrait le rétablir
 n'aurait alors plus rien à rétablir.
 
 **Composer les étiquettes en note de bas de page.** Écarté : le motif n'est pas que l'exposant soit

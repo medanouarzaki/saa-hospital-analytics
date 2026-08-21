@@ -35,7 +35,7 @@ porte l'erreur.
 
 ## Ce qui a été écarté
 
-**Corriger aussi le vocabulaire de soutenance ailleurs dans le dépôt.** Écarté pour ce lot : un
+**Corriger aussi le vocabulaire de soutenance ailleurs dans le dépôt.** Écarté ici : un
 rapport de stage d'application se soutient aussi, et rien n'établit que « soutenance » soit fautif.
 Le marqueur de date de soutenance est conservé, et la ligne qui le porte disparaît tant qu'il est
 vide — voir `0073`.

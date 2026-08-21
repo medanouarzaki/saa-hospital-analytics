@@ -19,7 +19,7 @@ tairait ne laisserait aucune trace ; l'oubli réaliste — l'un des deux — est
 CE QU'IL NE PEUT PAS VOIR. Les valeurs elles-mêmes ne sont plus dans le dépôt : `report/noms.tex`
 redéfinit les deux marqueurs à la compilation et n'est pas suivi. En état de remise, ce contrôle
 exige donc que `marqueurs.tex` porte les noms — et c'est le seul moment où ils y seraient écrits.
-Le lot qui basculera l'état devra trancher entre les y écrire et déplacer la propriété sur le
+Le travail qui basculera l'état devra trancher entre les y écrire et déplacer la propriété sur le
 fichier injecté, que ce contrôle ne lit pas.
 
 CE CONTRÔLE LIT LE FICHIER DES MARQUEURS, JAMAIS LE PDF. Une propriété qui dépend du rendu n'est pas
