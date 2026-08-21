@@ -53,6 +53,47 @@ normalise sans juger ; la couche analytique modélise. Une correction appliquée
 effacé ce qu'il fallait mesurer, et une correction appliquée en sortie aurait rendu la chaîne
 irreproductible.
 
+Ce que cette architecture dit des données, une seconde figure le dit des outils : chaque brique de
+la pile, son rôle, et la couche à laquelle elle appartient.
+
+\begin{center}
+\begin{tikzpicture}[x=1mm, y=1mm]
+
+\node[coucheUML, anchor=east] at (-4,0)   {restitution};
+\node[coucheUML, anchor=east] at (-4,-20) {ordonnancement};
+\node[coucheUML, anchor=east] at (-4,-40) {identités};
+\node[coucheUML, anchor=east] at (-4,-60) {modélisation};
+\node[coucheUML, anchor=east] at (-4,-80) {persistance};
+
+\node[briqueUML, text width=52mm] (res) at (26,0)   {Bibliothèque d'application web analytique\\[1pt]\emph{lire, filtrer, afficher}};
+\node[briqueUML, text width=52mm] (ord) at (26,-20) {Orchestrateur de graphes de tâches\\[1pt]\emph{déclencher dans l'ordre}};
+\node[briqueUML, text width=52mm] (rap) at (26,-40) {Bibliothèque de rapprochement probabiliste\\[1pt]\emph{estimer, apparier, regrouper}};
+\node[briqueUML, text width=52mm] (mod) at (26,-60) {Outil de transformation déclaratif\\[1pt]\emph{typer, modéliser, tester}};
+\node[briqueUML, text width=52mm] (per) at (26,-80) {Serveur de base de données relationnelle\\[1pt]\emph{stocker, servir, transiger}};
+
+\node[briqueOptUML, text width=44mm] (sch) at (96,-60) {Schéma en étoile\\[1pt]\emph{faits, dimensions, agrégats}};
+\node[briqueOptUML, text width=44mm] (mem) at (96,-40) {Moteur en mémoire\\[1pt]\emph{calculer hors du serveur}};
+
+\draw[fluxUML] (per) -- (mod);
+\draw[fluxUML] (mod) -- (rap);
+\draw[fluxUML] (rap) -- (ord);
+\draw[fluxUML] (ord) -- (res);
+\draw[fluxUML] (sch.west) -- (mod.east);
+\draw[fluxUML] (mem.west) -- (rap.east);
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\footnotesize La pile technique, couche par couche. Chaque brique porte la désignation que le
+chapitre~\ref{chap:cadrage} lui donne — une désignation fonctionnelle et non un nom de produit — et
+son rôle en trois verbes. Les flèches pleines montent d'une couche à la suivante ; les deux briques
+en pointillé ne sont pas des couches mais des choix internes à celle qu'elles rejoignent. Aucun
+logotype d'éditeur ne figure ici : ce sont des marques déposées. La figure ne montre ni les versions,
+ni les dépendances, ni le conteneur qui porte chaque service.
+\end{center}
+
+\medskip
+
 La chaîne compte \chiffre{modeles-total} modèles de transformation —
 \chiffre{modeles-intermediate} intermédiaires et \chiffre{modeles-marts} analytiques — et
 \chiffre{taches-graphe} tâches d'\emph{orchestration}, c'est-à-dire de tâches qu'un ordonnanceur
@@ -263,29 +304,8 @@ Le graphe compte \chiffre{taches-graphe} tâches, en chaîne, et son ordre porte
 modélisation : \textbf{les dimensions se construisent avant les faits}, un fait se rattachant à une
 version de dimension.
 
-\begin{center}
-\begin{tabular}{@{}c@{}}
-\fbox{\begin{minipage}{0.90\linewidth}\centering\footnotesize\ttfamily
-verifier\_disponibilite\_extraction $\rightarrow$ charger\_journee $\rightarrow$ controle\_qualite\\[2pt]
-$\downarrow$\\[2pt]
-dbt\_intermediaire $\rightarrow$ dbt\_dimensions $\rightarrow$ dbt\_faits $\rightarrow$ dbt\_tests\\[2pt]
-$\downarrow$\\[2pt]
-rapprochement\_prediction $\rightarrow$ rapprochement\_regroupement\_evaluation\\[2pt]
-$\downarrow$\\[2pt]
-dbt\_agregats $\rightarrow$ rafraichir\_instantane $\rightarrow$ exporter
-\end{minipage}}
-\end{tabular}
-\end{center}
-
-\begin{center}
-\footnotesize Le graphe des tâches quotidiennes. Chaque nœud porte l'identifiant que le code lui
-donne.
-\end{center}
-
-\medskip
-
-Ce graphe dit l'ordre, il ne dit pas qui fait quoi. Le diagramme de séquence ci-dessous porte les
-deux : les mêmes tâches, dans le même ordre, mais entre les participants réels de la chaîne.
+Le diagramme de séquence ci-dessous les porte dans leur ordre, entre les participants réels de la
+chaîne.
 
 \begin{center}
 \begin{tikzpicture}[x=1mm, y=1mm]
@@ -328,7 +348,11 @@ deux : les mêmes tâches, dans le même ordre, mais entre les participants rée
 
 \begin{center}
 \footnotesize Le traitement quotidien entre ses six participants. Les douze messages sont les
-douze tâches du graphe, dans leur ordre, et deux traits de ce dessin ne se lisent pas sur la liste
+douze tâches du graphe, dans leur ordre, et chacune porte au code l'identifiant que voici :
+\texttt{verifier\_disponibilite\_extraction}, \texttt{charger\_journee}, \texttt{controle\_qualite},
+\texttt{dbt\_intermediaire}, \texttt{dbt\_dimensions}, \texttt{dbt\_faits}, \texttt{dbt\_tests},
+\texttt{rapprochement\_prediction}, \texttt{rapprochement\_regroupement\_evaluation},
+\texttt{dbt\_agregats}, \texttt{rafraichir\_instantane}, \texttt{exporter}. et deux traits de ce dessin ne se lisent pas sur la liste
 qui précède. \textbf{Les dimensions se construisent avant les faits} — messages~5 et~6 —, un fait
 se rattachant à une version de dimension. Et le rafraîchissement de l'instantané n'est pas une
 reconstruction : les tables neuves sont bâties à côté, puis \textbf{tous les noms sont échangés en
