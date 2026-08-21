@@ -97,10 +97,49 @@ confidentialité rend nécessaire et qui n'est pas du ressort d'un stage. Une ex
 depuis le système d'origine, dont le format et la cadence restent à établir. Et les champs manquants nommés plus haut, qui
 cesseraient d'être une limite documentée pour devenir un obstacle à lever.
 
-\textbf{Apport personnel.} Le paragraphe qui suit relève de la rédaction personnelle et ne peut
-être écrit que par l'auteur du travail.
+\section*{Apport personnel}
 
-\aRediger{apport-personnel}{ce que ce travail a apporté personnellement : les compétences acquises,
-les difficultés rencontrées et la façon dont elles ont été surmontées, et ce que l'expérience du
-service a changé dans la manière d'aborder un problème de
-données}\releve{apport-personnel}
+Je suis arrivé dans ce service sans rien connaître du domaine hospitalier. J'en repars en ayant
+compris comment un établissement enregistre son activité, ce qu'il doit remonter, et par quels
+gestes une donnée naît\releve{apport-personnel}.
+
+Ce que j'ai le plus appris ne s'apprend pas dans un cours. Au poste d'accueil, j'ai vu défiler des
+situations très différentes — des patients connus du système et d'autres à créer, des couvertures
+qui ouvrent des droits et d'autres qui n'en ouvrent pas, des personnes qui savent répondre aux
+questions qu'on leur pose et d'autres qui ne le savent pas. Un agent qui saisit un numéro de
+téléphone au hasard parce que la personne en face ne connaît pas le sien ne fabrique pas une
+erreur : il fait passer un dossier avec ce qu'il a. C'est en voyant cela que j'ai compris qu'un
+champ renseigné n'est pas un champ juste, et que cette distinction gouverne tout le reste.
+
+J'ai compris aussi pourquoi les données comptent dans ce domaine plus qu'ailleurs. Le service
+saisit tout, chaque jour, depuis des années. Cette matière existe, elle est là, et elle ne sert
+presque à rien tant qu'aucun chemin ne la mène jusqu'à un indicateur. Construire ce chemin —
+c'est-à-dire une chaîne qui prend des données brutes et rend des grandeurs sur lesquelles quelqu'un
+peut décider — est ce que j'ai trouvé de plus intéressant dans ce travail.
+
+Ce qui m'a le plus tenu, c'est de construire un jeu de données qui se comporte comme un vrai. Il ne
+s'agissait pas de quelques dizaines de lignes propres écrites pour illustrer un exercice, mais de
+plusieurs centaines de milliers, réparties sur onze tables et deux ans et demi, avec leurs saisons,
+leurs jours creux, leurs doublons et leurs champs vides. J'ai passé beaucoup de temps à calibrer
+chaque paramètre sur ce qu'une source publiait plutôt que sur ce qui m'arrangeait, et à semer
+volontairement les défauts qu'un fichier réel porte — parce qu'un jeu propre n'aurait rien permis
+de démontrer. Le résultat n'est pas la réalité, et le rapport le dit partout où il le faut ; mais
+il en a la forme, le volume et les imperfections, et c'est ce qui a rendu la chaîne intéressante à
+construire.
+
+Sur le plan technique, j'ai appris à construire une chaîne complète plutôt que des morceaux :
+modéliser, charger, transformer, restituer, et surtout vérifier. La vérification est ce qui m'a le
+plus surpris. J'ai découvert qu'un contrôle vert ne prouve rien tant qu'on ne l'a pas mis en défaut
+volontairement, et que la plupart de ceux que je croyais solides ne surveillaient pas ce que je
+pensais.
+
+La difficulté qui m'a le plus retenu n'était pas technique. C'était de distinguer ce que je pouvais
+affirmer de ce que je ne pouvais pas. Sur un jeu de données que j'ai moi-même construit, tout
+résultat est suspect, et il a fallu apprendre à séparer ce que la chaîne démontre de ce qu'elle
+n'établit pas. C'est la partie du travail dont je suis le plus satisfait, et c'est aussi celle qui
+m'a coûté le plus de reprises.
+
+S'il fallait recommencer, j'écrirais au fil de l'eau plutôt qu'à la fin. J'ai mené la rédaction en
+fin de projet alors qu'elle devait être répartie, et j'ai découvert en écrivant des erreurs
+qu'aucun contrôle n'avait vues — ce qui, rétrospectivement, dit quelque chose d'utile : écrire est
+aussi une manière de vérifier.
