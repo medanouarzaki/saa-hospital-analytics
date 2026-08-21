@@ -102,3 +102,4 @@ chaque exécution.
 | [0086](0086-la-page-de-garde-reprise.md) | La page de garde reprise : l'aplat retiré, le nom développé |
 | [0087](0087-les-trois-diagrammes-uml-et-l-egalisation-reprise.md) | Les trois diagrammes UML, et une égalisation que le rendu a reprise |
 | [0088](0088-la-correction-de-l-article-35-et-la-passe-de-conversion.md) | La correction de l'article 35, et une passe de conversion qui n'atteint pas sa cible |
+| [0089](0089-l-apport-personnel-et-la-liste-qui-se-vide.md) | L'apport personnel, et la liste des emplacements qui se vide |
