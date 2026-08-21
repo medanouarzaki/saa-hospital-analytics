@@ -2,9 +2,15 @@
 % garde est écrite. Tout autre fichier les emploie par leur commande, jamais en
 % écrivant la valeur.
 %
-% Un marqueur laissé vide ou renseigné à contretemps fait échouer un contrôle :
-% `tests/test_marqueurs_nominatifs.py` vérifie l'accord entre l'état déclaré et les
-% deux marqueurs, sur CE fichier, jamais sur le PDF produit.
+% LES DEUX NOMS DE PERSONNE NE SONT PAS ICI. Ils ne sont commis nulle part : les
+% deux marqueurs nominatifs sont déclarés VIDES dans ce fichier, et redéfinis à la
+% compilation par `noms.tex`, qui n'est pas suivi par le gestionnaire de versions.
+% Voir la fin de ce fichier.
+%
+% Un marqueur nominatif renseigné ici ferait échouer un contrôle en état de
+% brouillon, et `tests/test_aucun_nom_de_personne.py` le verrait aussi.
+% `tests/test_marqueurs_nominatifs.py` vérifie l'accord sur CE fichier, jamais sur
+% le PDF produit.
 %
 % Ne pas renommer les commandes : les contrôles les cherchent par leur nom.
 
@@ -20,7 +26,8 @@
 % Un contrôle vérifie l'accord entre cet état et les deux marqueurs : renseigner
 % l'un des deux est rouge dans les deux états, et c'est l'oubli qui arrive.
 % Passer à la remise ne coûte que ce mot — et le contrôle dira alors quel marqueur
-% manque encore.
+% manque encore. Les noms venant de `noms.tex`, la bascule suppose que ce fichier
+% existe, ou que l'intégration continue l'écrive depuis ses variables de dépôt.
 \newcommand{\etatDuDocument}{brouillon}
 
 % --- marqueurs nominatifs : ils portent un nom de personne ---------------------
@@ -76,4 +83,21 @@
 \newcommand{\marqueurVide}{}
 \newcommand{\siRenseigne}[2]{%
   \ifx#1\marqueurVide\else#2\fi%
+}
+
+% --- les noms, injectés à la compilation --------------------------------------
+% `noms.tex` redéfinit les deux marqueurs nominatifs. Il n'est JAMAIS commis :
+% `.gitignore` porte `report/noms.tex`, et un contrôle cherche les deux noms dans
+% l'ensemble des fichiers suivis.
+%
+% DEUX CHEMINS SONT ESSAYÉS, et c'est mesuré : le rapport se compose depuis
+% `report/`, où le fichier est `noms.tex` ; la présentation se compose depuis
+% `slides/` et charge ce fichier-ci par `\input{../report/marqueurs}`, où le même
+% fichier est `../report/noms.tex`. Un seul des deux chemins existe à la fois.
+% Si aucun ne répond, les marqueurs restent vides et le document compose sans
+% noms : c'est le comportement attendu tant que l'état vaut `brouillon`.
+\IfFileExists{noms.tex}{%
+  \input{noms.tex}%
+}{%
+  \IfFileExists{../report/noms.tex}{\input{../report/noms.tex}}{}%
 }

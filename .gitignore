@@ -61,6 +61,13 @@ rapport*.md
 report/*.pdf
 slides/*.pdf
 
+# Le fichier des noms, jamais commis. Les deux noms de personne du projet —
+# l'auteur et l'encadrant de stage — vivent ici et nulle part ailleurs ; le
+# fichier des marqueurs le charge s'il existe, et l'intégration continue l'écrit
+# depuis deux variables de dépôt. `tests/test_aucun_nom_de_personne.py` cherche
+# ces deux noms dans l'ensemble des fichiers suivis.
+report/noms.tex
+
 # Images
 *.heic
 *.HEIC

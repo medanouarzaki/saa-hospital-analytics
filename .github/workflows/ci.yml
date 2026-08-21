@@ -83,6 +83,16 @@ jobs:
       # n'est donc pas le travail qui compile.
       - run: uv run pytest tests/test_marqueurs_nominatifs.py tests/test_structure_du_rapport.py -v
 
+      # Qu'aucun fichier suivi ne porte l'un des deux noms de personne du projet. Le contrôle ne
+      # porte pas les noms qu'il interdit : il les lit dans ces deux variables, et SANS ELLES IL
+      # S'ABSTIENT — un `skip` déclaré, visible dans la sortie, jamais un vert silencieux. Les
+      # valeurs passent par `env:` et non par une interpolation dans le corps de la commande :
+      # elles ne figurent donc pas dans le texte du script, et aucune étape ne les affiche.
+      - env:
+          RAPPORT_AUTEUR: ${{ vars.RAPPORT_AUTEUR }}
+          RAPPORT_ENCADRANT: ${{ vars.RAPPORT_ENCADRANT }}
+        run: uv run pytest tests/test_aucun_nom_de_personne.py -v
+
       # La provenance des affirmations du rapport. Ce contrôle lit les fichiers de chapitre, le fichier
       # bibliographique produit et le registre des sources : aucune base, aucune compilation. Sa place est
       # donc ici, avec les deux précédents, et non dans le travail qui compile.
@@ -592,6 +602,35 @@ jobs:
       #
       # `latexmk` appelle `biber` de lui-même dès qu'il voit le fichier de contrôle que biblatex
       # produit ; aucune étape de bibliographie n'est donc à écrire.
+      # Les deux noms de personne du rapport ne sont commis nulle part : `report/marqueurs.tex` les
+      # déclare vides, et `report/noms.tex` les redéfinit à la compilation. Cette étape écrit ce
+      # fichier depuis deux variables de dépôt. `.gitignore` le porte : il n'entre jamais à l'index.
+      #
+      # SI L'UNE DES DEUX VARIABLES MANQUE, L'ÉTAPE N'ÉCRIT RIEN ET N'ÉCHOUE PAS. Tant que
+      # `\etatDuDocument` vaut `brouillon`, un document composé sans noms est le résultat attendu,
+      # et la page de garde fait alors disparaître les deux lignes plutôt que de les laisser vides.
+      #
+      # LES VALEURS NE SONT JAMAIS JOURNALISÉES. Elles passent par `env:`, et non par une
+      # interpolation `${{ }}` dans le corps du script : le texte de la commande ne les porte donc
+      # pas. `printf` écrit dans le fichier, jamais sur la sortie standard, et aucune autre étape
+      # de ce travail ne lit ces variables.
+      - name: Déposer les noms, s'ils sont déclarés
+        env:
+          RAPPORT_AUTEUR: ${{ vars.RAPPORT_AUTEUR }}
+          RAPPORT_ENCADRANT: ${{ vars.RAPPORT_ENCADRANT }}
+        run: |
+          if [ -z "$RAPPORT_AUTEUR" ] || [ -z "$RAPPORT_ENCADRANT" ]; then
+            echo "aucun nom declare : le document se compose sans noms"
+            exit 0
+          fi
+          {
+            printf '%% Ecrit par l integration continue depuis deux variables de depot.\n'
+            printf '%% Ce fichier n est jamais commis : voir .gitignore et report/marqueurs.tex.\n'
+            printf '\\renewcommand{\\marqueurAuteur}{%s}\n' "$RAPPORT_AUTEUR"
+            printf '\\renewcommand{\\marqueurEncadrantProfessionnel}{%s}\n' "$RAPPORT_ENCADRANT"
+          } > report/noms.tex
+          echo "noms deposes dans report/noms.tex"
+
       - name: Compiler le rapport
         uses: xu-cheng/latex-action@6549dc21effb2730855a1281407ecfcececc6c1b # v4.1.0
         with:
