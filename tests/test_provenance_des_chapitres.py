@@ -72,7 +72,7 @@ ANNEXES_PRINCIPAL = REPORT / "annexes.tex"
 # depuis le registre des champs, ne porte aucune déclaration de provenance et n'a pas à en porter
 # — `tests/test_provenance.py` le régénère et le compare au registre dont il dérive. L'écarter ici
 # est donc une décision, pas un oubli, et `EXCLUS` la rend visible plutôt que silencieuse.
-ANNEXES = ("releve_des_ecrans.tex",)
+ANNEXES = ("releve_des_ecrans.tex", "correspondance_relations.tex")
 EXCLUS = ("dictionnaire_synthese.tex",)
 
 # Les paragraphes qui relèvent de la rédaction personnelle et que le squelette ne peut pas écrire.

@@ -32,11 +32,11 @@
 illustrent ce que la chaîne permet de mesurer, non l'activité réelle du service.} Cette phrase ne
 sera pas répétée ; elle vaut pour chacune des pages qui suivent.
 
-Deux conventions de lecture en découlent. \textbf{Chaque grandeur en volume absolu porte un renvoi
-à la section de sensibilité} (§\ref{sec:sensibilite}) ; les taux, délais et parts n'en portent pas,
-un rapport étant insensible à l'échelle. Et \textbf{chaque résultat sépare ce qu'il démontre de ce
-qu'il n'établit pas} : reproduire une relation injectée démontre que la chaîne sait la retrouver, et
-rien de plus.
+Deux conventions de lecture en découlent. \textbf{Chaque volume absolu porte un renvoi à la section
+de sensibilité} (§\ref{sec:sensibilite}) ; les taux, délais et parts n'en portent pas, un rapport
+étant insensible à l'échelle.
+
+Et \textbf{chaque résultat sépare ce qu'il démontre de ce qu'il n'établit pas.}
 
 La période couverte va du \chiffre{periode-debut} au \chiffre{periode-fin}, soit
 \chiffre{periode-jours} jours.
@@ -148,11 +148,11 @@ création\releve{REL-RDV.C02} et la date du rendez-vous\releve{REL-RDV.R08}. C'e
 centrale de ce chapitre.
 
 \textbf{Une part majoritaire du délai est un artefact de construction, et non un tirage.} Le
-générateur, lorsqu'il place un rendez-vous honoré, tire un délai dans une loi log-normale puis le
-\emph{plafonne à la marge disponible} — le nombre de jours écoulés entre la création de la fiche du
-patient et le rendez-vous — et il ouvre le premier rendez-vous d'un patient au jour même de la
-création de sa fiche. Dans les deux cas, le délai obtenu n'est plus celui de la loi : il est
-exactement la marge disponible.
+générateur tire un délai dans une loi log-normale, puis le \emph{plafonne à la marge disponible} —
+le nombre de jours entre la création de la fiche et le rendez-vous.
+
+Quand la marge est plus courte que le délai tiré, le délai obtenu n'est plus celui de la loi : il
+est exactement la marge.
 
 Sur les \chiffre{honores-total} rendez-vous honorés, \chiffre{honores-avec-fiche} ont une fiche
 patient en vigueur et peuvent donc être rangés ; les \chiffre{honores-sans-fiche} autres n'en ont
@@ -537,67 +537,13 @@ précédent l'est contre cette distribution injectée.}
 \section*{Ce que le chapitre reproduit, et ce qu'il n'établit pas}
 \addcontentsline{toc}{section}{Ce que le chapitre reproduit, et ce qu'il n'établit pas}
 
-\textbf{Premier sens} : toute relation du registre des relations injectées est reprise par une
-conclusion de ce chapitre, avec l'amplitude injectée en regard de l'amplitude mesurée, ou déclarée
-non reprise avec son motif.
+Chacune des conclusions ci-dessus porte un identifiant, et le jeu de données porte des relations
+injectées qui portent le leur. L'annexe~\ref{annexe:correspondance} met les deux en regard, dans
+les deux sens : toute relation injectée y est reprise par une conclusion ou déclarée non reprise
+avec son motif, et toute conclusion y renvoie à une relation ou est déclarée comme n'en venant pas.
 
-{\footnotesize
-% Un tableau long, et non un tableau ordinaire : vingt et une lignes ne tiennent pas dans le
-% reste d'une page, et un tableau ordinaire les reporte en bloc en laissant la page presque vide.
-\begin{longtable}{@{}llp{0.255\linewidth}p{0.255\linewidth}@{}}
-\toprule
-Relation & Conclusion & Amplitude injectée & Amplitude mesurée \\
-\midrule
-\endfirsthead
-\toprule
-Relation & Conclusion & Amplitude injectée & Amplitude mesurée \\
-\midrule
-\endhead
-\bottomrule
-\endlastfoot
-\relreprise{R-01}{C-11}{pente de \chiffre{injecte-pente-absenteisme} par jour, interne à la spécialité}{corrélation interne positive, écart de médiane positif sur \chiffre{relation-activites-ecart-positif} activités}
-\relreprise{R-02}{C-09}{taux d'absentéisme fixé par activité}{\chiffre{taux-absenteisme-global}~\% en global, classement par activité retrouvé}
-\relreprise{R-03}{C-07}{loi log-normale, médiane fixée par activité}{rapport de \chiffre{delai-rapport-extremes} entre les extrêmes, écart sous le jour entre sous-populations}
-\relreprise{R-04}{C-02, C-13}{fenêtre de pointe posée, poids tous positifs aux urgences}{pointe à \chiffre{flux-heure-pointe} h, \chiffre{flux-heures-vides-programme} heures vides côté programmé, aucune aux urgences}
-\relreprise{R-05}{C-03}{rapport de \chiffre{injecte-hebdo-rapport} entre le premier et le sixième jour}{\chiffre{hebdo-rapport-mesure}}
-\relreprise{R-06}{C-04}{coefficient de \chiffre{injecte-ramadan-coefficient} pendant le Ramadan}{baisse de \chiffre{ramadan-baisse}~\%, un point sous le coefficient}
-\relreprise{R-07}{C-05}{coefficient de \chiffre{injecte-ferie-coefficient} les jours fériés pour le programmé}{\chiffre{feries-programme-passages} passage programmé, urgences invariantes}
-\relnonreprise{R-08}{aucune grandeur de ce chapitre ne ventile par régime de couverture : la dimension d'organisme payeur n'est référencée par aucun fait}
-\relreprise{R-09}{C-14, C-16}{part de \chiffre{injecte-part-deux-derniers-niveaux} pour les deux niveaux aux cibles les plus longues}{\chiffre{urgences-part-consultation-ordinaire}~\%}
-\relreprise{R-10}{C-14}{cibles de \chiffre{cible-delai-niveau-1} à \chiffre{cible-delai-niveau-5} min, respect fixé}{chaque médiane sous sa cible, chaque neuvième décile au-dessus}
-\relreprise{R-11}{C-15}{répartition fixée des cinq issues}{\chiffre{urgences-part-retour-domicile}~\% de retour à domicile, transfert devant hospitalisation}
-\relnonreprise{R-12}{aucune conclusion de ce chapitre ne croise le champ d'origine avec le niveau de tri ; la relation est traitée au chapitre de conception du jeu de données}
-\relnonreprise{R-13}{aucune colonne d'âge ni de tranche d'âge n'est calculée dans les couches aval : le chapitre n'a aucune grandeur démographique à analyser}
-\relreprise{R-14}{C-22}{taux de doublons de \chiffre{injecte-taux-doublons}}{\chiffre{doublons-part-mesuree}~\%}
-\relreprise{R-15}{C-20}{taux de champs manquants fixé par colonne}{\chiffre{qualite-colonnes-incompletes} colonnes incomplètes, dont \chiffre{qualite-colonne-vide} entièrement vide}
-\relreprise{R-16}{C-09}{taux d'annulation de \chiffre{injecte-taux-annulation}}{\chiffre{taux-annulation-global}~\%}
-\relreprise{R-17}{C-08}{part de \chiffre{injecte-part-jour-meme} pour le jour même}{\chiffre{part-jour-meme}~\%, l'excès venant de la marge nulle}
-\relnonreprise{R-18}{aucune page ne donne la part des patients adressés à voir, et ce chapitre n'ouvre aucune section sur l'adressage}
-\relnonreprise{R-19}{le laboratoire n'entre dans aucune des six sections de ce chapitre ; le ratio est traité au chapitre de conception du jeu de données}
-\relreprise{R-20}{C-18, C-19}{taux de facturation et de recouvrement fixés par type}{de \chiffre{recouvrement-taux-minimal} à \chiffre{recouvrement-taux-maximal}~\% selon le débiteur ; \chiffre{creances-part-au-dela-un-an}~\% du restant dû a un an}
-\relreprise{R-21}{C-11}{corrélation de \chiffre{injecte-correlation-parametres} entre les deux tables de paramètres}{\chiffre{relation-inter-ensemble}}
-\end{longtable}
-}
-
-\textbf{Second sens} : toute conclusion renvoie à une relation injectée, ou est déclarée comme n'en
-venant pas — auquel cas elle est un effet des autres choix du générateur et \textbf{n'établit
-rien}.
-
-\begin{center}
-\footnotesize
-\begin{tabular}{@{}lp{0.72\linewidth}@{}}
-\toprule
-Conclusion & Ce dont elle vient \\
-\midrule
-\conclusionhors{C-01}{d'aucune relation : effet des paramètres de volumétrie et du calendrier}
-\conclusionhors{C-06}{d'aucune relation : effet du mécanisme de plafonnement du délai}
-\conclusionhors{C-10}{d'aucune relation : R-16 déclare que la distinction relève du modèle de données. C'est ce que la chaîne établit vraiment}
-\conclusionhors{C-12}{d'aucune relation : propriété du mécanisme de plafonnement, mesurée sur le complément}
-\conclusionhors{C-17}{d'aucune relation : effet conjoint des tarifs et de la clé de couverture}
-\conclusionhors{C-21}{d'aucune relation : effet des défauts de forme semés à l'ingestion}
-\bottomrule
-\end{tabular}
-\end{center}
+Une conclusion qui reproduit une relation injectée démontre que la chaîne sait la retrouver. Une
+conclusion qui n'en reproduit aucune est un effet des autres choix du générateur, et n'établit rien.
 
 \textbf{Aucune conclusion de ce chapitre n'établit un fait sur le service.} Ce qu'il démontre est
 que la chaîne produit ces grandeurs à partir d'une extraction, les ventile, et sépare ce qui vient

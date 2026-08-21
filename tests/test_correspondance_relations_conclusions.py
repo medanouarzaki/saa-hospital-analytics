@@ -26,7 +26,15 @@ from pathlib import Path
 import yaml
 
 RACINE = Path(__file__).resolve().parent.parent
+
+# DEUX FICHIERS, ET LA PORTÉE SUIT LA MATIÈRE. Les marques de conclusion vivent dans la prose du
+# chapitre ; les lignes de correspondance vivent en annexe depuis que le tableau y est descendu.
+# Le contrôle lit les deux, et les deux sont écrits ici en clair : sans le second, toute relation
+# du registre serait déclarée non reprise et le contrôle rougirait à tort ; sans le premier,
+# aucune conclusion ne serait vue.
 CHAPITRE = RACINE / "report" / "chapitres" / "analyse-de-l-activite.tex"
+CORRESPONDANCE = RACINE / "report" / "correspondance_relations.tex"
+FICHIERS = (CHAPITRE, CORRESPONDANCE)
 REGISTRE = RACINE / "docs" / "relations_injectees.yml"
 
 # Un commentaire LaTeX s'ouvre sur un pourcentage non échappé.
@@ -53,7 +61,13 @@ def partie_active(source: str) -> str:
 
 
 def source() -> str:
-    return partie_active(CHAPITRE.read_text(encoding="utf-8"))
+    return "\n".join(partie_active(f.read_text(encoding="utf-8")) for f in FICHIERS)
+
+
+def test_les_deux_fichiers_de_la_correspondance_existent() -> None:
+    """Un nom mal orthographié dans la liste lèverait à la lecture ; il doit rougir avant."""
+    absents = [f.relative_to(RACINE).as_posix() for f in FICHIERS if not f.is_file()]
+    assert not absents, f"fichiers déclarés et absents du disque : {absents}"
 
 
 def relations() -> list[dict]:
