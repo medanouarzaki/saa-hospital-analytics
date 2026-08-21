@@ -184,12 +184,13 @@ def rendre() -> None:
 
     rendu.titre_indicateur("sejours_admissions_journees")
     mensuel = q("sejours_admissions_journees")
-    st.bar_chart(
+    rendu.tracer_temporel(
         rendu.en_nombres(mensuel, "journees"),
         x="mois",
         y=["admissions", "journees"],
         x_label="Mois d'admission",
         y_label="Effectif",
+        forme="bar",
     )
 
     rendu.titre_indicateur("sejours_indicateurs_reglementaires")

@@ -294,11 +294,11 @@ def rendre() -> None:
         "séjours ne porte aucune clé de facturation : le rattachement d'une hospitalisation à sa "
         "facture passe par le passage correspondant, ce qui a été vérifié et non supposé."
     )
-    st.line_chart(
+    rendu.tracer_temporel(
         rendu.en_nombres(non_factures, "part"),
         x="mois",
         y="part",
-        color="famille",
+        couleur="famille",
         x_label="Mois",
         y_label="Part des épisodes non facturés",
     )

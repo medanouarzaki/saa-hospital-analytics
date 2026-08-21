@@ -312,3 +312,85 @@ def titre_indicateur(identifiant: str) -> None:
     st.caption(definition(identifiant))
     mention_de_source(identifiant)
     mention_de_filtrabilite(identifiant)
+
+
+# --- les axes de temps, en français ---------------------------------------------------------------
+# Les tracés intégrés de l'outil d'affichage composent leurs étiquettes de date par le moteur de
+# graphiques sous-jacent, dont la locale est anglaise : une application française affichait ses mois
+# en « Jan », « Feb », « Mar ».
+#
+# AUCUNE OPTION DE CONFIGURATION NE CHANGE CETTE LOCALE, et c'est mesuré plutôt que supposé :
+# l'inventaire des options de l'outil ne porte aucune entrée de locale ni de format de date. La
+# seule prise est l'expression d'étiquette du moteur de graphiques, qui s'écrit dans la
+# spécification et s'évalue à chaque graduation.
+#
+# Les mois sont donc énumérés ici, et l'expression les indexe par le numéro de mois de la valeur de
+# graduation. Elle ne dépend d'aucune locale : elle ne peut pas retomber en anglais.
+MOIS_ABREGES = (
+    "janv.",
+    "févr.",
+    "mars",
+    "avr.",
+    "mai",
+    "juin",
+    "juil.",
+    "août",
+    "sept.",
+    "oct.",
+    "nov.",
+    "déc.",
+)
+
+# Une étiquette sur deux lignes — le mois, puis l'année —, forme que le moteur emploie lui-même
+# pour un axe de temps. `month(...)` rend le numéro de mois de zéro à onze.
+_ETIQUETTE_DE_TEMPS = f"[{list(MOIS_ABREGES)}[month(datum.value)], year(datum.value)]"
+
+
+def tracer_temporel(
+    tableau,
+    *,
+    x: str,
+    y,
+    couleur: str | None = None,
+    x_label: str | None = None,
+    y_label: str | None = None,
+    forme: str = "line",
+) -> None:
+    """Un tracé dont l'axe des abscisses est une date, avec ses étiquettes en français.
+
+    Même appel que les tracés intégrés — un tableau, une abscisse, une ou plusieurs ordonnées, une
+    couleur facultative — et même rendu, à l'étiquette de date près.
+
+    `y` accepte une liste : les colonnes sont alors repliées en deux, une de nom et une de valeur,
+    et la couleur porte le nom. C'est ce que font les tracés intégrés lorsqu'on leur passe
+    plusieurs ordonnées.
+    """
+    mesures = list(y) if isinstance(y, (list, tuple)) else [y]
+    plusieurs = len(mesures) > 1
+
+    encodage = {
+        "x": {
+            "field": x,
+            "type": "temporal",
+            "title": x_label,
+            "axis": {"labelExpr": _ETIQUETTE_DE_TEMPS, "labelOverlap": True},
+        },
+        "y": {
+            "field": "valeur" if plusieurs else mesures[0],
+            "type": "quantitative",
+            "title": y_label,
+        },
+    }
+
+    champ_couleur = "mesure" if plusieurs else couleur
+    if champ_couleur is not None:
+        encodage["color"] = {"field": champ_couleur, "type": "nominal", "title": None}
+
+    specification = {
+        "mark": {"type": forme, "tooltip": True},
+        "encoding": encodage,
+    }
+    if plusieurs:
+        specification["transform"] = [{"fold": mesures, "as": ["mesure", "valeur"]}]
+
+    st.vega_lite_chart(tableau, specification, use_container_width=True)

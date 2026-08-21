@@ -102,11 +102,11 @@ def rendre() -> None:
 
     rendu.titre_indicateur("urgences_passages_par_niveau")
     passages = q("urgences_passages_par_niveau")
-    st.line_chart(
+    rendu.tracer_temporel(
         passages,
         x="jour",
         y="passages",
-        color="niveau_tri",
+        couleur="niveau_tri",
         x_label="Jour",
         y_label="Passages",
     )
