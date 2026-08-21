@@ -7,22 +7,60 @@
 %   niveau 1  \Huge\bfseries   le titre du travail
 %   niveau 2  \LARGE\scshape   « Rapport de stage d'application » — il annonce, il ne crie pas :
 %                              petites capitales espacées, et jamais de gras
-%   niveau 3  \large           les valeurs — organisme d'accueil, noms — et le sous-titre
-%   niveau 4  \normalsize      établissement de formation, filière, année universitaire
+%   niveau 3  \large           les valeurs — établissement, organisme d'accueil, noms — et le
+%                              sous-titre
+%   niveau 4  \normalsize      filière et année universitaire
 %   niveau 5  \footnotesize    les intitulés, en petites capitales grises
 %
 % LA RÈGLE QUI GOUVERNE LES NIVEAUX 3 ET 5 : un intitulé est plus petit que sa valeur. C'est ce
 % rapport-là qui manquait, et son absence donnait l'impression d'un texte posé au hasard.
+%
+% UNE SEULE COULEUR D'ACCENT, ET ELLE NE PORTE QUE DEUX CHOSES : les filets et la bande de pied
+% d'une part, la mention du type de document de l'autre. Le titre reste noir — c'est lui le plus
+% gros corps de la page, et le mettre en couleur ferait deux accents concurrents là où il n'en faut
+% qu'un. Le gris de cartouche du document principal garde, lui, les intitulés et les mentions
+% accessoires : il ne rivalise avec rien.
+%
+% LE TITRE EST ANCRÉ PAR DEUX FILETS ÉPAIS, ET NON PAR UN APLAT. Il a d'abord occupé un aplat très
+% clair de la couleur d'accent, sur toute la largeur du bloc de texte. Regardé sur l'image du PDF,
+% cet aplat ALOURDISSAIT au lieu d'ancrer : un rectangle gris de 52 mm de haut pesait plus que le
+% titre qu'il devait porter, et le fond blanc du reste de la page s'y arrêtait net. Il est retiré.
+%
+% L'ancrage tient désormais à deux filets, l'un au-dessus du titre et l'autre en dessous, à 1,5 pt
+% contre 0,4 pt pour les filets fins du document — presque quatre fois plus épais, écart voulu :
+% deux filets de même épaisseur que les autres ne tiendraient rien. Ils sont plus courts que la
+% largeur du texte et centrés, si bien que le titre respire entre eux sur fond blanc.
+%
+% LE NOM DE L'ÉTABLISSEMENT COMPOSE SANS SON SIGLE NI SA VILLE, et la valeur n'est pas réécrite ici
+% pour autant. Le marqueur porte « Institut National de Statistique et d'Économie Appliquée (INSEA),
+% Rabat », et il continue de le porter : la page des remerciements et la présentation l'emploient
+% entier, et le marqueur ne leur appartient pas moins qu'à cette page. La page de garde en DÉRIVE la
+% partie qui la concerne, par une macro à argument délimité qui coupe à la première parenthèse
+% ouvrante. Aucune valeur n'est écrite ici, et la règle du fichier tient.
 %
 % L'ESPACEMENT DES CAPITALES vient de `microtype`, déjà chargé par le document principal. Mesuré
 % avant d'être employé : un document d'essai portant `\usepackage{microtype}` seul compose
 % `\textls[200]{...}` avec un espacement visible.
 %
 % AUCUN RESSORT ÉLASTIQUE. Pas un seul `\vfill` : la page se recomposerait entièrement dès qu'un
-% champ changerait de longueur. Tous les espaces sont fixes, en millimètres.
+% champ changerait de longueur. Tous les espaces sont fixes, en millimètres — la bande de pied
+% comprise, dont la position vient d'un espace fixe mesuré sur l'image du PDF et non d'un ressort
+% qui la collerait au bas de la page.
 %
 % Aucune valeur n'est écrite ici : chaque champ vient d'un marqueur, et tout champ dont le marqueur
 % peut être vide passe par `\siRenseigne` — l'intitulé disparaît avec sa valeur.
+
+% La couleur d'accent, déclarée ici parce qu'elle ne sert qu'ici. `griscartouche`, qui sert dans
+% tout le document, reste déclaré par le document principal.
+\definecolor{accentgarde}{RGB}{23,54,93}
+
+% Le nom de l'établissement sans son sigle ni sa ville. `\nomSansSigle` prend tout ce qui précède la
+% première parenthèse ouvrante ; la parenthèse ajoutée par l'appel sert de garde, si bien qu'un
+% marqueur qui n'en porterait aucune rendrait le marqueur entier au lieu de faire déborder l'analyse.
+\def\nomSansSigle#1(#2\FINSIGLE{#1}
+\newcommand{\etablissementDeveloppe}{%
+  \expandafter\nomSansSigle\marqueurEtablissementFormation(\FINSIGLE%
+}
 
 \begin{titlepage}
 \setlength{\parskip}{0pt}
@@ -31,49 +69,49 @@
 
 % 1. La mention de version de travail, en haut à droite, petite et discrète.
 \hfill\siBrouillon{\fbox{\footnotesize\mentionVersionDeTravail}}\par
-\vspace*{6mm}
+\vspace*{4mm}
 
-% 2. Le logotype, par la commande d'emplacement réservé : un cadre tant que le fichier n'existe pas.
-\logoEcole{2.2cm}
+% 2. Les deux logotypes, par la commande d'emplacement réservé : des cadres tant que les fichiers
+% n'existent pas, et les mêmes dimensions dans les deux cas.
+\logosInstitutionnels
 
-\vspace{9mm}
+\vspace{10mm}
 
-% 3 et 4. L'établissement et la filière, niveau 4.
+% 3 et 4. L'établissement au NIVEAU 3 — celui des valeurs, comme le bloc des noms —, la filière au
+% niveau 4, un cran en dessous. Le nom compose développé, sans sigle ni ville.
 \siRenseigne{\marqueurEtablissementFormation}{%
-  {\normalsize\scshape \marqueurEtablissementFormation\par}\vspace{2mm}%
+  {\large\scshape \etablissementDeveloppe\par}\vspace{2mm}%
 }
 \siRenseigne{\marqueurFiliere}{%
   {\normalsize\itshape\color{griscartouche} \marqueurFiliere\par}%
 }
 
-% 5. Un filet fin, pleine largeur.
+% 5. Un filet, pleine largeur, de la couleur d'accent.
 \vspace{5mm}
-{\color{griscartouche}\rule{\linewidth}{0.4pt}}
+{\color{accentgarde}\rule{\linewidth}{0.8pt}}
 
 % 6. Un espace fixe.
-\vspace{22mm}
+\vspace{13mm}
 
-% 7. La nature du document, niveau 2 : nettement plus grand que le corps, espacé, sans gras.
-{\LARGE\scshape\color{griscartouche}\textls[180]{Rapport de stage d'application}\par}
+% 7. La nature du document, niveau 2 : nettement plus grand que le corps, espacé, sans gras, et
+% seule mention que la couleur d'accent porte.
+{\LARGE\scshape\color{accentgarde}\textls[180]{Rapport de stage d'application}\par}
 
-\vspace{9mm}
+\vspace{7mm}
 
-% 8. Le titre, niveau 1.
-{\Huge\bfseries Chaîne de données\\[3mm] et tableau de bord\par}
-
-\vspace{6mm}
-
-% Le sous-titre, niveau 3.
-{\large pour un établissement hospitalier\par}
-
-% 9. Un filet court, centré, plus étroit que le premier.
+% 8. Le titre, niveau 1, entre ses deux filets épais. Fond blanc, aucun aplat.
+{\color{accentgarde}\rule{0.62\linewidth}{1.5pt}}\par
 \vspace{8mm}
-{\color{griscartouche}\rule{0.30\linewidth}{0.4pt}}
+{\Huge\bfseries Chaîne de données\\[3mm] et tableau de bord\par}
+\vspace{5mm}
+{\large pour un établissement hospitalier\par}
+\vspace{8mm}
+{\color{accentgarde}\rule{0.62\linewidth}{1.5pt}}
 
-% 10. Un espace fixe.
-\vspace{20mm}
+% 9. Un espace fixe.
+\vspace{13mm}
 
-% 11. Le bloc des noms. UNE SEULE COLONNE D'INTITULÉS, alignée à droite : les deux intitulés sont
+% 10. Le bloc des noms. UNE SEULE COLONNE D'INTITULÉS, alignée à droite : les deux intitulés sont
 % des chaînes fixes, si bien que la colonne des valeurs commence toujours au même endroit et que
 % déposer un nom ne déplace rien.
 \begin{tabular}{@{}r@{\hspace{7mm}}l@{}}
@@ -81,18 +119,24 @@
   \siRenseigne{\marqueurEncadrantProfessionnel}{{\footnotesize\scshape\color{griscartouche} Encadré par} & {\large\marqueurEncadrantProfessionnel} \\}
 \end{tabular}
 
-% 12. Un espace fixe.
-\vspace{16mm}
+% 11. Un espace fixe.
+\vspace{11mm}
 
-% 13. L'organisme d'accueil : l'intitulé au niveau 5, sa valeur au niveau 3.
+% 12. L'organisme d'accueil : l'intitulé au niveau 5, sa valeur au niveau 3.
 {\footnotesize\scshape\color{griscartouche} Organisme d'accueil\par}
 \vspace{1.5mm}
 {\large \marqueurOrganismeAccueil\par}
 
-% 14. L'année universitaire, niveau 4.
-\vspace{12mm}
+% 13. L'année universitaire, niveau 4.
+\vspace{10mm}
 \siRenseigne{\marqueurAnneeUniversitaire}{%
   {\normalsize\color{griscartouche} Année universitaire \marqueurAnneeUniversitaire\par}%
 }
+
+% 14. La bande de pied, fine, pleine largeur, de la couleur d'accent. L'espace qui la précède est
+% fixe : il est réglé pour que la bande vienne au bas du bloc de texte lorsque la page porte ses
+% deux noms, et la page tient sur une feuille dans les deux états.
+\vspace{24mm}
+{\color{accentgarde}\rule{\linewidth}{2.2mm}}
 
 \end{titlepage}

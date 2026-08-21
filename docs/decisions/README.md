@@ -98,3 +98,5 @@ chaque exécution.
 | [0082](0082-la-reecriture-des-chapitres-4-a-9.md) | La réécriture des six derniers chapitres, et deux portées qui suivent la matière |
 | [0083](0083-la-page-de-garde-et-les-trois-pages-liminaires.md) | La page de garde reçoit une hiérarchie, et les trois pages liminaires sont écrites |
 | [0084](0084-le-theme-le-bandeau-et-la-locale-du-tableau-de-bord.md) | Le thème, le bandeau et la locale du tableau de bord |
+| [0085](0085-les-deux-logos-et-les-captures.md) | Les deux logotypes, les captures, et une réservation qui cesse de deviner |
+| [0086](0086-la-page-de-garde-reprise.md) | La page de garde reprise : l'aplat retiré, le nom développé |
