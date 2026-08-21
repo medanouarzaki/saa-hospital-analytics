@@ -1,5 +1,5 @@
 % Ce chapitre repose sur :
-%   DOC: s06, s07, s08, s09, s10
+%   DOC: s06, s07, s08, s09, s10, s27
 %   OBS: REL-DEM.I01, REL-DEM.I02, REL-DEM.P02, REL-IPP.O01, REL-IPP.O02, REL-IPP.O03
 %   OBS: REL-IPP.O04, REL-IPP.R12, REL-PAT.A01, REL-PAT.D01, REL-PAT.D02, REL-PAT.D03
 %   OBS: REL-PAT.D04, REL-PAT.D09, REL-PAT.D10, REL-PAT.D11, REL-PAT.H06, REL-PAT.H08
@@ -79,6 +79,61 @@ L'éditeur ne publie aucune fiche distincte pour le recouvrement : la fonction e
 module de facturation, ce qui explique que deux profils s'y rattachent. Le cinquième profil est le
 seul dont le contenu se déduise d'une source extérieure à l'éditeur, la nomenclature des
 indicateurs qu'un hôpital nommé remonte à la statistique nationale \cite{s10}.
+
+Le découpage en cinq profils et les missions que le règlement prescrit ne se recouvrent pas terme
+à terme, et le diagramme des cas d'utilisation ci-dessous le montre mieux qu'un tableau : quatre
+missions sur neuf reçoivent un profil, cinq n'en reçoivent aucun, et un profil ne répond à aucune
+mission de l'article~35.
+
+\begin{center}
+\begin{tikzpicture}[node distance=3.4mm and 0mm]
+
+% --- les neuf missions de l'article 35, dans l'ordre du texte -------------------
+\node[casUML] (m1) {Gérer l'accueil et l'orientation des patients};
+\node[casUML, below=of m1] (m2) {Organiser les admissions et les sorties des malades\\ainsi que la gestion des rendez-vous};
+\node[casUML, below=of m2] (m3) {Gérer les effectifs des patients et leurs\\mouvements à l'intérieur de l'hôpital};
+\node[casUML, below=of m3] (m4) {Enregistrer les actes médicaux légaux et assurer\\la gestion de la morgue hospitalière};
+\node[casUML, below=of m4] (m5) {Établir les statistiques et gérer\\l'information hospitalière};
+\node[casUML, below=of m5] (m6) {Établir la facturation des prestations et services rendus\\par l'hôpital sur la base de la classification des maladies,\\des nomenclatures des actes et des tarifs en vigueur};
+\node[casUML, below=of m6] (m7) {Organiser la communication interne\\et externe de l'hôpital};
+\node[casUML, below=of m7] (m8) {Assurer l'assistance sociale aux patients};
+\node[casUML, below=of m8] (m9) {Organiser et gérer les archives médicales\\et les dossiers des patients de l'établissement};
+
+\node[cadreUML, fit=(m1)(m2)(m3)(m4)(m5)(m6)(m7)(m8)(m9)] (cadre) {};
+\node[font=\scriptsize\scshape, text=griscartouche, above=0.8mm of cadre.north] {Service d'accueil et d'admission};
+
+% --- les cinq profils applicatifs, sous leur libellé exact ----------------------
+\foreach \i/\cible/\lib in {1/m1/{MSM - URGENCE}, 2/m2/{MSM - GESTION DE RDV},
+                            3/m5/{MSM RAPPORTS\\ET STATISTIQUES}, 4/m6/{MSM - FACTURATION SAA}}{
+  \coordinate (p\i) at (cadre.west |- \cible);
+  \pic at ($(p\i)+(-26mm,2.6mm)$) {acteurUML};
+  \node[font=\scriptsize\ttfamily, align=center, anchor=north] (l\i) at ($(p\i)+(-26mm,-2.4mm)$) {\lib};
+}
+\draw[lienUML] (l1.east) -- (m1.west);
+\draw[lienUML] (l2.east) -- (m2.west);
+\draw[lienUML] (l3.east) -- (m5.west);
+\draw[lienUML] (l4.east) -- (m6.west);
+
+% Le cinquième profil est posé À L'ÉCART, sous les autres et sans lien : aucune des neuf
+% missions de l'article 35 ne porte le recouvrement.
+\coordinate (p5) at ($(l4.south)+(0,-16mm)$);
+\pic at ($(p5)+(0,2.6mm)$) {acteurUML};
+\node[font=\scriptsize\ttfamily, align=center, anchor=north] (l5) at ($(p5)+(0,-2.4mm)$) {MSM - RECOUVREMENT};
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\footnotesize Les neuf missions que l'article~35 du règlement intérieur prescrit au service
+\cite{s27}, et les cinq profils applicatifs relevés à l'écran de démarrage\releve{REL-DEM.P02}.
+Chaque mission est reproduite dans les termes du texte, chaque profil sous son libellé exact. Un
+trait joint un profil à la mission qu'il porte. Les cinq missions sans trait ne sont pas un oubli
+du dessin : aucun des cinq profils ne les porte. Le profil de recouvrement est posé à l'écart, sans
+trait, parce que le recouvrement ne figure pas à l'article~35 — il relève de l'article~9,
+paragraphe~b, qui en charge le pôle des affaires administratives \cite{s27}. La figure ne montre
+ni les habilitations qui cloisonnent les profils, ni les modules que chacun ouvre.
+\end{center}
+
+\medskip
 
 \section{Méthode de relevé}
 
