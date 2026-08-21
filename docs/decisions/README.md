@@ -105,3 +105,4 @@ chaque exécution.
 | [0089](0089-l-apport-personnel-et-la-liste-qui-se-vide.md) | L'apport personnel, et la liste des emplacements qui se vide |
 | [0090](0090-la-presentation-de-soutenance.md) | La présentation de soutenance, et une portée de contrôle qui s'étend au support |
 | [0091](0091-les-decimales-et-le-releve-date-des-criteres.md) | Un format d'affichage au registre, et un relevé daté des critères |
+| [0092](0092-les-neuf-ecarts-fermes-et-le-controle-des-nombres-tapes.md) | Les neuf écarts fermés, le nombre tapé retiré, et une vérification déclarée due |
