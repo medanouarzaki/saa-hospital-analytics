@@ -799,6 +799,7 @@ chiffres:
   note: Points du balayage où précision et rappel valent tous deux 1. Mesure l'étendue du plateau.
 - id: baseline-f-mesure
   valeur: 0.9076682316118936
+  decimales: 4
   unite: proportion
   type: python
   commande: '[float(l[''f_mesure_baseline_collision_exacte'']) for l in __import__(''csv'').DictReader((R/''linkage/ablation.csv'').open(encoding=''utf-8''))
@@ -808,6 +809,7 @@ chiffres:
     que f-mesure-seuil-retenu.
 - id: ablation-ecart-complet
   valeur: 270.868434285775
+  decimales: 2
   unite: poids
   type: python
   commande: '[float(l[''ecart'']) for l in __import__(''csv'').DictReader((R/''linkage/ablation.csv'').open(encoding=''utf-8''))
@@ -817,6 +819,7 @@ chiffres:
     Positive, un seuil sépare les deux populations ; négative, aucun ne le fait.'
 - id: ablation-ecart-variante-a
   valeur: -2.6554053556955406
+  decimales: 2
   unite: poids
   type: python
   commande: '[float(l[''ecart'']) for l in __import__(''csv'').DictReader((R/''linkage/ablation.csv'').open(encoding=''utf-8''))
@@ -826,6 +829,7 @@ chiffres:
     d'une fiche à l'autre.
 - id: ablation-ecart-variante-c
   valeur: -9.571871091053188
+  decimales: 2
   unite: poids
   type: python
   commande: '[float(l[''ecart'']) for l in __import__(''csv'').DictReader((R/''linkage/ablation.csv'').open(encoding=''utf-8''))
@@ -834,6 +838,7 @@ chiffres:
   note: Même grandeur, sur la variante cumulant les deux retraits.
 - id: ablation-f-variante-c
   valeur: 0.9984856133266027
+  decimales: 4
   unite: proportion
   type: python
   commande: '[float(l[''f_mesure'']) for l in __import__(''csv'').DictReader((R/''linkage/ablation.csv'').open(encoding=''utf-8''))

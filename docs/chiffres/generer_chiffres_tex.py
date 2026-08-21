@@ -55,7 +55,7 @@ ENTETE = r"""% Fichier produit mécaniquement à partir de docs/chiffres/registr
 """
 
 
-def formater(valeur, unite: str) -> str:
+def formater(valeur, unite: str, decimales: int | None = None) -> str:
     """Un nombre prend ses séparateurs de milliers ; un décimal prend en plus la virgule.
 
     TROIS RÈGLES, ET LES TROIS SONT MESURÉES SUR LE RENDU. La partie entière d'un décimal reçoit le
@@ -64,6 +64,13 @@ def formater(valeur, unite: str) -> str:
     le motif du contrôle qui lit ce fichier reste capable d'y délimiter la valeur — et non le trait
     d'union, qui est un autre caractère et se compose plus court. Un zéro de fin est retiré, mais
     jamais au point de manger un zéro significatif de la partie entière.
+
+    UNE QUATRIÈME RÈGLE, ET ELLE NE TOUCHE QUE L'AFFICHAGE. Une entrée peut porter `decimales` :
+    la valeur consignée reste celle que la commande a rendue — c'est elle que la remesure compare,
+    à l'égalité stricte —, et seul son RENDU est arrondi. Le motif est mesuré : cinq entrées du
+    registre portent de douze à seize décimales, et une marge écrite « 270,868434285775 » sur une
+    planche projetée ne se lit pas. Arrondir la valeur consignée aurait été une autre chose, et une
+    faute : la remesure aurait rougi sur une valeur juste.
     """
     if isinstance(valeur, bool):
         return str(valeur)
@@ -75,9 +82,10 @@ def formater(valeur, unite: str) -> str:
     if isinstance(valeur, int):
         return signe + f"{absolue:,}".replace(",", r"\,")
 
-    texte = repr(absolue)
+    texte = f"{absolue:.{decimales}f}" if decimales is not None else repr(absolue)
     entiere, _, decimale = texte.partition(".")
-    decimale = decimale.rstrip("0")
+    if decimales is None:
+        decimale = decimale.rstrip("0")
     entiere = f"{int(entiere):,}".replace(",", r"\,")
     return signe + (entiere + "," + decimale if decimale else entiere)
 
@@ -85,7 +93,7 @@ def formater(valeur, unite: str) -> str:
 def rendre(registre: dict) -> str:
     lignes = [ENTETE]
     for entree in registre["chiffres"]:
-        valeur = formater(entree["valeur"], entree["unite"])
+        valeur = formater(entree["valeur"], entree["unite"], entree.get("decimales"))
         lignes.append(
             r"\expandafter\def\csname chiffre@" + entree["id"] + r"\endcsname{" + valeur + "}"
         )

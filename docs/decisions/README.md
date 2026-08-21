@@ -104,3 +104,4 @@ chaque exécution.
 | [0088](0088-la-correction-de-l-article-35-et-la-passe-de-conversion.md) | La correction de l'article 35, et une passe de conversion qui n'atteint pas sa cible |
 | [0089](0089-l-apport-personnel-et-la-liste-qui-se-vide.md) | L'apport personnel, et la liste des emplacements qui se vide |
 | [0090](0090-la-presentation-de-soutenance.md) | La présentation de soutenance, et une portée de contrôle qui s'étend au support |
+| [0091](0091-les-decimales-et-le-releve-date-des-criteres.md) | Un format d'affichage au registre, et un relevé daté des critères |
