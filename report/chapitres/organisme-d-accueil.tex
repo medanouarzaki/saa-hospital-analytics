@@ -220,3 +220,56 @@ L'observation conduite pour ce travail a porté sur un poste et sur un seul de c
 celui des rendez-vous : les quatre autres exigent des habilitations qu'un stagiaire ne reçoit
 pas.
 
+Missions et profils disent ce que le service \emph{doit} faire et par quel outil. Ni l'un ni
+l'autre ne dit le chemin que suit un patient, et c'est pourtant ce chemin qui relie les cinq
+processus entre eux.
+
+\begin{center}
+\begin{tikzpicture}[x=1mm, y=1mm]
+
+\node[briqueUML] (arr) at (0,0) {Arrivée du patient};
+\node[briqueUML] (rdv) at (31,14) {Prise de rendez-vous\\[1pt]\emph{gestion de RDV}};
+\node[briqueUML] (urg) at (31,-14) {Passage aux urgences\\[1pt]\emph{urgence}};
+\node[briqueUML] (cons) at (62,14) {Consultation externe};
+\node[briqueUML] (tri) at (62,-14) {Tri et orientation};
+\node[briqueUML] (adm) at (93,14) {Admission\\en hospitalisation};
+\node[briqueUML] (sej) at (124,14) {Séjour\\[1pt]\emph{mouvements internes}};
+\node[briqueUML] (sor) at (124,-14) {Sortie};
+\node[briqueUML] (fac) at (93,-38) {Facturation\\[1pt]\emph{facturation SAA}};
+\node[briqueUML] (cre) at (62,-38) {Créance impayée};
+\node[briqueUML] (rel) at (31,-38) {Relance\\[1pt]\emph{recouvrement}};
+
+\draw[fluxUML] (arr.east) -- (rdv.west);
+\draw[fluxUML] (arr.east) -- (urg.west);
+\draw[fluxUML] (rdv) -- (cons);
+\draw[fluxUML] (urg) -- (tri);
+\draw[fluxUML] (cons) -- (adm);
+\draw[fluxUML] (tri.east) -- (adm.south west);
+\draw[fluxUML] (adm) -- (sej);
+\draw[fluxUML] (sej) -- (sor);
+
+% Les trois voies qui aboutissent à une facture se rejoignent en un point avant elle.
+\coordinate (j) at (93,-26);
+\fill[accentgarde] (j) circle (0.6mm);
+\draw[fluxUML] (cons.south) -- ++(0,-6) -| (j);
+\draw[fluxUML] (tri.south) -- ++(0,-6) -| (j);
+\draw[fluxUML] (sor.south) -- ++(0,-6) -| (j);
+\draw[fluxUML] (j) -- (fac.north);
+
+\draw[fluxUML] (fac) -- (cre);
+\draw[fluxUML] (cre) -- (rel);
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\footnotesize Le parcours d'un patient à travers les cinq processus du service, de son arrivée à la
+relance d'une créance. Les deux voies d'entrée sont la voie programmée, qui commence par un
+rendez-vous, et la voie non programmée, qui commence aux urgences. Une consultation, une orientation
+de sortie ou une sortie d'hospitalisation aboutissent toutes trois à une facture ; celle-ci ne donne
+lieu à une créance que si elle n'est pas soldée, et une créance seule appelle une relance. Les
+intitulés en italique nomment le processus, non le profil applicatif. La figure ne montre ni les
+délais, ni les volumes, ni les cas où un épisode n'est jamais facturé — le
+chapitre~\ref{chap:activite} les mesure.
+\end{center}
+
+\medskip
