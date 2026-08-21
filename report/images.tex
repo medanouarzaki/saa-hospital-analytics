@@ -299,3 +299,21 @@
   msgUML/.style={draw=accentgarde, line width=0.5pt, -{Latex[length=1.6mm,width=1.2mm]}},
   etiqUML/.style={font=\scriptsize, inner sep=1.2pt, fill=white, above=0.2mm},
 }
+
+% ------------------------------------------------------------------------------
+% LES STYLES DES DEUX FIGURES DE FLUX — le parcours du patient et la pile
+% technique. Ils prolongent les styles UML plutôt que d'en ouvrir un second jeu :
+% même couleur d'accent, mêmes épaisseurs de trait, mêmes corps.
+\tikzset{
+  % — une étape du parcours, ou une brique de la pile.
+  briqueUML/.style={
+    rectangle, draw=accentgarde, line width=0.6pt, align=center,
+    font=\scriptsize, inner sep=2.5pt, minimum height=8mm, text width=26mm,
+  },
+  % — une étape facultative, ou une branche : le trait se pointille.
+  briqueOptUML/.style={briqueUML, dash pattern=on 1.6pt off 1.6pt},
+  % — l'intitulé d'une couche, à gauche de la pile.
+  coucheUML/.style={font=\scriptsize\scshape, text=griscartouche, align=right},
+  % — une flèche de flux.
+  fluxUML/.style={draw=accentgarde, line width=0.6pt, -{Latex[length=1.8mm,width=1.4mm]}},
+}

@@ -1,7 +1,7 @@
 % Ce chapitre repose sur :
 %   DOC: s01, s03, s05, s12, s20, s27
 %   DOC: s28, s29, s30
-%   OBS: REL-DEM.P01, REL-DEM.P02, REL-DEM.P03, REL-DEM.P04, REL-DEM.P05
+%   OBS: REL-DEM.P02, REL-DEM.P03
 %   HYP: pyramide-des-ages
 %   CHI: (aucun)
 %   SER: (aucune)
@@ -169,50 +169,107 @@ services qu'elle comporte \cite{s27}. La distinction importe : cet article ne di
 structure interne du service d'accueil et d'admission, et il ne peut donc pas en être tiré
 d'organisation pour celui-ci.
 
-C'est l'article~35 qui porte les neuf missions du service \cite{s27}. Deux d'entre elles gouvernent
-directement l'objet de ce travail.
-
-La première est d'établir la facturation des prestations et services rendus par l'hôpital, sur la
-base de la classification des maladies, des nomenclatures des actes et des tarifs en vigueur. Elle
-fait du service le lieu où naît la donnée de facturation.
-
-La seconde est d'établir les statistiques et de gérer l'information hospitalière. C'est une mission
-propre du service, et non une fonction déléguée à une cellule tierce. Un tableau de bord alimenté
-par les données du service ne s'ajoute donc pas à ses attributions : il en sert une.
-
-Ce que le service fait au quotidien se lit aussi dans l'outil qu'il emploie. L'écran de connexion
-du système d'information propose cinq profils applicatifs, et chacun ouvre un jeu de modules
-distinct\releve{REL-DEM.P02}. Les profils ne sont donc pas cinq vues d'un même écran : ils
-découpent l'activité du service en cinq processus.
-
-La figure ci-dessous met ce découpage en regard des missions que le règlement prescrit.
+C'est l'article~35 qui porte les neuf missions du service, et les voici dans les termes du texte
+\cite{s27}.
 
 \begin{center}
-\begin{tabular}{@{}p{6.6cm}c p{6.4cm}@{}}
+\begin{tabular}{@{}r@{\hspace{2mm}}p{12.4cm}@{}}
 \toprule
-Mission prescrite, article~35 & & Profil applicatif qui la porte \\
+\multicolumn{2}{@{}l@{}}{Les neuf activités dont le service d'accueil et d'admission est chargé} \\
 \midrule
-Admettre et orienter les patients & $\leftrightarrow$ & \texttt{MSM - URGENCE}\releve{REL-DEM.P04} \\
-\addlinespace
-Organiser l'accueil et les rendez-vous & $\leftrightarrow$ & \texttt{MSM - GESTION DE RDV}\releve{REL-DEM.P02} \\
-\addlinespace
-Établir la facturation des prestations & $\leftrightarrow$ & \texttt{MSM - FACTURATION SAA}\releve{REL-DEM.P01} \\
-\addlinespace
-Recouvrer les sommes dues à l'hôpital & $\leftrightarrow$ & \texttt{MSM - RECOUVREMENT}\releve{REL-DEM.P03} \\
-\addlinespace
-Établir les statistiques et gérer l'information hospitalière & $\leftrightarrow$ & \texttt{MSM RAPPORTS ET STATISTIQUES}\releve{REL-DEM.P05} \\
+1 & Gérer l'accueil et l'orientation des patients \\
+2 & Organiser les admissions et les sorties des malades ainsi que la gestion des rendez-vous \\
+3 & Gérer les effectifs des patients et leurs mouvements à l'intérieur de l'hôpital \\
+4 & Enregistrer les actes médicaux légaux et assurer la gestion de la morgue hospitalière \\
+5 & \textbf{Établir les statistiques et gérer l'information hospitalière} \\
+6 & \textbf{Établir la facturation des prestations et services rendus par l'hôpital sur la base de
+la classification des maladies, des nomenclatures des actes et des tarifs en vigueur} \\
+7 & Organiser la communication interne et externe de l'hôpital \\
+8 & Assurer l'assistance sociale aux patients \\
+9 & Organiser et gérer les archives médicales et les dossiers des patients de l'établissement \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 \begin{center}
-\footnotesize Les cinq processus du service, entre les missions que le règlement intérieur
-prescrit \cite{s27} et les profils applicatifs relevés à l'écran de connexion. Aucune ligne n'est
-supposée : chaque profil est reproduit sous son libellé exact.
+\footnotesize Les neuf missions de l'article~35 \cite{s27}, reproduites dans les termes du texte.
+Les deux en gras gouvernent directement l'objet de ce travail.
 \end{center}
 
 \medskip
 
+La sixième fait du service le lieu où naît la donnée de facturation. La cinquième est une mission
+\emph{propre} du service, et non une fonction déléguée à une cellule tierce : un tableau de bord
+alimenté par les données du service ne s'ajoute donc pas à ses attributions, il en sert une.
+
+Ce que le service fait au quotidien se lit aussi dans l'outil qu'il emploie. L'écran de connexion
+du système d'information propose cinq profils applicatifs, et chacun ouvre un jeu de modules
+distinct\releve{REL-DEM.P02}. Les profils ne sont donc pas cinq vues d'un même écran : ils
+découpent l'activité du service en cinq processus. Le
+chapitre~\ref{chap:systeme} met ce découpage en regard des neuf missions.
+
+\textbf{Un profil du logiciel sert une mission que le règlement place ailleurs.} Le profil
+\texttt{MSM - RECOUVREMENT}\releve{REL-DEM.P03} porte le suivi des créances et des relances, et le
+recouvrement ne figure nulle part à l'article~35 : c'est l'article~9, paragraphe~b, qui charge le
+pôle des affaires administratives de veiller au recouvrement des créances de l'établissement
+\cite{s27}. Le découpage du logiciel ne recopie donc pas le découpage réglementaire, et un service
+peut porter à l'écran une activité que le texte attribue à un autre. Ce travail observe le
+logiciel tel qu'il est, et cite le règlement tel qu'il est écrit.
+
 L'observation conduite pour ce travail a porté sur un poste et sur un seul de ces cinq profils,
 celui des rendez-vous : les quatre autres exigent des habilitations qu'un stagiaire ne reçoit
 pas.
+
+Missions et profils disent ce que le service \emph{doit} faire et par quel outil. Ni l'un ni
+l'autre ne dit le chemin que suit un patient, et c'est pourtant ce chemin qui relie les cinq
+processus entre eux.
+
+\begin{center}
+\begin{tikzpicture}[x=1mm, y=1mm]
+
+\node[briqueUML] (arr) at (0,0) {Arrivée du patient};
+\node[briqueUML] (rdv) at (31,14) {Prise de rendez-vous\\[1pt]\emph{gestion de RDV}};
+\node[briqueUML] (urg) at (31,-14) {Passage aux urgences\\[1pt]\emph{urgence}};
+\node[briqueUML] (cons) at (62,14) {Consultation externe};
+\node[briqueUML] (tri) at (62,-14) {Tri et orientation};
+\node[briqueUML] (adm) at (93,14) {Admission\\en hospitalisation};
+\node[briqueUML] (sej) at (124,14) {Séjour\\[1pt]\emph{mouvements internes}};
+\node[briqueUML] (sor) at (124,-14) {Sortie};
+\node[briqueUML] (fac) at (93,-38) {Facturation\\[1pt]\emph{facturation SAA}};
+\node[briqueUML] (cre) at (62,-38) {Créance impayée};
+\node[briqueUML] (rel) at (31,-38) {Relance\\[1pt]\emph{recouvrement}};
+
+\draw[fluxUML] (arr.east) -- (rdv.west);
+\draw[fluxUML] (arr.east) -- (urg.west);
+\draw[fluxUML] (rdv) -- (cons);
+\draw[fluxUML] (urg) -- (tri);
+\draw[fluxUML] (cons) -- (adm);
+\draw[fluxUML] (tri.east) -- (adm.south west);
+\draw[fluxUML] (adm) -- (sej);
+\draw[fluxUML] (sej) -- (sor);
+
+% Les trois voies qui aboutissent à une facture se rejoignent en un point avant elle.
+\coordinate (j) at (93,-26);
+\fill[accentgarde] (j) circle (0.6mm);
+\draw[fluxUML] (cons.south) -- ++(0,-6) -| (j);
+\draw[fluxUML] (tri.south) -- ++(0,-6) -| (j);
+\draw[fluxUML] (sor.south) -- ++(0,-6) -| (j);
+\draw[fluxUML] (j) -- (fac.north);
+
+\draw[fluxUML] (fac) -- (cre);
+\draw[fluxUML] (cre) -- (rel);
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\footnotesize Le parcours d'un patient à travers les cinq processus du service, de son arrivée à la
+relance d'une créance. Les deux voies d'entrée sont la voie programmée, qui commence par un
+rendez-vous, et la voie non programmée, qui commence aux urgences. Une consultation, une orientation
+de sortie ou une sortie d'hospitalisation aboutissent toutes trois à une facture ; celle-ci ne donne
+lieu à une créance que si elle n'est pas soldée, et une créance seule appelle une relance. Les
+intitulés en italique nomment le processus, non le profil applicatif. La figure ne montre ni les
+délais, ni les volumes, ni les cas où un épisode n'est jamais facturé — le
+chapitre~\ref{chap:activite} les mesure.
+\end{center}
+
+\medskip
