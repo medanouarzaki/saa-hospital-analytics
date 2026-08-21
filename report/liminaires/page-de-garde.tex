@@ -1,16 +1,30 @@
-% Page de garde, entièrement textuelle : aucun logotype, aucune image. Le contrôle
-% d'absence d'image interdit toute image suivie sous report/, et cette page ne lui
-% en oppose aucune.
+% Page de garde. Aucune image du système d'information, ici comme ailleurs ; le
+% seul logotype admis est celui de l'établissement de formation, et il vient de
+% `\logoEcole`, qui compose un cadre de la même hauteur tant que le fichier
+% n'existe pas.
 %
 % Aucune valeur n'est écrite ici : chaque champ vient d'un marqueur.
+%
+% AUCUN TEXTE FIXE N'ENTOURE UN MARQUEUR QUI PEUT ÊTRE VIDE. Chaque champ dont le
+% marqueur peut ne pas être renseigné passe par `\siRenseigne` : l'étiquette
+% disparaît avec sa valeur au lieu d'annoncer une phrase qui s'arrête. La règle
+% vaut pour les deux noms, pour la date de soutenance, et pour les trois champs de
+% contexte. Le seul champ inconditionnel est l'organisme d'accueil, dont le
+% marqueur est renseigné dans le fichier des marqueurs lui-même — et il tient la
+% table des noms non vide, ce qui évite un tableau sans aucune ligne.
 
 \begin{titlepage}
 \centering
-\vspace*{2cm}
+\vspace*{1cm}
 
-{\large \marqueurEtablissementFormation\par}
-\vspace{0.5cm}
-{\large \marqueurFiliere\par}
+\logoEcole{2.2cm}
+
+\vspace{0.8cm}
+
+\siRenseigne{\marqueurEtablissementFormation}{%
+  {\large \marqueurEtablissementFormation\par}\vspace{0.5cm}%
+}
+\siRenseigne{\marqueurFiliere}{{\large \marqueurFiliere\par}}
 
 \vfill
 
@@ -23,23 +37,18 @@
 \vfill
 
 \begin{tabular}{rl}
-  Réalisé par & \marqueurAuteur \\[0.4em]
-  Encadrant académique & \marqueurEncadrantAcademique \\[0.4em]
-  Encadrant professionnel & \marqueurEncadrantProfessionnel \\[0.4em]
+  \siRenseigne{\marqueurAuteur}{Réalisé par & \marqueurAuteur \\[0.4em]}
+  \siRenseigne{\marqueurEncadrantProfessionnel}{Encadrant de stage & \marqueurEncadrantProfessionnel \\[0.4em]}
   Organisme d'accueil & \marqueurOrganismeAccueil \\
-\end{tabular}
-
-\vspace{1.5cm}
-
-\begin{tabular}{rl}
-  Président du jury & \marqueurPresidentJury \\[0.4em]
-  Examinateur & \marqueurExaminateur \\
 \end{tabular}
 
 \vfill
 
-{\large Soutenu le \marqueurDateSoutenance\par}
-\vspace{0.5cm}
-{\large Année universitaire \marqueurAnneeUniversitaire\par}
+\siRenseigne{\marqueurDateSoutenance}{%
+  {\large Soutenu le \marqueurDateSoutenance\par}\vspace{0.5cm}%
+}
+\siRenseigne{\marqueurAnneeUniversitaire}{%
+  {\large Année universitaire \marqueurAnneeUniversitaire\par}%
+}
 
 \end{titlepage}

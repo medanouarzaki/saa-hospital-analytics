@@ -1,42 +1,46 @@
-% Les marqueurs nominatifs du rapport, et le seul endroit du dépôt où un nom de
-% personne peut figurer. Tout autre fichier les emploie par leur commande, jamais
-% en écrivant la valeur.
+% Les marqueurs du rapport, et le seul endroit du dépôt où une valeur de page de
+% garde est écrite. Tout autre fichier les emploie par leur commande, jamais en
+% écrivant la valeur.
 %
-% Un marqueur laissé vide fait échouer un contrôle : c'est la propriété que le
-% critère de terminaison du projet exige, et tests/test_marqueurs_nominatifs.py
-% la vérifie sur CE fichier, jamais sur le PDF produit.
+% Un marqueur laissé vide ou renseigné à contretemps fait échouer un contrôle :
+% `tests/test_marqueurs_nominatifs.py` vérifie l'accord entre l'état déclaré et les
+% deux marqueurs, sur CE fichier, jamais sur le PDF produit.
 %
-% Renseigner une valeur, c'est écrire entre les accolades de la commande. Ne pas
-% renommer les commandes : le contrôle les cherche par leur nom.
+% Ne pas renommer les commandes : les contrôles les cherchent par leur nom.
 
 % --- l'état du document -------------------------------------------------------
 % Deux valeurs, et deux seulement.
 %
-%   brouillon : le rapport n'est pas remis. Les cinq marqueurs nominatifs
-%               ci-dessous sont TOUS vides, et la page de garde porte une mention
-%               visible de version de travail.
-%   remise    : le rapport est remis. Les cinq marqueurs sont TOUS renseignés, et
-%               la mention disparaît.
+%   brouillon : le rapport n'est pas remis. Les DEUX marqueurs nominatifs
+%               ci-dessous sont TOUS DEUX vides, et la page de garde porte une
+%               mention visible de version de travail.
+%   remise    : le rapport est remis. Les deux marqueurs sont TOUS DEUX
+%               renseignés, et la mention disparaît.
 %
-% Un contrôle vérifie l'accord entre cet état et les cinq marqueurs : renseigner
-% quatre marqueurs sur cinq est rouge dans les deux états, et c'est l'oubli qui
-% arrive. Passer à la remise ne coûte que ce mot — et le contrôle dira alors quel
-% marqueur manque encore.
+% Un contrôle vérifie l'accord entre cet état et les deux marqueurs : renseigner
+% l'un des deux est rouge dans les deux états, et c'est l'oubli qui arrive.
+% Passer à la remise ne coûte que ce mot — et le contrôle dira alors quel marqueur
+% manque encore.
 \newcommand{\etatDuDocument}{brouillon}
 
 % --- marqueurs nominatifs : ils portent un nom de personne ---------------------
+% DEUX, et deux seulement. Le document est un rapport de stage d'application : il
+% n'a pas d'encadrant académique, pas de président de jury, pas d'examinateur.
+% Ces trois marqueurs ont existé et ont été RETIRÉS, non laissés vides — un
+% marqueur vide est un oubli qui attend, et une ligne vide sur une page de garde
+% se remarque là où une ligne absente ne se remarque pas.
 \newcommand{\marqueurAuteur}{}
-\newcommand{\marqueurEncadrantAcademique}{}
 \newcommand{\marqueurEncadrantProfessionnel}{}
-\newcommand{\marqueurPresidentJury}{}
-\newcommand{\marqueurExaminateur}{}
 
 % --- marqueurs de contexte : ils ne portent aucun nom de personne --------------
-% Le contrôle ne les exige pas renseignés ; ils sont ici pour que la page de
-% garde n'écrive aucune valeur en dur.
-\newcommand{\marqueurEtablissementFormation}{}
-\newcommand{\marqueurFiliere}{}
-\newcommand{\marqueurAnneeUniversitaire}{}
+% Le contrôle des marqueurs nominatifs ne les regarde pas. Ils sont ici pour que
+% la page de garde n'écrive aucune valeur en dur.
+%
+% La date de soutenance n'est pas connue, et reste vide : la ligne qui la porte
+% disparaît entièrement plutôt que de composer « Soutenu le » suivi de rien.
+\newcommand{\marqueurEtablissementFormation}{Institut National de Statistique et d'Économie Appliquée (INSEA), Rabat}
+\newcommand{\marqueurFiliere}{Data \& Software Engineering}
+\newcommand{\marqueurAnneeUniversitaire}{2025-2026}
 \newcommand{\marqueurOrganismeAccueil}{Hôpital Sidi Saïd, Meknès}
 \newcommand{\marqueurDateSoutenance}{}
 
@@ -56,4 +60,20 @@
 % La mention elle-même, écrite une fois et employée par les deux documents.
 \newcommand{\mentionVersionDeTravail}{%
   \siBrouillon{\textbf{Version de travail} — document non remis}%
+}
+
+% --- aucun texte fixe autour d'un marqueur qui peut être vide ------------------
+% `\siRenseigne{\marqueur}{ce qui compose}` ne compose son second argument que si
+% le marqueur porte une valeur. Une étiquette — « Soutenu le », « Réalisé par » —
+% disparaît donc avec sa valeur, au lieu d'annoncer une phrase qui s'arrête.
+%
+% LE TÉMOIN DE VACUITÉ EST DÉCLARÉ ICI, ET NON EMPRUNTÉ AU NOYAU. `\ifx\x\empty`
+% serait FAUX même sur un marqueur vide : `\newcommand` définit ses commandes avec
+% le préfixe `\long`, que `\empty` du noyau ne porte pas, et `\ifx` compare aussi
+% les préfixes. Le témoin ci-dessous est défini par `\newcommand`, donc avec le
+% même préfixe que les marqueurs — c'est le même motif que `\etatBrouillonAttendu`
+% ci-dessus, et il est mesuré par compilation, non supposé.
+\newcommand{\marqueurVide}{}
+\newcommand{\siRenseigne}[2]{%
+  \ifx#1\marqueurVide\else#2\fi%
 }
