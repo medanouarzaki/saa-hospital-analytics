@@ -19,6 +19,19 @@
 
 \usepackage[a4paper,margin=2.5cm]{geometry}
 \usepackage{microtype}
+
+% L'aération du texte : interligne à 1,15 et espacement de paragraphe visible, sans retrait.
+% Le document était composé en interligne simple et sans blanc entre paragraphes, ce qui le
+% rendait dense à lire. Le contenu ne change pas ; la page en porte moins.
+%
+% `setspace` appartient à l ensemble `collection-latexrecommended`, le même que `microtype` et `booktabs`
+% chargés ci-dessus. L'image de composition de l'intégration continue les compose déjà à chaque
+% exécution verte : le paquet y est donc nécessairement présent, et le choix est mesuré plutôt
+% que supposé.
+\usepackage{setspace}
+\setstretch{1.15}
+\setlength{\parskip}{0.6em}
+\setlength{\parindent}{0pt}
 \usepackage{longtable}
 \usepackage{booktabs}
 \usepackage{fancyhdr}
@@ -32,6 +45,13 @@
 % compose donc déjà ce paquet à chaque exécution verte, sans que rien ne l'ait
 % demandé explicitement.
 \usepackage{graphicx}
+
+% La couleur, pour les intitulés de la page de garde. Elle est déjà chargée par la chaîne de
+% `pgfplots` — le journal de compilation nomme `xcolor.sty` — mais un paquet dont on se sert se
+% charge explicitement plutôt que par effet de bord. Même ensemble `collection-latexrecommended` que
+% `microtype` et `setspace`.
+\usepackage{xcolor}
+\definecolor{griscartouche}{gray}{0.42}
 
 % Tracé vectoriel. Le paquet est présent dans toute distribution complète, et l'image de
 % composition de l'intégration continue en porte une : le choix est mesuré, non supposé.
@@ -78,7 +98,33 @@
 \usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
 \addbibresource{biblio.bib}
 
+% Les adresses en ligne des entrées bibliographiques débordaient dans la marge — mesuré, jusqu'à
+% 333 pt, soit près de douze centimètres. Ces trois pénalités sont celles que `biblatex` expose
+% pour autoriser une coupure d'adresse ; sans elles, une adresse longue ne se coupe jamais.
+\setcounter{biburlnumpenalty}{7000}
+\setcounter{biburlucpenalty}{7000}
+\setcounter{biburllcpenalty}{7000}
+
 \usepackage[hidelinks]{hyperref}
+
+% Les adresses en ligne de la bibliographie débordaient dans la marge, jusqu'à 333 pt — près de
+% douze centimètres. Les pénalités de `biblatex` ne suffisent pas : elles n'autorisent la coupure
+% qu'entre certaines classes de caractères, et ces adresses n'en offrent pas. `xurl` autorise la
+% coupure partout dans une adresse. Il est du même ensemble `collection-latexextra` que `csquotes`,
+% chargé plus haut et composé à chaque exécution verte de l'intégration continue.
+\usepackage{xurl}
+
+% La hauteur d'en-tête : `fancyhdr` avertissait à chaque compilation qu'elle était trop petite, et
+% l'avertissement était présent depuis l'origine. La valeur ci-dessous est celle que le paquet
+% demande une fois l'interligne élargi — mesurée sur son propre message, non devinée.
+\setlength{\headheight}{15.5pt}
+\addtolength{\topmargin}{-3.5pt}
+
+% Une marge d'élasticité de dernier recours. Sans elle, une ligne que TeX ne sait pas couper
+% déborde dans la marge ; avec elle, il desserre l'interlettrage de cette ligne-là plutôt que de
+% la laisser dépasser. Elle ne peut rien contre un mot plus large que la colonne — une empreinte
+% de soixante-quatre caractères, par exemple.
+\setlength{\emergencystretch}{2em}
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -117,12 +163,15 @@
 
 \input{chapitres/conclusion}
 
-% Toutes les entrées du registre des sources figurent à la bibliographie, qu'elles
-% soient citées ou non : le fichier bibliographique est produit depuis ce registre,
-% et une entrée qui y figure est une source du projet. C'est aussi ce qui rend la
-% chaîne bibliographique vérifiable dès le squelette — sans cela, un fichier
-% bibliographique cassé passerait inaperçu jusqu'à la première citation.
-\nocite{*}
+% La bibliographie liste ce que le document EMPLOIE. Un `\nocite{*}` imprimait auparavant
+% toutes les entrées du fichier bibliographique, citées ou non, pour que la chaîne
+% bibliographique soit vérifiable dès le squelette : un fichier cassé se serait vu à la
+% première compilation plutôt qu'à la première citation. Ce motif a servi tant que le rapport
+% n'était pas rédigé ; il ne sert plus, puisque vingt clés sont désormais citées et que toute
+% rupture de la chaîne se voit aussitôt.
+%
+% Les entrées du registre des sources qu'aucun chapitre ne cite restent au registre avec leur
+% motif de non-emploi. Elles n'ont pas disparu ; elles ne s'impriment plus.
 \printbibliography[heading=bibintoc,title={Bibliographie}]
 
 \input{annexes}
