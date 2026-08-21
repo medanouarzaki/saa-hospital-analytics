@@ -284,6 +284,62 @@ donne.
 
 \medskip
 
+Ce graphe dit l'ordre, il ne dit pas qui fait quoi. Le diagramme de séquence ci-dessous porte les
+deux : les mêmes tâches, dans le même ordre, mais entre les participants réels de la chaîne.
+
+\begin{center}
+\begin{tikzpicture}[x=1mm, y=1mm]
+
+% --- les six participants, et leurs lignes de vie ------------------------------
+\foreach \i/\x/\nom in {1/0/{La zone\\d'atterrissage}, 2/23/{Le chargeur}, 3/46/{La base},
+                        4/69/{L'outil de\\transformation}, 5/92/{Le rapprochement},
+                        6/115/{L'instantané}}{
+  \node[partUML] (p\i) at (\x,0) {\nom};
+  \draw[vieUML] (p\i.south) -- ++(0,-126);
+}
+
+\def\msg#1#2#3#4{\draw[msgUML] (#1.south|-0,#3) -- (#2.south|-0,#3) node[etiqUML,midway] {#4};}
+
+\msg{p1}{p2}{-8}{1. vérifier la disponibilité de l'extraction}
+\msg{p2}{p3}{-19}{2. charger la journée}
+
+% Le contrôle de qualité s'exécute sur la base elle-même : message réflexif.
+\draw[msgUML] (p3.south|-0,-28) -- ++(7,0) -- ++(0,-5) -- ++(-7,0);
+\node[etiqUML, anchor=west] at (54,-30) {3. contrôle de qualité — taux de rejet cumulé};
+
+\msg{p3}{p4}{-42}{4. couche intermédiaire}
+\msg{p4}{p3}{-50}{5. \textbf{les dimensions}}
+\msg{p3}{p4}{-58}{6. \textbf{puis les faits}}
+\msg{p4}{p3}{-66}{7. tests de la couche}
+\msg{p3}{p5}{-76}{8. prédiction des paires}
+\msg{p5}{p3}{-84}{9. regroupement et évaluation}
+\msg{p3}{p4}{-94}{10. agrégats}
+\msg{p3}{p6}{-104}{11. rafraîchir l'instantané}
+
+% Le rafraîchissement échange les noms des tables : réflexif, et en une seule transaction.
+\draw[msgUML] (p6.south|-0,-110) -- ++(7,0) -- ++(0,-5) -- ++(-7,0);
+\node[etiqUML, anchor=east] at (113,-112) {\textbf{échange de tous les noms en une seule transaction}};
+
+% Le douzième message sort du diagramme : il n'a pas de destinataire parmi les participants.
+\draw[msgUML] (p3.south|-0,-122) -- ++(-40,0) node[etiqUML,midway] {12. exporter — fichiers de livraison} -- ++(-12,0);
+\fill[accentgarde] (p3.south|-0,-122) ++(-52,0) circle (0.6mm);
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\footnotesize Le traitement quotidien entre ses six participants. Les douze messages sont les
+douze tâches du graphe, dans leur ordre, et deux traits de ce dessin ne se lisent pas sur la liste
+qui précède. \textbf{Les dimensions se construisent avant les faits} — messages~5 et~6 —, un fait
+se rattachant à une version de dimension. Et le rafraîchissement de l'instantané n'est pas une
+reconstruction : les tables neuves sont bâties à côté, puis \textbf{tous les noms sont échangés en
+une seule transaction}, si bien qu'un lecteur ne voit jamais un état mixte. Le douzième message
+sort du diagramme parce que son destinataire n'est pas un participant : ce sont des fichiers.
+La figure ne montre ni les reprises sur échec, ni le verrou consultatif qui interdit deux
+rafraîchissements simultanés, ni le rattrapage d'une journée manquante.
+\end{center}
+
+\medskip
+
 \textbf{Une opération est \emph{idempotente} lorsque la refaire ne change rien : la faire deux fois
 donne le même résultat que la faire une fois.} C'est le chargement qui porte cette propriété ici,
 et non la couche dimensionnelle.
