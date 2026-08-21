@@ -334,9 +334,47 @@ def test_le_rendu_porte_exactement_les_entrees_du_registre() -> None:
         trouve = motif.search(rendu)
         rendue = trouve.group(1).replace("\\,", "").replace("$-$", "-").replace(",", ".")
         consignee = str(entree["valeur"])
+        # UNE ENTRÉE PEUT PORTER UN FORMAT D'AFFICHAGE, ET LE RENDU EST ALORS ARRONDI. La valeur
+        # CONSIGNÉE ne bouge pas — c'est elle que `mesurer.py --verifier` confronte à la commande,
+        # à l'égalité stricte —, et c'est donc à son arrondi, non à elle, que le rendu se compare.
+        # Sans cette branche, poser un format ferait rougir ce contrôle sur une valeur juste.
+        if entree.get("decimales") is not None:
+            consignee = f"{abs(float(entree['valeur'])):.{entree['decimales']}f}"
+            if float(entree["valeur"]) < 0:
+                consignee = "-" + consignee
         if not memes_nombres(rendue, consignee):
             ecarts.append(f"{entree['id']} : registre {consignee}, rendu {trouve.group(1)}")
     assert not ecarts, "valeurs rendues divergentes :\n  " + "\n  ".join(ecarts)
+
+
+def test_un_format_d_affichage_n_altere_jamais_la_valeur_consignee() -> None:
+    """Témoin positif ET négatif du format : il arrondit le rendu, il ne touche pas le registre.
+
+    Positif — chaque entrée qui porte `decimales` se rend avec exactement ce nombre de décimales.
+    Négatif — sa valeur consignée en porte davantage, sinon le format ne servirait à rien et le
+    témoin ne prouverait plus qu'il agit.
+
+    Sans cette épreuve, arrondir la valeur CONSIGNÉE passerait ici et ferait rougir la remesure,
+    qui compare à l'égalité stricte ce que la commande rend.
+    """
+    rendu = RENDU.read_text(encoding="utf-8")
+    formatees = [e for e in entrees() if e.get("decimales") is not None]
+    assert formatees, "aucune entrée ne porte de format : ce témoin ne prouve plus rien"
+    for entree in formatees:
+        motif = re.compile(
+            r"\\csname chiffre@" + re.escape(entree["id"]) + r"\\endcsname\{([^}]*)\}"
+        )
+        rendue = motif.search(rendu).group(1).replace("\\,", "").replace("$-$", "-")
+        _, _, decimale = rendue.partition(",")
+        assert len(decimale) == entree["decimales"], (
+            f"{entree['id']} : le rendu porte {len(decimale)} décimale(s), "
+            f"le format en déclare {entree['decimales']}"
+        )
+        consignee = repr(abs(float(entree["valeur"]))).partition(".")[2]
+        assert len(consignee) > entree["decimales"], (
+            f"{entree['id']} : la valeur consignée ne porte que {len(consignee)} décimale(s) — "
+            "le format n'arrondit rien, et ce témoin ne prouve plus qu'il agit"
+        )
 
 
 def test_chaque_chapitre_declare_les_chiffres_qu_il_appelle() -> None:
