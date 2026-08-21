@@ -15,11 +15,12 @@
 \section{Le problème des doublons dans un fichier patient}
 
 Une même personne portant deux identifiants patient est un défaut ordinaire des fichiers
-hospitaliers, et ses effets ne sont pas symétriques. Sur le plan clinique, un antécédent, une
-allergie ou un résultat d'examen enregistrés sous le premier identifiant sont invisibles au
-praticien qui ouvre le second : la donnée existe et ne se voit pas. Sur le plan administratif, deux
-dossiers se facturent séparément, deux créances naissent, deux relances partent, et le taux de
-recouvrement se dégrade sans qu'aucune ligne ne soit fausse.
+hospitaliers, et il coûte des deux côtés.
+
+Côté clinique, un antécédent enregistré sous le premier identifiant est invisible au praticien qui
+ouvre le second : la donnée existe et ne se voit pas. Côté administratif, deux dossiers se
+facturent séparément, deux créances naissent, et le taux de recouvrement se dégrade sans qu'aucune
+ligne ne soit fausse.
 
 \textbf{L'argument central de ce chapitre est que le système en place reconnaît lui-même le
 problème.} L'écran de recherche d'identifiant porte quatre onglets, dont deux s'adressent à un index
@@ -54,35 +55,40 @@ Le rapprochement repose sur le modèle de Fellegi-Sunter, dont la bibliothèque 
 l'implémentation \cite{s22}, et dont l'exposé de référence est celui que la documentation du projet
 désigne \cite{s23}.
 
-\textbf{Trois paramètres gouvernent le modèle.} Pour chaque comparaison de champ, la probabilité $m$ est celle d'observer un niveau
-d'accord donné \emph{sachant que les deux fiches désignent la même personne} ; la probabilité $u$ est
-celle d'observer le même niveau \emph{sachant qu'elles désignent deux personnes différentes} ; et la
-probabilité qu'un couple pris au hasard soit un vrai couple sert de prior. Le rapport $m/u$ est le
-facteur de vraisemblance du niveau, et son logarithme en base deux est le \emph{poids de
-correspondance} que le modèle additionne sur les champs.
+Le modèle compare deux fiches champ par champ, tire de chaque comparaison un \emph{poids de
+correspondance} — un nombre positif si les valeurs se ressemblent, négatif si elles diffèrent — et
+additionne ces poids. Un seuil sur la somme décide si les deux fiches désignent la même personne.
 
-L'estimation se fait par espérance-maximisation, qui alterne l'attribution probabiliste des paires
-aux deux populations et le réajustement des paramètres, jusqu'à convergence \cite{s22}. \textbf{Aucun
-couple étiqueté n'est fourni à cette estimation} : c'est ce qui permet d'employer la méthode sur un
-fichier patient réel, où la vérité n'est pas connue.
+\textbf{Deux probabilités donnent son poids à chaque champ.} La première est celle d'observer un
+accord \emph{sachant que les deux fiches désignent la même personne} ; la seconde, celle de
+l'observer \emph{sachant qu'elles en désignent deux différentes}. Leur rapport fait le poids ; la
+formule exacte est celle de la littérature \cite{s22}.
 
-\textbf{Ce que les deux probabilités capturent est différent.} La probabilité $u$ mesure la fréquence d'un accord dû au hasard : deux personnes distinctes
-partagent souvent une ville, rarement une date de naissance, presque jamais un numéro de pièce
-d'identité. Un accord sur un champ rare vaut donc beaucoup plus qu'un accord sur un champ commun, et
-le modèle l'apprend au lieu qu'on le lui dise. La probabilité $m$, elle, mesure la fiabilité du
-champ : un téléphone change, une date de naissance est stable.
+Les deux probabilités s'estiment sur les données elles-mêmes, sans qu'aucun couple étiqueté soit
+fourni. \textbf{C'est ce qui permet d'employer la méthode sur un fichier patient réel}, où la
+vérité n'est pas connue.
+
+\textbf{Les deux probabilités ne capturent pas la même chose.} La seconde mesure la fréquence d'un
+accord dû au hasard : deux personnes distinctes partagent souvent une ville, rarement une date de
+naissance, presque jamais un numéro de pièce d'identité.
+
+Un accord sur un champ rare vaut donc beaucoup plus qu'un accord sur un champ commun, et le modèle
+l'apprend au lieu qu'on le lui dise. La première, elle, mesure la fiabilité du champ : un téléphone
+change, une date de naissance est stable.
+
+\textbf{Le téléphone porte moins de signal encore que sa seule instabilité ne le laisserait
+croire.} Le chapitre~\ref{chap:systeme} relève qu'il est parfois rempli d'un numéro inventé
+lorsque la personne ne connaît pas le sien. Un champ renseigné mais faux ne produit ni accord ni
+désaccord informatif : il ajoute du bruit, et le modèle l'apprend en lui donnant un poids faible.
 
 Un désaccord porte de l'information au même titre qu'un accord : sur un champ stable il retire du
 poids, sur un champ instable il en retire peu.
 
-Le modèle estimé de ce projet porte \chiffre{comparaisons-modele} comparaisons de champs, chacune
-découpée en niveaux allant du plus strict au plus permissif et se terminant par un niveau par
-défaut. L'estimation s'arrête sur un critère de convergence de $10^{-4}$, avec un plafond de vingt-cinq
-itérations, et le prior estimé vaut environ quatre millionièmes.
+Le modèle estimé porte \chiffre{comparaisons-modele} comparaisons de champs, chacune découpée en
+niveaux allant du plus strict au plus permissif.
 
-Le poids total d'une paire se convertit en probabilité par $p = 1/(1 + 2^{-w})$, où $w$ est le poids
-en logarithme base deux des chances. C'est cette probabilité que le seuil compare, et celle que la
-colonne du même nom porte à l'écran de recherche du système observé.
+Le poids total d'une paire se convertit en probabilité, et c'est elle que le seuil compare. C'est
+aussi celle que la colonne du même nom porte à l'écran de recherche du système observé.
 
 \textbf{Une hypothèse du modèle doit être dite, parce qu'elle est fausse et qu'on l'emploie
 quand même.} L'addition des poids suppose les champs indépendants conditionnellement à l'état de la
@@ -93,16 +99,16 @@ a besoin ; une probabilité prise isolément ne se lit pas comme une chance.
 
 \section{Mise en œuvre}
 
-\textbf{La normalisation précède toute comparaison.} Deux variantes existent : la première passe en
-minuscules, retire les accents, réduit les espaces intérieurs et la ponctuation ; la seconde y
-ajoute le tri alphabétique des composants séparés par des espaces, ce qui absorbe l'inversion d'un
-prénom composé. \textbf{Une valeur vide reste vide} : aucune des deux ne transforme une absence en
-présence.
+\textbf{La normalisation précède toute comparaison.} Elle passe en minuscules, retire les accents et
+réduit la ponctuation ; une seconde variante trie en outre les composants séparés par des espaces,
+ce qui absorbe l'inversion d'un prénom composé. \textbf{Une valeur vide reste vide.}
 
-\textbf{Comparer toutes les paires est impossible, et le blocage est ce qui le résout.} Les
-\chiffre{identifiants-distincts} fiches de version courante forment
-\chiffre{paires-possibles} paires. Quatre règles de blocage en retiennent
-\chiffre{paires-candidates}.
+\textbf{Comparer toutes les paires est impossible.} Les \chiffre{identifiants-distincts} fiches de
+version courante forment \chiffre{paires-possibles} paires — plus que la chaîne n'en peut traiter.
+
+Le \emph{blocage} résout cela : il ne compare que les paires qui s'accordent déjà sur un critère
+grossier, par exemple le même nom de famille et le même téléphone. Quatre règles retiennent ainsi
+\chiffre{paires-candidates} paires.
 
 \begin{center}
 \begin{tabular}{@{}p{6.6cm}rr@{}}
