@@ -69,8 +69,19 @@ LONGUEUR_MINIMALE_D_UN_FRAGMENT = 4
 
 # Ce fichier se nomme lui-même : il cite les variables, jamais les valeurs. Il est
 # néanmoins exclu du balayage, comme tout fichier qui pourrait légitimement porter le
-# mot cherché sans porter le nom — il n'y en a aucun autre aujourd'hui.
+# mot cherché sans porter le nom.
 FICHIERS_EXCLUS = frozenset({"tests/test_aucun_nom_de_personne.py"})
+
+# UNE EXCLUSION PAR NOM, ET NON UNE EXCLUSION GÉNÉRALE. `LICENSE` porte le nom de l'auteur dans sa
+# ligne de droit d'auteur, et c'est la fonction même d'une licence : elle nomme le titulaire des
+# droits. Le retirer viderait le fichier de son sens.
+#
+# L'exclusion est donc étroite. Elle vaut pour le nom de l'AUTEUR et pour lui seul ; le nom de
+# l'encadrant reste cherché dans `LICENSE` comme partout ailleurs, et l'y déposer est rouge. Une
+# exclusion générale du fichier aurait ouvert une porte pour les deux noms au lieu d'un.
+EXCLUSIONS_PAR_VARIABLE: dict[str, frozenset[str]] = {
+    "RAPPORT_AUTEUR": frozenset({"LICENSE"}),
+}
 
 _ESPACES = re.compile(r"\s+")
 
@@ -117,15 +128,25 @@ def lire(chemin: str) -> str:
     return normaliser(brut.decode("utf-8", errors="replace"))
 
 
-def occurrences(fragments: list[str], chemins: list[str]) -> list[str]:
+def occurrences(par_variable: dict[str, list[str]], chemins: list[str]) -> list[str]:
+    """Les fichiers suivis qui portent un fragment de nom, variable par variable.
+
+    Le balayage est fait PAR VARIABLE et non sur l'union des fragments : c'est ce qui permet
+    d'exclure un fichier pour un nom sans l'exclure pour l'autre.
+    """
     trouvees = []
     for chemin in chemins:
         if chemin in FICHIERS_EXCLUS:
             continue
         contenu = lire(chemin)
-        for fragment in fragments:
-            if fragment in contenu:
-                trouvees.append(f"{chemin} : porte un fragment de {len(fragment)} caractères")
+        for variable, fragments in par_variable.items():
+            if chemin in EXCLUSIONS_PAR_VARIABLE.get(variable, frozenset()):
+                continue
+            for fragment in fragments:
+                if fragment in contenu:
+                    trouvees.append(
+                        f"{chemin} : porte un fragment de {len(fragment)} caractères de {variable}"
+                    )
     return sorted(set(trouvees))
 
 
@@ -193,8 +214,31 @@ def test_l_abstention_est_declaree_et_non_silencieuse() -> None:
 # --- la propriété ---------------------------------------------------------------------------------
 
 
-def noms_declares() -> list[str]:
-    return [valeur for nom in VARIABLES if (valeur := os.environ.get(nom, "").strip())]
+def noms_declares() -> dict[str, str]:
+    return {nom: valeur for nom in VARIABLES if (valeur := os.environ.get(nom, "").strip())}
+
+
+def test_l_exclusion_de_licence_ne_vaut_que_pour_l_auteur() -> None:
+    """Le témoin de l'étroitesse de l'exclusion, et il porte l'arbitrage.
+
+    `LICENSE` est écarté pour le nom de l'auteur, parce qu'une licence nomme le titulaire des
+    droits. Il ne l'est pour aucun autre : le nom de l'encadrant y est cherché comme partout.
+    """
+    ecartes = EXCLUSIONS_PAR_VARIABLE.get("RAPPORT_AUTEUR", frozenset())
+    assert "LICENSE" in ecartes, "l'exclusion de LICENSE pour l'auteur a disparu"
+    assert "LICENSE" not in EXCLUSIONS_PAR_VARIABLE.get("RAPPORT_ENCADRANT", frozenset()), (
+        "LICENSE serait écarté pour l'encadrant : l'exclusion cesserait d'être étroite"
+    )
+
+    temoin = ["LICENSE", "README.md"]
+    par_variable = {"RAPPORT_ENCADRANT": fragments_a_chercher([TEMOIN_NOM])}
+    contenu_licence = lire("LICENSE")
+    assert TEMOIN_NOM.split()[0].lower() not in contenu_licence, (
+        "le nom d'essai figure dans LICENSE : ce témoin ne prouverait rien"
+    )
+    assert occurrences(par_variable, temoin) == [], (
+        "le témoin doit être muet tant que le nom d'essai n'est nulle part"
+    )
 
 
 def test_aucun_nom_de_personne_dans_les_fichiers_suivis() -> None:
@@ -206,5 +250,6 @@ def test_aucun_nom_de_personne_dans_les_fichiers_suivis() -> None:
             + " n'est renseignée. Ce contrôle ne porte pas les noms qu'il interdit ; "
             "sans elles il ne peut rien chercher, et il le dit plutôt que de passer."
         )
-    fautifs = occurrences(fragments_a_chercher(noms), fichiers_suivis())
+    par_variable = {variable: fragments_a_chercher([valeur]) for variable, valeur in noms.items()}
+    fautifs = occurrences(par_variable, fichiers_suivis())
     assert not fautifs, "Nom de personne trouvé dans des fichiers suivis :\n" + "\n".join(fautifs)
