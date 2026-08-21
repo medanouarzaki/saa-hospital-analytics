@@ -58,6 +58,19 @@
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
 
+% Les bibliothèques de tracé des trois diagrammes UML. `pgfplots` charge déjà `tikz` et `pgf` —
+% le journal de compilation les nomme —, mais aucune de ses bibliothèques : elles se chargent
+% une à une, et un diagramme qui emploierait une bibliothèque non déclarée ici ferait échouer la
+% compilation plutôt que de composer autre chose.
+%
+% LEUR PRÉSENCE EST MESURÉE DANS L'IMAGE DE COMPOSITION, non supposée. Le travail d'intégration
+% continue appelle `xu-cheng/latex-action` sans `texlive_version`, sans `os` et sans
+% `docker_image` ; le script de l'action retient alors
+% `ghcr.io/xu-cheng/texlive-alpine:latest`, dont `action.yml` fixe le défaut `os: alpine`. Un
+% document d'essai portant ces six bibliothèques et une flèche `-{Latex}` y compose sans erreur :
+% TeX Live 2026, `Package: pgf 2025-08-29`.
+\usetikzlibrary{positioning, shapes.geometric, shapes.multipart, fit, calc, arrows.meta}
+
 % Les nombres des graduations et des tableaux composés suivent l'usage français : virgule
 % décimale, espace fine insécable aux milliers. Sans cette ligne, pgfplots écrit « 1,000 » là où
 % le rendu du registre des chiffres écrit « 1 000 », et deux conventions typographiques

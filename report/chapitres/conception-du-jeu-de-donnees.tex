@@ -63,6 +63,57 @@ c'est un défaut réel du service que le rapport de la Cour des comptes document
 modèle admet donc l'épisode sans facture, et le chapitre~\ref{chap:activite} en fait un indicateur
 plutôt qu'un cas d'erreur.
 
+Ces trois traits se lisent d'un coup sur le diagramme de classes ci-dessous, et les cardinalités y
+disent ce que la prose met trois paragraphes à dire.
+
+\begin{center}
+\begin{tikzpicture}[node distance=13mm and 16mm]
+
+\node[classeUML] (per) {\textbf{Personne}\nodepart{two}\emph{aucune clé au\\système d'origine}};
+\node[classeUML, below=of per] (ipp) {\textbf{Identifiant patient}\nodepart{two}\texttt{n\_ipp}};
+\node[classeUML, below=of ipp] (ver) {\textbf{Version de fiche}\nodepart{two}\texttt{nom}\\\texttt{sexe}\\\texttt{date\_naissance}\\\texttt{date\_extraction}};
+
+\node[classeUML, right=of ipp] (epi) {\textbf{Épisode de soin}\nodepart{two}\texttt{n\_passage}\\\texttt{type\_passage}\\\texttt{date\_heure\_entree}\\\texttt{date\_heure\_sortie}};
+\node[classeUML, above=22mm of epi] (rdv) {\textbf{Rendez-vous}\nodepart{two}\texttt{n\_rdv}\\\texttt{date\_rendez\_vous}\\\texttt{etat}};
+\node[classeUML, below=of epi] (mvt) {\textbf{Mouvement}\nodepart{two}\texttt{n\_sejour}\\\texttt{n\_mutation}\\\texttt{mode\_admission}\\\texttt{mode\_sortie}};
+
+\node[classeUML, right=of epi] (fac) {\textbf{Facture}\nodepart{two}\texttt{n\_facture}\\\texttt{montant\_total}\\\texttt{part\_organisme}\\\texttt{part\_patient}};
+\node[classeUML, below=of fac] (cre) {\textbf{Créance}\nodepart{two}\texttt{n\_creance}\\\texttt{montant\_du}\\\texttt{montant\_restant}};
+\node[classeUML, below=of cre] (rel) {\textbf{Relance}\nodepart{two}\texttt{n\_relance}\\\texttt{date\_relance}\\\texttt{canal}\\\texttt{resultat}};
+
+% --- les associations, avec leurs cardinalités ---------------------------------
+% Verticales : la cardinalité se pose à droite du trait, près de la classe qu'elle qualifie.
+\draw[assocUML] (per) -- node[cardUML,right,pos=0.28] {1} node[cardUML,right,pos=0.78] {1..*} (ipp);
+\draw[assocUML] (ipp) -- node[cardUML,right,pos=0.28] {1} node[cardUML,right,pos=0.78] {1..*} (ver);
+\draw[assocUML] (epi) -- node[cardUML,right,pos=0.15] {1} node[cardUML,right,pos=0.85] {0..*} (mvt);
+\draw[assocUML] (fac) -- node[cardUML,right,pos=0.15] {1} node[cardUML,right,pos=0.85] {0..1} (cre);
+\draw[assocUML] (cre) -- node[cardUML,right,pos=0.15] {1} node[cardUML,right,pos=0.85] {0..*} (rel);
+\draw[assocUML] (rdv) -- node[cardUML,right,pos=0.18] {0..1} node[cardUML,right,pos=0.82] {0..1} (epi);
+
+% Horizontales : la cardinalité se pose au-dessus du trait.
+\draw[assocUML] (ipp) -- node[cardUML,above,pos=0.18] {1} node[cardUML,above,pos=0.82] {0..*} (epi);
+\draw[assocUML] (epi) -- node[cardUML,above,pos=0.18] {1} node[cardUML,above,pos=0.82] {0..*} (fac);
+
+% En diagonale : le rendez-vous se rattache à l'identifiant, non à l'épisode. Le trait part du
+% coin de la classe et monte vers la droite, si bien qu'il ne traverse aucune autre classe.
+\draw[assocUML] (ipp.north east) -- node[cardUML,below right,pos=0.14] {1}
+  node[cardUML,above left,pos=0.94] {0..*} (rdv.west);
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\footnotesize Les neuf entités du domaine et leurs cardinalités. La chaîne de gauche porte la
+distinction que trois documents de travail de ce projet ont confondue : une personne reçoit un ou
+plusieurs identifiants, et un identifiant porte une ou plusieurs versions de fiche — trois
+grandeurs, non deux. Le rendez-vous se rattache à l'identifiant et non à l'épisode, et son lien à
+l'épisode est facultatif des deux côtés : c'est ce qui rend l'absence mesurable. La facture est
+facultative sur l'épisode. Les classes ne portent que leurs attributs principaux, jamais les
+colonnes de la couche source au complet ; la figure ne montre ni les tables de la couche produite,
+ni les clés étrangères, ni les tables de la quarantaine.
+\end{center}
+
+\medskip
+
 \section{Modèle logique de la couche source}
 
 La couche source compte \chiffre{source-tables} tables, une par flux extractible du système
