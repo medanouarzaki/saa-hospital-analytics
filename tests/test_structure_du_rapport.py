@@ -25,7 +25,18 @@ PRINCIPAL = REPORT / "rapport.tex"
 
 # Les fichiers de `report/` qui ne sont pas des sources à inclure : le document principal lui-même,
 # et le fichier bibliographique, que biblatex charge par son propre mécanisme.
-HORS_INCLUSION = {"rapport.tex", "biblio.bib"}
+# Les sources de `report/` que le document n'inclut pas, et le motif de chacune.
+#
+# `rapport.tex` est le document lui-même ; `biblio.bib` entre par `\addbibresource`, non par
+# `\input`.
+#
+# `dictionnaire_donnees.tex` est produit mécaniquement depuis le registre des champs, et le rapport
+# ne le compose plus : il occupait près d'un quart du document pour un tableau qui ne se lit pas
+# d'un bout à l'autre, et l'annexe porte désormais sa synthèse — produite par le même module — avec
+# un renvoi au dictionnaire complet. Le fichier reste un artefact du dépôt, et
+# `tests/test_provenance.py` le régénère pour le comparer au registre dont il dérive. Son absence
+# d'inclusion est donc une décision, et elle est écrite ici plutôt que découverte.
+HORS_INCLUSION = {"rapport.tex", "biblio.bib", "dictionnaire_donnees.tex"}
 
 # `\input{chemin}` — le chemin est relatif au répertoire du document et sans extension. Un `\input`
 # commenté n'inclut rien : le caractère de pourcentage ouvre un commentaire, sauf s'il est échappé.

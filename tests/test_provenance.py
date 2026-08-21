@@ -213,6 +213,10 @@ def test_artefacts_synchrones(tmp_path: Path) -> None:
     fichiers_a_comparer.append(RACINE / "dbt" / "models" / "sources" / "source.yml")
     fichiers_a_comparer.append(RACINE / "docs" / "champs" / "dictionnaire_donnees.md")
     fichiers_a_comparer.append(RACINE / "report" / "dictionnaire_donnees.tex")
+    # La synthèse dérive du même registre par le même module. Sans cette ligne, elle pourrait
+    # rester périmée après une modification du registre sans qu'aucun contrôle ne le voie : c'est
+    # la seule voie par laquelle elle serait verte alors que sa source aurait changé.
+    fichiers_a_comparer.append(RACINE / "report" / "dictionnaire_synthese.tex")
 
     echecs = []
     for committe in fichiers_a_comparer:

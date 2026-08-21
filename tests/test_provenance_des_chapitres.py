@@ -68,12 +68,12 @@ ANNEXES_PRINCIPAL = REPORT / "annexes.tex"
 # liste est DÉCLARÉE ici et confrontée aux inclusions de `report/annexes.tex` dans les deux sens :
 # un fichier ajouté à l'un sans l'autre fait rougir un contrôle.
 #
-# `dictionnaire_donnees.tex` n'y figure pas, et c'est délibéré : il est produit mécaniquement
+# `dictionnaire_synthese.tex` n'y figure pas, et c'est délibéré : il est produit mécaniquement
 # depuis le registre des champs, ne porte aucune déclaration de provenance et n'a pas à en porter
-# — `tests/test_provenance.py` le compare au registre dont il dérive. L'écarter ici est donc une
-# décision, pas un oubli, et `EXCLUS` la rend visible plutôt que silencieuse.
+# — `tests/test_provenance.py` le régénère et le compare au registre dont il dérive. L'écarter ici
+# est donc une décision, pas un oubli, et `EXCLUS` la rend visible plutôt que silencieuse.
 ANNEXES = ("releve_des_ecrans.tex",)
-EXCLUS = ("dictionnaire_donnees.tex",)
+EXCLUS = ("dictionnaire_synthese.tex",)
 
 # Les paragraphes qui relèvent de la rédaction personnelle et que le squelette ne peut pas écrire.
 # Ils sont marqués `\aRediger{...}` dans les sources et composent un cadre VISIBLE à la lecture.

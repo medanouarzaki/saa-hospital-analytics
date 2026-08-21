@@ -2,10 +2,26 @@
 
 \chapter{Dictionnaire de données}
 
-Le tableau qui suit est produit mécaniquement depuis le registre des champs, et
-n'est pas rédigé : un contrôle compare le fichier inclus ici au registre dont il
-dérive.
+La couche source compte onze tables. Le tableau ci-dessous en donne, pour chacune, le nombre de
+colonnes et la répartition de leur provenance : observée à l'écran, déduite d'une source
+documentaire, ou posée sans preuve externe.
 
-\input{dictionnaire_donnees}
+Il est produit mécaniquement depuis le registre des champs, comme le dictionnaire complet dont il
+dérive, et un contrôle régénère les deux pour les comparer au registre.
+
+\input{dictionnaire_synthese}
+
+\medskip
+
+La lecture par table apprend ce qu'une proportion d'ensemble masque. La table des patients et
+celle des rendez-vous sont observées presque colonne par colonne, parce que ce sont les deux
+écrans que le relevé a parcourus. Celle des relances ne l'est pas du tout : aucune de ses colonnes
+n'a été vue ni documentée, et le chapitre~\ref{chap:jeu-de-donnees} dit sur quoi elles reposent.
+
+\textbf{Le dictionnaire complet — colonne par colonne, avec son type métier, son libellé à
+l'écran, sa provenance, sa preuve et sa note — n'est pas reproduit ici.} Il occupait près d'un
+quart du document pour un tableau qui ne se lit pas d'un bout à l'autre. Il reste un artefact du
+projet, produit par le même module, et se lit au dépôt sous
+\texttt{docs/champs/dictionnaire\_donnees.md}.
 
 \input{releve_des_ecrans}
