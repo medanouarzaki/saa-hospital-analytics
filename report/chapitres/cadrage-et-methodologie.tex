@@ -35,8 +35,18 @@ affichent enfin leur code nu, faute de libellé qu'une source établisse.
 Cette dernière abstention est délibérée : un code nu est illisible et le montre, un libellé inventé
 est lisible et le cache.
 
-\aRediger{presentation-du-besoin}{la façon dont le besoin a été présenté au début du stage, et ce
-que l'encadrement a précisé oralement sur les attentes et les priorités}\releve{presentation-du-besoin}
+Le besoin est arrivé par ce document, remis en début de stage. L'encadrant en a redit oralement le
+contenu, sans rien y ajouter\releve{presentation-du-besoin}.
+
+Il a laissé toute liberté d'action dans le cadre ainsi fixé. Aucune démarche n'a été imposée, aucun
+outil prescrit, aucun découpage suggéré.
+
+Cette liberté a une conséquence qu'il faut écrire, parce qu'elle porte tout ce chapitre : \textbf{le
+cadrage est l'œuvre du stagiaire}. Le périmètre retenu, la décision de générer les données, la pile
+technique et la méthode de vérification ne sont pas des consignes reçues — ce sont des choix, et
+ils appartiennent à celui qui les a faits. Le reste du chapitre les assume comme tels.
+
+Le besoin n'a pas changé en cours de stage.
 
 \section{Périmètre d'observation}
 
@@ -52,7 +62,7 @@ présenter comme vu ce qui a été déduit. Chaque colonne du modèle de donnée
 étiquette de provenance, et l'exigence de preuve diffère par étiquette.
 
 \begin{center}
-\begin{tabular}{@{}p{1.6cm}p{5.0cm}p{1.6cm}p{5.5cm}@{}}
+\begin{tabular}{@{}p{1.9cm}p{4.9cm}p{1.6cm}p{5.3cm}@{}}
 \toprule
 Étiquette & Sens & Colonnes & Ce que la preuve doit être \\
 \midrule
@@ -135,8 +145,36 @@ Chaque valeur vit dans un registre avec la commande exacte qui la produit, et le
 par son identifiant. Un nombre écrit en clair est un nombre que plus rien ne rattache à une mesure,
 et il devient faux sans que personne ne s'en aperçoive.
 
-\aRediger{rattachement-du-travail}{le rattachement du travail effectué aux phases du projet, et ce
-que chaque phase a produit}\releve{rattachement-du-travail}
+Le travail a commencé par le service, et non par la technique : lecture du cahier de charges,
+observation au poste, puis relevé des écrans\releve{rattachement-du-travail}.
+
+L'ordre n'est pas anodin. Le modèle de données est calqué sur les champs réellement vus, non sur un
+modèle hospitalier générique ; commencer par la technique aurait produit un modèle plausible, et
+c'est exactement ce que ce rapport refuse.
+
+Ont suivi la recherche documentaire qui établit les chiffres de référence, la conception et la
+génération du jeu de données, la chaîne de traitement, le rapprochement d'identités et les
+contrôles de qualité, la restitution, puis la rédaction.
+
+Le rapport suit l'ordre de construction, chaque chapitre s'appuyant sur le précédent. Une seule
+inversion mérite d'être signalée : les sources documentaires sont présentées au fil des chapitres
+qui les emploient, alors qu'elles ont toutes été établies en amont.
+
+\textbf{Deux travaux ont été entièrement repris}, et le dire vaut mieux qu'un récit lisse.
+
+La volumétrie a été redérivée d'un bout à l'autre. Le cadrage initial tirait les volumes d'une
+capacité annoncée et d'indicateurs nationaux ; en cherchant ces chiffres à la source,
+l'établissement s'est révélé nommément présent dans le recueil ministériel, avec une capacité
+fonctionnelle très inférieure à la capacité annoncée. Tout a été recalculé depuis les valeurs
+relevées.
+
+Le tableau de bord a été repris deux fois. La première parce qu'aucune page ne s'affichait dans le
+conteneur alors que tous les services étaient sains ; la seconde parce que des graphiques ne
+traçaient rien alors qu'un contrôle comptait bien des éléments affichés.
+
+L'observation a été courte et bornée à un poste ; l'essentiel du temps est allé à la construction
+et à la rédaction. \textbf{La rédaction a été menée en fin de projet alors qu'elle devait être
+répartie sur toute sa durée}, et c'est une erreur de méthode.
 
 \section{Outils et justification}
 
@@ -179,6 +217,75 @@ pas décrire comme réfutable n'est pas un choix, c'est une préférence.
 
 \section{Organisation du projet en phases}
 
-\aRediger{organisation-en-phases}{les phases du projet, nommées par ce qu'elles font, avec pour
-chacune son objectif et ses livrables, suivies d'une figure restituant leurs dépendances — aucun
-calendrier, aucun relevé de jours}\releve{organisation-en-phases}
+Le projet se découpe en sept phases, nommées par ce qu'elles font\releve{organisation-en-phases}.
+
+\begin{center}
+\begin{tabular}{@{}p{4.6cm}p{4.6cm}p{4.6cm}@{}}
+\toprule
+Phase & Objectif & Ce qu'elle produit \\
+\midrule
+Comprendre le service et relever les écrans & savoir ce que le service fait et quels champs le système porte & le relevé des quatre écrans, élément par élément \\
+\addlinespace
+Établir les sources et les chiffres de référence & fonder chaque valeur sur un document vérifiable & le registre des sources et les volumes de référence \\
+\addlinespace
+Concevoir et engendrer le jeu de données & disposer de données réalistes sans données réelles & le jeu de données et le registre des relations injectées \\
+\addlinespace
+Construire la chaîne de traitement & porter les données brutes jusqu'aux tables analytiques & les couches d'ingestion, de quarantaine et de modélisation \\
+\addlinespace
+Rapprocher les identités et mesurer la qualité & savoir ce que valent les données produites & le modèle de rapprochement et son évaluation \\
+\addlinespace
+Restituer & rendre les indicateurs lisibles par le service & le tableau de bord et le livrable quotidien \\
+\addlinespace
+Rédiger & rendre compte du travail et de ses limites & le présent rapport \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\footnotesize Les sept phases, leur objectif et leur livrable.
+\end{center}
+
+\medskip
+
+Leurs dépendances comptent davantage que leur ordre, et la figure ci-dessous les restitue.
+
+\begin{center}
+\begin{tabular}{@{}c@{}}
+\fbox{\begin{minipage}{0.92\linewidth}
+\centering\small
+\fbox{\begin{minipage}{0.42\linewidth}\centering Comprendre le service \\ et relever les écrans\end{minipage}}%
+\hfill
+\fbox{\begin{minipage}{0.42\linewidth}\centering Établir les sources \\ et les chiffres de référence\end{minipage}}\\[3pt]
+$\searrow$ \hfill $\swarrow$\\[3pt]
+\fbox{\begin{minipage}{0.62\linewidth}\centering Concevoir et engendrer \\ le jeu de données\end{minipage}}\\[3pt]
+$\downarrow$\\[3pt]
+\fbox{\begin{minipage}{0.62\linewidth}\centering Construire la chaîne \\ de traitement\end{minipage}}\\[3pt]
+$\downarrow$\\[3pt]
+\fbox{\begin{minipage}{0.62\linewidth}\centering Rapprocher les identités \\ et mesurer la qualité\end{minipage}}\\[3pt]
+$\downarrow$\\[3pt]
+\fbox{\begin{minipage}{0.62\linewidth}\centering Restituer\end{minipage}}\\[3pt]
+$\downarrow$\\[3pt]
+\fbox{\begin{minipage}{0.62\linewidth}\centering Rédiger\end{minipage}}
+\end{minipage}}
+\end{tabular}
+\end{center}
+
+\begin{center}
+\footnotesize Dépendances entre phases. Aucun calendrier : une flèche dit qu'une phase exige la
+précédente, non qu'elle la suit dans le temps.
+\end{center}
+
+\medskip
+
+Les deux premières phases sont indépendantes l'une de l'autre. La troisième exige les deux : la
+structure du jeu de données vient des écrans relevés, ses valeurs viennent des sources. La
+quatrième exige la troisième.
+
+La restitution exige la chaîne, mais aussi le rapprochement : une page du tableau de bord lit
+directement les résultats de ce dernier. La rédaction exige tout ce qui précède, puisqu'elle en
+rend compte.
+
+\textbf{Une huitième phase s'est intercalée, et elle n'était pas prévue.} Une relecture critique de
+l'ensemble, menée entre la construction et la rédaction, a ouvert un travail de reprise et de
+vérification qui a coûté du temps. Il a corrigé des défauts qui, sans lui, auraient été découverts
+dans un rapport déjà remis. C'est un fait, pas une excuse.
