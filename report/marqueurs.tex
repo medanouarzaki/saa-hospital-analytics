@@ -15,19 +15,26 @@
 % Ne pas renommer les commandes : les contrôles les cherchent par leur nom.
 
 % --- l'état du document -------------------------------------------------------
-% Deux valeurs, et deux seulement.
+% CE FICHIER DÉCLARE `brouillon`, ET IL LE DÉCLARERA TOUJOURS.
 %
-%   brouillon : le rapport n'est pas remis. Les DEUX marqueurs nominatifs
-%               ci-dessous sont TOUS DEUX vides, et la page de garde porte une
-%               mention visible de version de travail.
-%   remise    : le rapport est remis. Les deux marqueurs sont TOUS DEUX
-%               renseignés, et la mention disparaît.
+% L'état de remise ne s'écrit pas ici. Il s'écrit dans `noms.tex`, avec les deux
+% noms, et `noms.tex` n'est jamais commis. Les trois valeurs qui font un document
+% remis — l'auteur, l'encadrant, l'état — voyagent donc ensemble et sortent
+% ensemble du dépôt.
 %
-% Un contrôle vérifie l'accord entre cet état et les deux marqueurs : renseigner
-% l'un des deux est rouge dans les deux états, et c'est l'oubli qui arrive.
-% Passer à la remise ne coûte que ce mot — et le contrôle dira alors quel marqueur
-% manque encore. Les noms venant de `noms.tex`, la bascule suppose que ce fichier
-% existe, ou que l'intégration continue l'écrive depuis ses variables de dépôt.
+% Le motif est qu'une contradiction se levait autrement. Un contrôle exigeait, en
+% état de remise, que CE fichier porte les deux noms ; une autre règle interdisait
+% au dépôt de les porter. Les deux ne pouvaient pas être vraies en même temps. En
+% sortant l'état avec les noms, la propriété que ce fichier doit tenir devient
+% permanente : il déclare `brouillon`, et ses deux marqueurs nominatifs sont vides.
+% `tests/test_marqueurs_nominatifs.py` la vérifie, et ne changera plus.
+%
+% Deux valeurs restent admises par le mécanisme typographique, parce que
+% `noms.tex` emploie la seconde :
+%
+%   brouillon : la page de garde porte une mention visible de version de travail,
+%               et les lignes de noms disparaissent avec leurs marqueurs vides ;
+%   remise    : la mention disparaît, et les deux noms figurent.
 \newcommand{\etatDuDocument}{brouillon}
 
 % --- marqueurs nominatifs : ils portent un nom de personne ---------------------
@@ -86,16 +93,23 @@
 }
 
 % --- les noms, injectés à la compilation --------------------------------------
-% `noms.tex` redéfinit les deux marqueurs nominatifs. Il n'est JAMAIS commis :
-% `.gitignore` porte `report/noms.tex`, et un contrôle cherche les deux noms dans
-% l'ensemble des fichiers suivis.
+% `noms.tex` redéfinit les deux marqueurs nominatifs ET l'état du document. Il
+% n'est JAMAIS commis : `.gitignore` porte `report/noms.tex`, et un contrôle
+% cherche les deux noms dans l'ensemble des fichiers suivis.
+%
+% Sa forme est celle-ci, et l'intégration continue l'écrit depuis deux secrets de
+% dépôt :
+%
+%   \renewcommand{\marqueurAuteur}{...}
+%   \renewcommand{\marqueurEncadrantProfessionnel}{...}
+%   \renewcommand{\etatDuDocument}{remise}
 %
 % DEUX CHEMINS SONT ESSAYÉS, et c'est mesuré : le rapport se compose depuis
 % `report/`, où le fichier est `noms.tex` ; la présentation se compose depuis
 % `slides/` et charge ce fichier-ci par `\input{../report/marqueurs}`, où le même
 % fichier est `../report/noms.tex`. Un seul des deux chemins existe à la fois.
-% Si aucun ne répond, les marqueurs restent vides et le document compose sans
-% noms : c'est le comportement attendu tant que l'état vaut `brouillon`.
+% Si aucun ne répond, les marqueurs restent vides, l'état reste `brouillon` et le
+% document compose sans noms, mention de version de travail comprise.
 \IfFileExists{noms.tex}{%
   \input{noms.tex}%
 }{%

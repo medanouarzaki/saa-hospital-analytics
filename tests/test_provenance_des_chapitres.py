@@ -18,6 +18,37 @@ l'égalité des deux ensembles.
 
 CE CONTRÔLE LIT LES SOURCES, JAMAIS LE PDF : il ne compile rien et ne dépend d'aucune distribution
 typographique.
+
+SA PORTÉE COUVRE LES FICHIERS DE CHAPITRE ET LES FICHIERS D'ANNEXE. Elle a été étendue le jour où
+les tableaux de relevé exhaustifs sont descendus du corps du rapport vers une annexe : quand une
+matière se déplace, c'est la portée du contrôle qui suit la matière, jamais la matière qui reste où
+le contrôle sait déjà regarder. Sans cette extension, cinquante-six champs relevés — onglets,
+menus, filtres, colonnes de résultat — seraient sortis de toute couverture d'un seul déplacement de
+fichier, et le contrôle serait resté vert.
+
+LA PORTÉE EST DÉCLARATIVE, PAS DEVINÉE. Les fichiers d'annexe examinés sont énumérés dans
+`ANNEXES`, et cette liste est confrontée aux inclusions de `report/annexes.tex` DANS LES DEUX SENS.
+Découvrir les fichiers par une convention de répertoire aurait fait entrer n'importe quel fichier
+déposé là sans que personne ne l'ait décidé ; se contenter d'une liste sans la confronter aurait
+laissé passer l'inverse.
+
+PAR QUELLE VOIE CE CONTRÔLE SERAIT-IL VERT ALORS QU'UN CHAMP AURAIT PERDU SA PROVENANCE ? Quatre
+voies ont été cherchées avant d'écrire l'extension, et les quatre sont fermées.
+
+  1. Un fichier d'annexe ajouté et absent de `ANNEXES`. Ses identifiants ne seraient pas comptés,
+     et les champs correspondants tomberaient en orphelins : le contrôle ROUGIT. La voie est
+     fermée par construction, et `test_la_liste_des_annexes_coincide_avec_les_inclusions` la
+     nomme explicitement.
+  2. Un fichier resté dans `ANNEXES` mais que `report/annexes.tex` n'inclut plus. C'est la voie
+     dangereuse : le fichier ne serait plus composé, ses champs auraient disparu du document, et
+     le contrôle continuerait de compter leurs identifiants. Fermée par la confrontation dans le
+     second sens.
+  3. `report/annexes.tex` lui-même retiré du fichier principal. Toutes les annexes sortiraient du
+     document composé sans qu'aucune liste ne bouge. Fermée par
+     `test_les_annexes_sont_incluses_par_le_document`.
+  4. Un identifiant porté par une annexe sans être déclaré en tête de celle-ci, ou déclaré sans y
+     être porté. Fermée par la correspondance dans les deux sens, qui s'applique désormais aux
+     annexes comme aux chapitres.
 """
 
 from __future__ import annotations
@@ -31,6 +62,18 @@ RACINE = Path(__file__).resolve().parent.parent
 REPORT = RACINE / "report"
 CHAPITRES = REPORT / "chapitres"
 PRINCIPAL = REPORT / "rapport.tex"
+ANNEXES_PRINCIPAL = REPORT / "annexes.tex"
+
+# Les fichiers d'annexe que ce contrôle examine, au même titre que les fichiers de chapitre. La
+# liste est DÉCLARÉE ici et confrontée aux inclusions de `report/annexes.tex` dans les deux sens :
+# un fichier ajouté à l'un sans l'autre fait rougir un contrôle.
+#
+# `dictionnaire_donnees.tex` n'y figure pas, et c'est délibéré : il est produit mécaniquement
+# depuis le registre des champs, ne porte aucune déclaration de provenance et n'a pas à en porter
+# — `tests/test_provenance.py` le compare au registre dont il dérive. L'écarter ici est donc une
+# décision, pas un oubli, et `EXCLUS` la rend visible plutôt que silencieuse.
+ANNEXES = ("releve_des_ecrans.tex",)
+EXCLUS = ("dictionnaire_donnees.tex",)
 BIBLIO = REPORT / "biblio.bib"
 MARQUEURS = REPORT / "marqueurs.tex"
 SOURCES = RACINE / "docs" / "sources" / "sources.yml"
@@ -174,7 +217,22 @@ def etat_du_document() -> str | None:
 
 
 def fichiers_de_chapitre() -> list[Path]:
-    return sorted(CHAPITRES.glob("*.tex"))
+    """Les fichiers de chapitre ET les fichiers d'annexe déclarés.
+
+    Le nom reste celui d'origine parce que la propriété qu'ils partagent est la même : ce sont les
+    fichiers de PROSE du rapport, ceux qui portent des citations, des relevés et des conventions,
+    et dont la déclaration de tête doit coïncider avec le contenu.
+    """
+    return sorted(CHAPITRES.glob("*.tex")) + [REPORT / nom for nom in ANNEXES]
+
+
+_INPUT = re.compile(r"\\input\{([a-z0-9_-]+)\}")
+
+
+def inclusions_des_annexes() -> set[str]:
+    """Les fichiers que `report/annexes.tex` inclut, nom de fichier compris."""
+    actif = partie_active(ANNEXES_PRINCIPAL.read_text(encoding="utf-8"))
+    return {f"{nom}.tex" for nom in _INPUT.findall(actif)}
 
 
 def non_employees_declarees() -> dict[str, str]:
@@ -320,6 +378,58 @@ def test_aucun_paragraphe_ne_reste_a_rediger() -> None:
     assert not restants, "état « remise » : des paragraphes restent à rédiger :\n  " + "\n  ".join(
         restants
     )
+
+
+def test_la_liste_des_annexes_coincide_avec_les_inclusions() -> None:
+    """La portée déclarée et la portée réelle, dans les deux sens.
+
+    Premier sens : un fichier d'annexe inclus par le document et absent de `ANNEXES` échapperait à
+    l'examen. Second sens : un fichier resté dans `ANNEXES` mais que le document n'inclut plus
+    verrait ses identifiants comptés alors qu'ils ne figurent plus nulle part — c'est la voie par
+    laquelle ce contrôle serait vert sur des champs disparus, et c'est celle-ci qui la ferme.
+
+    `EXCLUS` porte les fichiers volontairement hors examen. Un fichier inclus qui n'est ni dans
+    `ANNEXES` ni dans `EXCLUS` est un oubli, et il est rouge.
+    """
+    inclus = inclusions_des_annexes()
+    declares, exclus = set(ANNEXES), set(EXCLUS)
+
+    non_examines = sorted(inclus - declares - exclus)
+    assert not non_examines, (
+        f"fichiers inclus par {ANNEXES_PRINCIPAL.name} et hors de toute liste : {non_examines} — "
+        "ajoutez-les à ANNEXES pour qu'ils soient examinés, ou à EXCLUS avec le motif"
+    )
+
+    fantomes = sorted(declares - inclus)
+    assert not fantomes, (
+        f"fichiers déclarés dans ANNEXES et que {ANNEXES_PRINCIPAL.name} n'inclut plus : "
+        f"{fantomes} — leurs identifiants seraient comptés alors qu'ils ne sont plus composés"
+    )
+
+    exclus_absents = sorted(exclus - inclus)
+    assert not exclus_absents, (
+        f"fichiers déclarés dans EXCLUS et non inclus : {exclus_absents} — une exclusion qui ne "
+        "porte sur rien masque une décision qui n'a plus d'objet"
+    )
+
+
+def test_les_annexes_sont_incluses_par_le_document() -> None:
+    """Sans cette propriété, retirer les annexes du fichier principal ne rougirait nulle part.
+
+    Les identifiants continueraient d'être comptés par le contrôle, et les champs
+    correspondants auraient pourtant quitté le document composé.
+    """
+    actif = partie_active(PRINCIPAL.read_text(encoding="utf-8"))
+    assert "\\input{annexes}" in actif, (
+        f"{PRINCIPAL.name} n'inclut plus {ANNEXES_PRINCIPAL.name} : les fichiers d'annexe ne sont "
+        "plus composés, et les identifiants qu'ils portent ne sont plus dans le document"
+    )
+
+
+def test_chaque_fichier_examine_existe() -> None:
+    """Un nom mal orthographié dans `ANNEXES` lèverait à la lecture ; il doit rougir avant."""
+    absents = [chemin.name for chemin in fichiers_de_chapitre() if not chemin.is_file()]
+    assert not absents, f"fichiers déclarés et absents du disque : {absents}"
 
 
 def test_chaque_chapitre_declare_les_trois_etiquettes() -> None:

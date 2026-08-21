@@ -9,18 +9,21 @@ président de jury, pas d'examinateur. Ces trois marqueurs-là ont existé et on
 fichier, non laissés vides — un marqueur vide est un oubli qui attend. Une propriété ci-dessous
 vérifie qu'aucun ne revient.
 
-ELLE N'EST PAS AFFAIBLIE, ELLE EST CONDITIONNÉE À UN ÉTAT ÉCRIT. Le fichier des marqueurs déclare
-son état — `brouillon` ou `remise`, et rien d'autre — et le contrôle exige des deux marqueurs
-qu'ils soient TOUS DEUX vides dans le premier, TOUS DEUX renseignés dans le second. Trois choses en
-découlent, et aucune n'est une abstention : l'état apparaît dans un diff, là où un contrôle qui se
-tairait ne laisserait aucune trace ; l'oubli réaliste — l'un des deux — est rouge dans les DEUX
-états ; et le passage à la remise ne coûte qu'un mot, après quoi le contrôle nomme ce qui manque.
+LA PROPRIÉTÉ EST PERMANENTE, ET CE CONTRÔLE NE CHANGERA PLUS. `report/marqueurs.tex` déclare
+l'état `brouillon` et ses deux marqueurs nominatifs vides — toujours. Le passage à la remise ne se
+fait pas en modifiant ce fichier : il se fait en déposant `report/noms.tex`, qui n'est jamais
+commis et qui redéfinit les deux noms ET l'état.
 
-CE QU'IL NE PEUT PAS VOIR. Les valeurs elles-mêmes ne sont plus dans le dépôt : `report/noms.tex`
-redéfinit les deux marqueurs à la compilation et n'est pas suivi. En état de remise, ce contrôle
-exige donc que `marqueurs.tex` porte les noms — et c'est le seul moment où ils y seraient écrits.
-Le travail qui basculera l'état devra trancher entre les y écrire et déplacer la propriété sur le
-fichier injecté, que ce contrôle ne lit pas.
+C'EST LA LEVÉE D'UNE CONTRADICTION, ET ELLE VAUT D'ÊTRE DITE. Ce contrôle exigeait auparavant,
+en état de remise, que le fichier commis porte les deux noms ; une autre règle du projet
+interdisait au dépôt de les porter. Les deux ne pouvaient pas être vraies ensemble, et la
+contradiction était consignée sans être tranchée. Elle l'est : l'état sort du dépôt avec les noms
+qu'il commande, et le fichier commis n'a plus qu'un seul état légitime.
+
+CE QU'IL NE PEUT PAS VOIR. Il ne voit rien de `noms.tex` — ni les noms, ni l'état qu'il pose. Un
+document composé avec un `noms.tex` mal formé se remettrait sans nom sans qu'aucun contrôle ne
+bronche. La seule chose qui l'établirait est la lecture du document composé, que le dépôt ne suit
+pas.
 
 CE CONTRÔLE LIT LE FICHIER DES MARQUEURS, JAMAIS LE PDF. Une propriété qui dépend du rendu n'est pas
 observable côté serveur — le projet l'a déjà mesuré sur ses graphiques — et un PDF n'est pas suivi
@@ -65,11 +68,12 @@ RETIRES = (
     "marqueurExaminateur",
 )
 
-# La commande qui porte l'état du document, et les deux seules valeurs qu'elle admet.
+# La commande qui porte l'état du document. `brouillon` est la SEULE valeur que le fichier commis
+# ait le droit de déclarer ; `remise` reste une valeur du mécanisme typographique, posée par
+# `noms.tex`, que ce contrôle ne lit pas et n'a pas à connaître.
 ETAT = "etatDuDocument"
 BROUILLON = "brouillon"
-REMISE = "remise"
-ETATS_ADMIS = (BROUILLON, REMISE)
+ETATS_ADMIS = (BROUILLON,)
 
 # Les valeurs d'attente : renseigner un marqueur avec l'une d'elles, c'est ne pas l'avoir renseigné.
 VALEURS_D_ATTENTE = ("à compléter", "a completer", "todo", "xxx", "nom prénom", "nom prenom", "...")
@@ -205,26 +209,29 @@ def test_les_trois_marqueurs_retires_ne_reviennent_pas() -> None:
 
 
 def desaccords(source: str) -> list[str]:
-    """Ce qui, dans une source, contredit l'état qu'elle déclare."""
+    """Ce qui, dans le fichier commis, contredit la propriété permanente.
+
+    Deux façons de la contredire, et une seule branche pour chacune : l'état déclaré n'est pas
+    `brouillon` — absent, mal orthographié, ou porté à `remise` dans le fichier commis —, ou l'un
+    des deux marqueurs nominatifs y est renseigné.
+    """
     etat = etat_declare(source)
     if etat is None:
         return [
             f"aucune déclaration active de \\{ETAT} : l'état du document doit être écrit, "
-            f"et valoir « {BROUILLON} » ou « {REMISE} »"
+            f"et valoir « {BROUILLON} »"
         ]
     if etat not in ETATS_ADMIS:
         return [
-            f"état « {etat} » : les seules valeurs admises sont "
-            + " et ".join(f"« {v} »" for v in ETATS_ADMIS)
+            f"état « {etat} » : le fichier commis ne déclare que « {BROUILLON} ». "
+            "La remise se pose dans `report/noms.tex`, qui n'est pas suivi, et jamais ici."
         ]
 
     vides = marqueurs_vides(source, NOMINATIFS)
-    if etat == REMISE:
-        return [f"état « {REMISE} » : {ligne}" for ligne in vides]
-
     nommes_vides = {ligne.split(" :")[0] for ligne in vides}
     return [
-        f"état « {BROUILLON} » : {nom} est renseigné, alors qu'un brouillon les porte tous vides"
+        f"état « {BROUILLON} » : {nom} est renseigné, alors que le fichier commis les porte "
+        "tous deux vides"
         for nom in NOMINATIFS
         if nom not in nommes_vides
     ]
@@ -245,6 +252,12 @@ TEMOINS_D_ETAT = (
         "{provisoire}",
         "provisoire",
         "lue telle quelle, puis refusée par desaccords",
+    ),
+    (
+        "l'état de remise, écrit dans le fichier commis",
+        "{remise}",
+        "remise",
+        "lu telle quelle, puis refusé par desaccords : il ne se pose que dans noms.tex",
     ),
     ("déclaration commentée", None, None, "refusée : aucune déclaration active"),
 )
@@ -271,6 +284,19 @@ def test_une_valeur_tierce_est_refusee() -> None:
     source = "\\newcommand{\\" + ETAT + "}{provisoire}"
     ecarts = desaccords(source)
     assert ecarts and "provisoire" in ecarts[0], ecarts
+
+
+def test_l_etat_de_remise_est_refuse_dans_le_fichier_commis() -> None:
+    """Le témoin qui porte l'arbitrage : la remise ne s'écrit pas ici.
+
+    Sans cette propriété, basculer le fichier commis à `remise` passerait, et les deux noms
+    devraient alors y être écrits — ce que le projet interdit par ailleurs. C'est la
+    contradiction levée, et elle est éprouvée plutôt que déclarée.
+    """
+    source = "\\newcommand{\\" + ETAT + "}{remise}"
+    ecarts = desaccords(source)
+    assert ecarts, "l'état de remise passe dans le fichier commis"
+    assert "noms.tex" in ecarts[0], ecarts
 
 
 def test_l_etat_declare_est_l_une_des_deux_valeurs_admises() -> None:

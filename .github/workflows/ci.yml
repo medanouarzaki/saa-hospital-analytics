@@ -84,13 +84,17 @@ jobs:
       - run: uv run pytest tests/test_marqueurs_nominatifs.py tests/test_structure_du_rapport.py -v
 
       # Qu'aucun fichier suivi ne porte l'un des deux noms de personne du projet. Le contrôle ne
-      # porte pas les noms qu'il interdit : il les lit dans ces deux variables, et SANS ELLES IL
-      # S'ABSTIENT — un `skip` déclaré, visible dans la sortie, jamais un vert silencieux. Les
-      # valeurs passent par `env:` et non par une interpolation dans le corps de la commande :
-      # elles ne figurent donc pas dans le texte du script, et aucune étape ne les affiche.
+      # porte pas les noms qu'il interdit : il les lit dans ces deux SECRETS, et SANS EUX IL
+      # S'ABSTIENT — un `skip` déclaré, visible dans la sortie, jamais un vert silencieux.
+      #
+      # DES SECRETS ET NON DES VARIABLES DE DÉPÔT, et le motif est mesuré : le journal d'un
+      # travail recopie le TEXTE du script, et `gh variable list` affiche la valeur d'une
+      # variable en clair. Un secret est masqué par la plateforme partout où il apparaîtrait.
+      # Les valeurs passent en outre par `env:` et non par une interpolation dans le corps de la
+      # commande : elles ne figurent donc pas dans le texte du script.
       - env:
-          RAPPORT_AUTEUR: ${{ vars.RAPPORT_AUTEUR }}
-          RAPPORT_ENCADRANT: ${{ vars.RAPPORT_ENCADRANT }}
+          RAPPORT_AUTEUR: ${{ secrets.RAPPORT_AUTEUR }}
+          RAPPORT_ENCADRANT: ${{ secrets.RAPPORT_ENCADRANT }}
         run: uv run pytest tests/test_aucun_nom_de_personne.py -v
 
       # La provenance des affirmations du rapport. Ce contrôle lit les fichiers de chapitre, le fichier
@@ -602,34 +606,41 @@ jobs:
       #
       # `latexmk` appelle `biber` de lui-même dès qu'il voit le fichier de contrôle que biblatex
       # produit ; aucune étape de bibliographie n'est donc à écrire.
-      # Les deux noms de personne du rapport ne sont commis nulle part : `report/marqueurs.tex` les
-      # déclare vides, et `report/noms.tex` les redéfinit à la compilation. Cette étape écrit ce
-      # fichier depuis deux variables de dépôt. `.gitignore` le porte : il n'entre jamais à l'index.
+      # LES TROIS VALEURS QUI FONT UN DOCUMENT REMIS VOYAGENT ENSEMBLE : l'auteur, l'encadrant et
+      # l'état. `report/marqueurs.tex` déclare `brouillon` et ses deux marqueurs vides, et il le
+      # déclarera toujours ; c'est `report/noms.tex`, jamais commis, qui pose les trois autres
+      # valeurs. Cette étape écrit ce fichier depuis deux SECRETS de dépôt. `.gitignore` le porte :
+      # il n'entre jamais à l'index.
       #
-      # SI L'UNE DES DEUX VARIABLES MANQUE, L'ÉTAPE N'ÉCRIT RIEN ET N'ÉCHOUE PAS. Tant que
-      # `\etatDuDocument` vaut `brouillon`, un document composé sans noms est le résultat attendu,
-      # et la page de garde fait alors disparaître les deux lignes plutôt que de les laisser vides.
+      # C'est ce qui lève une contradiction consignée : un contrôle exigeait, en état de remise,
+      # que le fichier commis porte les deux noms, quand une autre règle interdisait au dépôt de
+      # les porter. L'état sortant avec les noms, le fichier commis n'a plus qu'un état légitime.
       #
-      # LES VALEURS NE SONT JAMAIS JOURNALISÉES. Elles passent par `env:`, et non par une
-      # interpolation `${{ }}` dans le corps du script : le texte de la commande ne les porte donc
-      # pas. `printf` écrit dans le fichier, jamais sur la sortie standard, et aucune autre étape
-      # de ce travail ne lit ces variables.
-      - name: Déposer les noms, s'ils sont déclarés
+      # SI L'UN DES DEUX SECRETS MANQUE, L'ÉTAPE N'ÉCRIT RIEN ET N'ÉCHOUE PAS. Le document se
+      # compose alors en brouillon : mention de version de travail visible, et les deux lignes de
+      # noms absentes plutôt que vides.
+      #
+      # LES VALEURS NE SONT JAMAIS JOURNALISÉES, et c'est doublement tenu. Ce sont des secrets, que
+      # la plateforme masque partout où ils apparaîtraient ; et elles passent par `env:` plutôt que
+      # par une interpolation `${{ }}` dans le corps du script, si bien que le texte de la commande
+      # — que le journal recopie ligne à ligne — ne les porte pas.
+      - name: Déposer les noms et l'état, s'ils sont déclarés
         env:
-          RAPPORT_AUTEUR: ${{ vars.RAPPORT_AUTEUR }}
-          RAPPORT_ENCADRANT: ${{ vars.RAPPORT_ENCADRANT }}
+          RAPPORT_AUTEUR: ${{ secrets.RAPPORT_AUTEUR }}
+          RAPPORT_ENCADRANT: ${{ secrets.RAPPORT_ENCADRANT }}
         run: |
           if [ -z "$RAPPORT_AUTEUR" ] || [ -z "$RAPPORT_ENCADRANT" ]; then
-            echo "aucun nom declare : le document se compose sans noms"
+            echo "aucun nom declare : le document se compose en brouillon"
             exit 0
           fi
           {
-            printf '%% Ecrit par l integration continue depuis deux variables de depot.\n'
+            printf '%% Ecrit par l integration continue depuis deux secrets de depot.\n'
             printf '%% Ce fichier n est jamais commis : voir .gitignore et report/marqueurs.tex.\n'
             printf '\\renewcommand{\\marqueurAuteur}{%s}\n' "$RAPPORT_AUTEUR"
             printf '\\renewcommand{\\marqueurEncadrantProfessionnel}{%s}\n' "$RAPPORT_ENCADRANT"
+            printf '\\renewcommand{\\etatDuDocument}{remise}\n'
           } > report/noms.tex
-          echo "noms deposes dans report/noms.tex"
+          echo "noms et etat deposes dans report/noms.tex"
 
       - name: Compiler le rapport
         uses: xu-cheng/latex-action@6549dc21effb2730855a1281407ecfcececc6c1b # v4.1.0
