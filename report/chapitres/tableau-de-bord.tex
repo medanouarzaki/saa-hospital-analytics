@@ -2,32 +2,22 @@
 %   DOC: s30
 %   OBS: REL-DEM.P05
 %   HYP: (aucun)
-%   CHI: tdb-pages, tdb-pages-pilotage, tdb-pages-methode, tdb-indicateurs,
-%   CHI: tdb-indicateurs-pilotage, tdb-indicateurs-methode, tdb-graphiques,
-%   CHI: tdb-page-plus-chargee, tdb-filtrabilite-oui, tdb-filtrabilite-sous-reserve,
-%   CHI: tdb-filtrabilite-non, tdb-recalcules-depuis-faits, instantane-tables,
-%   CHI: instantane-objets-copies, instantane-lignes, instantane-volume,
-%   CHI: instantane-duree-rafraichissement, instantane-lectures-temoin,
-%   CHI: instantane-erreurs-dimension, instantane-erreurs-completude,
-%   CHI: instantane-fenetre-dimension, instantane-fenetre-completude,
-%   CHI: instantane-rapport-cout-lecture, instantane-rapport-hors-completude,
-%   CHI: tdb-erreurs-lecture-tolerees, rotation-affichee-avant, rotation-affichee,
-%   CHI: trot-publie, irot-publie, irot-affiche, tom-affiche, tom-publie, dms-affichee,
-%   CHI: dms-publie, facteur-annualisation, tolerance-indicateurs-sejour,
-%   CHI: exigences-rubriques, exigences-calculables, exigences-non-calculables,
-%   CHI: exigences-sans-objet, exigences-champs-manquants, exigences-ecart-maximal
-%   SER: tableau-de-bord-par-page, instantane-objets, exigences-restitution
+%   CHI: dms-affichee, dms-publie, exigences-calculables, exigences-champs-manquants, exigences-ecart-maximal, exigences-non-calculables
+%   CHI: exigences-rubriques, exigences-sans-objet, facteur-annualisation, instantane-duree-rafraichissement, instantane-erreurs-completude, instantane-erreurs-dimension
+%   CHI: instantane-fenetre-completude, instantane-fenetre-dimension, instantane-lectures-temoin, instantane-lignes, instantane-objets-copies, instantane-rapport-cout-lecture
+%   CHI: instantane-rapport-hors-completude, instantane-tables, instantane-volume, irot-affiche, irot-publie, rotation-affichee
+%   CHI: rotation-affichee-avant, tdb-erreurs-lecture-tolerees, tdb-filtrabilite-non, tdb-filtrabilite-oui, tdb-filtrabilite-sous-reserve, tdb-graphiques
+%   CHI: tdb-indicateurs, tdb-indicateurs-methode, tdb-indicateurs-pilotage, tdb-page-plus-chargee, tdb-pages, tdb-pages-methode
+%   CHI: tdb-pages-pilotage, tdb-recalcules-depuis-faits, tolerance-indicateurs-sejour, tom-affiche, tom-publie, trot-publie
+%   SER: exigences-restitution, instantane-objets, tableau-de-bord-par-page
 %   SECTIONS: 4
 
 \chapter{Le tableau de bord}\label{chap:tableau-de-bord}
 
 \textbf{Ce chapitre ne porte aucune capture d'écran.} Les figures qui suivent sont des maquettes
-redessinées et des graphiques composés, et ce choix est une décision, non une commodité. Deux
-contrôles du dépôt interdisent toute image du système d'information, et sont verts depuis l'origine
-du projet ; les amender pour illustrer serait le premier relâchement de l'ensemble. Une capture
-lisible d'une page dense n'existe pas à la taille dont ce chapitre dispose. Et une reconstitution
-composée se relit dans une comparaison de versions, ce qu'une image ne fait pas — le rapport s'en
-est déjà servi deux fois, pour les écrans du logiciel observé et pour les schémas de la chaîne.
+redessinées et des graphiques composés. Une capture lisible d'une page dense n'existerait pas à la
+taille dont ce chapitre dispose, et une reconstitution composée se relit dans une comparaison de
+versions, ce qu'une image ne fait pas.
 
 \section{Conception et ergonomie}
 
@@ -46,7 +36,7 @@ chaîne reconstruit puis substitue d'un bloc.
 \textbf{Trois.} Les pages se répartissent en deux sections nommées par leur \emph{public}, et non
 par leur sujet.
 
-\textbf{Le motif du schéma figé n'est pas le coût des lectures, et l'écrire ainsi serait faux.} Ce
+\textbf{Le motif du schéma figé n'est pas le coût des lectures.} Ce
 coût a été mesuré : lire les indicateurs de toutes les pages contre les vues coûte
 \chiffre{instantane-rapport-cout-lecture} fois ce qu'il en coûte contre des tables copiées. Ce
 rapport moyen est trompeur — il est porté par une minorité d'indicateurs, et retirer la seule page
@@ -58,28 +48,23 @@ concurrent, lisant en boucle pendant une reconstruction complète, a compté
 \chiffre{instantane-erreurs-dimension} lectures en erreur sur
 \chiffre{instantane-lectures-temoin} tentatives contre une dimension simple, et
 \chiffre{instantane-erreurs-completude} sur autant de tentatives contre la vue la plus coûteuse à
-produire. Le message est le même dans les deux cas, et il ne dit pas une attente mais une absence :
-l'objet n'existe plus, pendant \chiffre{instantane-fenetre-dimension} seconde dans le premier cas
-et \chiffre{instantane-fenetre-completude} dans le second. La cause a été isolée par une expérience
-dédiée : la suppression d'une vue de sauvegarde emporte en cascade les vues construites au-dessus
-d'elle, qui ne réapparaissent qu'à leur propre rang dans l'ordre de reconstruction. \textbf{Le critère
+produire. Le message ne dit pas une attente mais une absence : l'objet n'existe plus, pendant
+\chiffre{instantane-fenetre-dimension} seconde dans le premier cas et
+\chiffre{instantane-fenetre-completude} dans le second. La cause est isolée : la suppression d'une
+vue de sauvegarde emporte en cascade les vues construites au-dessus d'elle. \textbf{Le critère
 retenu est asymétrique} : le nombre d'échecs de lecture tolérés est de
 \chiffre{tdb-erreurs-lecture-tolerees}, sous toute charge et sans classe d'erreur exceptée, parce
 qu'un utilisateur le subit sans recours ; un échec de substitution, lui, est
 journalisé et relançable, et la transaction qui l'enveloppe laisse l'instantané dans sa génération
 précédente, complète.
 
-\textbf{La séparation en deux sections ne repose pas sur un critère de complexité, mais sur l'objet
-du nombre.} Un indicateur reste opérationnel si sa valeur peut changer une décision du service ; il
-passe en méthode s'il décrit la chaîne — sa performance, sa provenance, ses paramètres — et non
-l'activité. Un indicateur dont l'objet est le jeu de données lui-même ne peut, par construction,
-informer aucune décision de service. La règle a été appliquée aux décisions servies que chaque
-entrée du registre déclare déjà, et non décrétée page par page : elle donne
+\textbf{La séparation en deux sections repose sur l'objet du nombre.} Un indicateur reste
+opérationnel si sa valeur peut changer une décision du service ; il passe en méthode s'il décrit la
+chaîne — sa performance, sa provenance, ses paramètres — et non l'activité. La règle donne
 \chiffre{tdb-indicateurs-pilotage} indicateurs en pilotage et \chiffre{tdb-indicateurs-methode} en
-méthode, sans qu'aucune décision servie ait manqué de trancher. Les deux intitulés nomment le
-public — « Pilotage du service » et « Évaluation de la chaîne » — parce que « Qualité » ou
-« Technique » désigneraient un domaine et laisseraient un responsable se demander si la seconde
-section le concerne.
+méthode. Les deux intitulés nomment le public — « Pilotage du service » et « Évaluation de la
+chaîne » — parce que « Qualité » ou « Technique » désigneraient un domaine et laisseraient un
+responsable se demander si la seconde section le concerne.
 
 \section{Les pages, en deux sections}
 
@@ -199,13 +184,10 @@ paramètres. L'ensemble pèse \chiffre{instantane-volume} octets pour
 grandeur, du fait de passage à l'agrégat de doublons, ce qui explique que le gain de lecture soit
 si inégal d'un indicateur à l'autre.
 
-\textbf{Une divergence apparente qu'il faut nommer, faute de quoi un lecteur y verrait une
-incohérence.} Le registre des indicateurs déclare des objets de la couche analytique, quand les
-pages lisent le schéma figé. \textbf{Ce n'est pas un défaut mais un invariant écrit et contrôlé} :
-le registre nomme la couche analytique parce que c'est là qu'un objet est produit par un modèle,
-documenté et testé ; les pages lisent le schéma figé pour la raison donnée plus haut. L'invariant
-qui les relie est le nom de table, privé de son schéma, et un contrôle le vérifie page par page en
-recueillant les requêtes réellement émises plutôt qu'en analysant le code.
+\textbf{Une divergence apparente mérite d'être nommée.} Le registre des indicateurs déclare des
+objets de la couche analytique, quand les pages lisent le schéma figé. Le registre nomme la couche
+analytique parce que c'est là qu'un objet est produit par un modèle ; l'invariant qui relie les deux
+est le nom de table, privé de son schéma.
 
 \section{Guide d'utilisation}
 
@@ -251,8 +233,7 @@ publiés, \chiffre{dms-affichee} jours de durée moyenne contre \chiffre{dms-pub
 \chiffre{rotation-affichee} de rotation contre \chiffre{trot-publie}, et
 \chiffre{irot-affiche} jours d'intervalle contre \chiffre{irot-publie} — les quatre sous la
 tolérance relative de \chiffre{tolerance-indicateurs-sejour} que le contrôle porte.
-\textbf{Une seconde mesure n'a de valeur que si elle peut être fausse quand la première l'est}, et
-c'est la leçon que ce chapitre lègue au lecteur autant qu'au projet.
+\textbf{Une seconde mesure n'a de valeur que si elle peut être fausse quand la première l'est.}
 
 \section{Correspondance avec les exigences du profil de restitution}
 

@@ -1,8 +1,7 @@
 % Ce chapitre repose sur :
 %   DOC: s12, s13, s20, s24, s30
-%   OBS: REL-PAT.H12, REL-PAT.H14, REL-IPP.O03, REL-IPP.R12
-%   HYP: absentéisme-par-spécialité, complétude-par-champ, ancienneté-des-créances,
-%   HYP: répartition-des-niveaux-de-tri
+%   OBS: REL-IPP.O03, REL-IPP.R12, REL-PAT.H12, REL-PAT.H14
+%   HYP: absentéisme-par-spécialité, ancienneté-des-créances, complétude-par-champ, répartition-des-niveaux-de-tri
 %   CHI: (aucun)
 %   SER: (aucune)
 %   SECTIONS: 5
@@ -12,21 +11,18 @@
 Ce chapitre propose cinq actions. Chacune tient en un bloc de forme fixe, et ce bloc sépare deux
 choses que l'on confond ordinairement.
 
-\textbf{Ce qui établit le constat} est ce qui autorise à dire qu'un problème existe. Sur un jeu de
-données produit pour ce projet, cela ne peut pas être une valeur affichée par le tableau de bord :
-les relations qui gouvernent ces valeurs y ont été injectées, et les relire à la sortie serait
-circulaire. Le constat vient donc d'une source extérieure au jeu — un rapport de contrôle, une
-publication statistique, une observation au poste — ou bien il n'existe pas, et le rapport le dit.
+\textbf{Ce qui établit le constat} autorise à dire qu'un problème existe. Ce ne peut pas être une
+valeur affichée par le tableau de bord : les relations qui la gouvernent ont été injectées, et les
+relire à la sortie serait circulaire. Le constat vient d'une source extérieure au jeu — un rapport
+de contrôle, une publication statistique, une observation au poste — ou il n'existe pas, et le
+rapport le dit.
 
-\textbf{Ce que l'indicateur démontre} est autre chose, et ce n'est pas rien : il démontre que la
-chaîne de données sait produire le nombre, à la maille utile, à partir des tables. Le jour où elle
-sera branchée sur les données réelles du service, le nombre sera un constat. Aujourd'hui, il est une
-capacité.
+\textbf{Ce que l'indicateur démontre} est autre chose : que la chaîne sait produire le nombre, à la
+maille utile, à partir des tables. Le jour où elle sera branchée sur les données réelles, le nombre
+sera un constat ; aujourd'hui, il est une capacité.
 
-\textbf{Aucun effort n'est chiffré et aucun effet n'est quantifié.} Un effort en jours et un gain en
-points seraient des nombres sans mesure qui les produise, et ce rapport ne s'en autorise pas. Chaque
-bloc dit ce que l'action suppose — quel champ existe déjà, quel processus change — et par quelle
-mesure on constaterait son effet. L'effet lui-même, lorsqu'il est énoncé, l'est comme une attente.
+\textbf{Aucun effort n'est chiffré et aucun effet n'est quantifié.} Chaque bloc dit ce que l'action
+suppose et par quelle mesure on constaterait son effet.
 
 \section{Sur les rendez-vous}
 
@@ -56,11 +52,9 @@ sont pas exploitées par le service\releve{REL-PAT.H14}. L'action ne demande don
 logiciel : elle demande que le champ soit renseigné à l'admission et qu'un envoi soit déclenché.
 
 \textbf{L'effet attendu et sa mesure.} On attend une baisse du taux d'absence sur les activités
-ciblées, et une réduction du délai médian sur ces mêmes activités par récupération des créneaux
-perdus. La mesure existe : le taux d'absence et le délai d'obtention par activité, comparés avant et
-après, à activité constante. La distinction entre absence et annulation, que le système enregistre
-par un couple de champs distinct, permet de vérifier que la baisse vient bien des absences et non
-d'un report de qualification.
+ciblées, et une réduction du délai médian par récupération des créneaux perdus. La mesure existe :
+le taux d'absence et le délai d'obtention par activité, comparés avant et après. La distinction
+entre absence et annulation permet de vérifier que la baisse vient bien des absences.
 
 \section{Sur les urgences}
 
