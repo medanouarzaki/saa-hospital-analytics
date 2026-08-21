@@ -1,18 +1,25 @@
 % Page de garde.
 %
-% TROIS EXIGENCES GOUVERNENT CETTE PAGE, et elles se lisent dans ce qui suit.
+% CINQ NIVEAUX DE CORPS, ET CHAQUE ÉLÉMENT PREND LE SIEN. La page composait auparavant sur trois
+% niveaux : la nature du document, le lieu du travail et les mentions accessoires y étaient au même
+% corps, et l'œil ne trouvait aucune hiérarchie.
 %
-% 1. QUATRE CORPS DE CARACTÈRE AU MOINS. Le document annoncé, le titre, les intitulés et les
-%    valeurs ne se lisent pas au même rang, et la page doit le montrer avant d'être lue.
-%    Six corps sont employés : \footnotesize, \small, \normalsize, \large, \Large, \Huge.
+%   niveau 1  \Huge\bfseries   le titre du travail
+%   niveau 2  \LARGE\scshape   « Rapport de stage d'application » — il annonce, il ne crie pas :
+%                              petites capitales espacées, et jamais de gras
+%   niveau 3  \large           les valeurs — organisme d'accueil, noms — et le sous-titre
+%   niveau 4  \normalsize      établissement de formation, filière, année universitaire
+%   niveau 5  \footnotesize    les intitulés, en petites capitales grises
 %
-% 2. AUCUN RESSORT ÉLASTIQUE ENTRE DEUX BLOCS VOISINS. Pas un seul \vfill : la page était
-%    auparavant construite sur des ressorts, et elle se recomposait entièrement dès qu'un champ
-%    changeait de longueur. Tous les espaces sont fixes, en millimètres, et la page ne bouge donc
-%    plus quand un nom est déposé ou retiré.
+% LA RÈGLE QUI GOUVERNE LES NIVEAUX 3 ET 5 : un intitulé est plus petit que sa valeur. C'est ce
+% rapport-là qui manquait, et son absence donnait l'impression d'un texte posé au hasard.
 %
-% 3. AUCUNE IMAGE tant que le logotype n'est pas déposé. `\logoEcole` compose un cadre de la
-%    hauteur déclarée en attendant, et le contrôle d'absence d'image reste vert.
+% L'ESPACEMENT DES CAPITALES vient de `microtype`, déjà chargé par le document principal. Mesuré
+% avant d'être employé : un document d'essai portant `\usepackage{microtype}` seul compose
+% `\textls[200]{...}` avec un espacement visible.
+%
+% AUCUN RESSORT ÉLASTIQUE. Pas un seul `\vfill` : la page se recomposerait entièrement dès qu'un
+% champ changerait de longueur. Tous les espaces sont fixes, en millimètres.
 %
 % Aucune valeur n'est écrite ici : chaque champ vient d'un marqueur, et tout champ dont le marqueur
 % peut être vide passe par `\siRenseigne` — l'intitulé disparaît avec sa valeur.
@@ -22,58 +29,70 @@
 \setstretch{1.0}
 \centering
 
-% La mention de version de travail, en haut à droite : elle signale l'état du document sans
-% occuper le centre de la page.
-\hfill\siBrouillon{\fbox{\small\mentionVersionDeTravail}}\par
+% 1. La mention de version de travail, en haut à droite, petite et discrète.
+\hfill\siBrouillon{\fbox{\footnotesize\mentionVersionDeTravail}}\par
 \vspace*{6mm}
 
+% 2. Le logotype, par la commande d'emplacement réservé : un cadre tant que le fichier n'existe pas.
 \logoEcole{2.2cm}
 
-\vspace{8mm}
+\vspace{9mm}
 
+% 3 et 4. L'établissement et la filière, niveau 4.
 \siRenseigne{\marqueurEtablissementFormation}{%
-  {\large\scshape \marqueurEtablissementFormation\par}\vspace{2mm}%
+  {\normalsize\scshape \marqueurEtablissementFormation\par}\vspace{2mm}%
 }
 \siRenseigne{\marqueurFiliere}{%
   {\normalsize\itshape\color{griscartouche} \marqueurFiliere\par}%
 }
 
+% 5. Un filet fin, pleine largeur.
 \vspace{5mm}
 {\color{griscartouche}\rule{\linewidth}{0.4pt}}
 
-\vspace{30mm}
+% 6. Un espace fixe.
+\vspace{22mm}
 
-{\large\scshape\color{griscartouche} Rapport de stage d'application\par}
+% 7. La nature du document, niveau 2 : nettement plus grand que le corps, espacé, sans gras.
+{\LARGE\scshape\color{griscartouche}\textls[180]{Rapport de stage d'application}\par}
+
+\vspace{9mm}
+
+% 8. Le titre, niveau 1.
+{\Huge\bfseries Chaîne de données\\[3mm] et tableau de bord\par}
 
 \vspace{6mm}
 
-{\Huge\bfseries Chaîne de données\\[2mm] et tableau de bord\par}
+% Le sous-titre, niveau 3.
+{\large pour un établissement hospitalier\par}
 
-\vspace{5mm}
+% 9. Un filet court, centré, plus étroit que le premier.
+\vspace{8mm}
+{\color{griscartouche}\rule{0.30\linewidth}{0.4pt}}
 
-{\Large pour un établissement hospitalier\par}
+% 10. Un espace fixe.
+\vspace{20mm}
 
-\vspace{7mm}
-{\color{griscartouche}\rule{0.35\linewidth}{0.4pt}}
-
-\vspace{32mm}
-
-% Le bloc des noms. UNE SEULE COLONNE D'INTITULÉS, alignée à droite, et une colonne de valeurs qui
-% commence toujours au même endroit : les trois intitulés sont des chaînes fixes, si bien que la
-% largeur de leur colonne ne dépend d'aucun marqueur. Déposer un nom ne déplace donc rien.
-\begin{tabular}{@{}r@{\hspace{6mm}}l@{}}
-  \siRenseigne{\marqueurAuteur}{{\scshape\color{griscartouche} Réalisé par} & \marqueurAuteur \\[3mm]}
-  \siRenseigne{\marqueurEncadrantProfessionnel}{{\scshape\color{griscartouche} Encadrant de stage} & \marqueurEncadrantProfessionnel \\[3mm]}
-  {\scshape\color{griscartouche} Organisme d'accueil} & \marqueurOrganismeAccueil \\
+% 11. Le bloc des noms. UNE SEULE COLONNE D'INTITULÉS, alignée à droite : les deux intitulés sont
+% des chaînes fixes, si bien que la colonne des valeurs commence toujours au même endroit et que
+% déposer un nom ne déplace rien.
+\begin{tabular}{@{}r@{\hspace{7mm}}l@{}}
+  \siRenseigne{\marqueurAuteur}{{\footnotesize\scshape\color{griscartouche} Réalisé par} & {\large\marqueurAuteur} \\[4mm]}
+  \siRenseigne{\marqueurEncadrantProfessionnel}{{\footnotesize\scshape\color{griscartouche} Encadré par} & {\large\marqueurEncadrantProfessionnel} \\}
 \end{tabular}
 
-\vspace{26mm}
+% 12. Un espace fixe.
+\vspace{16mm}
 
-\siRenseigne{\marqueurDateSoutenance}{%
-  {\small\color{griscartouche} Soutenu le \marqueurDateSoutenance\par}\vspace{2mm}%
-}
+% 13. L'organisme d'accueil : l'intitulé au niveau 5, sa valeur au niveau 3.
+{\footnotesize\scshape\color{griscartouche} Organisme d'accueil\par}
+\vspace{1.5mm}
+{\large \marqueurOrganismeAccueil\par}
+
+% 14. L'année universitaire, niveau 4.
+\vspace{12mm}
 \siRenseigne{\marqueurAnneeUniversitaire}{%
-  {\small\color{griscartouche} Année universitaire \marqueurAnneeUniversitaire\par}%
+  {\normalsize\color{griscartouche} Année universitaire \marqueurAnneeUniversitaire\par}%
 }
 
 \end{titlepage}
