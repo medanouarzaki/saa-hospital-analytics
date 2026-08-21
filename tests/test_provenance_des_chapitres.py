@@ -82,7 +82,7 @@ EXCLUS = ("dictionnaire_synthese.tex",)
 # sens : un paragraphe écrit sans être retiré d'ici est rouge, un emplacement ajouté sans être
 # déclaré ici l'est aussi. Elle se vide à mesure que le rapport s'écrit, et le jour où elle est
 # vide, plus aucun paragraphe n'attend.
-EMPLACEMENTS_ATTENDUS = ("apport-personnel",)
+EMPLACEMENTS_ATTENDUS: tuple[str, ...] = ()
 BIBLIO = REPORT / "biblio.bib"
 MARQUEURS = REPORT / "marqueurs.tex"
 SOURCES = RACINE / "docs" / "sources" / "sources.yml"
