@@ -61,9 +61,49 @@ rapport*.md
 report/*.pdf
 slides/*.pdf
 
+# Le fichier des noms, jamais commis. Les deux noms de personne du projet —
+# l'auteur et l'encadrant de stage — vivent ici et nulle part ailleurs ; le
+# fichier des marqueurs le charge s'il existe, et l'intégration continue l'écrit
+# depuis deux variables de dépôt. `tests/test_aucun_nom_de_personne.py` cherche
+# ces deux noms dans l'ensemble des fichiers suivis.
+report/noms.tex
+
 # Images
+#
+# Deux répertoires font exception, et deux seulement : le logotype de
+# l'établissement de formation, et les captures du tableau de bord produit par ce
+# projet. Toute autre image reste hors du dépôt, et
+# `tests/test_aucune_image.py` tient la même frontière sur les fichiers suivis.
+#
+# LA NÉGATION NE MORD QUE PARCE QUE LES MOTIFS CI-DESSUS VISENT DES FICHIERS ET
+# NON UN RÉPERTOIRE PARENT. Si `report/figures/` était un jour ignoré en tant que
+# répertoire, git cesserait d'y descendre et aucune négation d'un fichier à
+# l'intérieur ne mordrait.
 *.heic
 *.HEIC
 *.jpg
 *.jpeg
 *.png
+*.gif
+*.svg
+*.webp
+*.tif
+*.tiff
+!report/figures/logos/*.heic
+!report/figures/logos/*.jpg
+!report/figures/logos/*.jpeg
+!report/figures/logos/*.png
+!report/figures/logos/*.gif
+!report/figures/logos/*.svg
+!report/figures/logos/*.webp
+!report/figures/logos/*.tif
+!report/figures/logos/*.tiff
+!report/figures/tableau-de-bord/*.heic
+!report/figures/tableau-de-bord/*.jpg
+!report/figures/tableau-de-bord/*.jpeg
+!report/figures/tableau-de-bord/*.png
+!report/figures/tableau-de-bord/*.gif
+!report/figures/tableau-de-bord/*.svg
+!report/figures/tableau-de-bord/*.webp
+!report/figures/tableau-de-bord/*.tif
+!report/figures/tableau-de-bord/*.tiff

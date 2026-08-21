@@ -5,7 +5,14 @@
 % complète, sans dépendre d'une police du système.
 %
 % Aucun contenu n'est rédigé : chaque section porte son titre et une planche vide.
-% Les marqueurs nominatifs sont ceux du rapport, lus dans son fichier unique.
+% Les marqueurs sont ceux du rapport, lus dans son fichier unique. Les DEUX noms —
+% l'auteur et l'encadrant de stage — n'y sont pas écrits : ils viennent de
+% `../report/noms.tex`, que le fichier des marqueurs charge s'il existe et qui
+% n'est jamais commis. Sans lui, la planche de titre compose sans noms.
+%
+% Aucun texte fixe n'entoure un marqueur qui peut être vide : la ligne de
+% l'encadrant passe par `\siRenseigne` et disparaît avec sa valeur, comme sur la
+% page de garde du rapport.
 
 \documentclass[aspectratio=169]{beamer}
 
@@ -24,7 +31,15 @@
 
 \title{Chaîne de données et tableau de bord\\pour un établissement hospitalier}
 \author{\marqueurAuteur}
-\institute{\marqueurEtablissementFormation\\\marqueurFiliere}
+% Le seul texte fixe de la planche de titre est le saut de ligne qui sépare
+% l'établissement de la filière, et il ne compose que si les DEUX portent une
+% valeur : un séparateur seul en tête ou en queue serait une ligne blanche
+% inexpliquée. Les trois appels disent exactement cela, sans commande de plus.
+\institute{%
+  \siRenseigne{\marqueurEtablissementFormation}{\marqueurEtablissementFormation}%
+  \siRenseigne{\marqueurEtablissementFormation}{\siRenseigne{\marqueurFiliere}{\\}}%
+  \siRenseigne{\marqueurFiliere}{\marqueurFiliere}%
+}
 \date{\marqueurDateSoutenance}
 
 \begin{document}
@@ -35,8 +50,7 @@
   \begin{center}
     \small
     \begin{tabular}{rl}
-      Encadrant académique & \marqueurEncadrantAcademique \\
-      Encadrant professionnel & \marqueurEncadrantProfessionnel \\
+      \siRenseigne{\marqueurEncadrantProfessionnel}{Encadrant de stage & \marqueurEncadrantProfessionnel \\}
       Organisme d'accueil & \marqueurOrganismeAccueil \\
     \end{tabular}
   \end{center}

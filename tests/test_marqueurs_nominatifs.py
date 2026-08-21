@@ -1,24 +1,35 @@
 """Les marqueurs nominatifs du rapport s'accordent avec l'état que le document déclare.
 
-C'est la propriété que le critère de terminaison du projet nomme, et la seule que le dépôt affirme
-sur le CONTENU du rapport. Un rapport dont la page de garde porte un nom manquant se découvre à
-l'impression, ou pire, à la soutenance.
+C'est la seule propriété que le dépôt affirme sur le CONTENU du rapport. Un rapport dont la page de
+garde porte un nom manquant se découvre à l'impression.
+
+DEUX MARQUEURS, ET DEUX SEULEMENT. Le document est un rapport de stage d'application : il a un
+auteur et un encadrant de stage, chef du service. Il n'a pas d'encadrant académique, pas de
+président de jury, pas d'examinateur. Ces trois marqueurs-là ont existé et ont été RETIRÉS du
+fichier, non laissés vides — un marqueur vide est un oubli qui attend. Une propriété ci-dessous
+vérifie qu'aucun ne revient.
 
 ELLE N'EST PAS AFFAIBLIE, ELLE EST CONDITIONNÉE À UN ÉTAT ÉCRIT. Le fichier des marqueurs déclare
-son état — `brouillon` ou `remise`, et rien d'autre — et le contrôle exige des cinq marqueurs qu'ils
-soient TOUS vides dans le premier, TOUS renseignés dans le second. Trois choses en découlent, et
-aucune n'est une abstention : l'état apparaît dans un diff, là où un contrôle qui se tairait ne
-laisserait aucune trace ; l'oubli réaliste — quatre marqueurs sur cinq — est rouge dans les DEUX
+son état — `brouillon` ou `remise`, et rien d'autre — et le contrôle exige des deux marqueurs
+qu'ils soient TOUS DEUX vides dans le premier, TOUS DEUX renseignés dans le second. Trois choses en
+découlent, et aucune n'est une abstention : l'état apparaît dans un diff, là où un contrôle qui se
+tairait ne laisserait aucune trace ; l'oubli réaliste — l'un des deux — est rouge dans les DEUX
 états ; et le passage à la remise ne coûte qu'un mot, après quoi le contrôle nomme ce qui manque.
+
+CE QU'IL NE PEUT PAS VOIR. Les valeurs elles-mêmes ne sont plus dans le dépôt : `report/noms.tex`
+redéfinit les deux marqueurs à la compilation et n'est pas suivi. En état de remise, ce contrôle
+exige donc que `marqueurs.tex` porte les noms — et c'est le seul moment où ils y seraient écrits.
+Le travail qui basculera l'état devra trancher entre les y écrire et déplacer la propriété sur le
+fichier injecté, que ce contrôle ne lit pas.
 
 CE CONTRÔLE LIT LE FICHIER DES MARQUEURS, JAMAIS LE PDF. Une propriété qui dépend du rendu n'est pas
 observable côté serveur — le projet l'a déjà mesuré sur ses graphiques — et un PDF n'est pas suivi
 par le gestionnaire de versions. La source est donc le seul objet sur lequel la propriété se
 vérifie.
 
-UN MARQUEUR PEUT ÊTRE VIDE DE CINQ FAÇONS, et un motif textuel qui n'en verrait qu'une donnerait une
-assurance fausse. Les cinq sont énumérées ci-dessous avec leur témoin positif, et quatre formes que
-le motif ne doit PAS prendre pour un marqueur vide ont leur témoin négatif — dont une accolade vide
+UN MARQUEUR PEUT ÊTRE VIDE DE SIX FAÇONS, et un motif textuel qui n'en verrait qu'une donnerait une
+assurance fausse. Les six sont énumérées ci-dessous avec leur témoin positif, et cinq formes que le
+motif ne doit PAS prendre pour un marqueur vide ont leur témoin négatif — dont une accolade vide
 légitime ailleurs dans le fichier et un caractère de pourcentage échappé, qui n'introduit aucun
 commentaire.
 
@@ -36,13 +47,20 @@ import pytest
 RACINE = Path(__file__).resolve().parent.parent
 MARQUEURS = RACINE / "report" / "marqueurs.tex"
 
-# Les marqueurs qui portent un nom de personne. Ce sont eux, et eux seuls, que le critère de
-# terminaison exige renseignés : les marqueurs de contexte du même fichier — établissement, filière,
-# année — n'en portent aucun et ne sont pas de son ressort.
+# Les marqueurs qui portent un nom de personne. Ce sont eux, et eux seuls, que la propriété exige
+# renseignés en état de remise : les marqueurs de contexte du même fichier — établissement, filière,
+# année, organisme d'accueil, date de soutenance — n'en portent aucun et ne sont pas de son ressort.
 NOMINATIFS = (
     "marqueurAuteur",
-    "marqueurEncadrantAcademique",
     "marqueurEncadrantProfessionnel",
+)
+
+# Les trois marqueurs RETIRÉS. Le document n'a ni encadrant académique, ni jury nommé. Ils sont
+# énumérés ici pour qu'un retour, par copie d'un ancien fichier ou par réflexe, soit rouge et non
+# silencieux : un marqueur laissé vide sur une page de garde compose une ligne vide, et c'est
+# exactement ce que le retrait évite.
+RETIRES = (
+    "marqueurEncadrantAcademique",
     "marqueurPresidentJury",
     "marqueurExaminateur",
 )
@@ -128,7 +146,7 @@ TEMOINS_RENSEIGNES = (
     ),
     (
         "commentaire APRÈS une déclaration renseignée",
-        r"\newcommand{\marqueurAuteur}{Un nom} % renseigné à la soutenance",
+        r"\newcommand{\marqueurAuteur}{Un nom} % renseigné à la remise",
     ),
     (
         "déclaration commentée doublant une déclaration active",
@@ -139,7 +157,7 @@ TEMOINS_RENSEIGNES = (
 
 @pytest.mark.parametrize(("libelle", "source"), TEMOINS_VIDES)
 def test_le_motif_voit_chaque_forme_de_marqueur_vide(libelle: str, source: str) -> None:
-    """Cinq formes de vacuité, cinq témoins : un motif éprouvé sur une seule forme ne l'est pas."""
+    """Six formes de vacuité, six témoins : un motif éprouvé sur une seule forme ne l'est pas."""
     assert marqueurs_vides(source, ("marqueurAuteur",)), (
         f"témoin « {libelle} » : le motif ne voit pas ce marqueur vide"
     )
@@ -149,7 +167,7 @@ def test_le_motif_voit_chaque_forme_de_marqueur_vide(libelle: str, source: str) 
 def test_le_motif_ne_prend_aucune_forme_legitime_pour_un_marqueur_vide(
     libelle: str, source: str
 ) -> None:
-    """Quatre formes qu'il ne doit pas voir, et une renseignée ordinaire."""
+    """Quatre formes qu'il ne doit pas voir, et une renseignée ordinaire — cinq témoins."""
     vides = marqueurs_vides(source, ("marqueurAuteur",))
     assert not vides, f"témoin « {libelle} » : le motif crie à tort — {vides}"
 
@@ -165,6 +183,25 @@ def test_le_fichier_des_marqueurs_existe_et_les_declare_tous() -> None:
         nom for nom, valeur in valeurs_des_marqueurs(source, NOMINATIFS).items() if valeur is None
     ]
     assert not absents, f"marqueurs nominatifs non déclarés dans {MARQUEURS.name} : {absents}"
+
+
+def test_les_trois_marqueurs_retires_ne_reviennent_pas() -> None:
+    """Ils sont RETIRÉS, pas laissés vides : une déclaration, même vide, est rouge.
+
+    Le motif est celui du retrait lui-même. Un `\marqueurPresidentJury` déclaré vide fait
+    composer à la page de garde une ligne « Président du jury » sans valeur, et une ligne vide
+    se remarque là où une ligne absente ne se remarque pas. Le contrôle porte donc sur la
+    PRÉSENCE de la déclaration, pas sur sa valeur.
+    """
+    source = MARQUEURS.read_text(encoding="utf-8")
+    revenus = [
+        nom for nom, valeur in valeurs_des_marqueurs(source, RETIRES).items() if valeur is not None
+    ]
+    assert not revenus, (
+        f"marqueurs retirés redéclarés dans {MARQUEURS.name} : {revenus}. "
+        "Le document est un rapport de stage d'application : il n'a ni encadrant académique, "
+        "ni président de jury, ni examinateur."
+    )
 
 
 def desaccords(source: str) -> list[str]:

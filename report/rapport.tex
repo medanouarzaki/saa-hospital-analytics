@@ -23,6 +23,16 @@
 \usepackage{booktabs}
 \usepackage{fancyhdr}
 
+% L'inclusion d'images. Le paquet appartient à l'ensemble `graphics`, requis par
+% LaTeX 2e et présent dans toute distribution, et le choix est MESURÉ et non supposé de deux
+% façons : `kpsewhich graphicx.sty` le trouve ici sous
+% `texmf-dist/tex/latex/graphics/graphicx.sty`, et surtout `pgfcore.sty` — que
+% `pgfplots`, déjà chargé ci-dessous, tire à lui — porte à sa ligne 10
+% `\RequirePackage{graphicx}`. L'image de composition de l'intégration continue
+% compose donc déjà ce paquet à chaque exécution verte, sans que rien ne l'ait
+% demandé explicitement.
+\usepackage{graphicx}
+
 % Tracé vectoriel. Le paquet est présent dans toute distribution complète, et l'image de
 % composition de l'intégration continue en porte une : le choix est mesuré, non supposé.
 \usepackage{pgfplots}
@@ -77,6 +87,7 @@
 
 \input{marqueurs}
 \input{provenance}
+\input{images}
 \input{chiffres}
 
 \begin{document}

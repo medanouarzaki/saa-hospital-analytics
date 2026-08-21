@@ -85,3 +85,8 @@ chaque exécution.
 | [0069](0069-le-registre-des-chiffres-s-etend-aux-series-et-la-dette-de-correspondance-se-solde.md) | Le registre des chiffres s'étend aux séries, et la dette de correspondance se solde |
 | [0070](0070-le-tableau-de-bord-se-decrit-sans-capture-d-ecran.md) | Le tableau de bord se décrit sans capture d'écran, et les séries acceptent deux types de commande |
 | [0071](0071-l-annonce-du-plan-est-un-appareil-de-plus-et-les-en-tetes-courants-mentaient.md) | L'annonce du plan est confrontée aux chapitres qui existent, et deux en-têtes courants mentaient |
+| [0072](0072-le-document-est-un-rapport-de-stage-d-application.md) | Le document est un rapport de stage d'application, et sa page de garde annonçait autre chose |
+| [0073](0073-cinq-marqueurs-nominatifs-ramenes-a-deux.md) | Cinq marqueurs nominatifs ramenés à deux, et une ligne vide ne se compose plus |
+| [0074](0074-les-deux-noms-sont-injectes-a-la-compilation.md) | Les deux noms de personne sortent du dépôt et sont injectés à la compilation |
+| [0075](0075-les-etiquettes-de-provenance-cessent-d-imprimer.md) | Les étiquettes de provenance cessent d'imprimer, et l'appareil reste câblé |
+| [0076](0076-les-images-tolerees-sous-deux-repertoires.md) | Les images sont tolérées sous deux répertoires, et l'emplacement est réservé avant d'être rempli |
