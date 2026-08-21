@@ -9,7 +9,7 @@
 %   HYP: (aucun)
 %   CHI: (aucun)
 %   SER: (aucune)
-%   SECTIONS: 8
+%   SECTIONS: 5
 
 \chapter{Le système d'information hospitalier}\label{chap:systeme}
 
@@ -139,8 +139,7 @@ ni les habilitations qui cloisonnent les profils, ni les modules que chacun ouvr
 
 L'observation a porté sur un poste du service, sur le profil \texttt{MSM - GESTION DE RDV}, le
 28 juillet 2026. Quatre écrans ont été parcourus : l'écran de démarrage, la recherche d'identifiant
-patient, la fiche patient et l'écran de prise de rendez-vous. Cent quarante-trois éléments y ont
-été relevés.
+patient, la fiche patient et l'écran de prise de rendez-vous.
 
 L'observation n'a pas été passive. Des patients de test ont été saisis dans le système pour
 comprendre ce qui distingue les cas, et les cas rencontrés étaient variés : patient déjà présent
@@ -151,22 +150,17 @@ son libellé reproduit à l'identique, son type apparent, et la valeur affichée
 l'était. L'identifiant n'est pas une commodité de rédaction : c'est la clé par laquelle chaque
 colonne du modèle de données désigne son témoin d'observation.
 
-Deux conventions gouvernent la restitution. Le caractère obligatoire ou facultatif d'un champ n'a
-été relevé sur aucun écran, et n'est donc affirmé nulle part ; les boutons des barres d'outils ne
-figurent pas aux tableaux, parce qu'ils déclenchent une opération sans porter de donnée.
+Une convention gouverne la restitution : le caractère obligatoire ou facultatif d'un champ n'a été
+relevé sur aucun écran, et n'est donc affirmé nulle part.
 
-Les quatre sections qui suivent donnent, pour chaque écran, ce qu'il sert, la répartition de ses
-éléments par bloc, et un extrait des champs que le reste du rapport emploie. Le relevé intégral,
-élément par élément, est reporté à l'annexe~\ref{annexe:releve}.
+\textbf{Ce chapitre ne décrit pas une interface, il décrit ce que le service saisit.} Les boutons,
+les barres d'actions et les agencements de blocs ne portent aucune donnée et ne figurent pas ici ;
+le relevé intégral, élément par élément, est reporté à l'annexe~\ref{annexe:releve}.
 
-\section{L'écran de démarrage et les profils}
+\section{Ce que le service saisit}
 
-Cet écran identifie l'établissement et l'autorité dont il relève, puis propose les cinq profils et
-quatre menus de navigation. Onze éléments y sont relevés : deux d'identification du site, les cinq
-profils, et quatre menus.
-
-Aucun champ de cet écran n'entre au modèle de données : il ne porte aucune donnée de dossier. Deux
-éléments comptent néanmoins pour la suite.
+\textbf{L'établissement et sa tutelle.} L'écran de démarrage n'entre au modèle de données par aucun
+champ — il ne porte aucune donnée de dossier —, mais deux valeurs y comptent pour la suite.
 
 \begin{center}
 \begin{tabular}{@{}p{2.6cm}p{4.4cm}p{7.4cm}@{}}
@@ -185,13 +179,9 @@ Le code de région est accolé au nom de l'établissement sous une graphie que l
 telle quelle, séparateur compris. C'est le premier signe d'une pratique que les écrans suivants
 confirment : le système code ses références et affiche le code avec son libellé.
 
-\section{La recherche d'identifiant patient}
-
-C'est l'écran par lequel un agent retrouve un dossier avant toute opération. Trente-trois éléments
-y sont relevés, en quatre blocs : quatre onglets, treize critères de recherche, quatre filtres de
-population et douze colonnes de résultat.
-
-Quatre éléments de cet écran portent le diagnostic que le chapitre~\ref{chap:qualite} reprend.
+\textbf{L'identifiant du patient, et la façon dont on le retrouve.} C'est par cet écran qu'un agent
+retrouve un dossier avant toute opération. Quatre de ses éléments portent le diagnostic que le
+chapitre~\ref{chap:qualite} reprend.
 
 \begin{center}
 \begin{tabular}{@{}p{2.6cm}p{4.6cm}p{7.2cm}@{}}
@@ -215,54 +205,21 @@ L'\emph{identifiant patient permanent} — l'IPP — est le numéro unique qu'un
 les libellés de l'écran — est le registre qui rassemble ces identifiants et sert à retrouver une
 personne déjà connue.
 
-Un index maître des patients existe donc dans le système. Le bloc d'onglets en porte la preuve : à
-côté de la recherche ordinaire et de la création d'un nouvel identifiant, deux onglets s'adressent
-explicitement à cet index, dont l'un en recherche pondérée\releve{REL-IPP.O03}.
+Un index maître des patients existe donc dans le système, et deux onglets s'y adressent
+explicitement, dont l'un en recherche pondérée\releve{REL-IPP.O03}. La dernière colonne de résultat
+affiche une \emph{probabilité}\releve{REL-IPP.R12} : une recherche qui rend des probabilités n'est
+pas une recherche exacte, c'est un rapprochement. Le relevé s'arrête là — il atteste qu'un index
+maître et une recherche pondérée existent dans l'installation observée, et rien sur leur
+déploiement ailleurs.
 
-Le bloc des colonnes de résultat le confirme : la dernière colonne affiche une
-\emph{probabilité}\releve{REL-IPP.R12}. Une recherche qui rend des probabilités n'est pas une
-recherche exacte — c'est un rapprochement.
-
-Ce que le relevé établit s'arrête là. Il atteste qu'un index maître et une recherche pondérée
-existent dans l'installation observée ; il n'établit rien sur leur déploiement au-delà de cet
-établissement.
-
-Les treize critères de recherche méritent enfin une lecture. Ils ne cherchent pas seulement par
+Les critères de recherche méritent enfin une lecture. Ils ne cherchent pas seulement par
 identifiant : nom, prénom, date de naissance, mais aussi mois et année seuls, âge, et une
 approximation en années. Un écran qui offre de chercher à l'âge approché est un écran conçu pour
 des dossiers dont la date de naissance est incertaine ou absente.
 
-\section{La fiche patient}
-
-La fiche patient est l'écran le plus dense du périmètre observé : cinquante-sept éléments, dont dix
-boutons de barre d'outils. Les quarante-sept restants se répartissent en trois onglets et cinq
-blocs de données.
-
-\begin{center}
-\begin{tabular}{@{}c@{}}
-\fbox{\begin{minipage}{0.86\linewidth}
-\centering\small
-\fbox{\begin{minipage}{0.95\linewidth}\centering Barre d'actions \\ \footnotesize dix boutons, hors tableau\end{minipage}}\\[3pt]
-\fbox{\begin{minipage}{0.95\linewidth}\centering Onglets : Général \quad|\quad Contacts \quad|\quad Quota soins primaires\end{minipage}}\\[3pt]
-\fbox{\begin{minipage}{0.95\linewidth}\centering Données principales \\ \footnotesize seize éléments\end{minipage}}\\[3pt]
-\fbox{\begin{minipage}{0.46\linewidth}\centering Compagnie d'assurance \\ \footnotesize six éléments\end{minipage}}%
-\hfill
-\fbox{\begin{minipage}{0.46\linewidth}\centering Né \\ \footnotesize six éléments\end{minipage}}\\[3pt]
-\fbox{\begin{minipage}{0.95\linewidth}\centering Domicile \\ \footnotesize quinze éléments\end{minipage}}\\[3pt]
-\fbox{\begin{minipage}{0.95\linewidth}\centering Commentaire\end{minipage}}
-\end{minipage}}
-\end{tabular}
-\end{center}
-
-\begin{center}
-\footnotesize Agencement des blocs de la fiche patient. Reconstitution structurelle : aucun
-contenu, aucune valeur.
-\end{center}
-
-\medskip
-
-Quarante-deux de ces quarante-sept éléments deviennent des colonnes du modèle de données. L'extrait
-ci-dessous retient ceux dont le rapport se sert explicitement plus loin.
+\textbf{L'identité du patient.} La fiche patient est l'écran le plus dense du périmètre observé, et
+c'est de lui que vient la plus grande part des colonnes du modèle. L'extrait ci-dessous retient
+celles dont le rapport se sert explicitement plus loin.
 
 \begin{center}
 \begin{tabular}{@{}p{2.6cm}p{4.2cm}p{7.6cm}@{}}
@@ -293,43 +250,16 @@ Quatre valeurs affichées documentent la forme des nomenclatures du système\rel
 Deux sont des couples code-libellé : la compagnie d'assurance et la nationalité, cette dernière
 relevée deux fois — au domicile et au lieu de naissance — sous le même couple. Deux autres sont des
 couples de valeurs codées : le type de pièce d'identité et l'état civil, tous deux abrégés par une
-lettre suivie de son libellé développé.
+lettre suivie de son libellé développé. Le système code donc ses références et affiche les deux
+faces du couple, ce qui permet plus loin de reconstituer des dimensions sans inventer de libellés.
 
-Le système code donc ses références et affiche les deux faces du couple. C'est ce qui permet, plus
-loin, de reconstituer des dimensions sans inventer de libellés.
+La fiche porte enfin quatre lignes de téléphone et deux cases d'avertissement, l'une par message
+court, l'autre par courrier électronique\releve{REL-PAT.H12} : les canaux de contact existent déjà
+dans le dossier.
 
-Le bloc du domicile porte enfin quatre lignes de téléphone et deux cases d'avertissement, l'une par
-message court, l'autre par courrier électronique\releve{REL-PAT.H12}. Les canaux de contact
-existent donc déjà dans la fiche.
-
-\section{Donner rendez-vous}
-
-C'est l'écran du seul processus observé de bout en bout. Quarante-deux éléments y sont relevés,
-dont sept boutons de barre d'outils.
-
-\begin{center}
-\begin{tabular}{@{}c@{}}
-\fbox{\begin{minipage}{0.86\linewidth}
-\centering\small
-\fbox{\begin{minipage}{0.95\linewidth}\centering Barre d'actions \\ \footnotesize sept boutons, hors tableau\end{minipage}}\\[3pt]
-\fbox{\begin{minipage}{0.95\linewidth}\centering Identification du patient \\ \footnotesize dix éléments, rappelés de la fiche\end{minipage}}\\[3pt]
-\fbox{\begin{minipage}{0.95\linewidth}\centering Rendez-vous \\ \footnotesize quatorze éléments\end{minipage}}\\[3pt]
-\fbox{\begin{minipage}{0.46\linewidth}\centering Contrôle de modifications \\ \footnotesize huit éléments\end{minipage}}%
-\hfill
-\fbox{\begin{minipage}{0.46\linewidth}\centering Liste d'attente \\ \footnotesize trois colonnes\end{minipage}}
-\end{minipage}}
-\end{tabular}
-\end{center}
-
-\begin{center}
-\footnotesize Agencement des blocs de l'écran de prise de rendez-vous. Reconstitution
-structurelle : aucun contenu, aucune valeur.
-\end{center}
-
-\medskip
-
-Les dix éléments du bloc d'identification ne sont pas des champs de saisie propres à cet écran :
-ils rappellent des valeurs de la fiche patient, et le modèle ne les enregistre pas deux fois.
+\textbf{Le rendez-vous.} C'est le seul processus observé de bout en bout. Les éléments qui
+identifient le patient y sont rappelés de la fiche et le modèle ne les enregistre pas deux fois ;
+ceux du rendez-vous lui-même sont les suivants.
 
 \begin{center}
 \begin{tabular}{@{}p{2.6cm}p{4.2cm}p{7.6cm}@{}}
@@ -351,10 +281,10 @@ Identifiant & Libellé à l'écran & Ce que la suite en fait \\
 
 \medskip
 
-Le bloc du rendez-vous porte l'origine de la demande sous forme de couple code-libellé, et la
-valeur observée désigne un adressage par une autre structure hospitalière\releve{REL-RDV.R03}. Le
-bloc de contrôle des modifications porte quatre couples d'auteur et d'horodatage — création,
-modification, confirmation, annulation — dont la portée est traitée à la section suivante.
+L'origine de la demande est un couple code-libellé, et la valeur observée désigne un adressage par
+une autre structure hospitalière\releve{REL-RDV.R03}. Le bloc de contrôle des modifications porte
+quatre couples d'auteur et d'horodatage — création, modification, confirmation, annulation — dont
+la portée est traitée à la section suivante.
 
 \section{Les observations exploitables}
 
