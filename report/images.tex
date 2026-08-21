@@ -66,32 +66,52 @@
 % LES DEUX HAUTEURS NE SONT PAS ÉGALES, ET C'EST MESURÉ. Imposer la même hauteur
 % aux deux ne les équilibre pas : un logotype large et bas paraît plus grand qu'un
 % logotype compact et haut à hauteur égale. L'égalisation porte donc sur la
-% SURFACE OPTIQUE — la surface de la boîte utile, marge transparente exclue.
+% SURFACE D'ENCRE — le nombre de pixels opaques, pondérés par leur opacité —, et
+% non sur la boîte qui l'entoure.
 %
-%   fichier          dimensions   rapport   boîte utile   marge   encre        hauteur
-%   INSEA-logo.png   1200x1304    0,9202    983x1110      30,3 %  582 421 px   20,0 mm
-%   HCP-logo.png     3790x1088    3,4835    3781x1088      0,2 %  547 086 px   17,2 mm
+%   fichier          dimensions   boîte utile   encre pondérée   hauteur déclarée
+%   INSEA-logo.png   1200x1304    983x1110      582 198 px       20,00 mm
+%   HCP-logo.png      450x88      441x88          5 195 px       11,81 mm
 %
-% Le calcul : la surface portée à la page vaut la surface en pixels multipliée par
-% le carré de l'échelle, et l'échelle vaut la hauteur déclarée divisée par la
-% hauteur du fichier. Égaliser donne un rapport d'échelles égal à la racine du
-% rapport des surfaces, et le rapport des hauteurs s'en déduit en multipliant par
-% le rapport des hauteurs en pixels.
+% Le calcul sur le FICHIER : la surface portée à la page vaut la surface en pixels
+% multipliée par le carré de l'échelle, et l'échelle vaut la hauteur déclarée
+% divisée par la hauteur du fichier. Égaliser donne un rapport d'échelles égal à
+% la racine du rapport des surfaces — racine(5195/582198) = 0,09446 —, et le
+% rapport des hauteurs s'en déduit en multipliant par 1304/88 : 1,3998, d'où
+% 14,29 mm pour 20 mm de référence.
 %
-% DEUX SURFACES SONT CANDIDATES, ET ELLES NE DONNENT PAS LE MÊME RÉSULTAT. La
-% boîte utile donne un rapport de hauteurs de 2,3267, donc 8,6 mm pour le second
-% logotype ; l'encre — le nombre de pixels réellement opaques — donne 1,1616, donc
-% 17,2 mm. L'écart tient à ceci : la boîte utile de l'INSEA est couverte à 53,4 %,
-% celle du HCP à 13,3 % seulement, parce que ce second logotype est un mot écrit
-% en fin, largement étalé, quand le premier est une marque pleine. La boîte utile
-% créditait donc le HCP d'une surface qu'il n'occupe pas.
+% LE RENDU A DÉMENTI CE CALCUL, ET C'EST LE RENDU QUI TRANCHE. Composée à 14,29 mm,
+% l'encre du HCP couvrait 224 mm² sur la page contre 142 pour l'INSEA : une fois et
+% demie de trop, visible à l'œil. Le motif est mesurable. Le fichier du HCP ne fait
+% que 450 pixels de large ; agrandi jusqu'à 60 mm, chacun de ses pixels en devient
+% près de deux, et ses traits fins — le mot est écrit en fin — s'épaississent d'un
+% tiers, quand la marque pleine de l'INSEA, déjà à 1200 pixels, ne gagne rien. La
+% surface d'encre du fichier ne prédit donc pas la surface d'encre COMPOSÉE.
 %
-% LA MESURE À L'ENCRE EST RETENUE, ET LE RENDU L'A TRANCHÉE. La page composée avec
-% 8,6 mm a été regardée en image : le second logotype y paraissait nettement plus
-% faible que le premier, et sa ligne « Haut-Commissariat au Plan » n'était plus
-% lisible. À 17,2 mm les deux marques pèsent le même poids à l'œil et les deux
-% textes se lisent. C'est la surface d'encre qui mesure la présence optique, pas
-% le rectangle qui l'entoure.
+% L'ÉGALISATION PORTE DONC SUR L'ENCRE COMPOSÉE, mesurée sur l'image du PDF à
+% 300 points par pouce — la résolution à laquelle l'œil lit une feuille à distance
+% de lecture. Elle donne 11,81 mm, et le relevé confirme : 142,4 mm² pour l'INSEA
+% contre 152,9 pour le HCP, sept pour cent d'écart. Regardés côte à côte, les deux
+% pèsent alors le même poids.
+%
+% POURQUOI L'ENCRE ET NON LA BOÎTE. La boîte utile de l'INSEA est couverte à
+% 53,4 %, celle du HCP à 13,3 % : le second est un mot écrit en fin, largement
+% étalé, quand le premier est une marque pleine. Égaliser les boîtes donnait
+% 8,6 mm au HCP, et le rendu l'a démenti — la marque y disparaissait et sa ligne
+% n'était plus lisible. Le rectangle mesure l'emprise, l'encre mesure la présence.
+%
+% LA MESURE EST PONDÉRÉE PAR L'OPACITÉ, et non seuillée à mi-opacité. Les deux
+% concordent à 1 % — 14,29 mm contre 14,41 mm —, mais le fichier du HCP ne fait
+% que 450 pixels de large : à ce format, la part des pixels de bord partiellement
+% opaques n'est plus négligeable, et un seuil les jette tous du même côté.
+%
+% LA LIMITE DE CETTE ÉGALISATION EST ÉCRITE. Le fichier du HCP est rogné : son
+% emblème mesure 99 pixels de large pour 88 de haut, quand un cercle en ferait 99
+% des deux côtés. L'encre tranchée n'est donc pas comptée, et l'égalisation
+% sous-estime le poids de ce logotype de quelques pour cent. C'est un arbitrage
+% rendu, non un défaut toléré : mieux vaut une égalisation qui sous-estime de peu
+% qu'un rapport de cinq à un, qui est ce que donnaient les hauteurs de l'ancien
+% fichier appliquées au nouveau.
 %
 % LES DEUX SONT ALIGNÉS SUR LEUR LIGNE MÉDIANE, jamais sur leur base : deux
 % logotypes de hauteurs différentes alignés par le bas paraissent décalés.
@@ -110,7 +130,7 @@
 % base. La correction s'applique au `\raisebox` extérieur, donc aussi bien à
 % l'image qu'à son cadre d'attente.
 \newcommand{\hauteurLogoEtablissement}{20mm}
-\newcommand{\hauteurLogoTutelle}{17.2mm}
+\newcommand{\hauteurLogoTutelle}{11.81mm}
 \newcommand{\ecartEntreLogos}{16mm}
 
 % Un logotype, ou son cadre d'attente aux mêmes dimensions.
@@ -142,7 +162,7 @@
 \newcommand{\logosInstitutionnels}{%
   \unLogo{INSEA-logo}{\hauteurLogoEtablissement}{0.9202}{0.706mm}{logotype de l'établissement}%
   \hspace{\ecartEntreLogos}%
-  \unLogo{HCP-logo}{\hauteurLogoTutelle}{3.4835}{0mm}{logotype de la tutelle}%
+  \unLogo{HCP-logo}{\hauteurLogoTutelle}{5.1136}{0mm}{logotype de la tutelle}%
 }
 
 % ------------------------------------------------------------------------------
@@ -224,3 +244,4 @@
   \end{center}%
   \legendeCapture{#3}{#4}%
 }
+
