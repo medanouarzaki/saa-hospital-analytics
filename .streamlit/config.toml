@@ -1,0 +1,34 @@
+# Configuration de l'application de restitution.
+#
+# ELLE EST UNIQUE ET VERSIONNÉE. Un seul fichier, à la racine du dépôt, copié tel quel dans
+# l'image du conteneur. Aucune variable d'environnement ne double ces réglages — mesuré :
+# `git grep -i 'STREAMLIT_THEME|STREAMLIT_CLIENT'` ne rend rien. Une configuration à deux
+# sources diverge.
+#
+# STREAMLIT LIT SA CONFIGURATION À `$CWD/.streamlit/config.toml`, et c'est mesuré dans son propre
+# code plutôt que supposé — `streamlit/config.py` énumère ses sources par ordre de priorité
+# croissante : « 1. default values defined in this file / 2. the global ~/.streamlit/config.toml
+# file / 3. per-project $CWD/.streamlit/config.toml files / 4. environment variables such as
+# STREAMLIT_SERVER_PORT / 5. command line flags passed to streamlit run ».
+#
+# Le répertoire de travail du conteneur est `/app` : le fichier n'y parvient que parce que
+# `docker/dashboard.Dockerfile` le copie explicitement.
+
+[theme]
+# LE THÈME EST CLAIR, DÉFINITIVEMENT. Sans cette ligne, Streamlit n'impose rien et suit la
+# préférence du navigateur : l'application s'affichait donc en sombre chez qui a réglé son système
+# ainsi, et en clair chez les autres. Deux motifs commandent le choix : le destinataire est un
+# responsable de service, qui imprime et partage plus qu'il ne consulte à l'écran ; et les
+# captures du rapport sont imprimées sur fond blanc.
+base = "light"
+
+[client]
+# LE BANDEAU DE DÉVELOPPEMENT DISPARAÎT. La valeur est lue dans la description que Streamlit donne
+# de l'option : « "viewer" : Hide the developer options, including the rerun, clear cache, and
+# deploy button from the toolbar and menu. — "minimal" : Show only options set externally [...] If
+# there are no options left, hide the menu. »
+#
+# `minimal` est retenu plutôt que `viewer` : le premier retire le menu entier quand il ne reste
+# rien dedans, le second garde un menu de lecteur. Le bouton de déploiement et le menu
+# appartiennent à l'environnement de développement, pas à l'application livrée.
+toolbarMode = "minimal"

@@ -11,6 +11,11 @@ ENV UV_PROJECT_ENVIRONMENT=/app/.venv
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev
 
+# La configuration de l'application. Streamlit la lit a `$CWD/.streamlit/config.toml`, et le
+# repertoire de travail est ici `/app` : sans cette ligne, le fichier de configuration versionne
+# au depot n'atteint jamais l'application livree, et le theme redevient celui du navigateur.
+COPY .streamlit/ .streamlit/
+
 # Le repertoire d'affichage entier, registre compris, et le module d'ingestion dont le
 # tableau de bord tire son chemin de connexion — il n'en ouvre pas un second.
 COPY dashboard/ dashboard/

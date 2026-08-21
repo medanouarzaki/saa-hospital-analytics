@@ -165,7 +165,9 @@ def rendre() -> None:
 
     rendu.titre_indicateur("activite_volume_journalier")
     retenu = volumes[(volumes["jour"] >= debut) & (volumes["jour"] <= fin)]
-    st.line_chart(retenu, x="jour", y="evenements", color="famille")
+    rendu.tracer_temporel(
+        retenu, x="jour", y="evenements", couleur="famille", x_label="Jour", y_label="Événements"
+    )
 
     rendu.titre_indicateur("activite_patients_distincts")
     patients = lecture.interroger(REQUETES["activite_patients_distincts"])
@@ -179,7 +181,9 @@ def rendre() -> None:
                 f"{int(part['patients'].sum()):,}".replace(",", " "),
                 help="Patients distincts par jour, cumulés sur la période retenue",
             )
-    st.line_chart(patients, x="jour", y="patients", color="famille")
+    rendu.tracer_temporel(
+        patients, x="jour", y="patients", couleur="famille", x_label="Jour", y_label="Patients"
+    )
 
     rendu.titre_indicateur("activite_profil_semaine")
     st.bar_chart(
