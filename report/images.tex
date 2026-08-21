@@ -245,3 +245,57 @@
   \legendeCapture{#3}{#4}%
 }
 
+% ------------------------------------------------------------------------------
+% LES STYLES DES TROIS DIAGRAMMES UML.
+%
+% Ils sont déclarés ici, dans le fichier qui tient l'apparat des figures, et non
+% dans chaque chapitre : trois diagrammes qui répéteraient leurs réglages
+% finiraient par diverger, et le lecteur y verrait trois notations au lieu d'une.
+%
+% LA COULEUR EST CELLE DE LA PAGE DE GARDE, `accentgarde`. Elle est déclarée dans
+% `liminaires/page-de-garde.tex`, donc APRÈS ce fichier dans l'ordre de lecture ;
+% un style TikZ ne retient toutefois qu'un NOM de couleur, résolu au moment du
+% tracé, et la page de garde compose bien avant le premier chapitre. Le gris de
+% cartouche du document porte, comme ailleurs, ce qui est accessoire.
+%
+% LA NOTATION EST CELLE QUE LA NORME DONNE — cadres, cardinalités, flèches pleines
+% pour un message, flèches ouvertes pour une réponse — et les corps sont ceux des
+% six figures déjà composées : `\footnotesize` pour le contenu, `\scriptsize` pour
+% les cardinalités et les libellés de flèche.
+\tikzset{
+  % — un acteur : le bonhomme normalisé, tracé au trait, et son libellé dessous.
+  acteurUML/.pic={
+    \draw[line width=0.6pt] (0,0.30) circle (0.13);
+    \draw[line width=0.6pt] (0,0.17) -- (0,-0.16);
+    \draw[line width=0.6pt] (-0.17,0.01) -- (0.17,0.01);
+    \draw[line width=0.6pt] (0,-0.16) -- (-0.14,-0.42);
+    \draw[line width=0.6pt] (0,-0.16) -- (0.14,-0.42);
+  },
+  % — un cas d'utilisation : l'ellipse.
+  casUML/.style={
+    ellipse, draw=accentgarde, line width=0.6pt, align=center,
+    font=\scriptsize, inner sep=1.5pt, minimum height=8mm,
+  },
+  % — le cadre du système, qui enferme les cas.
+  cadreUML/.style={draw=griscartouche, line width=0.5pt, inner sep=3mm},
+  % — un lien acteur-cas : un simple trait, sans pointe.
+  lienUML/.style={draw=accentgarde, line width=0.5pt},
+  % — une classe : le rectangle à deux compartiments.
+  classeUML/.style={
+    rectangle split, rectangle split parts=2, draw=accentgarde, line width=0.6pt,
+    rectangle split part align=left, align=left, font=\scriptsize,
+    inner sep=2.5pt, text width=30mm,
+  },
+  % — une association, et sa cardinalité.
+  assocUML/.style={draw=accentgarde, line width=0.5pt},
+  cardUML/.style={font=\scriptsize, inner sep=1.5pt, text=griscartouche},
+  % — un participant de séquence, et sa ligne de vie.
+  partUML/.style={
+    rectangle, draw=accentgarde, line width=0.6pt, align=center,
+    font=\scriptsize, inner sep=2.5pt, minimum height=6mm, text width=20mm,
+  },
+  vieUML/.style={draw=griscartouche, line width=0.4pt, dash pattern=on 1.4pt off 1.4pt},
+  % — un message, et un message perdu (celui qui sort du diagramme).
+  msgUML/.style={draw=accentgarde, line width=0.5pt, -{Latex[length=1.6mm,width=1.2mm]}},
+  etiqUML/.style={font=\scriptsize, inner sep=1.2pt, fill=white, above=0.2mm},
+}
