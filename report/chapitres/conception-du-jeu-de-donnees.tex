@@ -1,29 +1,23 @@
 % Ce chapitre repose sur :
 %   DOC: s20, s29, s30
-%   OBS: REL-PAT.A01, REL-PAT.A03, REL-PAT.D01, REL-PAT.D02, REL-PAT.D03, REL-PAT.D05, REL-PAT.D06,
-%   OBS: REL-PAT.D09, REL-PAT.D10, REL-PAT.D11, REL-PAT.H05, REL-PAT.H07, REL-PAT.H12, REL-RDV.C01,
-%   OBS: REL-RDV.C02, REL-RDV.C05, REL-RDV.C07, REL-RDV.C08, REL-RDV.R01, REL-RDV.R02, REL-RDV.R03,
-%   OBS: REL-RDV.R08, REL-RDV.R10, REL-RDV.R11, REL-RDV.R12
+%   OBS: REL-PAT.A01, REL-PAT.A03, REL-PAT.D01, REL-PAT.D02, REL-PAT.D03, REL-PAT.D05
+%   OBS: REL-PAT.D06, REL-PAT.D09, REL-PAT.D10, REL-PAT.D11, REL-PAT.H05, REL-PAT.H07
+%   OBS: REL-PAT.H12, REL-RDV.C01, REL-RDV.C02, REL-RDV.C05, REL-RDV.C07, REL-RDV.C08
+%   OBS: REL-RDV.R01, REL-RDV.R02, REL-RDV.R03, REL-RDV.R08, REL-RDV.R10, REL-RDV.R11
+%   OBS: REL-RDV.R12
 %   HYP: (aucun)
-%   CHI: admissions-2024, capacite-fonctionnelle, colonnes-aval-decrites, colonnes-aval-total,
-%   CHI: colonnes-intermediate, colonnes-marts, colonnes-source-catalogue,
-%   CHI: colonnes-source-catalogue-doc, colonnes-source-catalogue-hyp, colonnes-source-catalogue-obs,
-%   CHI: colonnes-source-doc, colonnes-source-hyp, colonnes-source-obs, colonnes-source-registre,
-%   CHI: consultations-2024, consultations-produites, defaut-ages-incoherents, defaut-dates-aberrantes,
-%   CHI: defaut-factures-sans-pec, defaut-familles, defaut-rdv-doublon-creneau, defaut-taux-doublons,
-%   CHI: dim-patient-fiches-plusieurs-versions, dms-publie, examens-2024, factures-avec-creance,
-%   CHI: grappes-multiples, identifiants-distincts, interventions-2024, journees-2024,
-%   CHI: mouvements-lits-distincts, niveaux-tri, parametres-doc, parametres-fichiers, parametres-hyp,
-%   CHI: parametres-obs, parametres-total, part-couverture-principale, part-sans-couverture,
-%   CHI: part-sejours-depuis-urgences, part-sexe-masculin, part-tri-niveau-4, part-tri-niveau-5,
-%   CHI: part-urbain, passages-urgences-produits, patients-produits, periode-debut, periode-fin,
-%   CHI: periode-jours, personnes-estimees, prelevements-2024, quarantaine-lignes-total,
-%   CHI: quarantaine-patients-lignes, quarantaine-rendez-vous-lignes, sejours-produits,
-%   CHI: source-creances-lignes, source-encaissements-lignes, source-factures-lignes,
-%   CHI: source-lignes-facture-lignes, source-lignes-total, source-mouvements-lignes,
-%   CHI: source-passages-lignes, source-passages-urgences-lignes, source-patients-lignes,
-%   CHI: source-prises-en-charge-lignes, source-relances-lignes, source-rendez-vous-lignes,
-%   CHI: source-tables, tom-publie, tranches-age, urgences-borne-basse, urgences-borne-haute,
+%   CHI: admissions-2024, capacite-fonctionnelle, colonnes-aval-decrites, colonnes-aval-total, colonnes-intermediate, colonnes-marts
+%   CHI: colonnes-source-catalogue, colonnes-source-catalogue-doc, colonnes-source-catalogue-hyp, colonnes-source-catalogue-obs, colonnes-source-doc, colonnes-source-hyp
+%   CHI: colonnes-source-obs, colonnes-source-registre, consultations-2024, consultations-produites, defaut-ages-incoherents, defaut-dates-aberrantes
+%   CHI: defaut-factures-sans-pec, defaut-familles, defaut-rdv-doublon-creneau, defaut-taux-doublons, dim-patient-fiches-plusieurs-versions, dms-publie
+%   CHI: examens-2024, factures-avec-creance, grappes-multiples, identifiants-distincts, interventions-2024, journees-2024
+%   CHI: mouvements-lits-distincts, niveaux-tri, parametres-doc, parametres-fichiers, parametres-hyp, parametres-obs
+%   CHI: parametres-total, part-couverture-principale, part-sans-couverture, part-sejours-depuis-urgences, part-sexe-masculin, part-tri-niveau-4
+%   CHI: part-tri-niveau-5, part-urbain, passages-urgences-produits, patients-produits, periode-debut, periode-fin
+%   CHI: periode-jours, personnes-estimees, prelevements-2024, quarantaine-lignes-total, quarantaine-patients-lignes, quarantaine-rendez-vous-lignes
+%   CHI: sejours-produits, source-creances-lignes, source-encaissements-lignes, source-factures-lignes, source-lignes-facture-lignes, source-lignes-total
+%   CHI: source-mouvements-lignes, source-passages-lignes, source-passages-urgences-lignes, source-patients-lignes, source-prises-en-charge-lignes, source-relances-lignes
+%   CHI: source-rendez-vous-lignes, source-tables, tom-publie, tranches-age, urgences-borne-basse, urgences-borne-haute
 %   CHI: urgences-scenario-retenu
 %   SER: (aucune)
 %   SECTIONS: 8
@@ -40,7 +34,7 @@ et, si celle-ci n'est pas soldée, à une \emph{créance} puis à des \emph{rela
 décompose en \emph{mouvements} — admission, mutations internes, sortie. Le rendez-vous, enfin, est
 une entité distincte de l'épisode : il précède la consultation, et il peut ne jamais aboutir.
 
-Trois traits de ce modèle méritent d'être posés d'emblée, parce qu'ils commandent tout le reste.
+Trois traits de ce modèle commandent tout le reste.
 
 \textbf{La personne, l'identifiant et la version sont trois grandeurs, non deux.} La couche produite
 porte \chiffre{patients-produits} lignes de fiche patient, qui sont des \emph{versions} — une fiche
@@ -110,8 +104,7 @@ donnant lieu à une créance éclaire un point du chapitre~\ref{chap:activite} :
 ne porte pas sur l'ensemble des factures, et deux calculs justes peuvent donc différer de plusieurs
 dizaines de points selon la population retenue.
 
-Le grain de chaque table mérite une remarque, parce qu'il n'est pas toujours celui qu'on
-attendrait. La table des passages porte un épisode de soin \emph{toutes familles confondues} — la
+Le grain de chaque table n'est pas toujours celui qu'on attendrait. La table des passages porte un épisode de soin \emph{toutes familles confondues} — la
 consultation, l'urgence et le séjour y coexistent, distingués par un type — tandis que la table des
 passages aux urgences porte un enregistrement supplémentaire par passage d'urgence, avec son niveau
 de tri. Les deux se recoupent donc, et le décompte le montre : les
@@ -132,7 +125,7 @@ Chaque colonne de la couche source est rattachée à ce qui l'établit. Le table
 correspondance pour deux tables ; l'annexe la porte pour les onze.
 
 \begin{center}
-\begin{tabular}{@{}p{3.1cm}p{3.0cm}p{1.4cm}p{1.5cm}p{3.0cm}@{}}
+\begin{tabular}{@{}p{3.0cm}p{2.9cm}p{1.5cm}p{1.9cm}p{3.6cm}@{}}
 \toprule
 Libellé relevé & Colonne & Type & Provenance & Preuve \\
 \midrule
@@ -184,9 +177,9 @@ d'un champ de son intitulé se tromperait.
 
 \section{Le dictionnaire des données et son décompte de provenance}
 
-Un registre unique porte une entrée par colonne de la couche source, et quatre artefacts en dérivent
-mécaniquement : la définition de schéma, les fichiers de propriétés de la couche de transformation,
-le dictionnaire lisible, et sa version composée en annexe de ce rapport. Le registre porte
+Un registre unique porte une entrée par colonne de la couche source, et plusieurs artefacts en
+dérivent mécaniquement : la définition de schéma, les fichiers de propriétés de la couche de
+transformation, le dictionnaire lisible et sa synthèse en annexe. Le registre porte
 \chiffre{colonnes-source-registre} entrées, et le catalogue de la base en compte exactement autant :
 \chiffre{colonnes-source-catalogue} colonnes au schéma source. La correspondance est vérifiée dans
 les deux sens par un contrôle bloquant.
@@ -212,18 +205,14 @@ qui les déclare, et dans le catalogue de la base qui les porte.
 
 \medskip
 
-\textbf{Le registre ne couvre pas les couches en aval, et ce n'est pas un oubli.} Les couches
-intermédiaire et analytique comptent ensemble \chiffre{colonnes-aval-total} colonnes —
-\chiffre{colonnes-intermediate} et \chiffre{colonnes-marts} —, et aucune ne porte d'étiquette de
-provenance. La raison est qu'une colonne calculée n'a pas de provenance au même sens : sa provenance
-est sa formule, et cette formule est écrite dans le modèle qui la produit. Ces mêmes
-\chiffre{colonnes-aval-decrites} colonnes sont en revanche toutes décrites, une par une, dans les
-fichiers de propriétés de la couche de transformation, et un contrôle vérifie qu'aucune n'échappe à
-sa description. Le même nombre décrit donc deux faits différents : ce que le registre de provenance
-ne couvre pas, et ce que la documentation des couches aval couvre.
+\textbf{Le registre ne couvre pas les couches en aval.} Les couches intermédiaire et analytique
+comptent ensemble \chiffre{colonnes-aval-total} colonnes — \chiffre{colonnes-intermediate} et
+\chiffre{colonnes-marts} —, et aucune ne porte d'étiquette de provenance : une colonne calculée a
+pour provenance sa formule, écrite dans le modèle qui la produit. Ces
+\chiffre{colonnes-aval-decrites} colonnes sont en revanche toutes décrites dans les fichiers de
+propriétés de la couche de transformation.
 
-\textbf{Et voici l'asymétrie que ce rapport doit montrer, parce qu'elle n'apparaît nulle part
-ailleurs.} Les colonnes décrivent la \emph{structure} du jeu de données ; les paramètres du
+\textbf{Une asymétrie mérite d'être montrée.} Les colonnes décrivent la \emph{structure} du jeu de données ; les paramètres du
 générateur en produisent les \emph{valeurs}. Les deux portent les mêmes trois étiquettes, et leurs
 distributions n'ont rien à voir.
 
@@ -252,8 +241,7 @@ Un peu moins de la moitié des colonnes est observée ; un cinquantième des par
 l'inverse, plus des trois quarts des paramètres sont posés sans preuve externe, contre un peu plus
 d'un huitième des colonnes. \textbf{Ce sont les paramètres qui produisent les nombres du
 chapitre~\ref{chap:activite}}, et ils sont donc bien plus hypothétiques que la structure qui les
-porte. Un lecteur qui accorderait aux valeurs le crédit que mérite la structure se tromperait de
-grandeur, et c'est pourquoi les deux décomptes sont donnés ensemble plutôt que séparément.
+porte. C'est pourquoi les deux décomptes sont donnés ensemble.
 
 \section{Spécification du générateur}
 
@@ -273,33 +261,27 @@ Ce qui en résulte est mesurable sur la couche produite : \chiffre{sejours-produ
 urgences.
 
 \textbf{L'écart au cadrage initial, et son motif.} Le cadrage dérivait la volumétrie d'une capacité
-annoncée et d'indicateurs nationaux, par le produit d'une capacité litière, d'un taux d'occupation et
-d'une durée moyenne de séjour. La dérivation était fausse d'un facteur de cinq à sept sur ses deux
-branches, et deux confusions l'expliquent. La première est celle de la capacité \emph{existante},
-annoncée par voie de presse, avec la capacité \emph{fonctionnelle}, seule grandeur publiée par
-établissement : \chiffre{capacite-fonctionnelle} lits contre les cent quarante annoncés
-\cite{s29}. La seconde est celle d'une valeur nationale avec une valeur d'établissement : le taux
-d'occupation national appliqué à cet hôpital y vaut \chiffre{tom-publie}~\% et sa durée moyenne de
-séjour \chiffre{dms-publie} jours, l'une et l'autre relevées et non supposées. \textbf{La seule entrée
-correcte de la dérivation initiale était le taux d'occupation.}
+annoncée et d'indicateurs nationaux. La dérivation était fausse d'un facteur de cinq à sept, et deux
+confusions l'expliquent : celle de la capacité \emph{existante}, annoncée par voie de presse, avec
+la capacité \emph{fonctionnelle}, seule grandeur publiée par établissement —
+\chiffre{capacite-fonctionnelle} lits contre les cent quarante annoncés \cite{s29} — et celle d'une
+valeur nationale avec une valeur d'établissement : le taux d'occupation national appliqué à cet
+hôpital vaut \chiffre{tom-publie}~\% et sa durée moyenne de séjour \chiffre{dms-publie} jours.
 
-Une voie de reconstruction de la capacité existe dans les données et n'est pas retenue : le décompte
-des lits distincts observés dans les mouvements rend \chiffre{mouvements-lits-distincts}, soit
-exactement la valeur publiée. Elle est écartée parce qu'un lit fonctionnel n'ayant accueilli aucun
-patient sur toute la période resterait invisible du décompte — \textbf{la mesure est un plancher, pas une
-capacité.}
+Une reconstruction de la capacité par le décompte des lits distincts observés dans les mouvements
+rendrait \chiffre{mouvements-lits-distincts}, soit exactement la valeur publiée. Elle n'est pas
+retenue : un lit n'ayant accueilli aucun patient resterait invisible, et \textbf{la mesure serait un
+plancher, pas une capacité.}
 
 \textbf{L'absence d'activité chirurgicale, démontrée.} Le chapitre~\ref{chap:organisme} l'énonce et
 renvoie ici pour sa démonstration. Le recueil statistique porte, pour cet établissement,
-\chiffre{interventions-2024} intervention chirurgicale — et l'affirmation ne repose pas sur un zéro
-imprimé mais sur une \emph{absence de ligne}, ce qui est plus fragile et demande trois vérifications.
+\chiffre{interventions-2024} intervention chirurgicale — et l'affirmation repose sur une
+\emph{absence de ligne} et non sur un zéro imprimé, ce qui demande trois vérifications.
 
 La première est une \textbf{recherche exhaustive de dénomination} : le nom de l'établissement a été
 cherché sans distinction de casse sur le texte intégral des deux éditions du recueil, et les trois
-occurrences connues ont été retrouvées aux tableaux qui le mentionnent — le contrôle porte donc sur
-la propriété exploitée, et non sur la seule présence d'un enregistrement. Aucune occurrence n'existe
-dans l'emprise du tableau des interventions, balayée page par page, et les variantes de graphie ont
-été testées séparément.
+occurrences connues ont été retrouvées aux tableaux qui le mentionnent. Aucune n'existe dans
+l'emprise du tableau des interventions, balayée page par page, variantes de graphie comprises.
 
 La deuxième est un \textbf{contrôle de somme provinciale} : la somme des lignes visibles de la section
 provinciale égale exactement le total imprimé, sur les deux exercices et sur les deux colonnes.
@@ -344,13 +326,10 @@ mécaniquement : le nombre de lignes de la table des passages aux urgences, et l
 d'hospitalisation aux urgences, dérivé de la part des séjours provenant des urgences
 (\chiffre{part-sejours-depuis-urgences}) rapportée aux passages du scénario.
 
-\textbf{Ce que le scénario ne change pas}, et c'est le résultat de cette section. Les séjours n'en
-dépendent pas : leur nombre est ancré sur les admissions relevées, indépendamment du scénario. Les
-taux n'en dépendent pas non plus — un taux d'absentéisme, une part de rendez-vous le jour même, une
-répartition par niveau de tri sont des rapports, et le scénario agit sur leur numérateur et leur
-dénominateur à la fois. Les délais n'en dépendent pas : ils sont tirés de distributions, non de
-volumes. La performance du rapprochement d'identités n'en dépend pas : elle est fonction du nombre de
-fiches patient, ancré ailleurs.
+\textbf{Ce que le scénario ne change pas}, et c'est le résultat de cette section. Les séjours sont
+ancrés sur les admissions relevées. Les taux sont des rapports, et le scénario agit sur leur
+numérateur et leur dénominateur à la fois. Les délais sont tirés de distributions, non de volumes.
+La performance du rapprochement dépend du nombre de fiches patient, ancré ailleurs.
 
 \textbf{Conclusion : aucune conclusion de ce rapport exprimée en taux ou en délai n'est affectée par
 le choix du scénario.} Seuls les volumes absolus de passages aux urgences le sont, et ils sont
@@ -391,13 +370,10 @@ aux urgences sont documentées. Une conclusion tirée de la pyramide des âges d
 donc rien du monde ; une conclusion tirée de la répartition par niveau de tri reproduirait une
 échelle publiée, sans davantage prouver qu'elle s'applique ici.
 
-La nuance mérite d'être poussée d'un cran, car elle est le point le plus incompris de ce genre de
-travail. Une distribution posée n'est pas arbitraire : elle est choisie pour être plausible, et son
-effet est borné. Une répartition par sexe de \chiffre{part-sexe-masculin} d'hommes n'est appuyée par
-aucune source pour cet établissement, mais elle est proche de l'équilibre, et une valeur voisine
-changerait peu de chose à ce que la chaîne démontre. À l'inverse, une distribution documentée n'est
-pas transférable pour autant : l'échelle de tri employée pour les urgences est française, et rien
-n'établit qu'un service marocain trie de la même façon. \textbf{L'étiquette dit d'où vient la valeur,
+Une distribution posée n'est pas pour autant arbitraire : elle est choisie plausible, et son effet
+est borné. Une distribution documentée n'est pas transférable pour autant : l'échelle de tri
+employée pour les urgences est française, et rien n'établit qu'un service marocain trie de la même
+façon. \textbf{L'étiquette dit d'où vient la valeur,
 elle ne dit pas qu'elle s'applique.}
 
 Chaque paramètre porte en outre, dans sa configuration, une phrase disant ce qui serait faux si la

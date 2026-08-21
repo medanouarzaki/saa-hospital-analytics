@@ -1,44 +1,29 @@
 % Ce chapitre repose sur :
-%   DOC: s12, s13, s14, s20, s26, s27, s30
+%   DOC: s12, s13, s14, s20, s26, s27
+%   DOC: s30
 %   OBS: REL-RDV.C02, REL-RDV.C07, REL-RDV.C08, REL-RDV.R08, REL-RDV.R11
 %   HYP: (aucun)
-%   CHI: flux-passages-total, flux-programme-total, flux-jours-ouverts, flux-programme-moyenne,
-%   CHI: flux-urgences-moyenne, flux-lundi-moyenne, flux-samedi-moyenne, flux-dimanche-programme,
-%   CHI: flux-heure-pointe, flux-passages-heure-pointe, ramadan-jours, ramadan-jours-ouverts,
-%   CHI: ramadan-programme-moyenne, ramadan-hors-moyenne, ramadan-baisse, feries-jours,
-%   CHI: feries-programme-passages, feries-urgences-moyenne, feries-urgences-hors-moyenne,
-%   CHI: periode-debut, periode-fin, periode-jours, injecte-ramadan-coefficient,
-%   CHI: injecte-ferie-coefficient, injecte-hebdo-rapport, honores-total, honores-avec-fiche,
-%   CHI: honores-sans-fiche, honores-sans-fiche-en-quarantaine, artefact-nombre, artefact-part,
-%   CHI: complement-nombre, delai-mediane-ensemble, delai-mediane-complement, part-jour-meme,
-%   CHI: injecte-part-jour-meme, jour-meme-marge-nulle, jour-meme-part-marge-nulle,
-%   CHI: source-rendez-vous-lignes, rdv-en-instance, absences-total, annulations-total,
-%   CHI: taux-absenteisme-global, taux-annulation-global, injecte-taux-annulation,
-%   CHI: annulations-avec-agent, absences-avec-agent-annulation, relation-inter-ensemble,
-%   CHI: relation-intra-ensemble, relation-brute-ensemble, relation-inter-complement,
-%   CHI: relation-intra-complement, relation-brute-complement, relation-effectif-ensemble,
-%   CHI: relation-effectif-complement, relation-activites-ecart-positif,
-%   CHI: injecte-correlation-parametres, injecte-pente-absenteisme, passages-urgences-produits,
-%   CHI: urgences-part-consultation-ordinaire, urgences-part-mode-principal,
-%   CHI: urgences-part-retour-domicile, urgences-part-hospitalisation, urgences-part-transfert,
-%   CHI: urgences-heure-pointe, urgences-heure-creux, urgences-rapport-pointe-creux,
-%   CHI: source-part-non-urgentes, source-part-non-appropriees, injecte-part-deux-derniers-niveaux,
-%   CHI: cible-delai-niveau-1, cible-delai-niveau-2, cible-delai-niveau-3, cible-delai-niveau-4,
-%   CHI: cible-delai-niveau-5, facturation-montant-total, facturation-factures,
-%   CHI: facturation-part-organisme, facturation-part-patient, encaissements-montant,
-%   CHI: taux-encaissement, recouvrement-taux-global, recouvrement-taux-minimal,
-%   CHI: recouvrement-taux-maximal, recouvrement-creances, recouvrement-montant-du,
-%   CHI: recouvrement-montant-restant, recouvrement-relances, recouvrement-taux-aboutissement,
-%   CHI: creances-part-au-dela-un-an, qualite-colonnes, qualite-colonnes-incompletes,
-%   CHI: qualite-colonne-vide, qualite-lignes-examinees, quarantaine-lignes-total-analyse,
-%   CHI: qualite-taux-quarantaine-maximal, identifiants-distincts, personnes-estimees,
-%   CHI: grappes-multiples, grappes-taille-maximale, doublons-part-mesuree, injecte-taux-doublons,
-%   CHI: collision-groupes-nom, collision-groupes-piece, activites-distinctes,
-%   CHI: delai-rapport-extremes, flux-heures-vides-programme, hebdo-rapport-mesure,
-%   CHI: qualite-tables, qualite-tables-sans-quarantaine
-%   SER: flux-mensuel, flux-horaire, delais-repartition, delais-par-activite,
-%   SER: absenteisme-par-activite, urgences-par-niveau, facturation-par-type,
-%   SER: anciennete-creances, qualite-par-table, completude-champs
+%   CHI: absences-avec-agent-annulation, absences-total, activites-distinctes, annulations-avec-agent, annulations-total, artefact-nombre
+%   CHI: artefact-part, cible-delai-niveau-1, cible-delai-niveau-2, cible-delai-niveau-3, cible-delai-niveau-4, cible-delai-niveau-5
+%   CHI: collision-groupes-nom, collision-groupes-piece, complement-nombre, creances-part-au-dela-un-an, delai-mediane-complement, delai-mediane-ensemble
+%   CHI: delai-rapport-extremes, doublons-part-mesuree, encaissements-montant, facturation-factures, facturation-montant-total, facturation-part-organisme
+%   CHI: facturation-part-patient, feries-jours, feries-programme-passages, feries-urgences-hors-moyenne, feries-urgences-moyenne, flux-dimanche-programme
+%   CHI: flux-heure-pointe, flux-heures-vides-programme, flux-jours-ouverts, flux-lundi-moyenne, flux-passages-heure-pointe, flux-passages-total
+%   CHI: flux-programme-moyenne, flux-programme-total, flux-samedi-moyenne, flux-urgences-moyenne, grappes-multiples, grappes-taille-maximale
+%   CHI: hebdo-rapport-mesure, honores-avec-fiche, honores-sans-fiche, honores-sans-fiche-en-quarantaine, honores-total, identifiants-distincts
+%   CHI: injecte-correlation-parametres, injecte-ferie-coefficient, injecte-hebdo-rapport, injecte-part-deux-derniers-niveaux, injecte-part-jour-meme, injecte-pente-absenteisme
+%   CHI: injecte-ramadan-coefficient, injecte-taux-annulation, injecte-taux-doublons, jour-meme-marge-nulle, jour-meme-part-marge-nulle, part-jour-meme
+%   CHI: passages-urgences-produits, periode-debut, periode-fin, periode-jours, personnes-estimees, qualite-colonne-vide
+%   CHI: qualite-colonnes, qualite-colonnes-incompletes, qualite-lignes-examinees, qualite-tables, qualite-tables-sans-quarantaine, qualite-taux-quarantaine-maximal
+%   CHI: quarantaine-lignes-total-analyse, ramadan-baisse, ramadan-hors-moyenne, ramadan-jours, ramadan-jours-ouverts, ramadan-programme-moyenne
+%   CHI: rdv-en-instance, recouvrement-creances, recouvrement-montant-du, recouvrement-montant-restant, recouvrement-relances, recouvrement-taux-aboutissement
+%   CHI: recouvrement-taux-global, recouvrement-taux-maximal, recouvrement-taux-minimal, relation-activites-ecart-positif, relation-brute-complement, relation-brute-ensemble
+%   CHI: relation-effectif-complement, relation-effectif-ensemble, relation-inter-complement, relation-inter-ensemble, relation-intra-complement, relation-intra-ensemble
+%   CHI: source-part-non-appropriees, source-part-non-urgentes, source-rendez-vous-lignes, taux-absenteisme-global, taux-annulation-global, taux-encaissement
+%   CHI: urgences-heure-creux, urgences-heure-pointe, urgences-part-consultation-ordinaire, urgences-part-hospitalisation, urgences-part-mode-principal, urgences-part-retour-domicile
+%   CHI: urgences-part-transfert, urgences-rapport-pointe-creux
+%   SER: absenteisme-par-activite, anciennete-creances, completude-champs, delais-par-activite, delais-repartition, facturation-par-type
+%   SER: flux-horaire, flux-mensuel, qualite-par-table, urgences-par-niveau
 %   SECTIONS: 6
 
 \chapter{Analyse de l'activité}\label{chap:activite}
@@ -47,15 +32,11 @@
 illustrent ce que la chaîne permet de mesurer, non l'activité réelle du service.} Cette phrase ne
 sera pas répétée ; elle vaut pour chacune des pages qui suivent.
 
-Deux conventions de lecture en découlent. La première : \textbf{chaque grandeur en volume absolu
-porte un renvoi à la section de sensibilité} (§\ref{sec:sensibilite}), qui mesure de combien ce
-volume dépendrait d'un autre choix de calibration ; les grandeurs en taux, en délai et en part n'en
-portent pas, un rapport étant insensible à l'échelle qui le produit. La seconde : \textbf{chaque
-résultat sépare ce qu'il démontre de ce qu'il n'établit pas.} Un résultat qui reproduit une
-relation injectée démontre que la chaîne sait la retrouver, et rien de plus ; un résultat qui ne
-correspond à aucune relation injectée est un effet des autres choix du générateur, et n'établit
-rien du tout. Une section terminale porte cette correspondance dans les deux sens, relation par
-relation et conclusion par conclusion.
+Deux conventions de lecture en découlent. \textbf{Chaque grandeur en volume absolu porte un renvoi
+à la section de sensibilité} (§\ref{sec:sensibilite}) ; les taux, délais et parts n'en portent pas,
+un rapport étant insensible à l'échelle. Et \textbf{chaque résultat sépare ce qu'il démontre de ce
+qu'il n'établit pas} : reproduire une relation injectée démontre que la chaîne sait la retrouver, et
+rien de plus.
 
 La période couverte va du \chiffre{periode-debut} au \chiffre{periode-fin}, soit
 \chiffre{periode-jours} jours.
@@ -64,8 +45,8 @@ La période couverte va du \chiffre{periode-debut} au \chiffre{periode-fin}, soi
 
 Le fait de passage réunit \chiffre{flux-passages-total} lignes (§\ref{sec:sensibilite}), dont
 \chiffre{flux-programme-total} relèvent de l'activité programmée — consultation externe et
-hospitalisation — et le reste des urgences. La séparation se lit sur le code de type de passage,
-jamais sur les libellés des codes, qu'aucune source du registre ne documente.
+hospitalisation — et le reste des urgences. La séparation se lit sur le code de type de passage, jamais sur son libellé, qu'aucune source ne
+documente.
 
 \begin{center}
 \begin{tikzpicture}
@@ -164,7 +145,7 @@ l'invariance des urgences l'est aussi.}
 Le délai d'obtention est l'écart entre la date de création du rendez-vous et la date du rendez-vous
 lui-même, soit l'écart entre deux champs relevés au poste, la date de
 création\releve{REL-RDV.C02} et la date du rendez-vous\releve{REL-RDV.R08}. C'est la variable
-centrale de ce chapitre, et elle demande d'abord un avertissement.
+centrale de ce chapitre.
 
 \textbf{Une part majoritaire du délai est un artefact de construction, et non un tirage.} Le
 générateur, lorsqu'il place un rendez-vous honoré, tire un délai dans une loi log-normale puis le
@@ -175,14 +156,11 @@ exactement la marge disponible.
 
 Sur les \chiffre{honores-total} rendez-vous honorés, \chiffre{honores-avec-fiche} ont une fiche
 patient en vigueur et peuvent donc être rangés ; les \chiffre{honores-sans-fiche} autres n'en ont
-pas, et la cause est mesurée et non supposée — leurs \chiffre{honores-sans-fiche-en-quarantaine}
-fiches sont en quarantaine. Sur cette population de \chiffre{honores-avec-fiche},
-\chiffre{artefact-nombre} rendez-vous portent un délai égal à la marge disponible, soit
-\chiffre{artefact-part}~\%, et \chiffre{complement-nombre} ne le portent pas. \textbf{La partition
-est exhaustive et disjointe par décompte} : les deux parts somment à \chiffre{honores-avec-fiche},
-et aucun rendez-vous n'appartient aux deux, l'appartenance se décidant sur une égalité de dates.
-\textbf{Toute relation qui met en jeu le délai est donc donnée deux fois dans ce chapitre} — sur
-l'ensemble et sur le seul complément.
+pas : leurs \chiffre{honores-sans-fiche-en-quarantaine} fiches sont en quarantaine. Sur cette
+population de \chiffre{honores-avec-fiche}, \chiffre{artefact-nombre} rendez-vous portent un délai
+égal à la marge disponible, soit \chiffre{artefact-part}~\%, et \chiffre{complement-nombre} ne le
+portent pas. \textbf{Toute relation qui met en jeu le délai est donc donnée deux fois dans ce
+chapitre} — sur l'ensemble et sur le seul complément.
 
 \begin{center}
 \begin{tikzpicture}
@@ -323,7 +301,7 @@ lointain se manque plus souvent. \emph{Sans distinguer les activités}, elle vau
 \chiffre{relation-brute-ensemble} : le rangement des activités efface presque entièrement la
 relation interne.
 
-\textbf{Les trois ne concordent pas, et cela s'explique plutôt que cela ne se choisit.} La
+\textbf{Les trois ne concordent pas, et cela s'explique.} La
 troisième forme est un mélange des deux premières, dominé par la seconde parce que la variance de
 l'issue entre activités est faible devant sa variance à l'intérieur de chacune. Montrer la première
 seule ferait conclure qu'attendre ne fait pas manquer son rendez-vous ; montrer la deuxième seule
@@ -621,7 +599,6 @@ Conclusion & Ce dont elle vient \\
 \end{tabular}
 \end{center}
 
-\textbf{Aucune conclusion de ce chapitre n'établit un fait sur le service}, qu'elle reproduise une
-relation injectée ou qu'elle n'en reproduise aucune. Ce que le chapitre démontre, et c'est tout ce
-qu'il démontre, est que la chaîne produit ces grandeurs à partir d'une extraction, les ventile, et
-sépare ce qui vient d'un paramètre de ce qui n'en vient pas.
+\textbf{Aucune conclusion de ce chapitre n'établit un fait sur le service.} Ce qu'il démontre est
+que la chaîne produit ces grandeurs à partir d'une extraction, les ventile, et sépare ce qui vient
+d'un paramètre de ce qui n'en vient pas.

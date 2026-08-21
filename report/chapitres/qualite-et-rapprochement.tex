@@ -2,16 +2,12 @@
 %   DOC: s20, s22, s23
 %   OBS: REL-IPP.O03, REL-IPP.R12
 %   HYP: (aucun)
-%   CHI: ablation-comparaisons-variante-a, ablation-ecart-complet, ablation-ecart-variante-a,
-%   CHI: ablation-ecart-variante-c, ablation-f-variante-c, balayage-points, balayage-points-f-parfaite,
-%   CHI: baseline-f-mesure, blocage-nom-adresse, blocage-nom-telephone, blocage-parents-naissance,
-%   CHI: blocage-piece-identite, collision-groupes-nom, collision-groupes-piece, collision-vides-piece,
-%   CHI: comparaisons-modele, f-mesure-seuil-retenu, grappes-exactes-global, grappes-exactes-restreint,
-%   CHI: identifiants-distincts, paires-candidates, paires-possibles, precision-seuil-retenu,
-%   CHI: qualite-colonne-vide, qualite-colonnes, qualite-colonnes-incompletes,
-%   CHI: quarantaine-lignes-total, quarantaine-patients-lignes, quarantaine-rendez-vous-lignes,
-%   CHI: rappel-seuil-retenu, seuil-retenu, source-lignes-total, sur-fusionnes-global,
-%   CHI: vt-paires-injectees, vt-paires-presentes
+%   CHI: ablation-comparaisons-variante-a, ablation-ecart-complet, ablation-ecart-variante-a, ablation-ecart-variante-c, ablation-f-variante-c, balayage-points
+%   CHI: balayage-points-f-parfaite, baseline-f-mesure, blocage-nom-adresse, blocage-nom-telephone, blocage-parents-naissance, blocage-piece-identite
+%   CHI: collision-groupes-nom, collision-groupes-piece, collision-vides-piece, comparaisons-modele, f-mesure-seuil-retenu, grappes-exactes-global
+%   CHI: grappes-exactes-restreint, identifiants-distincts, paires-candidates, paires-possibles, precision-seuil-retenu, qualite-colonne-vide
+%   CHI: qualite-colonnes, qualite-colonnes-incompletes, quarantaine-lignes-total, quarantaine-patients-lignes, quarantaine-rendez-vous-lignes, rappel-seuil-retenu
+%   CHI: seuil-retenu, source-lignes-total, sur-fusionnes-global, vt-paires-injectees, vt-paires-presentes
 %   SER: (aucune)
 %   SECTIONS: 6
 \chapter{Qualité des données et rapprochement d'identités}\label{chap:qualite}
@@ -58,8 +54,7 @@ Le rapprochement repose sur le modèle de Fellegi-Sunter, dont la bibliothèque 
 l'implémentation \cite{s22}, et dont l'exposé de référence est celui que la documentation du projet
 désigne \cite{s23}.
 
-\textbf{Trois paramètres gouvernent le modèle}, et leur distinction est ce qui le rend estimable
-sans étiquettes. Pour chaque comparaison de champ, la probabilité $m$ est celle d'observer un niveau
+\textbf{Trois paramètres gouvernent le modèle.} Pour chaque comparaison de champ, la probabilité $m$ est celle d'observer un niveau
 d'accord donné \emph{sachant que les deux fiches désignent la même personne} ; la probabilité $u$ est
 celle d'observer le même niveau \emph{sachant qu'elles désignent deux personnes différentes} ; et la
 probabilité qu'un couple pris au hasard soit un vrai couple sert de prior. Le rapport $m/u$ est le
@@ -68,40 +63,33 @@ correspondance} que le modèle additionne sur les champs.
 
 L'estimation se fait par espérance-maximisation, qui alterne l'attribution probabiliste des paires
 aux deux populations et le réajustement des paramètres, jusqu'à convergence \cite{s22}. \textbf{Aucun
-couple étiqueté n'est fourni à cette estimation} : c'est ce qui permet d'employer la méthode là où
-la vérité n'est pas connue, et c'est précisément le cas d'un fichier patient réel.
+couple étiqueté n'est fourni à cette estimation} : c'est ce qui permet d'employer la méthode sur un
+fichier patient réel, où la vérité n'est pas connue.
 
-\textbf{Ce que les deux probabilités capturent est différent, et c'est la source de la puissance du
-modèle.} La probabilité $u$ mesure la fréquence d'un accord dû au hasard : deux personnes distinctes
+\textbf{Ce que les deux probabilités capturent est différent.} La probabilité $u$ mesure la fréquence d'un accord dû au hasard : deux personnes distinctes
 partagent souvent une ville, rarement une date de naissance, presque jamais un numéro de pièce
 d'identité. Un accord sur un champ rare vaut donc beaucoup plus qu'un accord sur un champ commun, et
 le modèle l'apprend au lieu qu'on le lui dise. La probabilité $m$, elle, mesure la fiabilité du
-champ : un téléphone change, une date de naissance est stable, et un accord sur un champ instable
-prouve moins qu'un accord sur un champ stable.
+champ : un téléphone change, une date de naissance est stable.
 
-Un désaccord porte de l'information au même titre qu'un accord, et c'est ce qui distingue ce modèle
-d'une somme de correspondances : un désaccord sur un champ stable retire du poids, un désaccord sur
-un champ instable en retire peu.
+Un désaccord porte de l'information au même titre qu'un accord : sur un champ stable il retire du
+poids, sur un champ instable il en retire peu.
 
 Le modèle estimé de ce projet porte \chiffre{comparaisons-modele} comparaisons de champs, chacune
 découpée en niveaux allant du plus strict au plus permissif et se terminant par un niveau par
-défaut. L'estimation s'arrête sur un critère de convergence de $10^{-4}$, avec un plafond de
-vingt-cinq itérations. Le prior estimé vaut environ quatre millionièmes — l'ordre de grandeur attendu
-sur une population où quelques centaines de paires sont vraies parmi des centaines de millions
-possibles.
+défaut. L'estimation s'arrête sur un critère de convergence de $10^{-4}$, avec un plafond de vingt-cinq
+itérations, et le prior estimé vaut environ quatre millionièmes.
 
-Le poids total d'une paire se convertit en probabilité par la relation que la bibliothèque emploie,
-$p = 1/(1 + 2^{-w})$ où $w$ est le poids en logarithme base deux des chances. C'est cette probabilité
-que le seuil compare, et c'est elle que la colonne du même nom porte à l'écran de recherche du
-système observé.
+Le poids total d'une paire se convertit en probabilité par $p = 1/(1 + 2^{-w})$, où $w$ est le poids
+en logarithme base deux des chances. C'est cette probabilité que le seuil compare, et celle que la
+colonne du même nom porte à l'écran de recherche du système observé.
 
 \textbf{Une hypothèse du modèle doit être dite, parce qu'elle est fausse et qu'on l'emploie
 quand même.} L'addition des poids suppose les champs indépendants conditionnellement à l'état de la
 paire. Ils ne le sont pas : une adresse et une ville sont liées, un nom de père et un nom de famille
-aussi. La conséquence est que les poids extrêmes sont surestimés, et donc que les probabilités
-affichées sont plus tranchées que la réalité ne le justifie. Cela n'affecte pas le \emph{classement}
-des paires, qui est ce dont le seuil a besoin ; cela affecte l'interprétation d'une probabilité prise
-isolément, qu'il ne faut donc pas lire comme une chance.
+aussi. Les poids extrêmes sont donc surestimés, et les probabilités affichées plus tranchées que la
+réalité ne le justifie. Le \emph{classement} des paires n'en souffre pas, et c'est ce dont le seuil
+a besoin ; une probabilité prise isolément ne se lit pas comme une chance.
 
 \section{Mise en œuvre}
 
@@ -109,7 +97,7 @@ isolément, qu'il ne faut donc pas lire comme une chance.
 minuscules, retire les accents, réduit les espaces intérieurs et la ponctuation ; la seconde y
 ajoute le tri alphabétique des composants séparés par des espaces, ce qui absorbe l'inversion d'un
 prénom composé. \textbf{Une valeur vide reste vide} : aucune des deux ne transforme une absence en
-présence, ce qui serait la façon la plus simple de fabriquer un faux accord.
+présence.
 
 \textbf{Comparer toutes les paires est impossible, et le blocage est ce qui le résout.} Les
 \chiffre{identifiants-distincts} fiches de version courante forment
@@ -138,43 +126,37 @@ qu'elle opère sur les \chiffre{paires-possibles} paires possibles.
 
 \medskip
 
-Une quatrième règle a été ajoutée au périmètre initial, qui en prévoyait trois, et le motif est
-mesuré : l'union des quatre atteint le rappel maximal pour \chiffre{paires-candidates} paires, là où
-la meilleure union à trois règles atteignant ce même rappel en coûtait près de quatre cent mille —
-un rapport de quatre-vingts.
+Une quatrième règle a été ajoutée aux trois prévues, et le motif est mesuré : l'union des quatre
+atteint le rappel maximal pour \chiffre{paires-candidates} paires, là où la meilleure union à trois
+règles atteignant ce rappel en coûtait quatre-vingts fois plus.
 
 \textbf{Les comparaisons par champ, et les colonnes écartées.} Treize colonnes sont comparées, sous
 \chiffre{comparaisons-modele} comparaisons — deux colonnes de nom de famille se traitent ensemble.
 Les niveaux emploient une distance de Jaro-Winkler pour les champs de texte, à deux seuils
 successifs, et la date de naissance reçoit un traitement propre : l'égalité exacte, puis un écart en
 nombre de jours, puis une distance de chaîne, puis le niveau par défaut. \textbf{L'ordre de ces deux
-niveaux intermédiaires a été établi par mesure} — un écart en jours s'est révélé nettement plus
-discriminant qu'une distance de chaîne — et non par intuition, ce qui est le genre de détail dont
-dépend la performance réelle d'un rapprochement.
+niveaux intermédiaires a été établi par mesure} : un écart en jours s'est révélé nettement plus
+discriminant qu'une distance de chaîne.
 
 Neuf colonnes sont écartées, chacune avec son motif mesuré, et deux motifs distincts s'y
 rencontrent. Le premier est qu'un accord n'y apprend presque rien : le rapport entre la probabilité
 d'accord chez les vrais couples et chez les faux y vaut 1,10 pour l'état, 1,15 pour le pays de
 naissance, 1,29 pour l'état de naissance. Le second est plus intéressant : certaines colonnes sont
 des \emph{copies programmatiques} d'une autre — l'état de naissance de l'état, la ville de naissance
-de la ville —, égales ligne à ligne sur toute la population. \textbf{Les comparer reviendrait à compter
-deux fois le même accord}, et à gonfler artificiellement les poids. Écarter une colonne est ici une
-décision documentée, jamais un oubli.
+de la ville —, égales ligne à ligne sur toute la population. \textbf{Les comparer reviendrait à
+compter deux fois le même accord.}
 
 \textbf{La disjonction structurelle des champs d'identité.} Les règles de blocage s'appuient sur la
 pièce d'identité, le téléphone et l'adresse : ce sont des identifiants, et le jeu de données est
 publié. Un invariant les gouverne donc — \emph{aucun champ synthétique ne prend une valeur
 structurellement possible dans son espace réel}. Le raisonnement tient en une phrase : un numéro de
 téléphone tiré sur un préfixe attribué \emph{est le numéro de quelqu'un}, et publié à côté d'un nom
-et d'une ville il se lit comme un fichier nominatif. \textbf{L'impossibilité recherchée est de structure
-et jamais de non-attribution} : une plage non attribuée aujourd'hui peut être ouverte demain, et la
-garantie tomberait en silence sans que personne ne touche au dépôt ; une longueur qui n'existe dans
-aucun plan de numérotation, elle, ne change pas.
+et d'une ville il se lit comme un fichier nominatif. \textbf{L'impossibilité recherchée est de
+structure et jamais de non-attribution} : une plage non attribuée aujourd'hui peut être ouverte
+demain, quand une longueur qui n'existe dans aucun plan de numérotation ne change pas.
 
-Un contrôle bloquant l'établit champ par champ. Il exclut délibérément les noms, prénoms, voies et
-villes, et son critère est écrit : \textbf{un identifiant désigne une personne ou un compte, un attribut la
-décrit.} Les exclure est un choix, et le retirer de ces colonnes viderait le jeu du réalisme qui
-fait son intérêt.
+Un contrôle bloquant l'établit champ par champ. Il exclut les noms, prénoms, voies et villes, sur un
+critère écrit : \textbf{un identifiant désigne une personne ou un compte, un attribut la décrit.}
 
 \section{Évaluation contre la vérité terrain}
 
@@ -188,7 +170,7 @@ Au seuil retenu de \chiffre{seuil-retenu}, la précision vaut \chiffre{precision
 rappel \chiffre{rappel-seuil-retenu} et la F-mesure \chiffre{f-mesure-seuil-retenu}, mesurés au
 niveau de la paire.
 
-\textbf{Un résultat parfait doit être relativisé sur-le-champ, et voici de quoi.} Le balayage porte
+\textbf{Un résultat parfait doit être relativisé sur-le-champ.} Le balayage porte
 \chiffre{balayage-points} points de seuil, et \chiffre{balayage-points-f-parfaite} d'entre eux
 donnent la même F-mesure de 1. Le plateau s'étend sur plus de soixante-dix ordres de grandeur de
 probabilité. \textbf{Ce n'est pas le signe d'un modèle finement réglé : c'est le signe que les deux
@@ -225,8 +207,8 @@ de seuils. Le point carré est la référence par collision exacte, qui ne dépe
 \medskip
 
 \textbf{La métrique primaire est au niveau de la paire, et une métrique de grappe l'accompagne.}
-Les deux ne disent pas la même chose : une paire manquée sur une grappe de trois casse la grappe
-sans casser les deux autres paires. Sur le périmètre restreint aux identifiants impliqués dans au
+Une paire manquée sur une grappe de trois casse la grappe sans casser les deux autres paires. Sur le
+périmètre restreint aux identifiants impliqués dans au
 moins une paire de vérité terrain, \chiffre{grappes-exactes-restreint} grappes sont exactement
 retrouvées ; sur la population entière, singletons compris,
 \chiffre{grappes-exactes-global} le sont — soit toutes. Et le nombre de
@@ -234,10 +216,8 @@ fiches réunies à tort dans une grappe trop grande s'élève à \chiffre{sur-fu
 est le défaut que l'asymétrie des coûts redoute le plus.
 
 \textbf{Le seuil retenu ne se choisit pas sur la F-mesure}, qui exigerait des étiquettes qu'un
-service réel n'a pas. Il se choisit sur une propriété observable sans elles, et l'asymétrie des
-coûts la commande : réunir à tort deux personnes distinctes mêle deux dossiers médicaux, tandis que
-manquer un doublon laisse un fichier dans l'état où il était déjà. \textbf{Un faux positif est plus cher
-qu'un faux négatif}, et le seuil est donc placé du côté prudent du plateau.
+service réel n'a pas. Il se choisit sur l'asymétrie des coûts : un faux positif est plus cher qu'un
+faux négatif, et le seuil est placé du côté prudent du plateau.
 
 \textbf{La comparaison à la ligne de base, et ce qu'elle montre vraiment.} La référence est la
 collision exacte, celle qu'un service peut écrire en une requête : deux fiches sont un doublon si
@@ -295,18 +275,17 @@ attraper.
 la couche intermédiaire et calcule pour chacune son taux de renseignement.
 \chiffre{qualite-colonnes-incompletes} sont renseignées à moins de cent pour cent, et
 \chiffre{qualite-colonne-vide} ne l'est jamais. Ce dernier cas n'est pas un défaut de chargement :
-c'est une colonne que le service ne remplit pas, et la distinguer d'une colonne perdue en chemin est
-exactement ce à quoi sert la mesure. Les colonnes les moins renseignées sont les lignes de téléphone
-supplémentaires et les champs de liste d'attente, ce qui est cohérent avec un usage où le premier
-numéro suffit.
+c'est une colonne que le service ne remplit pas. Les colonnes les moins renseignées sont les lignes
+de téléphone supplémentaires et les champs de liste d'attente, ce qui est cohérent avec un usage où
+le premier numéro suffit.
 
 \textbf{La quarantaine.} Sur les onze tables chargées, deux seulement portent des lignes rejetées —
 \chiffre{quarantaine-patients-lignes} fiches patient et \chiffre{quarantaine-rendez-vous-lignes}
 rendez-vous, soit \chiffre{quarantaine-lignes-total} lignes sur
 \chiffre{source-lignes-total}. Ce sont les défauts injectés que les contrôles d'entrée ont
 attrapés : dates hors domaine, âges incohérents avec la date de naissance, valeurs hors
-nomenclature. Les neuf autres tables n'en portent aucune, ce qui n'est pas un signe de perfection
-mais de nature : leurs défauts injectés ne se voient pas sur une ligne prise seule.
+nomenclature. Les neuf autres tables n'en portent aucune, parce que leurs défauts injectés ne se
+voient pas sur une ligne prise seule.
 
 \textbf{La cohérence entre tables.} La collision exacte, en plus de servir de référence au
 rapprochement, est un contrôle de qualité à part entière : elle dénombre
@@ -315,17 +294,14 @@ rapprochement, est un contrôle de qualité à part entière : elle dénombre
 affichés au tableau de bord et servent une décision — lancer une campagne de fusion d'identités et
 choisir le critère à prioriser.
 
-\textbf{Une précaution de lecture s'attache à ces deux décomptes}, et elle vaut pour tout indicateur
-de qualité construit sur une égalité. Le second critère ne voit rien des
-\chiffre{collision-vides-piece} fiches sans pièce d'identité : sur celles-là, il ne dit pas qu'il n'y
-a pas de doublon, il dit qu'il ne peut pas se prononcer. Un tableau de bord qui afficherait le
-décompte sans la population examinée laisserait confondre les deux, et l'agrégat porte donc, pour
-chaque critère, le nombre de fiches examinées et le nombre de fiches à valeur vide.
+\textbf{Une précaution de lecture s'attache à ces deux décomptes.} Le second critère ne voit rien
+des \chiffre{collision-vides-piece} fiches sans pièce d'identité : sur celles-là, il ne dit pas
+qu'il n'y a pas de doublon, il dit qu'il ne peut pas se prononcer. L'agrégat porte donc, pour chaque
+critère, le nombre de fiches examinées et le nombre de fiches à valeur vide.
 
-\textbf{Ce que ces contrôles ne font pas.} Aucun d'eux ne corrige quoi que ce soit. La complétude
-mesure, la quarantaine met de côté, la collision dénombre — et la chaîne ne réécrit jamais une
-valeur qu'elle juge mauvaise. C'est un choix : une correction automatique effacerait la trace du
-défaut, et le défaut est ici l'objet même du travail.
+\textbf{Aucun de ces contrôles ne corrige quoi que ce soit.} La complétude mesure, la quarantaine
+met de côté, la collision dénombre. Une correction automatique effacerait la trace du défaut, et le
+défaut est ici l'objet même du travail.
 
 \section{Ce que cette évaluation ne prouve pas}\label{sec:limites-rapprochement}
 
