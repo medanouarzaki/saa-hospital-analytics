@@ -61,6 +61,12 @@ _MODIFICATION = re.compile(
 
 TYPES_ATTENDUS = {
     "lignes": int,
+    "chapitres": int,
+    "sections": int,
+    "relations": int,
+    "conclusions": int,
+    "limites": int,
+    "sources": int,
     "tables": int,
     "pages": int,
     "indicateurs": int,

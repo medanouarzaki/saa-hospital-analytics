@@ -84,3 +84,4 @@ chaque exécution.
 | [0068](0068-la-courbe-de-precision-et-de-rappel-est-composee-et-non-tabulee.md) | La courbe de précision et de rappel est composée par un paquet de tracé, et le choix a été tranché par mesure |
 | [0069](0069-le-registre-des-chiffres-s-etend-aux-series-et-la-dette-de-correspondance-se-solde.md) | Le registre des chiffres s'étend aux séries, et la dette de correspondance se solde |
 | [0070](0070-le-tableau-de-bord-se-decrit-sans-capture-d-ecran.md) | Le tableau de bord se décrit sans capture d'écran, et les séries acceptent deux types de commande |
+| [0071](0071-l-annonce-du-plan-est-un-appareil-de-plus-et-les-en-tetes-courants-mentaient.md) | L'annonce du plan est confrontée aux chapitres qui existent, et deux en-têtes courants mentaient |

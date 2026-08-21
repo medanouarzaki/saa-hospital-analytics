@@ -673,7 +673,7 @@ chiffres:
   commande: (R/'airflow/saa_daily.py').read_text(encoding='utf-8').count('task_id=')
   portee: independant-des-donnees
 - id: fichiers-de-controle
-  valeur: 73
+  valeur: 74
   unite: fichiers
   type: python
   commande: len(list((R/'tests').glob('test_*.py')))
@@ -2355,6 +2355,102 @@ chiffres:
     Échecs de lecture tolérés pendant un rafraîchissement, sous toute charge et sans classe d'erreur
     exceptée. Le critère est ASYMÉTRIQUE : un échec d'échange, lui, est journalisé et relançable. La
     commande est la constante elle-même, faute d'artefact qui la porte ailleurs.
+- id: chapitres-numerotes
+  valeur: 9
+  unite: chapitres
+  type: python
+  commande: 'len([n for n in __import__(''re'').findall(r''\\input\{chapitres/([a-z0-9-]+)\}'', (R/''report/rapport.tex'').read_text(encoding=''utf-8'')) if __import__(''re'').search(r''\\chapter\{'', (R/''report/chapitres''/(n+''.tex'')).read_text(encoding=''utf-8''))])'
+  portee: independant-des-donnees
+  note: >-
+    Chapitres numérotés du rapport, comptés dans l'ordre des inclusions du fichier principal. Un
+    chapitre non numéroté — l'introduction, la conclusion — n'y entre pas.
+- id: sections-du-rapport
+  valeur: 54
+  unite: sections
+  type: python
+  commande: 'sum(len([l for l in c.read_text(encoding=''utf-8'').splitlines() if l.startswith(''\\section{'')]) for c in sorted((R/''report/chapitres'').glob(''*.tex'')))'
+  portee: independant-des-donnees
+  note: >-
+    Sections numérotées de tous les chapitres. Les sections étoilées de l'introduction et de la
+    conclusion n'en sont pas et ne s'y comptent pas.
+- id: releve-champs-total
+  valeur: 143
+  unite: identifiants
+  type: python
+  commande: 'len(set(__import__(''re'').findall(r''id: (REL-[A-Z]{3}\.[A-Z][0-9]{2})(?![0-9])'', (R/''docs/observation/releve_champs.yml'').read_text(encoding=''utf-8''))))'
+  portee: independant-des-donnees
+  note: >-
+    Éléments relevés au poste, boutons et champs de donnée confondus. Le relevé consigne l'écran tel
+    qu'il se présente, et un bouton en fait partie.
+- id: releve-champs-non-employes
+  valeur: 17
+  unite: identifiants
+  type: python
+  commande: 'len(set(__import__(''re'').findall(r''id: (REL-[A-Z]{3}\.[A-Z][0-9]{2})(?![0-9])'', (R/''docs/observation/releve_champs.yml'').read_text(encoding=''utf-8''))) - set(__import__(''re'').findall(r''REL-[A-Z]{3}\.[A-Z][0-9]{2}(?![0-9])'', chr(10).join(c.read_text(encoding=''utf-8'') for c in sorted((R/''report/chapitres'').glob(''*.tex''))))))'
+  portee: independant-des-donnees
+  note: >-
+    Éléments relevés qu'aucun chapitre ne cite. Tous sont des boutons, aucun n'est un champ de
+    donnée : la commande compte les identifiants, et le rapport de travail nomme lesquels.
+- id: relations-injectees
+  valeur: 21
+  unite: relations
+  type: python
+  commande: 'len(yaml.safe_load((R/''docs/relations_injectees.yml'').read_text(encoding=''utf-8'')))'
+  portee: independant-des-donnees
+  note: >-
+    Relations que le générateur produit par construction, chacune déclarée au registre qui les
+    porte.
+- id: relations-non-reprises
+  valeur: 5
+  unite: relations
+  type: python
+  commande: 'len(__import__(''re'').findall(r''\\relnonreprise\{'', chr(10).join(c.read_text(encoding=''utf-8'') for c in sorted((R/''report/chapitres'').glob(''*.tex'')))))'
+  portee: independant-des-donnees
+  note: >-
+    Relations injectées déclarées non reprises par une conclusion, chacune avec son motif. Leur
+    somme avec `conclusions-avec-relation` égale `relations-injectees`.
+- id: conclusions-avec-relation
+  valeur: 16
+  unite: relations
+  type: python
+  commande: 'len(__import__(''re'').findall(r''\\relreprise\{'', chr(10).join(c.read_text(encoding=''utf-8'') for c in sorted((R/''report/chapitres'').glob(''*.tex'')))))'
+  portee: independant-des-donnees
+  note: >-
+    Lignes de reprise du tableau de correspondance — une par relation injectée reprise. Une ligne
+    peut nommer deux conclusions, et ce décompte compte les RELATIONS, non les conclusions.
+- id: conclusions-sans-relation
+  valeur: 6
+  unite: conclusions
+  type: python
+  commande: 'len(__import__(''re'').findall(r''\\conclusionhors\{'', chr(10).join(c.read_text(encoding=''utf-8'') for c in sorted((R/''report/chapitres'').glob(''*.tex'')))))'
+  portee: independant-des-donnees
+  note: >-
+    Conclusions du chapitre d'analyse déclarées ne venir d'aucune relation injectée. Elles sont un
+    effet des autres choix du générateur, et n'établissent rien.
+- id: limites-des-faits
+  valeur: 4
+  unite: limites
+  type: python
+  commande: 'len([l for l in (R/''docs/decisions/0024-limites-documentees-des-faits.md'').read_text(encoding=''utf-8'').split(''## Décision'')[1].split(''## Justification'')[0].splitlines() if __import__(''re'').match(r''^[0-9]+\. '', l)])'
+  portee: independant-des-donnees
+  note: >-
+    Limites du modèle dimensionnel documentées plutôt que contournées, comptées dans
+    l'enregistrement de décision qui les porte. Chacune y dit ce qu'il faudrait pour la lever.
+- id: sources-non-citees
+  valeur: 12
+  unite: sources
+  motif_non_emploi: >-
+    Mesuré et conservé, mais délibérément absent du rapport. Une entrée du registre des sources
+    qu'aucun chapitre ne cite n'est pas une omission : le registre garde ce qu'il a écarté, avec
+    le motif de l'écart, et plusieurs de ces entrées portent en toutes lettres « aucun usage » ou
+    renvoient à une autre source qui fait foi. Écrire ce décompte en conclusion ferait passer une
+    propriété du registre pour une limite du travail.
+  type: python
+  commande: 'len([s for s in yaml.safe_load((R/''docs/sources/sources.yml'').read_text(encoding=''utf-8'')) if s[''id''].lower().replace(''-'','''') not in {x.strip() for g in __import__(''re'').findall(r''\\cite\{([^}]*)\}'', chr(10).join(c.read_text(encoding=''utf-8'') for c in sorted((R/''report/chapitres'').glob(''*.tex'')))) for x in g.split('','') if x.strip()}])'
+  portee: independant-des-donnees
+  note: >-
+    Entrées du registre des sources qu'aucun chapitre ne cite. Le registre conserve ce qu'il a
+    écarté, motif compris : une entrée non citée n'est pas une omission.
 
 # Séries — un jeu de données par entrée, produit par une commande et lu par la composition
 #

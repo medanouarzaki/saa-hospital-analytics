@@ -48,6 +48,18 @@
 % toute conclusion renvoie à une relation ou déclare qu'elle n'en vient pas. Une ligne retirée
 % d'un côté ou de l'autre fait rougir ce contrôle en nommant l'orpheline.
 % ------------------------------------------------------------------------------------------
+% ------------------------------------------------------------------------------------------
+% L'annonce du plan, dans l'introduction générale.
+%
+% Un titre de chapitre annoncé s'écrit `\annonceChapitre{numéro}{titre}` et se compose en
+% italique, au fil de la prose. Un contrôle lit ces appels et les confronte AUX FICHIERS DE
+% CHAPITRE, dans les deux sens : tout chapitre annoncé existe sous ce numéro avec ce titre, et
+% tout chapitre existant est annoncé. Sans lui, une renumérotation laisserait l'introduction
+% annoncer un plan qui n'est plus celui du document — le projet a déjà eu, à l'écran, un
+% décompte écrit à la main devenu faux, et il ne l'a pas trouvé par un contrôle.
+% ------------------------------------------------------------------------------------------
+\newcommand{\annonceChapitre}[2]{\emph{#2}}
+
 \newcommand{\conclusion}[1]{\textbf{#1.}}
 \newcommand{\relreprise}[4]{#1 & #2 & #3 & #4 \\}
 \newcommand{\relnonreprise}[2]{#1 & --- & \multicolumn{2}{p{0.55\linewidth}}{#2} \\}

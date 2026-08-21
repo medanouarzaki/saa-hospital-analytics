@@ -1,12 +1,12 @@
 """Page « Données » : les lignes derrière les chiffres.
 
-POURQUOI CETTE PAGE EXISTE. Les sept autres pages répondent à « combien » ; aucune ne répond à
+POURQUOI CETTE PAGE EXISTE. Les autres pages répondent à « combien » ; aucune ne répond à
 « lesquels ». Un responsable qui lit qu'une part des passages aux urgences n'est pas facturée a
 besoin, pour agir, de la liste de ces passages — et le seul chemin vers les lignes était jusqu'ici
 le classeur produit par le graphe quotidien, qui n'est ni filtrable ni consultable à l'écran.
 
 CE QU'ELLE MONTRE. Quatre tables de faits, choisies sur l'usage et non sur la curiosité : celles
-qu'on consulte pour agir. Les agrégats en sont exclus — les sept autres pages les portent déjà — et
+qu'on consulte pour agir. Les agrégats en sont exclus — les autres pages les portent déjà — et
 la dimension des patients aussi : la consulter ligne à ligne n'appelle aucune action, et l'exposer
 en bloc n'est pas ce qu'un tableau de bord de pilotage a à faire.
 
@@ -148,7 +148,7 @@ def rendre() -> None:
     rendu.en_tete("Données")
 
     st.caption(
-        "Les sept autres pages répondent à « combien » ; celle-ci répond à « lesquels ». Elle "
+        "Les autres pages répondent à « combien » ; celle-ci répond à « lesquels ». Elle "
         "donne les lignes derrière les chiffres, filtrables et téléchargeables."
     )
 

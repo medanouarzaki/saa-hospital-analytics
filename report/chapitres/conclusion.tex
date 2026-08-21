@@ -1,10 +1,122 @@
 % Ce chapitre repose sur :
 %   DOC: (aucun)
-%   OBS: (aucun)
+%   OBS: apport-personnel
 %   HYP: (aucun)
-%   CHI: (aucun)
+%   CHI: modeles-total, tdb-pages, tdb-indicateurs, fichiers-de-controle, taches-graphe,
+%   CHI: releve-champs-total, releve-champs-non-employes, relations-non-reprises,
+%   CHI: relations-injectees, exigences-calculables, exigences-rubriques,
+%   CHI: exigences-non-calculables, exigences-sans-objet, exigences-champs-manquants,
+%   CHI: limites-des-faits, conclusions-avec-relation, conclusions-sans-relation
 %   SER: (aucune)
 %   SECTIONS: 0
 
 \chapter*{Conclusion générale}
 \addcontentsline{toc}{chapter}{Conclusion générale}
+% Un chapitre étoilé ne met pas à jour la marque de l'en-tête courant : sans cette ligne,
+% les pages de ce texte portent l'en-tête de ce qui le précède — mesuré, « TABLE DES
+% MATIÈRES » sur la deuxième page de l'introduction et « CHAPITRE 9 » sur celle de la
+% conclusion. Le défaut ne se voit qu'en regardant le document composé.
+\markboth{Conclusion générale}{Conclusion générale}
+
+\section*{Ce qui a été fait}
+
+Une chaîne de données complète a été construite, du fichier déposé jusqu'à l'écran :
+\chiffre{modeles-total} modèles de transformation, \chiffre{taches-graphe} tâches orchestrées, un
+rapprochement probabiliste d'identités évalué contre une vérité terrain connue, et un tableau de
+bord de \chiffre{tdb-pages} pages portant \chiffre{tdb-indicateurs} indicateurs. Elle se rejoue en
+entier, et \chiffre{fichiers-de-controle} fichiers de contrôle la surveillent.
+
+Ce n'est pas le volume de ce travail qui en fait l'intérêt, mais \textbf{ce qu'il refuse
+d'affirmer}. Chaque nombre du rapport vit dans un registre avec la commande exacte qui le produit ;
+chaque affirmation porte l'étiquette de ce qui l'étaye — un document, une observation, ou une
+convention posée ; chaque relation injectée est déclarée, et le rapport dit laquelle des conclusions
+la reproduit. Cinq appareils de traçabilité tiennent cet ensemble, et chacun casse dans les deux
+sens. \textbf{Le résultat le plus directement utilisable est la correspondance avec ce que la
+nomenclature nationale attend} : sur \chiffre{exigences-rubriques} rubriques attendues d'un
+établissement nommé, \chiffre{exigences-calculables} sont calculables par la chaîne.
+
+\section*{Ce qui n'a pas été fait, et pourquoi}
+
+\textbf{Des rubriques de la nomenclature restent hors d'atteinte, et aucune ne l'est par manque de
+temps.} Elles sont \chiffre{exigences-non-calculables}, bloquées chacune par un champ absent du
+système d'information — une table de structure de l'établissement, un référentiel des médecins, un
+marqueur d'accouchement rattaché au séjour — de sorte que
+\chiffre{exigences-champs-manquants} champs suffiraient à les débloquer, un pour chacune. Il s'y
+ajoute \chiffre{exigences-sans-objet} rubriques sans objet, et la distinction compte : elles ne
+manquent pas au logiciel, c'est l'établissement qui n'exerce pas l'activité. Confondre les deux
+ferait reprocher au système ce qui relève de l'hôpital.
+
+\textbf{Le modèle dimensionnel porte \chiffre{limites-des-faits} limites documentées plutôt que
+contournées}, et chacune
+dit ce qu'il faudrait pour la lever : rien ne distingue un accouchement d'un autre séjour du service
+concerné, aucun lien ne relie le fait de séjour au passage d'hospitalisation, le praticien reste un
+attribut sans dimension, et aucune dimension des actes n'est écrite faute d'un fait à son grain.
+Toutes tiennent à la même cause : la source ne porte pas ce qu'il faudrait pour aller plus loin, et
+fabriquer la distinction manquante aurait produit une donnée qu'aucune ligne n'établit.
+
+\textbf{Le registre des relations injectées en compte \chiffre{relations-injectees}, dont
+\chiffre{relations-non-reprises} ne sont reprises par aucune conclusion}, et trois d'entre elles
+pour la même raison : la colonne qui les porterait n'est calculée dans aucune couche aval — le
+régime de couverture, l'âge, l'adressage existent dans la source et s'arrêtent en chemin. Ce n'est
+pas un oubli de rédaction mais une limite du modèle, et elle est déclarée à l'endroit où un lecteur
+la cherche.
+
+\textbf{Le relevé d'observation, lui, est employé en entier ou presque.} Sur
+\chiffre{releve-champs-total} éléments relevés au poste,
+\chiffre{releve-champs-non-employes} seulement ne sont cités nulle part dans le rapport — et ce
+sont tous des boutons. \textbf{Aucun champ de donnée
+observé n'est resté inemployé.}
+
+\textbf{Enfin, et c'est le point qu'il ne faut ni minimiser ni dramatiser : aucune conclusion du
+chapitre d'analyse n'établit un fait sur le service.} Sur les vingt-deux qu'il porte,
+\chiffre{conclusions-avec-relation} reproduisent une relation injectée — elles démontrent que la chaîne sait la retrouver, et rien
+de plus — et \chiffre{conclusions-sans-relation} ne viennent d'aucune relation, auquel cas elles
+sont un effet des autres choix du générateur. Ce n'est pas un défaut d'exécution : c'est la
+conséquence nécessaire d'un jeu produit, et le rapport a choisi de l'écrire à chaque page plutôt que
+de la mentionner une fois.
+
+\section*{Les pistes qui n'ont pas été retenues}
+
+Trois pistes ont été écartées, et les trois pour le même genre de raison. \textbf{Inventer les
+libellés manquants} : un code nu est illisible et le montre, un libellé inventé est lisible et cache
+qu'il est inventé. \textbf{Régénérer le jeu de données} pour effacer le désaccord des deux faits sur
+la fin d'un épisode : un jeu qu'on régénère jusqu'à ce qu'il soit propre n'apprend plus rien, et la
+divergence a été mesurée, bornée et assumée. \textbf{Illustrer le tableau de bord par des captures
+d'écran} : deux dispositifs interdisent toute image du système d'information dans ce dépôt, et les
+amender pour du confort d'illustration aurait été le premier relâchement d'un ensemble qui n'en
+compte aucun.
+
+\section*{Ce qu'il faudrait pour passer à des données réelles}
+
+La chaîne est écrite pour lire des fichiers, non pour lire ce générateur : la question n'est pas
+de savoir si elle fonctionnerait, mais \textbf{ce qui changerait de nature}. Trois choses.
+
+\textbf{La vérité terrain disparaît.} Précision et rappel se calculent aujourd'hui parce qu'on sait
+lesquels des doublons sont vrais ; sur des données réelles, cette connaissance n'existe pas.
+L'évaluation changerait donc de nature — il faudrait un échantillon annoté à la main, avec son coût
+et son incertitude propres — et les grandeurs publiées au chapitre du rapprochement cesseraient
+d'être mesurables telles quelles.
+
+\textbf{Les distributions ne sont plus posées.} Délais, taux d'absentéisme, pyramide de gravité aux
+urgences sont aujourd'hui calibrés sur des sources publiées puis injectés. Sur des données réelles,
+les contrôles qui vérifient que la chaîne retrouve le paramètre injecté n'auraient plus de second
+membre, et devraient céder la place à des contrôles de forme, plus faibles et à écrire.
+
+\textbf{Les relations ne sont plus injectées, et c'est le changement décisif : un résultat cesse de
+démontrer et se met à établir.} Aujourd'hui, retrouver que l'absentéisme croît avec le délai à
+l'intérieur d'une spécialité ne prouve rien d'autre que la capacité de la chaîne à retrouver ce
+qu'on y a mis. Sur des données réelles, le même calcul deviendrait un constat sur le service — avec
+tout ce que cela impose de prudence supplémentaire sur la population, le dénominateur et la période.
+
+Trois conditions matérielles s'y ajoutent. Une convention d'accès aux données, que la contrainte de
+confidentialité rend nécessaire et qui n'est pas du ressort d'un stage. Une extraction périodique
+depuis le système d'origine, dont le format et la cadence restent à établir. Et les champs manquants nommés plus haut, qui
+cesseraient d'être une limite documentée pour devenir un obstacle à lever.
+
+\textbf{Apport personnel.} Le paragraphe qui suit relève de la rédaction personnelle et ne peut
+être écrit que par l'auteur du travail.
+
+\aRediger{apport-personnel}{ce que ce travail a apporté personnellement : les compétences acquises,
+les difficultés rencontrées et la façon dont elles ont été surmontées, et ce que l'expérience du
+service a changé dans la manière d'aborder un problème de
+données}\releve{apport-personnel}
