@@ -1,9 +1,90 @@
+% Le résumé et l'abstract.
+%
+% TROIS RÈGLES GOUVERNENT CES DEUX PAGES.
+%
+% Elles n'introduisent AUCUN résultat neuf : tout ce qu'elles citent est établi dans un chapitre,
+% et s'y trouve avec sa source.
+%
+% Elles n'écrivent AUCUN nombre en clair. Les valeurs passent par le registre des chiffres, comme
+% partout ailleurs dans le rapport. Ces appels ne sont pas comptés par le contrôle du registre, qui
+% ne lit que les chapitres et les annexes : tous les identifiants employés ici sont donc déjà
+% employés ailleurs, et aucun ne dépend de cette page pour ne pas devenir orphelin.
+%
+% Elles disent en une phrase que les données sont engendrées. Un résumé qui l'omettrait laisserait
+% un lecteur pressé croire à des mesures réelles.
+%
+% L'abstract est une traduction fidèle et non une variante : mêmes appels de registre, mêmes
+% mots-clés. Son vocabulaire technique suit l'usage anglophone du domaine.
+
 \chapter*{Résumé}
 \addcontentsline{toc}{chapter}{Résumé}
 
+Le service d'accueil et d'admission est le point d'entrée administratif d'un hôpital : il ouvre les
+dossiers, enregistre les rendez-vous, admet et oriente, facture et recouvre. Chacun de ces gestes
+laisse une trace dans le système d'information hospitalier.
+
+Le règlement intérieur range l'établissement des statistiques parmi les missions propres de ce
+service, et la nomenclature nationale fixe la liste de ce qu'il doit remonter. Entre les données
+saisies et les indicateurs attendus, il manque un chemin.
+
+Aucune donnée réelle ne sort de l'établissement, et la confidentialité des données de santé n'en
+fait pas une clause négociable. \textbf{La chaîne est donc bâtie sur un jeu de données engendré par
+un programme écrit pour ce projet}, calibré sur des volumes relevés par établissement nommé dans le
+recueil statistique national : \chiffre{source-lignes-total} lignes sur \chiffre{source-tables}
+tables, sur \chiffre{periode-jours} jours.
+
+Ce travail construit la chaîne complète, du fichier déposé jusqu'à l'écran. Elle compte
+\chiffre{modeles-total} modèles de transformation, met en quarantaine les lignes qu'elle refuse,
+historise la dimension des patients, et rapproche les identités par un modèle probabiliste évalué
+contre une vérité terrain connue. Un tableau de bord de \chiffre{tdb-pages} pages restitue
+\chiffre{tdb-indicateurs} indicateurs, chacun affichant sa définition et la décision qu'il sert.
+
+Le résultat le plus directement utilisable est la correspondance avec ce que la nomenclature
+attend : sur \chiffre{exigences-rubriques} rubriques, \chiffre{exigences-calculables} sont
+calculables et \chiffre{exigences-non-calculables} ne le sont pas, chacune bloquée par un champ
+absent du système.
+
+\textbf{Aucune grandeur produite par cette chaîne n'est une mesure de l'établissement.} Ce que le
+travail démontre est qu'elle sait produire ces grandeurs, et dire pour chacune si elle est
+calculable, ce qui l'en empêche, et ce qu'elle vaut.
+
 \section*{Mots-clés}
+
+Système d'information hospitalier ; chaîne de données ; données synthétiques ; entrepôt
+dimensionnel ; rapprochement d'identités ; qualité des données ; tableau de bord.
 
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
 
+The admissions department is a hospital's administrative front door: it opens patient records,
+books appointments, admits and directs patients, issues invoices and collects payment. Every one of
+these actions leaves a trace in the hospital information system.
+
+Hospital regulations list statistical reporting among this department's own duties, and the
+national nomenclature sets out what it must report. Between the data recorded and the indicators
+expected, a path is missing.
+
+No real data leaves the hospital, and the confidentiality of health data makes that
+non-negotiable. \textbf{The pipeline is therefore built on synthetic data produced by a program
+written for this project}, calibrated on volumes published for the named hospital in the national
+statistical yearbook: \chiffre{source-lignes-total} rows across \chiffre{source-tables} tables, over
+\chiffre{periode-jours} days.
+
+This work builds the full pipeline, from the landed file to the screen. It comprises
+\chiffre{modeles-total} transformation models, quarantines rejected rows rather than discarding
+them, keeps a slowly changing patient dimension, and performs record linkage with a probabilistic
+model evaluated against known ground truth. A \chiffre{tdb-pages}-page dashboard presents
+\chiffre{tdb-indicateurs} indicators, each showing its definition and the decision it serves.
+
+The most directly usable result is the mapping to what the nomenclature expects: of
+\chiffre{exigences-rubriques} required items, \chiffre{exigences-calculables} are computable and
+\chiffre{exigences-non-calculables} are not, each blocked by a field the system does not hold.
+
+\textbf{No figure this pipeline produces measures the hospital's actual activity.} What the work
+demonstrates is that it can produce these figures, and state for each whether it is computable,
+what prevents it, and what it is worth.
+
 \section*{Keywords}
+
+Hospital information system; data pipeline; synthetic data; dimensional warehouse; record linkage;
+data quality; dashboard.
