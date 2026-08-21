@@ -11,11 +11,28 @@
 % étiquettes, et un contrôle vérifie que la déclaration coïncide exactement avec ce que le fichier
 % porte — dans les deux sens.
 
+% --- ces deux étiquettes NE COMPOSENT PLUS RIEN ------------------------------------------------
+% Elles portaient un exposant `[obs.]` et `[conv.]` au fil de la prose. Elles ne l'impriment plus,
+% et le motif est le DESTINATAIRE du document : ce rapport s'adresse à un encadrant de stage, non
+% à une relecture adverse. Un exposant tous les deux paragraphes est un appareil de défense, et il
+% se lit comme tel.
+%
+% L'APPAREIL RESTE ENTIÈREMENT CÂBLÉ, IL CESSE SEULEMENT D'IMPRIMER. L'argument reste l'identifiant
+% du relevé ou de la convention ; chaque fichier de chapitre continue de déclarer en tête ce sur
+% quoi il repose ; et `tests/test_provenance_des_chapitres.py` continue de confronter la
+% déclaration à ce que le fichier porte, dans les deux sens. CE CONTRÔLE LIT LES SOURCES DE
+% COMPOSITION, JAMAIS LE PDF : rien de ce qu'il vérifie ne dépend de ce que ces deux commandes
+% composent, et les rendre muettes ne l'affaiblit d'aucune façon. Retirer un `\releve{...}` d'une
+% phrase reste rouge, exactement comme avant.
+%
+% Les citations `\cite{...}` de l'étiquette DOC, elles, restent visibles : renvoyer à une source
+% publiée est l'usage académique normal, et ce n'est pas un appareil de défense.
+
 % Un relevé d'observation. L'argument est son identifiant, court et stable ; il n'est pas composé.
-\newcommand{\releve}[1]{\textsuperscript{\,[obs.]}}
+\newcommand{\releve}[1]{}
 
 % Une convention posée. Même forme, même règle.
-\newcommand{\convention}[1]{\textsuperscript{\,[conv.]}}
+\newcommand{\convention}[1]{}
 
 % --- ce qui reste à rédiger --------------------------------------------------------------------
 % Un paragraphe qui relève de la rédaction personnelle et que le squelette ne peut pas écrire.
