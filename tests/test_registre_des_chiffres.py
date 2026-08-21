@@ -38,6 +38,7 @@ RENDU = RACINE / "report" / "chiffres.tex"
 # Les fichiers de données des séries sont désignés au registre par un chemin relatif au répertoire
 # de composition, qui est celui que `\addplot table` reçoit tel quel.
 RACINE_SERIES = RACINE / "report"
+SLIDES = RACINE / "slides"
 
 # Les deux séparateurs de colonnes admis, repris du rendu qui écrit ces fichiers. Le nom est
 # déclaré au registre ; l'écrire ici en clair plutôt que le lire ferait diverger le contrôle du
@@ -88,9 +89,61 @@ def identifiants_du_registre() -> set[str]:
 # identifiant qui le deviendrait serait signalé comme inemployé, donc rouge.
 ANNEXES = ("correspondance_relations.tex",)
 
+# LA PORTÉE SUIT LA MATIÈRE, ET ELLE VIENT DE S'ÉTENDRE AU SUPPORT DE SOUTENANCE. Le répertoire
+# `slides/` n'était couvert par aucun de ces contrôles : une planche pouvait y écrire un nombre à
+# la main, ou appeler un identifiant qui n'existe pas, sans qu'aucun code ne le voie. Le support
+# serait alors devenu le seul document du projet où un chiffre échappe au registre — et c'est par
+# cette voie exacte que cinq valeurs du projet sont devenues fausses.
+#
+# La liste est DÉCLARATIVE, comme celle des annexes : elle nomme les fichiers, elle ne les devine
+# pas par extension ni par balayage de répertoire. Un second fichier de planches qui ne serait pas
+# ajouté ici échapperait au contrôle, et c'est le point aveugle de cette forme — il est écrit
+# plutôt que découvert. Il est fermé du côté qui compte : un fichier NOMMÉ ici et absent du disque
+# fait rougir `test_chaque_fichier_examine_existe`.
+PLANCHES = ("presentation.tex",)
+
 
 def fichiers_de_chapitre() -> list[Path]:
-    return sorted(CHAPITRES.glob("*.tex")) + [RACINE_SERIES / nom for nom in ANNEXES]
+    return (
+        sorted(CHAPITRES.glob("*.tex"))
+        + [RACINE_SERIES / nom for nom in ANNEXES]
+        + [SLIDES / nom for nom in PLANCHES]
+    )
+
+
+def test_chaque_fichier_examine_existe() -> None:
+    """Un fichier déclaré aux listes de portée et absent du disque est rouge, jamais silencieux.
+
+    Sans cette épreuve, retirer `presentation.tex` ou renommer une annexe ferait simplement
+    disparaître leurs appels du décompte : le contrôle resterait vert en ayant cessé de regarder.
+    """
+    manquants = [str(chemin) for chemin in fichiers_de_chapitre() if not chemin.is_file()]
+    assert not manquants, "fichiers déclarés à la portée et introuvables : " + ", ".join(manquants)
+
+
+def test_la_portee_couvre_le_repertoire_des_planches() -> None:
+    """Témoin positif : le support de soutenance est bien dans le périmètre examiné.
+
+    C'est la moitié de l'épreuve que l'extension de portée réclame. Sans elle, retirer
+    `PLANCHES` laisserait tous les autres contrôles verts.
+    """
+    examines = {chemin.name for chemin in fichiers_de_chapitre()}
+    assert "presentation.tex" in examines, "le support de soutenance n'est plus examiné"
+    assert appels((SLIDES / "presentation.tex").read_text(encoding="utf-8")), (
+        "le support de soutenance n'appelle aucun chiffre : le témoin positif ne prouve plus rien"
+    )
+
+
+def test_la_portee_n_avale_pas_ce_qui_n_est_pas_une_planche() -> None:
+    """Témoin négatif : la portée nomme des fichiers, elle ne ramasse pas un répertoire.
+
+    Les fichiers auxiliaires que la composition laisse à côté du support — journal, table des
+    matières, fichier de navigation — ne doivent pas entrer au périmètre : ils portent des nombres
+    que personne n'a écrits.
+    """
+    examines = {chemin.name for chemin in fichiers_de_chapitre()}
+    for intrus in ("presentation.log", "presentation.toc", "presentation.nav", "styles.tex"):
+        assert intrus not in examines, f"{intrus} ne devrait pas être examiné"
 
 
 def appels(source: str) -> set[str]:
