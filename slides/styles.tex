@@ -1,0 +1,39 @@
+% Les styles de tracé de la présentation.
+%
+% Ils sont écrits ici plutôt qu'empruntés à `report/images.tex` : ce fichier-là porte l'apparat des
+% figures du rapport — emplacements réservés, logotypes, compteur de captures — dont une planche
+% n'a que faire, et il déclare ses couleurs par des noms que le document principal du rapport
+% définit. Une planche qui l'inclurait chargerait un apparat inutile et dépendrait d'un fichier
+% qu'elle ne compose pas.
+%
+% La couleur d'accent est celle de la page de garde du rapport, à l'identique : le support de
+% soutenance et le document remis se ressemblent, sans que l'un lise l'autre.
+
+\definecolor{accentgarde}{RGB}{23,54,93}
+\definecolor{griscartouche}{gray}{0.42}
+
+\setbeamercolor{structure}{fg=accentgarde}
+\setbeamercolor{frametitle}{fg=accentgarde}
+\setbeamercolor{title}{fg=accentgarde}
+\setbeamerfont{frametitle}{series=\bfseries}
+\setbeamertemplate{itemize item}{\color{accentgarde}\textbullet}
+\setbeamertemplate{itemize subitem}{\color{griscartouche}--}
+
+\usetikzlibrary{positioning, shapes.geometric, fit, calc, arrows.meta}
+
+\tikzset{
+  % — une brique de couche, ou une étape.
+  briquePres/.style={
+    rectangle, draw=accentgarde, line width=0.6pt, align=center,
+    font=\scriptsize, inner sep=2.5pt, minimum height=7mm, text width=24mm,
+  },
+  briqueLargePres/.style={briquePres, text width=54mm},
+  % — un cadre secondaire : trait pointillé.
+  briqueOptPres/.style={briquePres, dash pattern=on 1.6pt off 1.6pt},
+  % — l'intitulé d'une couche.
+  couchePres/.style={font=\scriptsize\scshape, text=griscartouche, align=right},
+  % — une flèche de flux.
+  fluxPres/.style={draw=accentgarde, line width=0.6pt, -{Latex[length=1.8mm,width=1.4mm]}},
+  % — une accolade de regroupement.
+  notePres/.style={font=\scriptsize\itshape, text=griscartouche},
+}
