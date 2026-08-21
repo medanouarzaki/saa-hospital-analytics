@@ -90,3 +90,6 @@ chaque exécution.
 | [0074](0074-les-deux-noms-sont-injectes-a-la-compilation.md) | Les deux noms de personne sortent du dépôt et sont injectés à la compilation |
 | [0075](0075-les-etiquettes-de-provenance-cessent-d-imprimer.md) | Les étiquettes de provenance cessent d'imprimer, et l'appareil reste câblé |
 | [0076](0076-les-images-tolerees-sous-deux-repertoires.md) | Les images sont tolérées sous deux répertoires, et l'emplacement est réservé avant d'être rempli |
+| [0077](0077-l-etat-du-document-sort-du-depot-avec-les-noms.md) | L'état du document sort du dépôt avec les noms, et la contradiction se lève |
+| [0078](0078-la-portee-du-controle-de-provenance-suit-la-matiere.md) | La portée du contrôle de provenance suit la matière, jusque dans les annexes |
+| [0079](0079-la-reecriture-de-l-encadrement-et-des-trois-premiers-chapitres.md) | La réécriture de l'encadrement, et ce qu'un budget de pages ne commande pas |
