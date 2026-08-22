@@ -127,6 +127,26 @@ cette vérification ouvre la base et compare des valeurs mesurées sur la pério
 l'exécuteur de l'intégration continue n'engendre que trois mois. Elle ne peut pas être un travail de
 la chaîne, et elle ne tourne donc qu'à la main.
 
+**ET ELLE EXIGE UNE CHOSE DE PLUS QUE LA BASE : LE JEU ENGENDRÉ.** Une entrée sur les 267 —
+`vt-paires-injectees`, les paires de doublons injectées avant tout chargement — lit
+`generator/output/scenario_30/verite_terrain.yml`, et cette grandeur n'existe dans aucune couche de
+la base : la quarantaine en écarte cinq au chargement, si bien que la base ne porte que les 991
+présentes, jamais les 996 injectées.
+
+**La régénération du jeu engendré est donc due avant toute remesure, au même titre que la remesure
+est due avant toute remise** :
+
+```bash
+uv run python -m generator generator/output      # mesuré : 1 min 12
+```
+
+Elle ne coûte rien d'autre que ce temps, et son identité se vérifie : le manifeste porte une empreinte
+SHA-256 par fichier et aucun horodatage. Confrontation faite — **18 956 fichiers, tous identiques**.
+
+Ce point n'a pas été deviné : un nettoyage a supprimé ce répertoire comme un artefact jetable, et la
+remesure a échoué. `generator/output/` est **régénérable sans être jetable**, et l'enregistrement de
+décision 0097 en tire la règle générale.
+
 ---
 
 ## Partie B — les critères qu'aucun contrôle ne peut établir

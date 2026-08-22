@@ -110,3 +110,4 @@ chaque exécution.
 | [0094](0094-les-questions-de-soutenance.md) | Les questions de soutenance, et deux chiffres arrondis à la main |
 | [0095](0095-la-bascule-en-remise.md) | La bascule en remise, et ce que la relecture a vu |
 | [0096](0096-la-fermeture.md) | La fermeture : une propriété de contrôle corrigée, et deux phrases fausses |
+| [0097](0097-regenerable-n-est-pas-jetable.md) | Régénérable n'est pas jetable |
