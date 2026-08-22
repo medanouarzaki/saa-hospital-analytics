@@ -107,3 +107,4 @@ chaque exécution.
 | [0091](0091-les-decimales-et-le-releve-date-des-criteres.md) | Un format d'affichage au registre, et un relevé daté des critères |
 | [0092](0092-les-neuf-ecarts-fermes-et-le-controle-des-nombres-tapes.md) | Les neuf écarts fermés, le nombre tapé retiré, et une vérification déclarée due |
 | [0093](0093-la-presentation-reprise.md) | La présentation reprise : une ouverture, un bloc technique, et une commande réemployée |
+| [0094](0094-les-questions-de-soutenance.md) | Les questions de soutenance, et deux chiffres arrondis à la main |
