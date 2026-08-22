@@ -199,10 +199,18 @@ convertible. Le domaine booléen est exactement composé de deux valeurs et de l
 
 \section{Modélisation dimensionnelle}
 
-La couche analytique compte \chiffre{modeles-marts} modèles : \chiffre{dimensions} dimensions,
-\chiffre{faits} faits et \chiffre{agregats} agrégats, organisés en \emph{schéma en étoile} —
-une forme où chaque table d'événements est entourée des tables qui la décrivent, et où toute
-interrogation part du centre pour aller vers les branches.
+La couche analytique compte \chiffre{modeles-marts} modèles, et le schéma qu'ils produisent porte
+\chiffre{dimensions} dimensions, \chiffre{faits} faits et \chiffre{agregats} agrégats. Les deux
+décomptes ne sont pas le même et ne s'additionnent pas : l'un des agrégats est une vue
+\emph{posée hors de l'outil de transformation}, par un fichier de définition de schéma appliqué en
+préalable d'initialisation, et il n'est donc pas l'un des modèles. Son fichier de propriétés le dit
+explicitement et donne le motif de ce maintien à part ; l'outil de transformation le signale
+d'ailleurs de lui-même à l'analyse, ne trouvant aucun modèle qui corresponde à cet objet
+documenté.
+
+Ces objets sont organisés en \emph{schéma en étoile} — une forme où chaque table d'événements est
+entourée des tables qui la décrivent, et où toute interrogation part du centre pour aller vers les
+branches.
 
 \begin{center}
 \begin{tabular}{@{}c@{}}

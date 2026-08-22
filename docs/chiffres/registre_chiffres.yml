@@ -863,6 +863,17 @@ chiffres:
     if l['variante']=='A_sans_champs_recopies'][0])
   portee: independant-des-donnees
   note: Comparaisons restantes après retrait, à comparer à comparaisons-modele.
+- id: ablation-comparaisons-variante-c
+  valeur: 6
+  unite: comparaisons
+  type: python
+  commande: int([float(l['nb_comparaisons_presentes']) for l in __import__('csv').DictReader((R/'linkage/ablation.csv').open(encoding='utf-8'))
+    if l['variante']=='C_les_deux_retraits'][0])
+  portee: independant-des-donnees
+  note: 'Même grandeur que ablation-comparaisons-variante-a, sur la variante cumulant les deux
+    retraits. Elle manquait au registre, et le support appelait à sa place comparaisons-modele :
+    la planche affichait 12 pour une variante qui en porte 6. La valeur était juste, la phrase
+    était fausse, et aucun contrôle ne pouvait le voir.'
 - id: qualite-colonnes
   valeur: 175
   unite: colonnes
