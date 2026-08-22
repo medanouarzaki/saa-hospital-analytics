@@ -129,6 +129,17 @@
 % mesurée sur son fichier, qui ramène sa ligne médiane d'encre sur la ligne de
 % base. La correction s'applique au `\raisebox` extérieur, donc aussi bien à
 % l'image qu'à son cadre d'attente.
+% LA RACINE DES FIGURES, ET POURQUOI ELLE EXISTE. `\IfFileExists` cherche depuis le
+% répertoire de composition, et il N'HONORE PAS `\graphicspath` : c'est mesuré, non
+% supposé. Un document d'essai composé depuis `slides/`, portant `\graphicspath{{../report/}}`
+% et appelant `\logosInstitutionnels`, compose les deux CADRES D'ATTENTE et non les
+% logotypes — la recherche de fichier échoue là où l'inclusion aurait réussi.
+%
+% La racine est donc déclarée ici, vide, et le rapport ne s'en aperçoit pas. Un document
+% composé depuis un autre répertoire la redéfinit et réemploie la commande telle quelle,
+% plutôt que d'en écrire une seconde qui divergerait.
+\newcommand{\racineFigures}{}
+
 \newcommand{\hauteurLogoEtablissement}{20mm}
 \newcommand{\hauteurLogoTutelle}{11.81mm}
 \newcommand{\ecartEntreLogos}{16mm}
@@ -145,11 +156,11 @@
 % fichier sans marge transparente.
 \newcommand{\unLogo}[5]{%
   \raisebox{\dimexpr-0.5\height-#4\relax}{%
-    \IfFileExists{figures/logos/#1.pdf}{%
-      \includegraphics[height=#2]{figures/logos/#1.pdf}%
+    \IfFileExists{\racineFigures figures/logos/#1.pdf}{%
+      \includegraphics[height=#2]{\racineFigures figures/logos/#1.pdf}%
     }{%
-      \IfFileExists{figures/logos/#1.png}{%
-        \includegraphics[height=#2]{figures/logos/#1.png}%
+      \IfFileExists{\racineFigures figures/logos/#1.png}{%
+        \includegraphics[height=#2]{\racineFigures figures/logos/#1.png}%
       }{%
         \setlength{\hauteurEmplacement}{#2}%
         \setlength{\largeurEmplacement}{#3\hauteurEmplacement}%
