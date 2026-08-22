@@ -32,6 +32,21 @@ def cle_bibtex(identifiant: str) -> str:
     return identifiant.lower().replace("-", "")
 
 
+# Une empreinte cryptographique est un mot d'une longueur qu'aucune colonne ne peut porter, et
+# qu'aucun mécanisme de coupure ne sait rompre : elle n'offre ni tiret, ni point, ni changement de
+# classe de caractères où couper. Mesuré au rendu : l'empreinte SHA-256 d'une source SORTAIT DE LA
+# FEUILLE, une trentaine de caractères perdus au-delà du bord de la page.
+#
+# `\nolinkurl` la compose en chasse fixe et autorise la coupure n'importe où, `xurl` étant chargé
+# par le document. Le seuil de trente-deux caractères hexadécimaux ne touche aucun mot du français
+# ni aucun identifiant du projet.
+EMPREINTE = re.compile(r"\b[0-9a-f]{32,}\b")
+
+
+def envelopper_empreintes(texte: str) -> str:
+    return EMPREINTE.sub(lambda m: r"\nolinkurl{" + m.group(0) + "}", texte)
+
+
 def construire_entree(source: dict) -> str:
     cle = cle_bibtex(source["id"])
     # author est un champ "names" pour biblatex/biber : une valeur libre contenant
@@ -42,9 +57,22 @@ def construire_entree(source: dict) -> str:
     champs = {
         "title": echapper_latex(source["titre"]),
         "author": "{" + echapper_latex(source["auteur"]) + "}",
-        "howpublished": echapper_latex(source["url"]),
-        "note": echapper_latex(
-            f"Consulté le {source['date_consultation']}. {source.get('note', '')}".strip()
+        # L'ADRESSE VA AU CHAMP `url`, ET NON À `howpublished`, ET LA RELECTURE DU DOCUMENT
+        # COMPOSÉ L'A IMPOSÉ. `howpublished` est un champ de texte ordinaire : biblatex l'imprime
+        # tel quel, sans passer par `\url`. Six adresses SORTAIENT DE LA FEUILLE, leur texte perdu
+        # au-delà du bord de la page — ni `xurl` ni la marge d'élasticité ne peuvent couper ce que
+        # `\url` n'enveloppe pas. Au champ `url`, biblatex les compose en chasse fixe et les coupe.
+        #
+        # L'adresse n'y est PAS échappée, et c'est la contrepartie exacte : dans `howpublished`,
+        # `%` et `_` devaient l'être pour ne pas casser la composition ; sous `\url`, ils doivent
+        # rester bruts, faute de quoi `\%20` se compose en `%5C%20` et l'adresse cesse d'être
+        # celle qui a été consultée. Mesuré au rendu, puis les vingt-huit adresses confrontées
+        # caractère par caractère au registre des sources.
+        "url": source["url"],
+        "note": envelopper_empreintes(
+            echapper_latex(
+                f"Consulté le {source['date_consultation']}. {source.get('note', '')}".strip()
+            )
         ),
     }
     if source["date_publication"] != "non_datee":

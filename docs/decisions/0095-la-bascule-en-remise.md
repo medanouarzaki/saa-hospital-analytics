@@ -6,7 +6,7 @@
 
 ## Contexte
 
-Dernier lot du projet : produire le document final. Les trois valeurs qui font un document remis —
+Dernier travail du projet : produire le document final. Les trois valeurs qui font un document remis —
 l'auteur, l'encadrant, l'état — voyagent ensemble et sortent du dépôt (ADR 0077). Il restait à poser
 les deux secrets, à basculer l'état, à remesurer le registre, à relire les 98 pages et les 30
 planches, et à refaire le relevé daté des critères.
@@ -58,7 +58,7 @@ Deux corrections successives à l'estime ont échoué sur la même colonne avant
 relevée sur l'image à 300 points par pouce : `type_piece_identite` occupe 4,18 cm en chasse fixe. La
 troisième, dimensionnée sur la mesure, a tenu.
 
-### 6. Deux corrections ont dû être défaites, et c'est le résultat le plus utile de ce lot
+### 6. Deux corrections ont dû être défaites, et c'est le résultat le plus utile de cette remise
 
 **La première a fait disparaître l'en-tête des neuf chapitres.** Le remède de l'en-tête d'annexe
 teste si une macro est vide par `\ifx`. Déclarée par `\newcommand`, elle est `\long` quand `\empty`
@@ -86,7 +86,7 @@ et dix qu'aucun ne peut établir, vérifiés à la main un par un.
 
 ### A3 — le contrôle des noms est ROUGE, et l'intégration continue avec lui
 
-C'est le point bloquant de ce lot. Les secrets posés, le contrôle cesse de s'abstenir — **en
+C'est le point bloquant de cette remise. Les secrets posés, le contrôle cesse de s'abstenir — **en
 intégration continue aussi**, `ci.yml` les lui passant par `env:` — et il rougit sur douze
 occurrences.
 
@@ -101,13 +101,13 @@ comme une voie ouverte et assumée, et porte déjà un mécanisme d'exclusion é
 employé pour `LICENSE`.
 
 **Le remède est d'étendre ce mécanisme aux douze porteurs légitimes, pour le seul nom de l'auteur.**
-Il n'a pas été appliqué : `tests/test_aucun_nom_de_personne.py` n'appartient pas à la liste fermée de
-ce lot, et surtout **élargir un contrôle pour le faire verdir est le geste que ce projet s'interdit
-sans décision explicite**. La décision revient à l'auteur.
+Il n'a pas été appliqué : `tests/test_aucun_nom_de_personne.py` n'appartient pas aux fichiers
+ouverts à l'écriture pour cette remise, et surtout **élargir un contrôle pour le faire verdir est le
+geste que ce projet s'interdit sans décision explicite**. La décision revient à l'auteur.
 
 ### Deux défauts de fond, signalés et non corrigés
 
-Le lot prescrit qu'un défaut de composition se corrige et qu'un défaut de fond s'arrête et se
+La règle veut qu'un défaut de composition se corrige et qu'un défaut de fond s'arrête et se
 signale. Deux ont été trouvés, et ils sont laissés tels quels.
 
 **Rapport, page 39.** « La couche analytique compte 19 modèles : 6 dimensions, 6 faits et 8
