@@ -673,7 +673,7 @@ chiffres:
   commande: (R/'airflow/saa_daily.py').read_text(encoding='utf-8').count('task_id=')
   portee: independant-des-donnees
 - id: fichiers-de-controle
-  valeur: 76
+  valeur: 77
   unite: fichiers
   type: python
   commande: len(list((R/'tests').glob('test_*.py')))
