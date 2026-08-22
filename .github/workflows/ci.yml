@@ -97,6 +97,11 @@ jobs:
           RAPPORT_ENCADRANT: ${{ secrets.RAPPORT_ENCADRANT }}
         run: uv run pytest tests/test_aucun_nom_de_personne.py -v
 
+      # Qu'aucun fichier suivi ne porte une commande qui détruit un volume nommé. Ce contrôle ne lit
+      # que `git ls-files` et le texte des fichiers : aucune base, aucun démon Docker, aucune
+      # compilation. Sa place est donc ici, avec les autres propriétés de l'arbre suivi.
+      - run: uv run pytest tests/test_aucune_commande_qui_detruit_un_volume.py -v
+
       # La provenance des affirmations du rapport. Ce contrôle lit les fichiers de chapitre, le fichier
       # bibliographique produit et le registre des sources : aucune base, aucune compilation. Sa place est
       # donc ici, avec les deux précédents, et non dans le travail qui compile.
