@@ -109,3 +109,4 @@ chaque exécution.
 | [0093](0093-la-presentation-reprise.md) | La présentation reprise : une ouverture, un bloc technique, et une commande réemployée |
 | [0094](0094-les-questions-de-soutenance.md) | Les questions de soutenance, et deux chiffres arrondis à la main |
 | [0095](0095-la-bascule-en-remise.md) | La bascule en remise, et ce que la relecture a vu |
+| [0096](0096-la-fermeture.md) | La fermeture : une propriété de contrôle corrigée, et deux phrases fausses |
