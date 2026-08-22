@@ -121,6 +121,35 @@ Lancée trois fois pour cette remise : avant la relecture, après les correction
 après la création de l'entrée de registre neuve. Zéro écart les trois fois ; la dernière porte sur
 **267 entrées**, l'entrée neuve comprise.
 
+**ET IL A ÉTÉ PÉRIMÉ UNE QUATRIÈME FOIS, PAR UN TRAVAIL QUI NE DÉPLAÇAIT AUCUNE MATIÈRE.** Le
+critère a été **faux** entre l'ajout de `tests/test_aucune_commande_qui_detruit_un_volume.py` et la
+remesure qui suit. L'entrée `fichiers-de-controle` consignait 76 ; sa commande,
+`len(list((R/'tests').glob('test_*.py')))`, rendait 77.
+
+| | |
+|---|---|
+| fichiers de test avant l'ajout du contrôle | 76 |
+| fichiers de test après | **77** |
+| dernière modification du registre | antérieure à l'ajout |
+
+**La leçon n'est pas que la valeur était fausse — elle est que la voie de péremption n'était pas
+celle qu'on surveillait.** La consigne écrite plus haut vise le travail « qui déplace de la
+matière » : une régénération, un rechargement, une migration. Ici, rien n'a bougé dans la base.
+Un fichier a été **ajouté à l'arbre du dépôt**, et cela a suffi.
+
+Mesuré sur le registre : **100 entrées** portent la portée `independant-des-donnees`, et
+**115 entrées** ont une commande qui lit un fichier de l'arbre. Mais celles qui exposent à ce
+défaut-ci sont plus rares — **quinze**, celles qui **dénombrent** des fichiers ou des lignes de
+l'arbre plutôt que d'y lire une valeur écrite : les modèles dbt, les fichiers de paramètres, les
+sections du rapport, les relations reprises, et celle-ci.
+
+**Ces quinze-là sont périmées par tout commit qui ajoute ou retire un fichier, pas seulement par
+tout chargement.** C'est une seconde voie de péremption, et elle n'était pas écrite.
+
+Le critère est redevenu vrai par le seul chemin admis : reporter la valeur, régénérer
+`report/chiffres.tex`, recomposer le rapport, et confronter les 98 pages image à image — **une
+seule a changé, la page 81, et la seule différence de son texte est le nombre lui-même.**
+
 **`docs/chiffres/mesurer.py --verifier` est dû avant toute remise, et il est périmé par tout travail
 qui déplace de la matière.** Ce n'est pas une consigne d'hygiène, c'est une propriété du dispositif :
 cette vérification ouvre la base et compare des valeurs mesurées sur la période entière, quand
