@@ -47,11 +47,38 @@ ANNEXES_PRODUITES = (
 # Les commandes dont l'argument porte légitimement des chiffres : un identifiant, une clé, une
 # dimension. Leur argument est retiré avant l'examen, jamais leur trace.
 COMMANDES_A_ARGUMENT = (
-    "chiffre", "serie", "releve", "convention", "cite", "ref", "label", "pageref",
-    "input", "includegraphics", "captureTdb", "unLogo", "declarerCapture", "rule",
-    "vspace", "hspace", "addlinespace", "setlength", "textls", "colorbox", "color",
-    "definecolor", "raisebox", "parbox", "multicolumn", "annonceChapitre", "conclusion",
-    "relreprise", "relnonreprise", "conclusionhors", "aRediger", "logoEcole",
+    "chiffre",
+    "serie",
+    "releve",
+    "convention",
+    "cite",
+    "ref",
+    "label",
+    "pageref",
+    "input",
+    "includegraphics",
+    "captureTdb",
+    "unLogo",
+    "declarerCapture",
+    "rule",
+    "vspace",
+    "hspace",
+    "addlinespace",
+    "setlength",
+    "textls",
+    "colorbox",
+    "color",
+    "definecolor",
+    "raisebox",
+    "parbox",
+    "multicolumn",
+    "annonceChapitre",
+    "conclusion",
+    "relreprise",
+    "relnonreprise",
+    "conclusionhors",
+    "aRediger",
+    "logoEcole",
     # `\texttt{...}` reproduit à l'identique un libellé, une valeur ou un identifiant relevés à
     # l'écran ou donnés par le code. Ce n'est pas une grandeur que le rapport affirme : c'est une
     # citation, et la corriger serait la fausser.
@@ -67,13 +94,18 @@ EXCEPTIONS = (
     (r"\bREL-[A-Z]{3}\.[A-Z]\d{2}\b", "un identifiant de relevé d'écran"),
     (r"\bC-\d{2}\b", "un identifiant de conclusion"),
     (r"\bR-\d{2}\b", "un identifiant de relation injectée"),
-    (r"\b\d{1,2}[~ ](?:janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)(?:[~ ](?:19|20)\d{2})?",
-     "une date en toutes lettres"),
+    (
+        r"\b\d{1,2}[~ ](?:janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)(?:[~ ](?:19|20)\d{2})?",  # noqa: E501
+        "une date en toutes lettres",
+    ),
     (r"\b(?:19|20)\d{2}\b", "une année"),
     (r"\b\d{4}[-/]\d{2}[-/]\d{2}\b", "une date au format ISO"),
     (r"\bchapitre~?\s?\d+", "un renvoi de chapitre"),
     (r"\bparagraphe~?\s?\d+", "un renvoi de paragraphe"),
-    (r"\b(?:section|tableau|figure|page|message|messages|planche)~?\s?\d+(?:\.\d+)?", "un renvoi interne"),
+    (
+        r"\b(?:section|tableau|figure|page|message|messages|planche)~?\s?\d+(?:\.\d+)?",
+        "un renvoi interne",
+    ),
     (r"\bet~\d+\b", "le second terme d'un renvoi"),
     (r"\bniveaux? de tri~?\s?\d+", "un rang de l'échelle de tri publiée"),
     (r"\bNom de famille \d\b", "un libellé d'écran reproduit à l'identique"),
@@ -101,49 +133,145 @@ EXCEPTIONS = (
 #
 # La clé est le fichier ET la ligne dépouillée : modifier une de ces lignes la fait sortir de la
 # liste, donc rougir. On ne peut pas la retoucher en silence.
+# Les lignes ci-dessous sont des DONNÉES, pas du code : chacune reproduit à l'identique une ligne
+# de source, et la couper la rendrait inutilisable comme clé. Elles portent donc la dérogation à la
+# longueur, une par une et jamais globalement.
 RESTES_CONNUS = (
-    ('analyse-de-l-activite.tex', 'spécialités médicales : 4 cardiologie, 11 dermatologie, 14 gynéco-obstétrique,'),
-    ('analyse-de-l-activite.tex', '20 médecine générale, 21 médecine interne, 28 ophtalmologie, 29 oto-rhino-laryngologie,'),
-    ('analyse-de-l-activite.tex', '30 pédiatrie.'),
-    ('architecture-de-la-chaine.tex', 'toucher aux autres.} Si les journées du 12, 13 et manquent, les charger les rattrape, et'),
-    ('conception-du-jeu-de-donnees.tex', '& & 46,3~\\% & & 2,0~\\% \\\\'),
-    ('conception-du-jeu-de-donnees.tex', '& & 41,1~\\% & & 20,3~\\% \\\\'),
-    ('conception-du-jeu-de-donnees.tex', '& & 12,6~\\% & & 77,7~\\% \\\\'),
-    ('organisme-d-accueil.tex', "Pour l'exercice , ce tableau imprime 177~établissements hospitaliers publics, dont"),
-    ('organisme-d-accueil.tex', "75~hôpitaux provinciaux ou préfectoraux . La catégorie de l'établissement étudié est donc,"),
-    ('organisme-d-accueil.tex', "148~services d'urgence dans le secteur hospitalier public, dont 94~services d'urgences"),
-    ('organisme-d-accueil.tex', 'Le recensement général de dénombre 4~467~911~habitants dans la région Fès-Meknès, dont'),
-    ('organisme-d-accueil.tex', '2~855~366 en milieu urbain et 1~612~545 en milieu rural . Ces trois valeurs sont'),
-    ('organisme-d-accueil.tex', 'Meknès 4~hôpitaux provinciaux ou préfectoraux sur 5~établissements hospitaliers . La'),
-    ('organisme-d-accueil.tex', 'résidence porté par chaque fiche patient, à hauteur de 63,9~\\% et 36,1~\\%. Elle est la seule part'),
-    ('organisme-d-accueil.tex', "L'hôpital Sidi Saïd est mis en fonction en et occupe une superficie de 4,5~hectares"),
-    ('organisme-d-accueil.tex', "Une dépêche d'agence de février~ annonce une capacité de 140~lits . Le recueil"),
-    ('organisme-d-accueil.tex', '40~lits .'),
-    ('qualite-et-rapprochement.tex', 'premier nom de famille \\emph{et} adresse & & 99,99929~\\% \\\\'),
-    ('qualite-et-rapprochement.tex', 'premier nom de famille \\emph{et} téléphone & & 99,99948~\\% \\\\'),
-    ('qualite-et-rapprochement.tex', "type \\emph{et} numéro de pièce d'identité & & 99,99770~\\% \\\\"),
-    ('qualite-et-rapprochement.tex', 'nom du père \\emph{et} nom de la mère \\emph{et} date de naissance & & 99,99999~\\% \\\\'),
-    ('qualite-et-rapprochement.tex', '\\textbf{Union des quatre} & \\textbf{ } & \\textbf{99,99850~\\%} \\\\'),
-    ('qualite-et-rapprochement.tex', "d'accord chez les vrais couples et chez les faux y vaut 1,10 pour l'état, 1,15 pour le pays de"),
-    ('qualite-et-rapprochement.tex', "naissance, 1,29 pour l'état de naissance. Le second est plus intéressant : certaines colonnes sont"),
-    ('qualite-et-rapprochement.tex', "donnent la même F-mesure de 1. Le plateau s'étend sur plus de soixante-dix ordres de grandeur de"),
-    ('qualite-et-rapprochement.tex', 'téléphone différent & 254 & 254 & 1,0000 \\\\'),
-    ('qualite-et-rapprochement.tex', 'adresse mise à jour & 261 & 260 & 0,9962 \\\\'),
-    ('qualite-et-rapprochement.tex', 'faute de frappe sur la date de naissance & 332 & 282 & 0,8494 \\\\'),
-    ('qualite-et-rapprochement.tex', 'translittération du prénom & 148 & 125 & 0,8446 \\\\'),
-    ('qualite-et-rapprochement.tex', 'prénom composé inversé & 243 & 197 & 0,8107 \\\\'),
-    ('qualite-et-rapprochement.tex', "\\textbf{pièce d'identité absente} & \\textbf{267} & \\textbf{146} & \\textbf{0,5468} \\\\"),
-    ('qualite-et-rapprochement.tex', '\\textbf{La F-mesure ne dit rien : elle passe de 1 à un peu moins de 0,999.} Un lecteur qui ne'),
-    ('recommandations.tex', "l'absentéisme ambulatoire est documenté par ailleurs — une moyenne mondiale de 23,5~\\% et une"),
-    ('recommandations.tex', 'fourchette de 23 à 33~\\% selon les contextes .'),
-    ('recommandations.tex', "sur les 6~482~185 consultations et soins d'urgence assurés chaque année par le secteur public,"),
-    ('recommandations.tex', '\\textbf{64~\\% sont des consultations non urgentes} et 10~\\% seulement des urgences vitales'),
-    ('recommandations.tex', '. Une étude conduite dans un hôpital provincial marocain mesure 30,7~\\% de consultations'),
-    ('recommandations.tex', "non appropriées sur 410 patients . Les deux sources concordent sur l'existence du"),
-    ('recommandations.tex', 'données. La Cour des comptes relève \\textbf{50~876~365 dirhams de créances non recouvrées} au'),
-    ('recommandations.tex', ', \\textbf{57~\\% des dossiers non facturés} en , et \\textbf{3~477 consultations'),
-    ('recommandations.tex', "payées sur 160~659} aux urgences en . Deux problèmes distincts s'y lisent : des"),
-    ('page-de-garde.tex', '\\setstretch{1.0}'),
+    (
+        "analyse-de-l-activite.tex",
+        "spécialités médicales : 4 cardiologie, 11 dermatologie, 14 gynéco-obstétrique,",
+    ),  # noqa: E501
+    (
+        "analyse-de-l-activite.tex",
+        "20 médecine générale, 21 médecine interne, 28 ophtalmologie, 29 oto-rhino-laryngologie,",
+    ),  # noqa: E501
+    ("analyse-de-l-activite.tex", "30 pédiatrie."),
+    (
+        "architecture-de-la-chaine.tex",
+        "toucher aux autres.} Si les journées du 12, 13 et manquent, les charger les rattrape, et",
+    ),  # noqa: E501
+    ("conception-du-jeu-de-donnees.tex", "& & 46,3~\\% & & 2,0~\\% \\\\"),
+    ("conception-du-jeu-de-donnees.tex", "& & 41,1~\\% & & 20,3~\\% \\\\"),
+    ("conception-du-jeu-de-donnees.tex", "& & 12,6~\\% & & 77,7~\\% \\\\"),
+    (
+        "organisme-d-accueil.tex",
+        "Pour l'exercice , ce tableau imprime 177~établissements hospitaliers publics, dont",
+    ),  # noqa: E501
+    (
+        "organisme-d-accueil.tex",
+        "75~hôpitaux provinciaux ou préfectoraux . La catégorie de l'établissement étudié est donc,",  # noqa: E501
+    ),  # noqa: E501
+    (
+        "organisme-d-accueil.tex",
+        "148~services d'urgence dans le secteur hospitalier public, dont 94~services d'urgences",
+    ),  # noqa: E501
+    (
+        "organisme-d-accueil.tex",
+        "Le recensement général de dénombre 4~467~911~habitants dans la région Fès-Meknès, dont",
+    ),  # noqa: E501
+    (
+        "organisme-d-accueil.tex",
+        "2~855~366 en milieu urbain et 1~612~545 en milieu rural . Ces trois valeurs sont",
+    ),  # noqa: E501
+    (
+        "organisme-d-accueil.tex",
+        "Meknès 4~hôpitaux provinciaux ou préfectoraux sur 5~établissements hospitaliers . La",
+    ),  # noqa: E501
+    (
+        "organisme-d-accueil.tex",
+        "résidence porté par chaque fiche patient, à hauteur de 63,9~\\% et 36,1~\\%. Elle est la seule part",  # noqa: E501
+    ),  # noqa: E501
+    (
+        "organisme-d-accueil.tex",
+        "L'hôpital Sidi Saïd est mis en fonction en et occupe une superficie de 4,5~hectares",
+    ),  # noqa: E501
+    (
+        "organisme-d-accueil.tex",
+        "Une dépêche d'agence de février~ annonce une capacité de 140~lits . Le recueil",
+    ),  # noqa: E501
+    ("organisme-d-accueil.tex", "40~lits ."),
+    (
+        "qualite-et-rapprochement.tex",
+        "premier nom de famille \\emph{et} adresse & & 99,99929~\\% \\\\",
+    ),  # noqa: E501
+    (
+        "qualite-et-rapprochement.tex",
+        "premier nom de famille \\emph{et} téléphone & & 99,99948~\\% \\\\",
+    ),  # noqa: E501
+    (
+        "qualite-et-rapprochement.tex",
+        "type \\emph{et} numéro de pièce d'identité & & 99,99770~\\% \\\\",
+    ),  # noqa: E501
+    (
+        "qualite-et-rapprochement.tex",
+        "nom du père \\emph{et} nom de la mère \\emph{et} date de naissance & & 99,99999~\\% \\\\",
+    ),  # noqa: E501
+    (
+        "qualite-et-rapprochement.tex",
+        "\\textbf{Union des quatre} & \\textbf{ } & \\textbf{99,99850~\\%} \\\\",
+    ),  # noqa: E501
+    (
+        "qualite-et-rapprochement.tex",
+        "d'accord chez les vrais couples et chez les faux y vaut 1,10 pour l'état, 1,15 pour le pays de",  # noqa: E501
+    ),  # noqa: E501
+    (
+        "qualite-et-rapprochement.tex",
+        "naissance, 1,29 pour l'état de naissance. Le second est plus intéressant : certaines colonnes sont",  # noqa: E501
+    ),  # noqa: E501
+    (
+        "qualite-et-rapprochement.tex",
+        "donnent la même F-mesure de 1. Le plateau s'étend sur plus de soixante-dix ordres de grandeur de",  # noqa: E501
+    ),  # noqa: E501
+    ("qualite-et-rapprochement.tex", "téléphone différent & 254 & 254 & 1,0000 \\\\"),
+    ("qualite-et-rapprochement.tex", "adresse mise à jour & 261 & 260 & 0,9962 \\\\"),
+    (
+        "qualite-et-rapprochement.tex",
+        "faute de frappe sur la date de naissance & 332 & 282 & 0,8494 \\\\",
+    ),  # noqa: E501
+    ("qualite-et-rapprochement.tex", "translittération du prénom & 148 & 125 & 0,8446 \\\\"),
+    ("qualite-et-rapprochement.tex", "prénom composé inversé & 243 & 197 & 0,8107 \\\\"),
+    (
+        "qualite-et-rapprochement.tex",
+        "\\textbf{pièce d'identité absente} & \\textbf{267} & \\textbf{146} & \\textbf{0,5468} \\\\",  # noqa: E501
+    ),  # noqa: E501
+    (
+        "qualite-et-rapprochement.tex",
+        "\\textbf{La F-mesure ne dit rien : elle passe de 1 à un peu moins de 0,999.} Un lecteur qui ne",  # noqa: E501
+    ),  # noqa: E501
+    (
+        "recommandations.tex",
+        "l'absentéisme ambulatoire est documenté par ailleurs — une moyenne mondiale de 23,5~\\% et une",  # noqa: E501
+    ),  # noqa: E501
+    ("recommandations.tex", "fourchette de 23 à 33~\\% selon les contextes ."),
+    (
+        "recommandations.tex",
+        "sur les 6~482~185 consultations et soins d'urgence assurés chaque année par le secteur public,",  # noqa: E501
+    ),  # noqa: E501
+    (
+        "recommandations.tex",
+        "\\textbf{64~\\% sont des consultations non urgentes} et 10~\\% seulement des urgences vitales",  # noqa: E501
+    ),  # noqa: E501
+    (
+        "recommandations.tex",
+        ". Une étude conduite dans un hôpital provincial marocain mesure 30,7~\\% de consultations",
+    ),  # noqa: E501
+    (
+        "recommandations.tex",
+        "non appropriées sur 410 patients . Les deux sources concordent sur l'existence du",
+    ),  # noqa: E501
+    (
+        "recommandations.tex",
+        "données. La Cour des comptes relève \\textbf{50~876~365 dirhams de créances non recouvrées} au",  # noqa: E501
+    ),  # noqa: E501
+    (
+        "recommandations.tex",
+        ", \\textbf{57~\\% des dossiers non facturés} en , et \\textbf{3~477 consultations",
+    ),  # noqa: E501
+    (
+        "recommandations.tex",
+        "payées sur 160~659} aux urgences en . Deux problèmes distincts s'y lisent : des",
+    ),  # noqa: E501
+    ("page-de-garde.tex", "\\setstretch{1.0}"),
 )
 
 
@@ -167,8 +295,15 @@ def fichiers_examines() -> list[Path]:
             p.name
             for p in (RACINE / "report").glob("*.tex")
             if p.name not in ANNEXES_PRODUITES
-            and p.name not in ("rapport.tex", "chiffres.tex", "marqueurs.tex",
-                               "provenance.tex", "images.tex", "annexes.tex")
+            and p.name
+            not in (
+                "rapport.tex",
+                "chiffres.tex",
+                "marqueurs.tex",
+                "provenance.tex",
+                "images.tex",
+                "annexes.tex",
+            )
         )
     ]
     return sorted(CHAPITRES.glob("*.tex")) + sorted(LIMINAIRES.glob("*.tex")) + annexes
@@ -196,11 +331,7 @@ def depouiller(source: str) -> str:
 
 def nombres_tapes(source: str) -> list[str]:
     depouille = depouiller(source)
-    return [
-        ligne.strip()
-        for ligne in depouille.splitlines()
-        if _CHIFFRE.search(ligne)
-    ]
+    return [ligne.strip() for ligne in depouille.splitlines() if _CHIFFRE.search(ligne)]
 
 
 def occurrences() -> list[tuple[str, str]]:
@@ -214,7 +345,7 @@ def occurrences() -> list[tuple[str, str]]:
 def test_aucun_nombre_tape_nouveau() -> None:
     """Toute occurrence qui n'est pas nommée à la liste des restes est rouge."""
     connus = set(RESTES_CONNUS)
-    nouvelles = [f"{f} : {l[:110]}" for f, l in occurrences() if (f, l) not in connus]
+    nouvelles = [f"{f} : {ligne[:110]}" for f, ligne in occurrences() if (f, ligne) not in connus]
     assert not nouvelles, (
         f"{len(nouvelles)} chiffre(s) littéral(aux) composé(s) hors d'un appel au registre, et non "
         "déclaré(s) :\n  " + "\n  ".join(nouvelles)
@@ -228,7 +359,7 @@ def test_la_liste_des_restes_ne_porte_rien_de_perime() -> None:
     qui n'existent plus — une dette fausse est aussi inutile qu'une dette tue.
     """
     presentes = set(occurrences())
-    perimees = [f"{f} : {l[:80]}" for f, l in RESTES_CONNUS if (f, l) not in presentes]
+    perimees = [f"{f} : {ligne[:80]}" for f, ligne in RESTES_CONNUS if (f, ligne) not in presentes]
     assert not perimees, (
         f"{len(perimees)} ligne(s) déclarée(s) aux restes et absente(s) des fichiers — "
         "retirez-les de RESTES_CONNUS :\n  " + "\n  ".join(perimees)
