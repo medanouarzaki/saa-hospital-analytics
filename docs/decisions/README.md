@@ -108,3 +108,4 @@ chaque exécution.
 | [0092](0092-les-neuf-ecarts-fermes-et-le-controle-des-nombres-tapes.md) | Les neuf écarts fermés, le nombre tapé retiré, et une vérification déclarée due |
 | [0093](0093-la-presentation-reprise.md) | La présentation reprise : une ouverture, un bloc technique, et une commande réemployée |
 | [0094](0094-les-questions-de-soutenance.md) | Les questions de soutenance, et deux chiffres arrondis à la main |
+| [0095](0095-la-bascule-en-remise.md) | La bascule en remise, et ce que la relecture a vu |
