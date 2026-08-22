@@ -120,7 +120,7 @@ La couche source compte \chiffre{source-tables} tables, une par flux extractible
 d'information, et \chiffre{source-lignes-total} lignes au total sur la période.
 
 \begin{center}
-\begin{tabular}{@{}p{3.4cm}p{6.2cm}r@{}}
+\begin{tabular}{@{}p{3.7cm}p{5.9cm}r@{}}
 \toprule
 Table & Grain — une ligne par & Lignes \\
 \midrule
@@ -178,11 +178,25 @@ attrapés, et leur décompte est une mesure de ces contrôles.
 Chaque colonne de la couche source est rattachée à ce qui l'établit. Le tableau ci-dessous donne la
 correspondance pour deux tables ; l'annexe la porte pour les onze.
 
-\begin{center}
-\begin{tabular}{@{}p{3.0cm}p{2.9cm}p{1.5cm}p{1.9cm}p{3.6cm}@{}}
+% CE TABLEAU EST SÉCABLE, ET C'EST LA RELECTURE QUI L'A IMPOSÉ. En `tabular`, il partait d'un seul
+% bloc à la page suivante dès qu'il ne tenait pas sur la fin de la page courante, et laissait les
+% trois quarts d'une page blanche EN PLEIN CHAPITRE — pas en fin de chapitre, où un blanc se
+% comprend. En `longtable`, il commence où il se trouve et se poursuit, avec sa ligne d'intitulés
+% répétée en tête de chaque page qu'il occupe.
+%
+% Les largeurs sont MESURÉES sur le rendu, non estimées : `type_piece_identite` occupe 4,18 cm en
+% chasse fixe et surimprimait la colonne suivante, et l'intitulé « Provenance » en occupe 2,06.
+% Deux corrections successives à l'estime sont restées insuffisantes avant que la largeur ne soit
+% relevée au rendu à 300 points par pouce. La somme des cinq colonnes vaut 12,9 cm.
+\begin{longtable}{@{}p{2.6cm}p{4.3cm}p{1.0cm}p{2.1cm}p{2.9cm}@{}}
 \toprule
 Libellé relevé & Colonne & Type & Provenance & Preuve \\
 \midrule
+\endfirsthead
+\toprule
+Libellé relevé & Colonne & Type & Provenance & Preuve \\
+\midrule
+\endhead
 \multicolumn{5}{@{}l}{\textbf{\texttt{patients}} — extraits}\\
 N° IPP & \texttt{n\_ipp} & texte & \texttt{OBS} & \texttt{REL-PAT.D01} \\
 Nom & \texttt{nom} & texte & \texttt{OBS} & \texttt{REL-PAT.D02} \\
@@ -212,8 +226,7 @@ Confirmé par & \texttt{confirme\_par} & texte & \texttt{OBS} & \texttt{REL-RDV.
 Annulé par & \texttt{annule\_par} & texte & \texttt{OBS} & \texttt{REL-RDV.C07} \\
 Date annul. & \texttt{date\_annulation} & texte & \texttt{OBS} & \texttt{REL-RDV.C08} \\
 \bottomrule
-\end{tabular}
-\end{center}
+\end{longtable}
 
 \begin{center}
 \footnotesize Correspondance entre libellé d'écran, colonne et preuve d'observation, pour deux
@@ -387,11 +400,19 @@ présentés partout comme relevant d'une hypothèse.
 Les valeurs que le générateur tire suivent des distributions, et chacune est rattachée à ce qui
 l'établit. Le tableau distingue ce qui vient d'une source documentaire de ce qui est posé.
 
-\begin{center}
-\begin{tabular}{@{}p{4.6cm}p{4.4cm}p{1.7cm}p{2.6cm}@{}}
+% SÉCABLE POUR LA MÊME RAISON QUE LE TABLEAU DE LA SECTION 4.3 : rendu insécable, il partait d'un
+% bloc et laissait une demi-page blanche en plein chapitre. Le premier remède avait déplacé le
+% blanc de la page 28 à la page 32 plutôt que de le supprimer ; la relecture image par image l'a
+% montré, et c'est pourquoi les deux tableaux sont traités ensemble.
+\begin{longtable}{@{}p{4.6cm}p{4.4cm}p{1.7cm}p{2.6cm}@{}}
 \toprule
 Distribution & Valeur ou forme & Étiquette & Ce qui l'étaye \\
 \midrule
+\endfirsthead
+\toprule
+Distribution & Valeur ou forme & Étiquette & Ce qui l'étaye \\
+\midrule
+\endhead
 Structure par âge & \chiffre{tranches-age} tranches & \texttt{HYP} & convention posée \\
 Répartition par sexe & \chiffre{part-sexe-masculin} d'hommes & \texttt{HYP} & convention posée \\
 Environnement de résidence & \chiffre{part-urbain} en milieu urbain & \texttt{HYP} & mesure régionale \cite{s30} \\
@@ -402,8 +423,7 @@ Part du niveau de tri 4 & \chiffre{part-tri-niveau-4} & \texttt{DOC} & échelle 
 Part du niveau de tri 5 & \chiffre{part-tri-niveau-5} & \texttt{DOC} & échelle de tri publiée \\
 Séjours provenant des urgences & \chiffre{part-sejours-depuis-urgences} & \texttt{HYP} & convention posée \\
 \bottomrule
-\end{tabular}
-\end{center}
+\end{longtable}
 
 \begin{center}
 \footnotesize Distributions du générateur, avec l'étiquette de provenance de chacune.

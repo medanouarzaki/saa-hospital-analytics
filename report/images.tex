@@ -235,11 +235,17 @@
 % déborderait donc pas de la réservation : il y laisserait un peu de blanc. C'est
 % ce qui rend la pagination indépendante de la présence du fichier, au lieu de la
 % faire dépendre d'une supposition écrite ailleurs.
+% LA CAPTURE ET SA LÉGENDE NE SE SÉPARENT PAS. Elles étaient deux blocs successifs, qu'une
+% coupure de page pouvait disjoindre : la capture de la page « Données » finissait une page et
+% « Figure 2 — La page Données… » ouvrait la suivante, orpheline de l'image qu'elle nommait. Le
+% `minipage` en fait un bloc unique, insécable par construction. Il peut laisser du blanc en bas
+% d'une page quand l'ensemble n'y tient plus ; c'est le prix, et il est moindre.
 \newcommand{\captureTdb}[4]{%
   \refstepcounter{capturetdb}%
   \setlength{\largeurEmplacement}{#2}%
   \edef\facteurDeLaCapture{\rapportDeLaCapture{#1}}%
   \setlength{\hauteurEmplacement}{\facteurDeLaCapture\largeurEmplacement}%
+  \par\noindent\begin{minipage}{\linewidth}%
   \begin{center}%
     \IfFileExists{figures/tableau-de-bord/#1.png}{%
       \parbox[b][\hauteurEmplacement][c]{\largeurEmplacement}{\centering%
@@ -254,6 +260,7 @@
     }%
   \end{center}%
   \legendeCapture{#3}{#4}%
+  \end{minipage}\par%
 }
 
 % ------------------------------------------------------------------------------

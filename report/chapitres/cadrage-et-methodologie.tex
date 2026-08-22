@@ -255,7 +255,15 @@ Leurs dépendances comptent davantage que leur ordre, et la figure ci-dessous le
 \fbox{\begin{minipage}{0.42\linewidth}\centering Comprendre le service \\ et relever les écrans\end{minipage}}%
 \hfill
 \fbox{\begin{minipage}{0.42\linewidth}\centering Établir les sources \\ et les chiffres de référence\end{minipage}}\\[3pt]
-$\searrow$ \hfill $\swarrow$\\[3pt]
+% LES DEUX FLÈCHES SE POSENT SOUS LE MILIEU DE LEUR BOÎTE. Avec un simple `\hfill` entre elles,
+% elles étaient rejetées aux deux bords du cadre et s'arrêtaient dans le vide, sans rien relier :
+% le lecteur voyait deux traits obliques posés à côté des boîtes.
+%
+% Chaque flèche est CENTRÉE DANS UNE BOÎTE DE LA LARGEUR DE LA SIENNE, et non poussée par un
+% espacement : une première correction posait un `\hspace*` de part et d'autre, et celui de fin
+% de ligne était absorbé — la flèche de droite restait au bord. Le rendu l'a démenti avant que la
+% correction ne soit gardée.
+\makebox[0.42\linewidth]{$\searrow$}\hfill\makebox[0.42\linewidth]{$\swarrow$}\\[3pt]
 \fbox{\begin{minipage}{0.62\linewidth}\centering Concevoir et engendrer \\ le jeu de données\end{minipage}}\\[3pt]
 $\downarrow$\\[3pt]
 \fbox{\begin{minipage}{0.62\linewidth}\centering Construire la chaîne \\ de traitement\end{minipage}}\\[3pt]
