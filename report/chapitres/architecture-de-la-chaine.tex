@@ -212,7 +212,11 @@ interrogation part du centre pour aller vers les branches.
 \fbox{\begin{minipage}{0.28\linewidth}\centering \texttt{dim\_patient} \\ \footnotesize historisée\end{minipage}}%
 \hfill
 \fbox{\begin{minipage}{0.28\linewidth}\centering \texttt{dim\_service}\end{minipage}}\\[3pt]
-\centering $\searrow$ \hfill $\downarrow$ \hfill $\swarrow$\\[3pt]
+% CHAQUE FLÈCHE EST CENTRÉE DANS UNE BOÎTE DE LA LARGEUR DE LA DIMENSION QU'ELLE RELIE. Avec un
+% `\hfill` entre elles, les deux flèches obliques étaient rejetées aux bords du cadre et
+% s'arrêtaient dans le vide, à côté des boîtes qu'elles devaient joindre. Les trois dimensions
+% occupent chacune 0,28 de la largeur ; les trois boîtes de flèche prennent la même largeur.
+\makebox[0.28\linewidth]{$\searrow$}\hfill\makebox[0.28\linewidth]{$\downarrow$}\hfill\makebox[0.28\linewidth]{$\swarrow$}\\[3pt]
 \fbox{\begin{minipage}{0.94\linewidth}\centering \textbf{Les six faits} \\[2pt]
 \footnotesize
 \texttt{fct\_sejour} — un séjour \quad
@@ -222,7 +226,7 @@ interrogation part du centre pour aller vers les branches.
 \texttt{fct\_facturation} — une facture \quad
 \texttt{fct\_encaissement} — un encaissement
 \end{minipage}}\\[3pt]
-\centering $\nearrow$ \hfill $\uparrow$ \hfill $\nwarrow$\\[3pt]
+\makebox[0.28\linewidth]{$\nearrow$}\hfill\makebox[0.28\linewidth]{$\uparrow$}\hfill\makebox[0.28\linewidth]{$\nwarrow$}\\[3pt]
 \fbox{\begin{minipage}{0.28\linewidth}\centering \texttt{dim\_activite}\end{minipage}}%
 \hfill
 \fbox{\begin{minipage}{0.28\linewidth}\centering \texttt{dim\_agent}\end{minipage}}%

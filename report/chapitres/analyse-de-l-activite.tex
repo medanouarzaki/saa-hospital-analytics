@@ -58,6 +58,10 @@ documente.
   grid=major, grid style={gray!25},
   every axis plot/.append style={thick},
   legend style={at={(0.5,-0.32)}, anchor=north, legend columns=2, font=\footnotesize,
+    % SÉPARATION ENTRE LES DEUX COLONNES DE LA LÉGENDE. Sans elle, la clé de la seconde entrée
+    % touchait le libellé de la première, et les deux se lisaient d'un seul tenant. Le défaut se
+    % voyait sur les quatre graphiques à légende en deux colonnes, et sur eux seuls.
+    /tikz/every even column/.append style={column sep=1.2em},
     draw=gray!40},
 ]
 \addplot[color=black, mark=none] table[x=annee, y=urgences, col sep=comma] {\serie{flux-mensuel}};
@@ -91,6 +95,10 @@ rien sur le service.}
   xmin=-0.8, xmax=23.8, ymin=0, xtick={0,3,6,9,12,15,18,21},
   grid=major, grid style={gray!25},
   legend style={at={(0.5,-0.34)}, anchor=north, legend columns=2, font=\footnotesize,
+    % SÉPARATION ENTRE LES DEUX COLONNES DE LA LÉGENDE. Sans elle, la clé de la seconde entrée
+    % touchait le libellé de la première, et les deux se lisaient d'un seul tenant. Le défaut se
+    % voyait sur les quatre graphiques à légende en deux colonnes, et sur eux seuls.
+    /tikz/every even column/.append style={column sep=1.2em},
     draw=gray!40},
 ]
 \addplot[fill=gray!30, draw=gray!60] table[x=heure, y=urgences, col sep=comma]
@@ -171,6 +179,10 @@ chapitre} — sur l'ensemble et sur le seul complément.
   grid=major, grid style={gray!25},
   every axis plot/.append style={thick},
   legend style={at={(0.5,-0.36)}, anchor=north, legend columns=2, font=\footnotesize,
+    % SÉPARATION ENTRE LES DEUX COLONNES DE LA LÉGENDE. Sans elle, la clé de la seconde entrée
+    % touchait le libellé de la première, et les deux se lisaient d'un seul tenant. Le défaut se
+    % voyait sur les quatre graphiques à légende en deux colonnes, et sur eux seuls.
+    /tikz/every even column/.append style={column sep=1.2em},
     draw=gray!40},
 ]
 \addplot[color=black, mark=none] table[x=jours, y=artefact, col sep=comma]
@@ -272,6 +284,10 @@ donc l'une des rares conclusions de ce chapitre que la chaîne établit vraiment
   xmin=0, xmax=52, ymin=0,
   grid=major, grid style={gray!25},
   legend style={at={(0.5,-0.36)}, anchor=north, legend columns=2, font=\footnotesize,
+    % SÉPARATION ENTRE LES DEUX COLONNES DE LA LÉGENDE. Sans elle, la clé de la seconde entrée
+    % touchait le libellé de la première, et les deux se lisaient d'un seul tenant. Le défaut se
+    % voyait sur les quatre graphiques à légende en deux colonnes, et sur eux seuls.
+    /tikz/every even column/.append style={column sep=1.2em},
     draw=gray!40},
 ]
 \addplot[only marks, mark=*, mark size=2pt, color=black] table[x=mediane, y=absences,
@@ -494,14 +510,27 @@ saisie obligatoire fondée sur ce classement serait circulaire.}
 
 \begin{center}
 \footnotesize
+% L'espacement entre colonnes est resserré POUR CE TABLEAU SEUL, et la mesure dit de combien : à
+% 6 pt, l'intitulé abrégé laissait encore 0,33 cm de débordement ; à 4 pt, les six colonnes
+% tiennent dans le bloc de texte, que le filet d'en-tête de page donne exactement. Le groupe
+% `center` borne la portée du changement.
+\setlength{\tabcolsep}{4pt}
 \pgfplotstabletypeset[
   col sep=comma,
   % Les noms de table portent des soulignements, qui sont des caractères actifs en mode texte.
   % `string replace*` les échappe à la lecture, sans toucher au fichier de données.
-  columns/objet/.style={column name={Table}, string type, string replace*={_}{\textunderscore}},
+  %
+  % LE NOM DE TABLE SE COMPOSE EN CHASSE FIXE, comme partout ailleurs dans le document. Il était
+  % composé en romain, où `\textunderscore` produit une barre basse démesurée : `int_patients` s'y
+  % lisait `int__patients`. Le défaut ne se voyait qu'à la relecture du document composé.
+  columns/objet/.style={column name={Table}, string type, string replace*={_}{\_},
+    postproc cell content/.append style={@cell content/.add={\texttt\bgroup}{\egroup}}},
   columns/colonnes/.style={column name={Colonnes}, int detect},
   columns/incompletes/.style={column name={Incomplètes}, int detect},
-  columns/completude_minimale/.style={column name={Complétude minimale (\%)}, fixed,
+  % L'INTITULÉ EST ABRÉGÉ PARCE QUE LE TABLEAU DÉBORDAIT LA MARGE, mesuré au rendu : son filet
+  % s'étendait 1,05 cm au-delà du bloc de texte, que le filet d'en-tête de page donne exactement.
+  % La légende sous le tableau porte le mot entier.
+  columns/completude_minimale/.style={column name={Complétude min. (\%)}, fixed,
     fixed zerofill, precision=2},
   columns/quarantaine/.style={column name={Quarantaine}, int detect, 1000 sep={\,}},
   columns/taux_quarantaine/.style={column name={Taux (\%)}, fixed, fixed zerofill, precision=2},
@@ -511,7 +540,8 @@ saisie obligatoire fondée sur ce classement serait circulaire.}
 \end{center}
 
 \begin{center}
-\footnotesize Complétude et quarantaine par table de la couche intermédiaire.
+\footnotesize Complétude et quarantaine par table de la couche intermédiaire. La colonne
+« Complétude min. » porte la complétude minimale observée sur les colonnes de la table.
 \end{center}
 
 \conclusion{C-21} \textbf{La quarantaine est marginale et concentrée sur deux tables.} Sur

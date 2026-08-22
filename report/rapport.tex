@@ -14,7 +14,12 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
-\usepackage[french]{babel}
+% `english` EST CHARGÉ POUR LE SEUL ABSTRACT, et `french` reste la langue principale parce qu'il
+% est déclaré en dernier. Sans lui, les règles typographiques françaises s'appliquaient au texte
+% anglais : une espace fine paraissait devant chaque deux-points et chaque point-virgule de la
+% page d'Abstract — « front door : it », « data pipeline ; synthetic data ». Le défaut ne se
+% voyait qu'à la relecture de la page composée.
+\usepackage[english,french]{babel}
 \usepackage{csquotes}
 
 \usepackage[a4paper,margin=2.5cm]{geometry}
@@ -141,7 +146,39 @@
 
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\leftmark}
+
+% L'EN-TÊTE DES ANNEXES NE PEUT PAS PASSER PAR `\leftmark`, ET C'EST MESURÉ. Les annexes B et C
+% sont faites de `longtable`, dont la routine de sortie expédie ses pages sans réémettre les
+% repères de page. Une sonde `\markboth` posée juste après le `\chapter` de l'annexe B n'a pas
+% paru une seule fois dans l'en-tête : les huit pages des annexes B et C portaient le titre de
+% l'annexe A. Le défaut se voyait à la relecture du document composé, et aucun contrôle ne le
+% voyait.
+%
+% Le remède ne rétablit pas le repère perdu — il cesse d'en dépendre. `\chapitreDAnnexe` écrit le
+% titre UNE SEULE FOIS et le donne aux deux endroits qui le veulent : la commande de chapitre et
+% l'en-tête. Aucun titre n'est donc recopié, et une dérive entre les deux est impossible par
+% construction.
+%
+% Hors annexe, `\enteteCourante` reste vide et l'en-tête retombe sur `\leftmark`, qui fonctionne :
+% les neuf chapitres portaient un en-tête juste, et rien n'y change.
+% `\let` ET NON `\newcommand`, ET LA RAISON EST MESURÉE. Avec `\newcommand{\enteteCourante}{}`,
+% la macro est déclarée `\long` quand `\empty` ne l'est pas : `\ifx` compare aussi ce préfixe,
+% le test rendait FAUX pour un contenu pourtant vide, et l'en-tête des NEUF CHAPITRES a disparu
+% d'un coup. Le défaut n'a pas été deviné : il a été vu en comparant les 98 pages composées avant
+% et après la correction, image par image. `\let\enteteCourante\empty` donne au test deux macros
+% de même nature, et il rend vrai.
+\let\enteteCourante\empty
+% L'ARGUMENT OPTIONNEL EST UN TITRE D'EN-TÊTE ABRÉGÉ, et il n'existe que parce que la première
+% version de ce remède a produit un défaut à la place de celui qu'elle corrigeait : le titre de
+% l'annexe C, repris en entier, passait sur deux lignes et chevauchait le filet. Sans argument,
+% l'en-tête reprend le titre du chapitre et rien n'est écrit deux fois ; avec, l'abrégé ne sert
+% qu'à l'en-tête et le titre plein reste seul au chapitre et à la table des matières.
+\newcommand{\chapitreDAnnexe}[2][]{%
+  \chapter{#2}%
+  \renewcommand{\enteteCourante}{%
+    \MakeUppercase{\appendixname\ \thechapter.\ \ifx\relax#1\relax#2\else#1\fi}}%
+}
+\fancyhead[L]{\ifx\enteteCourante\empty\leftmark\else\enteteCourante\fi}
 \fancyfoot[C]{\thepage}
 
 \input{marqueurs}

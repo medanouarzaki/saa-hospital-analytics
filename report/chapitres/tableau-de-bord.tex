@@ -82,8 +82,12 @@ pilotage : le volume d'événements par jour, ventilé par famille}{fig:tdb-acti
 \footnotesize
 \pgfplotstabletypeset[
   col sep=comma,
+  % LE NOM DE PAGE SE COMPOSE EN CHASSE FIXE, comme le nom de table au chapitre précédent et comme
+  % tout identifiant du document. En romain, `\textunderscore` produit une barre basse démesurée :
+  % `rendez_vous` s'y lisait `rendez__vous`.
   columns/page/.style={column name={Page}, string type,
-    string replace*={_}{\textunderscore}},
+    string replace*={_}{\_},
+    postproc cell content/.append style={@cell content/.add={\texttt\bgroup}{\egroup}}},
   columns/section/.style={column name={Section}, string type},
   columns/indicateurs/.style={column name={Indicateurs}, int detect},
   columns/graphiques/.style={column name={Tracés}, int detect},

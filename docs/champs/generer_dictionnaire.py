@@ -101,8 +101,13 @@ def rendre_synthese_tex(tables: dict[str, list[dict]]) -> str:
         total_colonnes += len(colonnes)
         for etiquette in ETIQUETTES:
             totaux[etiquette] += comptes[etiquette]
+        # LE NOM DE TABLE SE COMPOSE EN CHASSE FIXE. Il était rendu en romain, où le soulignement
+        # échappé produit une barre basse démesurée : `source.rendez_vous` s'y lisait
+        # `source.rendez__vous`. Le défaut ne se voyait qu'à la relecture du document composé, et
+        # aucun contrôle ne le voyait. Les deux autres tableaux du rapport qui portent des noms
+        # d'objet ont reçu la même correction.
         lignes.append(
-            f"{echapper_latex(table)} & {len(colonnes)} & "
+            f"\\texttt{{{echapper_latex(table)}}} & {len(colonnes)} & "
             + " & ".join(str(comptes[e]) for e in ETIQUETTES)
             + r" \\"
         )
