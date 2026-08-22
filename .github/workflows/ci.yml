@@ -169,6 +169,7 @@ jobs:
 
           - nom: coherence-parcours-patients-urgences-et-fichiers-courts
             fichiers: >-
+              tests/test_aucun_nombre_tape.py
               tests/test_aucune_image.py
               tests/test_calendrier.py
               tests/test_coherence_inter_tables.py

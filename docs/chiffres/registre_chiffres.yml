@@ -673,7 +673,7 @@ chiffres:
   commande: (R/'airflow/saa_daily.py').read_text(encoding='utf-8').count('task_id=')
   portee: independant-des-donnees
 - id: fichiers-de-controle
-  valeur: 74
+  valeur: 76
   unite: fichiers
   type: python
   commande: len(list((R/'tests').glob('test_*.py')))
@@ -845,6 +845,16 @@ chiffres:
     if l[''variante'']==''C_les_deux_retraits''][0]'
   portee: independant-des-donnees
   note: F-mesure de la variante C, au même dénominateur que f-mesure-seuil-retenu.
+- id: ablation-f-variante-a
+  valeur: 0.999495204442201
+  decimales: 4
+  unite: proportion
+  type: python
+  commande: '[float(l[''f_mesure'']) for l in __import__(''csv'').DictReader((R/''linkage/ablation.csv'').open(encoding=''utf-8'')) if l[''variante'']==''A_sans_champs_recopies''][0]'
+  portee: periode-entiere
+  note: F-mesure de la variante qui prive le modèle des champs recopiés. Elle était tapée
+    en clair au chapitre du rapprochement, dans un tableau dont les trois autres valeurs de
+    la même ligne venaient déjà du registre.
 - id: ablation-comparaisons-variante-a
   valeur: 6
   unite: comparaisons
@@ -2023,7 +2033,7 @@ chiffres:
   valeur: 23
   unite: graphiques
   type: python
-  commande: 'sum((R/''dashboard/pages''/(p+''.py'')).read_text(encoding=''utf-8'').count(g) for p in yaml.safe_load((R/''dashboard/indicateurs.yml'').read_text(encoding=''utf-8''))[''pages''] for g in (''st.line_chart'',''st.bar_chart'',''st.area_chart'',''st.scatter_chart''))'
+  commande: 'sum((R/''dashboard/pages''/(p+''.py'')).read_text(encoding=''utf-8'').count(g) for p in yaml.safe_load((R/''dashboard/indicateurs.yml'').read_text(encoding=''utf-8''))[''pages''] for g in (''st.line_chart'',''st.bar_chart'',''st.area_chart'',''st.scatter_chart'',''rendu.tracer_temporel''))'
   portee: independant-des-donnees
   note: >-
     Appels de tracé dans les neuf fichiers de page, les quatre formes employées comptées. Une page
@@ -2370,7 +2380,7 @@ chiffres:
     Chapitres numérotés du rapport, comptés dans l'ordre des inclusions du fichier principal. Un
     chapitre non numéroté — l'introduction, la conclusion — n'y entre pas.
 - id: sections-du-rapport
-  valeur: 54
+  valeur: 51
   unite: sections
   type: python
   commande: 'sum(len([l for l in c.read_text(encoding=''utf-8'').splitlines() if l.startswith(''\\section{'')]) for c in sorted((R/''report/chapitres'').glob(''*.tex'')))'
@@ -2391,7 +2401,7 @@ chiffres:
   valeur: 17
   unite: identifiants
   type: python
-  commande: 'len(set(__import__(''re'').findall(r''id: (REL-[A-Z]{3}\.[A-Z][0-9]{2})(?![0-9])'', (R/''docs/observation/releve_champs.yml'').read_text(encoding=''utf-8''))) - set(__import__(''re'').findall(r''REL-[A-Z]{3}\.[A-Z][0-9]{2}(?![0-9])'', chr(10).join(c.read_text(encoding=''utf-8'') for c in sorted((R/''report/chapitres'').glob(''*.tex''))))))'
+  commande: 'len(set(__import__(''re'').findall(r''id: (REL-[A-Z]{3}\.[A-Z][0-9]{2})(?![0-9])'', (R/''docs/observation/releve_champs.yml'').read_text(encoding=''utf-8''))) - set(__import__(''re'').findall(r''REL-[A-Z]{3}\.[A-Z][0-9]{2}(?![0-9])'', chr(10).join(c.read_text(encoding=''utf-8'') for c in sorted((R/''report/chapitres'').glob(''*.tex'')) + [R/''report/correspondance_relations.tex'', R/''report/releve_des_ecrans.tex'']))))'
   portee: independant-des-donnees
   note: >-
     Éléments relevés qu'aucun chapitre ne cite. Tous sont des boutons, aucun n'est un champ de
@@ -2409,7 +2419,7 @@ chiffres:
   valeur: 5
   unite: relations
   type: python
-  commande: 'len(__import__(''re'').findall(r''\\relnonreprise\{'', chr(10).join(c.read_text(encoding=''utf-8'') for c in sorted((R/''report/chapitres'').glob(''*.tex'')))))'
+  commande: 'len(__import__(''re'').findall(r''\\relnonreprise\{'', chr(10).join(c.read_text(encoding=''utf-8'') for c in sorted((R/''report/chapitres'').glob(''*.tex'')) + [R/''report/correspondance_relations.tex'', R/''report/releve_des_ecrans.tex''])))'
   portee: independant-des-donnees
   note: >-
     Relations injectées déclarées non reprises par une conclusion, chacune avec son motif. Leur
@@ -2418,7 +2428,7 @@ chiffres:
   valeur: 16
   unite: relations
   type: python
-  commande: 'len(__import__(''re'').findall(r''\\relreprise\{'', chr(10).join(c.read_text(encoding=''utf-8'') for c in sorted((R/''report/chapitres'').glob(''*.tex'')))))'
+  commande: 'len(__import__(''re'').findall(r''\\relreprise\{'', chr(10).join(c.read_text(encoding=''utf-8'') for c in sorted((R/''report/chapitres'').glob(''*.tex'')) + [R/''report/correspondance_relations.tex'', R/''report/releve_des_ecrans.tex''])))'
   portee: independant-des-donnees
   note: >-
     Lignes de reprise du tableau de correspondance — une par relation injectée reprise. Une ligne
@@ -2427,7 +2437,7 @@ chiffres:
   valeur: 6
   unite: conclusions
   type: python
-  commande: 'len(__import__(''re'').findall(r''\\conclusionhors\{'', chr(10).join(c.read_text(encoding=''utf-8'') for c in sorted((R/''report/chapitres'').glob(''*.tex'')))))'
+  commande: 'len(__import__(''re'').findall(r''\\conclusionhors\{'', chr(10).join(c.read_text(encoding=''utf-8'') for c in sorted((R/''report/chapitres'').glob(''*.tex'')) + [R/''report/correspondance_relations.tex'', R/''report/releve_des_ecrans.tex''])))'
   portee: independant-des-donnees
   note: >-
     Conclusions du chapitre d'analyse déclarées ne venir d'aucune relation injectée. Elles sont un
@@ -2679,7 +2689,7 @@ series:
   lignes: 9
   empreinte: 0ba7b302881861a1a90787ba979286e8a706cd49da68389c5f037ce0580710df
   type: python
-  commande: '[(p, [e[''section''] for e in yaml.safe_load((R/''dashboard/indicateurs.yml'').read_text(encoding=''utf-8''))[''indicateurs''] if e[''page'']==p][0], len([e for e in yaml.safe_load((R/''dashboard/indicateurs.yml'').read_text(encoding=''utf-8''))[''indicateurs''] if e[''page'']==p]), sum((R/''dashboard/pages''/(p+''.py'')).read_text(encoding=''utf-8'').count(g) for g in (''st.line_chart'',''st.bar_chart'',''st.area_chart'',''st.scatter_chart''))) for p in yaml.safe_load((R/''dashboard/indicateurs.yml'').read_text(encoding=''utf-8''))[''pages'']]'
+  commande: '[(p, [e[''section''] for e in yaml.safe_load((R/''dashboard/indicateurs.yml'').read_text(encoding=''utf-8''))[''indicateurs''] if e[''page'']==p][0], len([e for e in yaml.safe_load((R/''dashboard/indicateurs.yml'').read_text(encoding=''utf-8''))[''indicateurs''] if e[''page'']==p]), sum((R/''dashboard/pages''/(p+''.py'')).read_text(encoding=''utf-8'').count(g) for g in (''st.line_chart'',''st.bar_chart'',''st.area_chart'',''st.scatter_chart'',''rendu.tracer_temporel''))) for p in yaml.safe_load((R/''dashboard/indicateurs.yml'').read_text(encoding=''utf-8''))[''pages'']]'
   portee: independant-des-donnees
   note: >-
     Une ligne par page du tableau de bord, dans l'ordre du registre des indicateurs : sa section,

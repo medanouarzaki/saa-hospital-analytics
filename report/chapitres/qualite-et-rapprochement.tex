@@ -2,8 +2,8 @@
 %   DOC: s20, s22, s23
 %   OBS: REL-IPP.O03, REL-IPP.R12
 %   HYP: (aucun)
-%   CHI: ablation-comparaisons-variante-a, ablation-ecart-complet, ablation-ecart-variante-a, ablation-ecart-variante-c, ablation-f-variante-c, balayage-points
-%   CHI: balayage-points-f-parfaite, baseline-f-mesure, blocage-nom-adresse, blocage-nom-telephone, blocage-parents-naissance, blocage-piece-identite
+%   CHI: ablation-comparaisons-variante-a, ablation-ecart-complet, ablation-ecart-variante-a, ablation-ecart-variante-c, ablation-f-variante-a, ablation-f-variante-c
+%   CHI: balayage-points, balayage-points-f-parfaite, baseline-f-mesure, blocage-nom-adresse, blocage-nom-telephone, blocage-parents-naissance, blocage-piece-identite
 %   CHI: collision-groupes-nom, collision-groupes-piece, collision-vides-piece, comparaisons-modele, f-mesure-seuil-retenu, grappes-exactes-global
 %   CHI: grappes-exactes-restreint, identifiants-distincts, paires-candidates, paires-possibles, precision-seuil-retenu, qualite-colonne-vide
 %   CHI: qualite-colonnes, qualite-colonnes-incompletes, quarantaine-lignes-total, quarantaine-patients-lignes, quarantaine-rendez-vous-lignes, rappel-seuil-retenu
@@ -337,7 +337,7 @@ niveau d'absence de la pièce d'identité, et une troisième cumulant les deux.
 Variante & Comparaisons & F-mesure & Marge \\
 \midrule
 modèle complet & \chiffre{comparaisons-modele} & \chiffre{f-mesure-seuil-retenu} & \chiffre{ablation-ecart-complet} \\
-sans les champs recopiés & \chiffre{ablation-comparaisons-variante-a} & 0,9995 & \chiffre{ablation-ecart-variante-a} \\
+sans les champs recopiés & \chiffre{ablation-comparaisons-variante-a} & \chiffre{ablation-f-variante-a} & \chiffre{ablation-ecart-variante-a} \\
 les deux retraits cumulés & \chiffre{ablation-comparaisons-variante-a} & \chiffre{ablation-f-variante-c} & \chiffre{ablation-ecart-variante-c} \\
 \bottomrule
 \end{tabular}

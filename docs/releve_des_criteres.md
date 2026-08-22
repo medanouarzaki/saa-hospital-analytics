@@ -1,6 +1,7 @@
 # Relevé daté des critères de terminaison
 
-**Relevé du 2026-08-21, 23:07 UTC.** Dépôt à `9c02c7a`, sur la branche principale.
+**Relevé du 2026-08-22, mis à jour après fermeture du critère A12.** Dépôt à `939d466` puis à la
+branche de correction, sur la branche principale.
 
 Ce document n'entre pas dans le rapport. Il sert deux choses : la vérification avant remise, et la
 réponse à deux questions de soutenance — *quels critères sont atteints, et comment le sait-on ?* et
@@ -40,7 +41,8 @@ Le dépôt en donne un exemple immédiat : **aucun contrôle ne lit le PDF.**
 | A9 | Le rapport compose sans erreur | `latexmk -pdf -halt-on-error -interaction=nonstopmode rapport.tex` | sortie 0, 98 pages | **vrai** |
 | A10 | Le support de soutenance compose sans erreur | `latexmk -pdf -halt-on-error -interaction=nonstopmode presentation.tex` | sortie 0, 21 planches | **vrai** |
 | A11 | Le chargement est idempotent et le rattrapage indifférent à l'ordre | `pytest -q tests/test_idempotence.py` | `SAA_INSTRUMENT_JETABLE doit valoir '1'` | **non encore applicable** — voir ci-dessous |
-| A12 | **Les valeurs du registre sont celles que leurs commandes rendent aujourd'hui** | `python docs/chiffres/mesurer.py --verifier` | `265 entrée(s) et 13 série(s) confrontée(s), 9 écart(s)` | **FAUX** |
+| A13 | **Aucun chiffre littéral n'est composé hors d'un appel au registre**, hors les quarante-deux occurrences nommées | `pytest -q tests/test_aucun_nombre_tape.py` | `13 passed` | **vrai pour toute occurrence nouvelle** — voir B4 |
+| A12 | **Les valeurs du registre sont celles que leurs commandes rendent aujourd'hui** | `python docs/chiffres/mesurer.py --verifier` | `266 entrée(s) et 13 série(s) confrontée(s), 0 écart(s)` | **vrai** |
 
 ### A3 — pourquoi « non encore applicable » et non « vrai »
 
@@ -63,53 +65,40 @@ Ces contrôles détruisent et rechargent des partitions. Ils exigent que
 s'exécuter sans**. Ce n'est jamais un saut silencieux : l'échec nomme la variable. L'intégration
 continue la pose ; la machine de rédaction ne la pose pas.
 
-### A12 — le critère faux, et c'est la réponse à la question du jury
+### A12 — le critère était FAUX, il est fermé, et sa cause est une propriété du dispositif
 
-**Neuf écarts.** Sortie brute :
+**Neuf écarts au relevé du 2026-08-21. Zéro aujourd'hui.** Sortie brute :
 
 ```
-fichiers-de-controle : consigné 74, mesuré 75
-tdb-graphiques : consigné 23, mesuré 18
-instantane-volume : consigné 32710656, mesuré 34799616
-sections-du-rapport : consigné 54, mesuré 51
-releve-champs-non-employes : consigné 17, mesuré 101
-relations-non-reprises : consigné 5, mesuré 0
-conclusions-avec-relation : consigné 16, mesuré 0
-conclusions-sans-relation : consigné 6, mesuré 0
-tableau-de-bord-par-page : le fichier que la commande produit a pour empreinte 00255f5d…, le
-registre consigne 0ba7b302… — la commande et le registre divergent
-265 entrée(s) et 13 série(s) confrontée(s), 9 écart(s)
+266 entrée(s) et 13 série(s) confrontée(s), 0 écart(s)
 ```
 
-**Ce que ces écarts sont, et ce qu'ils ne sont pas.** Aucun ne dit qu'une valeur du rapport est
-fausse au sens où elle aurait été inventée : chacune a bien été mesurée par sa commande, un jour.
-Ils disent que **le dépôt a bougé depuis, et que le registre n'a pas suivi**. Quatre d'entre eux
-sont directement imputables aux travaux de rédaction récents :
+**Ce que la cause mesurée a montré, et qui n'était pas ce qu'on croyait.** Six des neuf écarts ne
+venaient pas d'une valeur devenue fausse : ils venaient d'une **commande devenue aveugle**. Le
+tableau de correspondance et le relevé des écrans étaient descendus en annexe, et quatre commandes
+cherchaient encore leur matière sous `report/chapitres/` ; cinq tracés du tableau de bord étaient
+passés par une fonction commune, et deux commandes ne comptaient plus que les formes intégrées. Les
+valeurs consignées — 5, 16, 6, 17, 23 — étaient **justes**. Corriger la commande les a rendues
+vraies de nouveau, sans qu'aucune valeur du rapport ne bouge.
 
-- `sections-du-rapport` — trois sections ont été fondues en une au chapitre du système
-  d'information ;
-- `releve-champs-non-employes` — la même coupe a retiré les tableaux d'agencement, et les
-  identifiants de relevé qu'ils citaient ne sont plus cités ;
-- `tdb-graphiques` et l'empreinte de `tableau-de-bord-par-page` — cinq tracés du tableau de bord
-  sont passés par une fonction commune pour porter des étiquettes françaises, et la commande qui
-  les compte ne les voit plus sous la forme qu'elle cherche ;
-- `fichiers-de-controle` — un fichier de contrôle de plus.
+Deux écarts seulement étaient une vraie dérive de valeur : le décompte des fichiers de contrôle et
+celui des sections du rapport. Un troisième — le volume de l'instantané — n'était pas une dérive du
+tout : il varie d'un rafraîchissement à l'autre, et il a concordé de lui-même à la mesure suivante.
 
-Les trois écarts à zéro — `relations-non-reprises`, `conclusions-avec-relation`,
-`conclusions-sans-relation` — sont d'une autre nature : mesurer **zéro** là où le registre consigne
-cinq, seize et six suggère que la commande cherche sa matière à un endroit où elle n'est plus, le
-tableau de correspondance étant descendu en annexe. Il n'est pas établi ici que le rapport soit
-faux ; il est établi que **la commande et le registre ne parlent plus de la même chose**.
+### CE QUI DOIT ÊTRE FAIT AVANT TOUTE REMISE
 
-**Pourquoi rien ne l'a vu.** `mesurer.py --verifier` n'est pas un travail de l'intégration
-continue, et ne peut pas l'être : il ouvre la base et compare des valeurs mesurées sur la période
-entière, quand l'exécuteur n'engendre que trois mois. C'est écrit en tête du registre. Le critère
-n'est donc vérifiable **qu'à la main**, sur une machine portant la période complète — ce qui est
-exactement ce que ce relevé vient de faire.
+**`docs/chiffres/mesurer.py --verifier` est dû avant toute remise, et il est périmé par tout travail
+qui déplace de la matière.**
 
-**Il n'est pas corrigé ici.** Corriger un écart demande de remesurer la valeur et de la reporter au
-registre, ce qui change une valeur composée par le rapport ; ni les chapitres ni les valeurs du
-registre n'étaient ouverts à ce travail. Le défaut est relevé, daté et nommé.
+Ce n'est pas une consigne d'hygiène, c'est une **propriété du dispositif** : cette vérification
+ouvre la base et compare des valeurs mesurées sur la période entière, quand l'exécuteur de
+l'intégration continue n'engendre que trois mois. Elle ne peut pas être un travail de la chaîne, et
+elle ne tourne donc qu'à la main.
+
+Les neuf écarts n'étaient pas nés d'une négligence : ils étaient nés de ce que personne ne l'avait
+lancée depuis plusieurs campagnes de rédaction, et que **déplacer une section, descendre un tableau en
+annexe ou changer la forme d'un appel périme une commande sans rien casser de visible**. Toute campagne de
+rédaction périme donc cette vérification, par construction.
 
 ---
 
@@ -122,7 +111,7 @@ Chacun est nommé avec ce qui le vérifierait à la main.
 | B1 | Le document composé ne porte pas plus de boîtes débordantes qu'avant | **Aucun contrôle ne lit le PDF ni le journal de composition.** La composition n'échoue que sur une erreur, jamais sur un débordement | composer, compter `Overfull` au journal — 22 au rapport, 0 au support ce jour |
 | B2 | Aucune planche ne déborde, aucune valeur n'y est illisible de loin | idem : rien ne lit le PDF | rendre chaque planche en image et la lire réduite au quart |
 | B3 | Aucune page ne porte de ligne veuve, de titre orphelin ni de coupure malheureuse | idem | relecture en image, page par page |
-| B4 | **Aucun nombre n'est tapé en clair dans une source du rapport** | Le contrôle du registre vérifie la **correspondance** entre appels et entrées ; il ne cherche pas les chiffres littéraux. Un nombre tapé n'appelle rien, donc rien ne le voit | relecture, ou un contrôle à écrire. **Un cas existe aujourd'hui** : `report/chapitres/qualite-et-rapprochement.tex:340` compose `0,9995` à la main, dans le tableau même où les trois autres valeurs viennent du registre |
+| B4 | **Aucun nombre n'est tapé en clair dans une source du rapport** | Le contrôle du registre vérifie la **correspondance** entre appels et entrées ; il ne cherche pas les chiffres littéraux. `tests/test_aucun_nombre_tape.py` le fait désormais, mais **quarante-deux occurrences existantes y sont nommées une par une** : elles restent des nombres tapés | corriger chacune demande une entrée au registre avec la commande qui la produit, ces valeurs venant de sources publiées dont la valeur vit dans la prose d'un fichier de sources. Une seule a été corrigée, celle du tableau d'ablation |
 | B5 | Un fait cité d'une source est cité fidèlement | Aucun contrôle ne lit la source citée | relecture contre le texte source. Un cas a été trouvé et corrigé : le tableau du chapitre premier rangeait le recouvrement parmi les missions de l'article 35, que le texte ne lui donne pas |
 | B6 | Une capture d'écran est à jour et lisible à sa largeur composée | Aucun contrôle ne lit une image ni ne la date | comparer la capture à l'application, et mesurer sa résolution composée. Un cas a été trouvé : une capture antérieure à la mise en français des dates |
 | B7 | La phase exclusive du rafraîchissement reste une opération de catalogue **sur une machine chargée** | Le contrôle A8 mesure des durées et dérive son seuil sur la machine du moment : il a rendu rouge une fois sur un exécuteur lent, vert à la reprise, sans qu'aucun code ne change | relancer, et ne conclure à une régression qu'après plusieurs mesures concordantes |
@@ -134,10 +123,16 @@ Chacun est nommé avec ce qui le vérifierait à la main.
 
 ## Ce que ce relevé établit
 
-**Onze critères vrais, un faux, deux non encore applicables** en partie A ; **dix critères qu'aucun
-contrôle ne peut établir** en partie B.
+**Treize critères qu'un contrôle établit : onze vrais, deux non encore applicables.** Le seul qui
+était faux — A12, la concordance du registre avec ses commandes — **est fermé** : la remesure rend
+zéro écart, et sa sortie brute est ci-dessus.
 
-La réponse à la question du jury est donc chiffrée et documentée : le seul critère de la partie A
-qui soit **faux** est A12 — la concordance du registre avec ses commandes —, avec neuf écarts
-nommés ; et la partie B dit que dix autres critères ne sont pas tenus par un contrôle du tout, dont
-un — B4 — dont un manquement existe aujourd'hui et est nommé.
+**Dix critères qu'aucun contrôle ne peut établir**, nommés un par un. L'un d'eux — B4 — a reçu son
+contrôle dans l'intervalle, mais il porte une dette explicite : **quarante-deux chiffres littéraux
+subsistent dans les sources du rapport**, nommés ligne par ligne dans le contrôle lui-même. Toute
+occurrence nouvelle est rouge ; celles-là sont comptées comme la dette qu'elles sont.
+
+**La réponse à la question du jury.** Un critère avait bien été déclaré atteint sans l'être. Il y en
+avait **un**, et sa cause n'était pas une négligence : la vérification qui l'établit n'est pas
+exécutable en intégration continue, et tout travail de rédaction qui déplace de la matière la
+périme. Elle est désormais écrite comme due avant toute remise.
