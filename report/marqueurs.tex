@@ -2,9 +2,9 @@
 % garde est écrite. Tout autre fichier les emploie par leur commande, jamais en
 % écrivant la valeur.
 %
-% LES DEUX NOMS DE PERSONNE NE SONT PAS ICI. Ils ne sont commis nulle part : les
-% deux marqueurs nominatifs sont déclarés VIDES dans ce fichier, et redéfinis à la
-% compilation par `noms.tex`, qui n'est pas suivi par le gestionnaire de versions.
+% LE NOM DE PERSONNE N'EST PAS ICI. Il n'est commis nulle part : le marqueur
+% nominatif est déclaré VIDE dans ce fichier, et redéfini à la compilation par
+% `noms.tex`, qui n'est pas suivi par le gestionnaire de versions.
 % Voir la fin de ce fichier.
 %
 % Un marqueur nominatif renseigné ici ferait échouer un contrôle en état de
@@ -17,34 +17,32 @@
 % --- l'état du document -------------------------------------------------------
 % CE FICHIER DÉCLARE `brouillon`, ET IL LE DÉCLARERA TOUJOURS.
 %
-% L'état de remise ne s'écrit pas ici. Il s'écrit dans `noms.tex`, avec les deux
-% noms, et `noms.tex` n'est jamais commis. Les trois valeurs qui font un document
-% remis — l'auteur, l'encadrant, l'état — voyagent donc ensemble et sortent
-% ensemble du dépôt.
+% L'état de remise ne s'écrit pas ici. Il s'écrit dans `noms.tex`, avec le nom de
+% l'auteur, et `noms.tex` n'est jamais commis. Les deux valeurs qui font un
+% document remis — le nom et l'état — voyagent donc ensemble et sortent ensemble
+% du dépôt.
 %
 % Le motif est qu'une contradiction se levait autrement. Un contrôle exigeait, en
-% état de remise, que CE fichier porte les deux noms ; une autre règle interdisait
-% au dépôt de les porter. Les deux ne pouvaient pas être vraies en même temps. En
-% sortant l'état avec les noms, la propriété que ce fichier doit tenir devient
-% permanente : il déclare `brouillon`, et ses deux marqueurs nominatifs sont vides.
+% état de remise, que CE fichier porte le nom ; une autre règle interdisait au
+% dépôt de le porter. Les deux ne pouvaient pas être vraies en même temps. En
+% sortant l'état avec le nom, la propriété que ce fichier doit tenir devient
+% permanente : il déclare `brouillon`, et son marqueur nominatif est vide.
 % `tests/test_marqueurs_nominatifs.py` la vérifie, et ne changera plus.
 %
 % Deux valeurs restent admises par le mécanisme typographique, parce que
 % `noms.tex` emploie la seconde :
 %
 %   brouillon : la page de garde porte une mention visible de version de travail,
-%               et les lignes de noms disparaissent avec leurs marqueurs vides ;
-%   remise    : la mention disparaît, et les deux noms figurent.
+%               et la ligne du nom disparaît avec son marqueur vide ;
+%   remise    : la mention disparaît, et le nom de l'auteur figure.
 \newcommand{\etatDuDocument}{brouillon}
 
-% --- marqueurs nominatifs : ils portent un nom de personne ---------------------
-% DEUX, et deux seulement. Le document est un rapport de stage d'application : il
-% n'a pas d'encadrant académique, pas de président de jury, pas d'examinateur.
-% Ces trois marqueurs ont existé et ont été RETIRÉS, non laissés vides — un
+% --- marqueur nominatif : il porte un nom de personne --------------------------
+% UN, et un seul : le document ne porte que le nom de son auteur. Les autres
+% marqueurs nominatifs ont existé et ont été RETIRÉS, non laissés vides — un
 % marqueur vide est un oubli qui attend, et une ligne vide sur une page de garde
 % se remarque là où une ligne absente ne se remarque pas.
 \newcommand{\marqueurAuteur}{}
-\newcommand{\marqueurEncadrantProfessionnel}{}
 
 % --- marqueurs de contexte : ils ne portent aucun nom de personne --------------
 % Le contrôle des marqueurs nominatifs ne les regarde pas. Ils sont ici pour que
@@ -92,16 +90,15 @@
   \ifx#1\marqueurVide\else#2\fi%
 }
 
-% --- les noms, injectés à la compilation --------------------------------------
-% `noms.tex` redéfinit les deux marqueurs nominatifs ET l'état du document. Il
-% n'est JAMAIS commis : `.gitignore` porte `report/noms.tex`, et un contrôle
-% cherche les deux noms dans l'ensemble des fichiers suivis.
+% --- le nom, injecté à la compilation -----------------------------------------
+% `noms.tex` redéfinit le marqueur nominatif ET l'état du document. Il n'est
+% JAMAIS commis : `.gitignore` porte `report/noms.tex`, et un contrôle cherche le
+% nom dans l'ensemble des fichiers suivis.
 %
-% Sa forme est celle-ci, et l'intégration continue l'écrit depuis deux secrets de
+% Sa forme est celle-ci, et l'intégration continue l'écrit depuis un secret de
 % dépôt :
 %
 %   \renewcommand{\marqueurAuteur}{...}
-%   \renewcommand{\marqueurEncadrantProfessionnel}{...}
 %   \renewcommand{\etatDuDocument}{remise}
 %
 % DEUX CHEMINS SONT ESSAYÉS, et c'est mesuré : le rapport se compose depuis
@@ -109,7 +106,7 @@
 % `slides/` et charge ce fichier-ci par `\input{../report/marqueurs}`, où le même
 % fichier est `../report/noms.tex`. Un seul des deux chemins existe à la fois.
 % Si aucun ne répond, les marqueurs restent vides, l'état reste `brouillon` et le
-% document compose sans noms, mention de version de travail comprise.
+% document compose sans nom, mention de version de travail comprise.
 \IfFileExists{noms.tex}{%
   \input{noms.tex}%
 }{%

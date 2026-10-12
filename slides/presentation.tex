@@ -4,13 +4,13 @@
 % classe beamer et les polices Latin Modern sont présentes dans toute distribution
 % complète, sans dépendre d'une police du système.
 %
-% Les marqueurs sont ceux du rapport, lus dans son fichier unique. Les DEUX noms —
-% l'auteur et l'encadrant de stage — n'y sont pas écrits : ils viennent de
+% Les marqueurs sont ceux du rapport, lus dans son fichier unique. Le seul nom de
+% personne — celui de l'auteur — n'y est pas écrit : il vient de
 % `../report/noms.tex`, que le fichier des marqueurs charge s'il existe et qui
-% n'est jamais commis. Sans lui, la planche de titre compose sans noms.
+% n'est jamais commis. Sans lui, la planche de titre compose sans nom.
 %
-% Aucun texte fixe n'entoure un marqueur qui peut être vide : la ligne de
-% l'encadrant passe par `\siRenseigne` et disparaît avec sa valeur, comme sur la
+% Aucun texte fixe n'entoure un marqueur qui peut être vide : une ligne qui en
+% porte un passe par `\siRenseigne` et disparaît avec sa valeur, comme sur la
 % page de garde du rapport.
 %
 % AUCUN NOMBRE N'EST TAPÉ ICI. Chaque valeur vient du registre des chiffres, par son
@@ -94,7 +94,6 @@
   \begin{center}
     \small
     \begin{tabular}{rl}
-      \siRenseigne{\marqueurEncadrantProfessionnel}{Encadrant de stage & \marqueurEncadrantProfessionnel \\}
       Organisme d'accueil & \marqueurOrganismeAccueil \\
     \end{tabular}
   \end{center}
@@ -794,7 +793,6 @@
 
     \small
     \begin{tabular}{rl}
-      \siRenseigne{\marqueurEncadrantProfessionnel}{Encadrant de stage & \marqueurEncadrantProfessionnel \\}
       Organisme d'accueil & \marqueurOrganismeAccueil \\
     \end{tabular}
   \end{center}

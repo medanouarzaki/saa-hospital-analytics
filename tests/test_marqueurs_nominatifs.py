@@ -3,24 +3,24 @@
 C'est la seule propriété que le dépôt affirme sur le CONTENU du rapport. Un rapport dont la page de
 garde porte un nom manquant se découvre à l'impression.
 
-DEUX MARQUEURS, ET DEUX SEULEMENT. Le document est un rapport de stage d'application : il a un
-auteur et un encadrant de stage, chef du service. Il n'a pas d'encadrant académique, pas de
-président de jury, pas d'examinateur. Ces trois marqueurs-là ont existé et ont été RETIRÉS du
-fichier, non laissés vides — un marqueur vide est un oubli qui attend. Une propriété ci-dessous
-vérifie qu'aucun ne revient.
+UN MARQUEUR, ET UN SEUL. Le document ne porte qu'un nom de personne, celui de son auteur. Les
+autres marqueurs nominatifs ont existé et ont été RETIRÉS du fichier, non laissés vides — un
+marqueur vide est un oubli qui attend. Une propriété ci-dessous vérifie qu'aucun ne revient, et
+une autre qu'aucune mention de la fonction qu'ils portaient ne revient dans les sources du
+rapport, de la présentation ou de `.gitignore`.
 
 LA PROPRIÉTÉ EST PERMANENTE, ET CE CONTRÔLE NE CHANGERA PLUS. `report/marqueurs.tex` déclare
-l'état `brouillon` et ses deux marqueurs nominatifs vides — toujours. Le passage à la remise ne se
-fait pas en modifiant ce fichier : il se fait en déposant `report/noms.tex`, qui n'est jamais
-commis et qui redéfinit les deux noms ET l'état.
+l'état `brouillon` et son marqueur nominatif vide — toujours. Le passage à la remise ne se fait
+pas en modifiant ce fichier : il se fait en déposant `report/noms.tex`, qui n'est jamais commis et
+qui redéfinit le nom ET l'état.
 
 C'EST LA LEVÉE D'UNE CONTRADICTION, ET ELLE VAUT D'ÊTRE DITE. Ce contrôle exigeait auparavant,
-en état de remise, que le fichier commis porte les deux noms ; une autre règle du projet
-interdisait au dépôt de les porter. Les deux ne pouvaient pas être vraies ensemble, et la
-contradiction était consignée sans être tranchée. Elle l'est : l'état sort du dépôt avec les noms
-qu'il commande, et le fichier commis n'a plus qu'un seul état légitime.
+en état de remise, que le fichier commis porte le nom ; une autre règle du projet interdisait au
+dépôt de le porter. Les deux ne pouvaient pas être vraies ensemble, et la contradiction était
+consignée sans être tranchée. Elle l'est : l'état sort du dépôt avec le nom qu'il commande, et le
+fichier commis n'a plus qu'un seul état légitime.
 
-CE QU'IL NE PEUT PAS VOIR. Il ne voit rien de `noms.tex` — ni les noms, ni l'état qu'il pose. Un
+CE QU'IL NE PEUT PAS VOIR. Il ne voit rien de `noms.tex` — ni le nom, ni l'état qu'il pose. Un
 document composé avec un `noms.tex` mal formé se remettrait sans nom sans qu'aucun contrôle ne
 bronche. La seule chose qui l'établirait est la lecture du document composé, que le dépôt ne suit
 pas.
@@ -42,7 +42,10 @@ s'exécute sur un clone frais.
 
 from __future__ import annotations
 
+import ast
 import re
+import subprocess
+import unicodedata
 from pathlib import Path
 
 import pytest
@@ -53,17 +56,15 @@ MARQUEURS = RACINE / "report" / "marqueurs.tex"
 # Les marqueurs qui portent un nom de personne. Ce sont eux, et eux seuls, que la propriété exige
 # renseignés en état de remise : les marqueurs de contexte du même fichier — établissement, filière,
 # année, organisme d'accueil, date de soutenance — n'en portent aucun et ne sont pas de son ressort.
-NOMINATIFS = (
-    "marqueurAuteur",
-    "marqueurEncadrantProfessionnel",
-)
+NOMINATIFS = ("marqueurAuteur",)
 
-# Les trois marqueurs RETIRÉS. Le document n'a ni encadrant académique, ni jury nommé. Ils sont
+# Les marqueurs RETIRÉS. Le document ne porte qu'un nom de personne, celui de son auteur. Ils sont
 # énumérés ici pour qu'un retour, par copie d'un ancien fichier ou par réflexe, soit rouge et non
 # silencieux : un marqueur laissé vide sur une page de garde compose une ligne vide, et c'est
 # exactement ce que le retrait évite.
 RETIRES = (
     "marqueurEncadrantAcademique",
+    "marqueurEncadrantProfessionnel",
     "marqueurPresidentJury",
     "marqueurExaminateur",
 )
@@ -189,7 +190,7 @@ def test_le_fichier_des_marqueurs_existe_et_les_declare_tous() -> None:
     assert not absents, f"marqueurs nominatifs non déclarés dans {MARQUEURS.name} : {absents}"
 
 
-def test_les_trois_marqueurs_retires_ne_reviennent_pas() -> None:
+def test_les_marqueurs_retires_ne_reviennent_pas() -> None:
     """Ils sont RETIRÉS, pas laissés vides : une déclaration, même vide, est rouge.
 
     Le motif est celui du retrait lui-même. Un `\marqueurPresidentJury` déclaré vide fait
@@ -203,8 +204,7 @@ def test_les_trois_marqueurs_retires_ne_reviennent_pas() -> None:
     ]
     assert not revenus, (
         f"marqueurs retirés redéclarés dans {MARQUEURS.name} : {revenus}. "
-        "Le document est un rapport de stage d'application : il n'a ni encadrant académique, "
-        "ni président de jury, ni examinateur."
+        "Le document ne porte qu'un nom de personne, celui de son auteur."
     )
 
 
@@ -212,8 +212,8 @@ def desaccords(source: str) -> list[str]:
     """Ce qui, dans le fichier commis, contredit la propriété permanente.
 
     Deux façons de la contredire, et une seule branche pour chacune : l'état déclaré n'est pas
-    `brouillon` — absent, mal orthographié, ou porté à `remise` dans le fichier commis —, ou l'un
-    des deux marqueurs nominatifs y est renseigné.
+    `brouillon` — absent, mal orthographié, ou porté à `remise` dans le fichier commis —, ou un
+    marqueur nominatif y est renseigné.
     """
     etat = etat_declare(source)
     if etat is None:
@@ -230,8 +230,8 @@ def desaccords(source: str) -> list[str]:
     vides = marqueurs_vides(source, NOMINATIFS)
     nommes_vides = {ligne.split(" :")[0] for ligne in vides}
     return [
-        f"état « {BROUILLON} » : {nom} est renseigné, alors que le fichier commis les porte "
-        "tous deux vides"
+        f"état « {BROUILLON} » : {nom} est renseigné, alors que le fichier commis porte "
+        "chaque marqueur nominatif vide"
         for nom in NOMINATIFS
         if nom not in nommes_vides
     ]
@@ -289,8 +289,8 @@ def test_une_valeur_tierce_est_refusee() -> None:
 def test_l_etat_de_remise_est_refuse_dans_le_fichier_commis() -> None:
     """Le témoin qui porte l'arbitrage : la remise ne s'écrit pas ici.
 
-    Sans cette propriété, basculer le fichier commis à `remise` passerait, et les deux noms
-    devraient alors y être écrits — ce que le projet interdit par ailleurs. C'est la
+    Sans cette propriété, basculer le fichier commis à `remise` passerait, et le nom devrait
+    alors y être écrit — ce que le projet interdit par ailleurs. C'est la
     contradiction levée, et elle est éprouvée plutôt que déclarée.
     """
     source = "\\newcommand{\\" + ETAT + "}{remise}"
@@ -314,3 +314,155 @@ def test_les_marqueurs_nominatifs_s_accordent_avec_l_etat_declare() -> None:
     assert not ecarts, (
         f"les marqueurs de {MARQUEURS.name} contredisent l'état déclaré :\n" + "\n".join(ecarts)
     )
+
+
+# --- les variables de nom lues par l'intégration continue ---------------------------------------
+# Le nom entre au document par une variable `RAPPORT_*` que l'intégration continue lit dans un
+# secret ; le contrôle d'absence de nom cherche les valeurs des variables qu'il énumère. Si les
+# deux listes divergent, un nom peut être composé sans être cherché, ou cherché sans exister. La
+# propriété les égale DANS LES DEUX SENS.
+#
+# CE QUI EST LU, ET NON CE QUI EST CITÉ. Une ligne de commentaire du fichier de workflow qui nomme
+# une variable ne la lit pas : elle est écartée. La liste du contrôle est lue par analyse de sa
+# source, sans importer le module.
+
+CI = RACINE / ".github" / "workflows" / "ci.yml"
+CONTROLE_DES_NOMS = RACINE / "tests" / "test_aucun_nom_de_personne.py"
+
+# Le préfixe est ancré sur un caractère qui ne peut pas prolonger un identifiant : un nom comme
+# `PAS_RAPPORT_X` n'est pas une variable de nom.
+_VARIABLE_DE_NOM = re.compile(r"(?<![A-Za-z0-9_])RAPPORT_[A-Z0-9_]+")
+
+
+def variables_lues(texte_du_workflow: str) -> set[str]:
+    actives = "\n".join(
+        ligne for ligne in texte_du_workflow.splitlines() if not ligne.lstrip().startswith("#")
+    )
+    return set(_VARIABLE_DE_NOM.findall(actives))
+
+
+def variables_du_controle(source_python: str) -> set[str]:
+    for noeud in ast.walk(ast.parse(source_python)):
+        if isinstance(noeud, ast.Assign) and any(
+            isinstance(cible, ast.Name) and cible.id == "VARIABLES" for cible in noeud.targets
+        ):
+            return set(ast.literal_eval(noeud.value))
+    raise AssertionError("aucune affectation de VARIABLES dans le contrôle d'absence de nom")
+
+
+TEMOINS_DE_LECTURE = (
+    (
+        "secret lu dans un environnement",
+        "          X: ${{ secrets.RAPPORT_TEMOIN }}",
+        {"RAPPORT_TEMOIN"},
+    ),
+    (
+        "variable lue par le script",
+        '          if [ -z "$RAPPORT_TEMOIN" ]; then',
+        {"RAPPORT_TEMOIN"},
+    ),
+    ("commentaire qui la cite", "      # RAPPORT_TEMOIN est cité ici, non lu", set()),
+    ("identifiant qui la prolonge", "          PAS_RAPPORT_TEMOIN: 1", set()),
+)
+
+
+@pytest.mark.parametrize(("libelle", "texte", "attendu"), TEMOINS_DE_LECTURE)
+def test_le_motif_lit_les_variables_de_nom(libelle: str, texte: str, attendu: set[str]) -> None:
+    assert variables_lues(texte) == attendu, f"témoin « {libelle} »"
+
+
+def test_l_analyse_lit_la_liste_du_controle() -> None:
+    assert variables_du_controle('VARIABLES = ("RAPPORT_A", "RAPPORT_B")\n') == {
+        "RAPPORT_A",
+        "RAPPORT_B",
+    }
+
+
+def test_les_variables_de_nom_du_workflow_sont_celles_du_controle() -> None:
+    lues = variables_lues(CI.read_text(encoding="utf-8"))
+    cherchees = variables_du_controle(CONTROLE_DES_NOMS.read_text(encoding="utf-8"))
+    assert lues, "le workflow ne lit aucune variable de nom : la propriété ne prouverait rien"
+    assert lues == cherchees, (
+        f"lues par le workflow et non cherchées : {sorted(lues - cherchees)} ; "
+        f"cherchées et non lues : {sorted(cherchees - lues)}"
+    )
+
+
+# --- aucune mention d'un encadrement ------------------------------------------------------------
+# Le document ne porte qu'un nom, et la fonction que portait un second nom n'est mentionnée nulle
+# part : ni dans les sources du rapport et de la présentation, COMMENTAIRES COMPRIS, ni dans
+# `.gitignore`, qui décrit le fichier des noms. Les commentaires comptent : ils décrivent le
+# mécanisme, et un commentaire qui décrit deux noms prépare le retour du second.
+#
+# LA RECHERCHE EST UNE SOUS-CHAÎNE, BORNÉE À DROITE. Elle voit un identifiant qui porte le mot —
+# un `\marqueur...` réintroduit n'importe où — parce qu'une majuscule peut suivre. Elle ne voit
+# pas le mot suivi d'une minuscule, et c'est ce qui laisse passer « les valeurs encadrantes » d'un
+# texte d'interpolation. Le prix est écrit et exécuté par un témoin : le pluriel « encadrants » et
+# le féminin « encadrante » passent aussi.
+#
+# Le texte est ramené en forme composée et ses blancs réduits à une espace avant la recherche : un
+# accent décomposé ou un saut de ligne entre « encadré » et « par » ne fait pas passer la mention.
+
+EXTENSIONS_SOURCES = frozenset({".tex", ".bib", ".sty", ".cls"})
+_MENTION = re.compile(r"(?i:encadrant|encadrement|encadré[\s~]+par)(?![a-zß-öø-ÿ])")
+
+
+def sources_vivantes() -> list[str]:
+    sortie = subprocess.run(
+        ["git", "-C", str(RACINE), "ls-files", "-z", "--", "report", "slides", ".gitignore"],
+        capture_output=True,
+        check=True,
+        text=True,
+    ).stdout
+    chemins = [c for c in sortie.split("\0") if c]
+    return [c for c in chemins if c == ".gitignore" or Path(c).suffix in EXTENSIONS_SOURCES]
+
+
+def mentions(texte: str) -> list[str]:
+    normalise = re.sub(r"\s+", " ", unicodedata.normalize("NFC", texte))
+    return _MENTION.findall(normalise)
+
+
+TEMOINS_VUS = (
+    ("le mot seul", "Je remercie mon encadrant."),
+    ("en capitales", "ENCADRANT DE STAGE"),
+    ("le nom de la fonction", "l'encadrement du stage"),
+    ("l'intitulé de page de garde", "Encadré par"),
+    ("l'intitulé coupé par un saut de ligne", "Encadré\npar"),
+    ("l'intitulé à espace insécable LaTeX", "Encadré~par"),
+    ("accent décomposé", "Encadré par"),
+    ("en commentaire LaTeX", "% l'encadrant de stage"),
+    ("l'identifiant d'un marqueur", "\\newcommand{\\marqueurEncadrantProfessionnel}{}"),
+)
+
+TEMOINS_NON_VUS = (
+    ("un bloc encadré", "un bloc encadré"),
+    ("un filet", "encadrée d'un filet"),
+    ("une interpolation", "les valeurs encadrantes"),
+    ("voie ouverte : le pluriel", "les encadrants"),
+    ("voie ouverte : le féminin", "une encadrante"),
+)
+
+
+@pytest.mark.parametrize(("libelle", "texte"), TEMOINS_VUS)
+def test_le_motif_voit_chaque_forme_de_mention(libelle: str, texte: str) -> None:
+    assert mentions(texte), f"témoin « {libelle} » : la mention passe"
+
+
+@pytest.mark.parametrize(("libelle", "texte"), TEMOINS_NON_VUS)
+def test_le_motif_ne_crie_sur_aucune_forme_ecartee(libelle: str, texte: str) -> None:
+    assert not mentions(texte), f"témoin « {libelle} » : le motif crie"
+
+
+def test_aucune_mention_d_un_encadrement_dans_les_sources_vivantes() -> None:
+    chemins = sources_vivantes()
+    assert "report/marqueurs.tex" in chemins and "slides/presentation.tex" in chemins, (
+        "le balayage ne voit pas les sources qu'il doit couvrir"
+    )
+    assert ".gitignore" in chemins, "le balayage ne voit pas .gitignore"
+    fautifs = [
+        f"{chemin} : {len(trouvees)} mention(s)"
+        for chemin in chemins
+        if (trouvees := mentions((RACINE / chemin).read_text(encoding="utf-8")))
+    ]
+    assert not fautifs, "Mention d'un encadrement :\n" + "\n".join(fautifs)
