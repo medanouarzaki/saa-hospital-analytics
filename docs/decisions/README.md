@@ -111,3 +111,4 @@ chaque exécution.
 | [0095](0095-la-bascule-en-remise.md) | La bascule en remise, et ce que la relecture a vu |
 | [0096](0096-la-fermeture.md) | La fermeture : une propriété de contrôle corrigée, et deux phrases fausses |
 | [0097](0097-regenerable-n-est-pas-jetable.md) | Régénérable n'est pas jetable |
+| [0098](0098-un-seul-nom.md) | Un seul nom |
