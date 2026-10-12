@@ -1,16 +1,16 @@
-"""Aucun fichier suivi ne porte l'un des deux noms de personne du projet.
+"""Aucun fichier suivi ne porte le nom de personne du projet.
 
-Le rapport porte deux noms : l'auteur et l'encadrant de stage. Ils ne sont commis
-NULLE PART. `report/marqueurs.tex` déclare les deux marqueurs vides ; `report/noms.tex`
-les redéfinit à la compilation et n'est pas suivi ; l'intégration continue écrit ce
-fichier depuis deux variables de dépôt. Ce contrôle tient l'autre bout de la chaîne :
-que rien, dans l'arbre suivi, ne les écrive.
+Le rapport porte un seul nom : celui de l'auteur. Il n'est commis NULLE PART.
+`report/marqueurs.tex` déclare le marqueur vide ; `report/noms.tex` le redéfinit à la
+compilation et n'est pas suivi ; l'intégration continue écrit ce fichier depuis un secret
+de dépôt. Ce contrôle tient l'autre bout de la chaîne : que rien, dans l'arbre suivi, ne
+l'écrive.
 
-LE CONTRÔLE NE PORTE PAS LES NOMS QU'IL INTERDIT. Il les lit dans deux VARIABLES
-D'ENVIRONNEMENT, `RAPPORT_AUTEUR` et `RAPPORT_ENCADRANT`. Écrire les valeurs ici
-reviendrait à commettre exactement ce que le contrôle existe pour empêcher.
+LE CONTRÔLE NE PORTE PAS LE NOM QU'IL INTERDIT. Il le lit dans une VARIABLE
+D'ENVIRONNEMENT, `RAPPORT_AUTEUR`. Écrire la valeur ici reviendrait à commettre
+exactement ce que le contrôle existe pour empêcher.
 
-D'OÙ SON POINT AVEUGLE PRINCIPAL, DÉCLARÉ ET NON DÉCOUVERT : sans les variables, il ne
+D'OÙ SON POINT AVEUGLE PRINCIPAL, DÉCLARÉ ET NON DÉCOUVERT : sans la variable, il ne
 peut rien chercher. Il ne passe alors pas en silence — il SE DÉCLARE ABSTENU, par un
 `pytest.skip` dont le message dit ce qui manque. Un contrôle vert sans avoir rien
 regardé serait une assurance fausse ; un contrôle sauté apparaît dans la sortie de
@@ -25,7 +25,7 @@ cherché.
 POURQUOI LA PROPRIÉTÉ A CHANGÉ, ET POURQUOI L'ANCIENNE ÉTAIT FAUSSE. Ce contrôle
 cherchait auparavant chaque mot du nom PRIS ISOLÉMENT, dès quatre caractères. Cette
 propriété n'était pas seulement bruyante, elle était FAUSSE : un mot isolé n'identifie
-personne. Mesuré au moment de la corriger, sur les deux noms réels du projet, l'ancienne
+personne. Mesuré au moment de la corriger, sur les noms réels alors déclarés, l'ancienne
 propriété rougissait sur douze fichiers, et aucun ne portait de nom :
 
   - dix fois sur un prénom très répandu que le dépôt porte comme NOM D'UN AUTRE HÔPITAL
@@ -38,7 +38,7 @@ ignoré. La propriété corrigée cherche ce que le contrôle existe pour interd
 de personne écrit dans un fichier suivi.
 
 L'ÉLARGISSEMENT NE PASSE PAS PAR UN MÉCANISME NEUF. Le contrôle en porte déjà un,
-`EXCLUSIONS_PAR_VARIABLE`, qui écarte un fichier NOMMÉMENT et POUR UN SEUL DES DEUX NOMS.
+`EXCLUSIONS_PAR_VARIABLE`, qui écarte un fichier NOMMÉMENT et POUR UNE SEULE VARIABLE.
 Il sert au fichier de licence, et il continue de servir : mesuré, `LICENSE` porte bien le
 nom complet de l'auteur, et l'exclusion y est donc encore nécessaire — elle n'est pas
 décorative. Aucun autre fichier n'a eu besoin d'y être ajouté : la propriété corrigée rend
@@ -90,8 +90,8 @@ CE QUE LE CONTRÔLE NE PEUT PAS VOIR, ET QUI N'EST PAS UNE VOIE DE CONTOURNEMENT
 voit qu'un nom ÉCRIT. Une personne désignée sans être nommée — « l'auteur », une adresse
 électronique, une photographie, une signature manuscrite dans une image, un nom porté par
 les métadonnées d'un fichier binaire plutôt que par son texte — lui échappe entièrement.
-Il ne dit donc pas « personne n'est identifiable » : il dit « aucun des deux noms déclarés
-n'est écrit en toutes lettres dans un fichier suivi ».
+Il ne dit donc pas « personne n'est identifiable » : il dit « le nom déclaré n'est écrit en
+toutes lettres dans aucun fichier suivi ».
 
 Aucun accès à la base, aucune dépendance à un volume de données : ce fichier se collecte
 et s'exécute sur un clone frais.
@@ -109,9 +109,10 @@ import pytest
 
 RACINE = Path(__file__).resolve().parent.parent
 
-# Les deux variables d'environnement qui portent les noms à chercher. Elles portent les
-# mêmes noms que les variables de dépôt lues par le travail de composition.
-VARIABLES = ("RAPPORT_AUTEUR", "RAPPORT_ENCADRANT")
+# La variable d'environnement qui porte le nom à chercher. Elle porte le même nom que le
+# secret lu par le travail de composition ; `tests/test_marqueurs_nominatifs.py` vérifie que
+# les variables `RAPPORT_*` lues par le workflow sont exactement celles-ci.
+VARIABLES = ("RAPPORT_AUTEUR",)
 
 # Une suite d'au moins DEUX mots consécutifs du nom : c'est ce qui identifie une personne,
 # quand un mot isolé ne le fait pas.
@@ -131,9 +132,9 @@ FICHIERS_EXCLUS = frozenset({"tests/test_aucun_nom_de_personne.py"})
 # ligne de droit d'auteur, et c'est la fonction même d'une licence : elle nomme le titulaire des
 # droits. Le retirer viderait le fichier de son sens.
 #
-# L'exclusion est donc étroite. Elle vaut pour le nom de l'AUTEUR et pour lui seul ; le nom de
-# l'encadrant reste cherché dans `LICENSE` comme partout ailleurs, et l'y déposer est rouge. Une
-# exclusion générale du fichier aurait ouvert une porte pour les deux noms au lieu d'un.
+# L'exclusion est donc étroite. Elle vaut pour la variable de l'AUTEUR et pour elle seule ; toute
+# autre variable qui viendrait à être déclarée serait cherchée dans `LICENSE` comme partout
+# ailleurs. Une exclusion générale du fichier aurait ouvert une porte à tout nom futur.
 EXCLUSIONS_PAR_VARIABLE: dict[str, frozenset[str]] = {
     "RAPPORT_AUTEUR": frozenset({"LICENSE"}),
 }
@@ -199,7 +200,7 @@ def occurrences(par_variable: dict[str, list[str]], chemins: list[str]) -> list[
     """Les fichiers suivis qui portent une suite de mots du nom, variable par variable.
 
     Le balayage est fait PAR VARIABLE et non sur l'union des suites : c'est ce qui permet
-    d'exclure un fichier pour un nom sans l'exclure pour l'autre.
+    d'exclure un fichier pour une variable sans l'exclure pour une autre.
 
     LE MESSAGE NE RECOPIE PAS LA SUITE TROUVÉE, il en donne le nombre de mots. Recopier la
     suite ferait apparaître le nom dans la sortie du contrôle, donc au journal de
@@ -235,7 +236,7 @@ TEMOINS_VUS = (
     ("espaces multiples", "signé Zéphyrin    Casimir  Machinchouette"),
     ("saut de ligne entre deux mots", "signé Zéphyrin Casimir\nMachinchouette"),
     ("les deux premiers mots seulement", "signé Zéphyrin Casimir, 2026"),
-    ("les deux derniers mots seulement", "l'encadrant Casimir Machinchouette a relu"),
+    ("les deux derniers mots seulement", "le relecteur Casimir Machinchouette a relu"),
     ("suite du nom suivie d'un suffixe", "voir casimir machinchouettes.txt"),
     ("suite du nom précédée d'un préfixe", "signé parCasimir Machinchouette"),
 )
@@ -246,7 +247,7 @@ TEMOINS_VUS = (
 # précédente.
 
 TEMOINS_NON_VUS = (
-    ("aucun mot du nom", "signé un encadrant anonyme"),
+    ("aucun mot du nom", "signé un relecteur anonyme"),
     ("prose ordinaire du dépôt", "le tableau de bord porte neuf pages"),
     # LES QUATRE TÉMOINS QUI SUIVENT SONT LE CŒUR DE LA PROPRIÉTÉ CORRIGÉE. Chacun était VU
     # par la propriété précédente, et chacun devait cesser de l'être : aucun ne nomme
@@ -329,16 +330,17 @@ def test_l_exclusion_de_licence_ne_vaut_que_pour_l_auteur() -> None:
     """Le témoin de l'étroitesse de l'exclusion, et il porte l'arbitrage.
 
     `LICENSE` est écarté pour le nom de l'auteur, parce qu'une licence nomme le titulaire des
-    droits. Il ne l'est pour aucun autre : le nom de l'encadrant y est cherché comme partout.
+    droits. Il ne l'est pour aucune autre variable : un nom déclaré ailleurs y serait cherché
+    comme partout.
     """
     ecartes = EXCLUSIONS_PAR_VARIABLE.get("RAPPORT_AUTEUR", frozenset())
     assert "LICENSE" in ecartes, "l'exclusion de LICENSE pour l'auteur a disparu"
-    assert "LICENSE" not in EXCLUSIONS_PAR_VARIABLE.get("RAPPORT_ENCADRANT", frozenset()), (
-        "LICENSE serait écarté pour l'encadrant : l'exclusion cesserait d'être étroite"
+    assert set(EXCLUSIONS_PAR_VARIABLE) == {"RAPPORT_AUTEUR"}, (
+        "une exclusion existe pour une autre variable : l'exclusion cesserait d'être étroite"
     )
 
     temoin = ["LICENSE", "README.md"]
-    par_variable = {"RAPPORT_ENCADRANT": suites_a_chercher([TEMOIN_NOM])}
+    par_variable = {"RAPPORT_TEMOIN": suites_a_chercher([TEMOIN_NOM])}
     contenu_licence = lire("LICENSE")
     assert TEMOIN_NOM.split()[0].lower() not in contenu_licence, (
         "le nom d'essai figure dans LICENSE : ce témoin ne prouverait rien"
@@ -352,10 +354,10 @@ def test_aucun_nom_de_personne_dans_les_fichiers_suivis() -> None:
     noms = noms_declares()
     if not noms:
         pytest.skip(
-            "abstention déclarée : ni "
-            + " ni ".join(VARIABLES)
-            + " n'est renseignée. Ce contrôle ne porte pas les noms qu'il interdit ; "
-            "sans elles il ne peut rien chercher, et il le dit plutôt que de passer."
+            "abstention déclarée : "
+            + ", ".join(VARIABLES)
+            + " non renseignée. Ce contrôle ne porte pas le nom qu'il interdit ; "
+            "sans lui il ne peut rien chercher, et il le dit plutôt que de passer."
         )
     par_variable = {variable: suites_a_chercher([valeur]) for variable, valeur in noms.items()}
     fautifs = occurrences(par_variable, fichiers_suivis())
