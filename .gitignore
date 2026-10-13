@@ -37,6 +37,9 @@ rapport*.md
 *.log
 *.out
 *.toc
+# Les listes des figures et des tableaux, que la composition écrit depuis qu'elles existent.
+*.lof
+*.lot
 *.bbl
 *.blg
 *.bcf
