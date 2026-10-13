@@ -49,9 +49,12 @@ pas\releve{REL-DEM.P02}.
 
 Ces cinq profils ne sont pas cinq vues d'un même écran. Chacun ouvre un jeu de modules distinct, et
 les habilitations cloisonnent l'accès. Un seul a été ouvert au poste ; les quatre autres n'ont été
-relevés qu'à l'écran de démarrage.
+relevés qu'à l'écran de démarrage. Chacun porte un processus, établi par le relevé ou par la
+documentation (cf. tableau~\ref{tab:profils-applicatifs}).
 
-\begin{center}
+\begin{table}[htbp]
+\centering
+\caption{Les cinq profils applicatifs, le processus que chacun porte et ce qui l'établit}\label{tab:profils-applicatifs}
 \begin{tabular}{@{}p{4.3cm}p{4.0cm}p{2.9cm}p{2.9cm}@{}}
 \toprule
 Profil & Processus porté & Module & Établi par \\
@@ -67,11 +70,7 @@ Profil & Processus porté & Module & Établi par \\
 \texttt{MSM RAPPORTS ET STATISTIQUES} & production des indicateurs remontés à la statistique nationale & — \cite{s10} & documentation \\
 \bottomrule
 \end{tabular}
-\end{center}
-
-\begin{center}
-\footnotesize Les cinq profils, le processus que chacun porte et ce qui l'établit.
-\end{center}
+\end{table}
 
 \medskip
 
@@ -81,11 +80,13 @@ seul dont le contenu se déduise d'une source extérieure à l'éditeur, la nome
 indicateurs qu'un hôpital nommé remonte à la statistique nationale \cite{s10}.
 
 Le découpage en cinq profils et les missions que le règlement prescrit ne se recouvrent pas terme
-à terme, et le diagramme des cas d'utilisation ci-dessous le montre mieux qu'un tableau : quatre
+à terme, et le diagramme des cas d'utilisation le montre mieux qu'un tableau (voir
+figure~\ref{fig:cas-utilisation}) : quatre
 missions sur neuf reçoivent un profil, cinq n'en reçoivent aucun, et un profil ne répond à aucune
 mission de l'article~35.
 
-\begin{center}
+\begin{figure}[htbp]
+\centering
 \begin{tikzpicture}[node distance=3.4mm and 0mm]
 
 % --- les neuf missions de l'article 35, dans l'ordre du texte -------------------
@@ -120,18 +121,15 @@ mission de l'article~35.
 \pic at ($(p5)+(0,2.6mm)$) {acteurUML};
 \node[font=\scriptsize\ttfamily, align=center, anchor=north] (l5) at ($(p5)+(0,-2.4mm)$) {MSM - RECOUVREMENT};
 \end{tikzpicture}
-\end{center}
+\caption[Les missions du service et les profils applicatifs]{Les missions que le règlement intérieur prescrit au service \cite{s27}, et les profils applicatifs relevés à l'écran de démarrage\releve{REL-DEM.P02}}\label{fig:cas-utilisation}
+\end{figure}
 
-\begin{center}
-\footnotesize Les neuf missions que l'article~35 du règlement intérieur prescrit au service
-\cite{s27}, et les cinq profils applicatifs relevés à l'écran de démarrage\releve{REL-DEM.P02}.
 Chaque mission est reproduite dans les termes du texte, chaque profil sous son libellé exact. Un
 trait joint un profil à la mission qu'il porte. Les cinq missions sans trait ne sont pas un oubli
 du dessin : aucun des cinq profils ne les porte. Le profil de recouvrement est posé à l'écart, sans
 trait, parce que le recouvrement ne figure pas à l'article~35 — il relève de l'article~9,
 paragraphe~b, qui en charge le pôle des affaires administratives \cite{s27}. La figure ne montre
 ni les habilitations qui cloisonnent les profils, ni les modules que chacun ouvre.
-\end{center}
 
 \medskip
 
@@ -160,9 +158,11 @@ le relevé intégral, élément par élément, est reporté à l'annexe~\ref{ann
 \section{Ce que le service saisit}
 
 \textbf{L'établissement et sa tutelle.} L'écran de démarrage n'entre au modèle de données par aucun
-champ — il ne porte aucune donnée de dossier —, mais deux valeurs y comptent pour la suite.
+champ — il ne porte aucune donnée de dossier —, mais deux valeurs y comptent pour la suite (cf. tableau~\ref{tab:ecran-demarrage}).
 
-\begin{center}
+\begin{table}[htbp]
+\centering
+\caption{L'écran de démarrage : l'établissement et sa tutelle}\label{tab:ecran-demarrage}
 \begin{tabular}{@{}p{2.6cm}p{4.4cm}p{7.4cm}@{}}
 \toprule
 Identifiant & Libellé à l'écran & Valeur observée \\
@@ -171,7 +171,7 @@ Identifiant & Libellé à l'écran & Valeur observée \\
 \texttt{REL-DEM.I02} & Ministère de tutelle & \texttt{Ministère de la Santé} \\
 \bottomrule
 \end{tabular}
-\end{center}
+\end{table}
 
 \medskip
 
@@ -181,9 +181,11 @@ confirment : le système code ses références et affiche le code avec son libel
 
 \textbf{L'identifiant du patient, et la façon dont on le retrouve.} C'est par cet écran qu'un agent
 retrouve un dossier avant toute opération. Quatre de ses éléments portent le diagnostic que le
-chapitre~\ref{chap:qualite} reprend.
+chapitre~\ref{chap:qualite} reprend (cf. tableau~\ref{tab:ecran-recherche}).
 
-\begin{center}
+\begin{table}[htbp]
+\centering
+\caption{La recherche d'identifiant patient : les éléments relevés}\label{tab:ecran-recherche}
 \begin{tabular}{@{}p{2.6cm}p{4.6cm}p{7.2cm}@{}}
 \toprule
 Identifiant & Libellé à l'écran & Bloc \\
@@ -195,7 +197,7 @@ Identifiant & Libellé à l'écran & Bloc \\
 \texttt{REL-IPP.R12} & Probabilité & colonne de résultat \\
 \bottomrule
 \end{tabular}
-\end{center}
+\end{table}
 
 \medskip
 
@@ -218,10 +220,12 @@ approximation en années. Un écran qui offre de chercher à l'âge approché es
 des dossiers dont la date de naissance est incertaine ou absente.
 
 \textbf{L'identité du patient.} La fiche patient est l'écran le plus dense du périmètre observé, et
-c'est de lui que vient la plus grande part des colonnes du modèle. L'extrait ci-dessous retient
-celles dont le rapport se sert explicitement plus loin.
+c'est de lui que vient la plus grande part des colonnes du modèle. Un extrait retient
+celles dont le rapport se sert explicitement plus loin (cf. tableau~\ref{tab:fiche-patient}).
 
-\begin{center}
+\begin{table}[htbp]
+\centering
+\caption{La fiche patient : les éléments dont le rapport se sert}\label{tab:fiche-patient}
 \begin{tabular}{@{}p{2.6cm}p{4.2cm}p{7.6cm}@{}}
 \toprule
 Identifiant & Libellé à l'écran & Ce que la suite en fait \\
@@ -242,7 +246,7 @@ Identifiant & Libellé à l'écran & Ce que la suite en fait \\
 \texttt{REL-PAT.N02} & Nom. Mère & champ de rapprochement \\
 \bottomrule
 \end{tabular}
-\end{center}
+\end{table}
 
 \medskip
 
@@ -259,9 +263,11 @@ dans le dossier.
 
 \textbf{Le rendez-vous.} C'est le seul processus observé de bout en bout. Les éléments qui
 identifient le patient y sont rappelés de la fiche et le modèle ne les enregistre pas deux fois ;
-ceux du rendez-vous lui-même sont les suivants.
+ceux du rendez-vous lui-même sont relevés à part (cf. tableau~\ref{tab:ecran-rendez-vous}).
 
-\begin{center}
+\begin{table}[htbp]
+\centering
+\caption{L'écran de prise de rendez-vous : les éléments propres au rendez-vous}\label{tab:ecran-rendez-vous}
 \begin{tabular}{@{}p{2.6cm}p{4.2cm}p{7.6cm}@{}}
 \toprule
 Identifiant & Libellé à l'écran & Ce que la suite en fait \\
@@ -277,7 +283,7 @@ Identifiant & Libellé à l'écran & Ce que la suite en fait \\
 \texttt{REL-RDV.C08} & Date annul. & date d'annulation \\
 \bottomrule
 \end{tabular}
-\end{center}
+\end{table}
 
 \medskip
 

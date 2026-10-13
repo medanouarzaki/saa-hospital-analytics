@@ -63,10 +63,12 @@ c'est un défaut réel du service que le rapport de la Cour des comptes document
 modèle admet donc l'épisode sans facture, et le chapitre~\ref{chap:activite} en fait un indicateur
 plutôt qu'un cas d'erreur.
 
-Ces trois traits se lisent d'un coup sur le diagramme de classes ci-dessous, et les cardinalités y
-disent ce que la prose met trois paragraphes à dire.
+Ces trois traits se lisent d'un coup sur le diagramme de classes (voir
+figure~\ref{fig:diagramme-classes}), et les cardinalités y disent ce que la prose met trois
+paragraphes à dire.
 
-\begin{center}
+\begin{figure}[htbp]
+\centering
 \begin{tikzpicture}[node distance=13mm and 16mm]
 
 \node[classeUML] (per) {\textbf{Personne}\nodepart{two}\emph{aucune clé au\\système d'origine}};
@@ -99,27 +101,28 @@ disent ce que la prose met trois paragraphes à dire.
 \draw[assocUML] (ipp.north east) -- node[cardUML,below right,pos=0.14] {1}
   node[cardUML,above left,pos=0.94] {0..*} (rdv.west);
 \end{tikzpicture}
-\end{center}
+\caption{Les entités du domaine et leurs cardinalités}\label{fig:diagramme-classes}
+\end{figure}
 
-\begin{center}
-\footnotesize Les neuf entités du domaine et leurs cardinalités. La chaîne de gauche porte la
-distinction que trois documents de travail de ce projet ont confondue : une personne reçoit un ou
-plusieurs identifiants, et un identifiant porte une ou plusieurs versions de fiche — trois
-grandeurs, non deux. Le rendez-vous se rattache à l'identifiant et non à l'épisode, et son lien à
-l'épisode est facultatif des deux côtés : c'est ce qui rend l'absence mesurable. La facture est
-facultative sur l'épisode. Les classes ne portent que leurs attributs principaux, jamais les
-colonnes de la couche source au complet ; la figure ne montre ni les tables de la couche produite,
-ni les clés étrangères, ni les tables de la quarantaine.
-\end{center}
+La chaîne de gauche porte la distinction que trois documents de travail de ce projet ont
+confondue : une personne reçoit un ou plusieurs identifiants, et un identifiant porte une ou
+plusieurs versions de fiche — trois grandeurs, non deux. Le rendez-vous se rattache à l'identifiant
+et non à l'épisode, et son lien à l'épisode est facultatif des deux côtés : c'est ce qui rend
+l'absence mesurable. La facture est facultative sur l'épisode. Les classes ne portent que leurs
+attributs principaux, jamais les colonnes de la couche source au complet ; la figure ne montre ni
+les tables de la couche produite, ni les clés étrangères, ni les tables de la quarantaine.
 
 \medskip
 
 \section{Modèle logique de la couche source}
 
 La couche source compte \chiffre{source-tables} tables, une par flux extractible du système
-d'information, et \chiffre{source-lignes-total} lignes au total sur la période.
+d'information, et \chiffre{source-lignes-total} lignes au total sur la période (cf.
+tableau~\ref{tab:tables-source}).
 
-\begin{center}
+\begin{table}[htbp]
+\centering
+\caption{Les tables de la couche source, leur grain et leur volume sur la période}\label{tab:tables-source}
 \begin{tabular}{@{}p{3.7cm}p{5.9cm}r@{}}
 \toprule
 Table & Grain — une ligne par & Lignes \\
@@ -139,11 +142,10 @@ Table & Grain — une ligne par & Lignes \\
 \textbf{Total} & & \textbf{\chiffre{source-lignes-total}} \\
 \bottomrule
 \end{tabular}
-\end{center}
+\end{table}
 
-\begin{center}
-\footnotesize Les onze tables de la couche source, leur grain et leur volume sur la période.
-\end{center}
+Chaque table y est donnée avec son grain — ce qu'une de ses lignes représente — et le nombre de
+lignes qu'elle porte sur la période.
 
 \medskip
 
@@ -175,8 +177,9 @@ attrapés, et leur décompte est une mesure de ces contrôles.
 
 \section{Correspondance champ par champ avec les écrans}
 
-Chaque colonne de la couche source est rattachée à ce qui l'établit. Le tableau ci-dessous donne la
-correspondance pour deux tables ; l'annexe la porte pour les onze.
+Chaque colonne de la couche source est rattachée à ce qui l'établit. La correspondance est donnée
+ici pour deux tables (cf. tableau~\ref{tab:correspondance-champs}) ; le dictionnaire complet la
+porte pour les onze, et l'annexe~\ref{annexe:dictionnaire} en donne la synthèse.
 
 % CE TABLEAU EST SÉCABLE, ET C'EST LA RELECTURE QUI L'A IMPOSÉ. En `tabular`, il partait d'un seul
 % bloc à la page suivante dès qu'il ne tenait pas sur la fin de la page courante, et laissait les
@@ -189,6 +192,7 @@ correspondance pour deux tables ; l'annexe la porte pour les onze.
 % Deux corrections successives à l'estime sont restées insuffisantes avant que la largeur ne soit
 % relevée au rendu à 300 points par pouce. La somme des cinq colonnes vaut 12,9 cm.
 \begin{longtable}{@{}p{2.6cm}p{4.3cm}p{1.0cm}p{2.1cm}p{2.9cm}@{}}
+\caption[Correspondance entre libellé d'écran, colonne et preuve d'observation]{Correspondance entre libellé d'écran, colonne et preuve d'observation, pour deux tables}\label{tab:correspondance-champs}\\
 \toprule
 Libellé relevé & Colonne & Type & Provenance & Preuve \\
 \midrule
@@ -228,11 +232,8 @@ Date annul. & \texttt{date\_annulation} & texte & \texttt{OBS} & \texttt{REL-RDV
 \bottomrule
 \end{longtable}
 
-\begin{center}
-\footnotesize Correspondance entre libellé d'écran, colonne et preuve d'observation, pour deux
-tables. La colonne « Preuve » porte l'identifiant du relevé, celui-là même que le registre des
-champs référence.
-\end{center}
+La colonne « Preuve » porte l'identifiant du relevé, celui-là même que le registre des champs
+référence.
 
 \medskip
 
@@ -249,9 +250,12 @@ dérivent mécaniquement : la définition de schéma, les fichiers de propriét�
 transformation, le dictionnaire lisible et sa synthèse en annexe. Le registre porte
 \chiffre{colonnes-source-registre} entrées, et le catalogue de la base en compte exactement autant :
 \chiffre{colonnes-source-catalogue} colonnes au schéma source. La correspondance est vérifiée dans
-les deux sens par un contrôle bloquant.
+les deux sens par un contrôle bloquant, et le décompte par étiquette se lit des deux côtés (cf.
+tableau~\ref{tab:provenance-colonnes}).
 
-\begin{center}
+\begin{table}[htbp]
+\centering
+\caption{Provenance des colonnes de la couche source, comptée au registre et au catalogue de la base}\label{tab:provenance-colonnes}
 \begin{tabular}{@{}p{2.2cm}rrp{6.4cm}@{}}
 \toprule
 Étiquette & Registre & Catalogue & Ce qu'elle signifie \\
@@ -263,12 +267,10 @@ les deux sens par un contrôle bloquant.
 \textbf{Total} & \textbf{\chiffre{colonnes-source-registre}} & \textbf{\chiffre{colonnes-source-catalogue}} & \\
 \bottomrule
 \end{tabular}
-\end{center}
+\end{table}
 
-\begin{center}
-\footnotesize Provenance des colonnes de la couche source, comptée des deux côtés : dans le registre
-qui les déclare, et dans le catalogue de la base qui les porte.
-\end{center}
+Chaque étiquette y est comptée deux fois — au registre qui déclare la colonne, au catalogue de la
+base qui la porte — et accompagnée de ce qu'elle signifie.
 
 \medskip
 
@@ -281,9 +283,11 @@ propriétés de la couche de transformation.
 
 \textbf{Une asymétrie mérite d'être montrée.} Les colonnes décrivent la \emph{structure} du jeu de données ; les paramètres du
 générateur en produisent les \emph{valeurs}. Les deux portent les mêmes trois étiquettes, et leurs
-distributions n'ont rien à voir.
+distributions n'ont rien à voir (cf. tableau~\ref{tab:structure-et-valeurs}).
 
-\begin{center}
+\begin{table}[htbp]
+\centering
+\caption{Provenance de la structure et provenance des valeurs, côte à côte}\label{tab:structure-et-valeurs}
 \begin{tabular}{@{}p{2.2cm}rrrr@{}}
 \toprule
 Étiquette & \multicolumn{2}{c}{Colonnes (structure)} & \multicolumn{2}{c}{Paramètres (valeurs)} \\
@@ -295,12 +299,10 @@ distributions n'ont rien à voir.
 \textbf{Total} & \textbf{\chiffre{colonnes-source-registre}} & & \textbf{\chiffre{parametres-total}} & \\
 \bottomrule
 \end{tabular}
-\end{center}
+\end{table}
 
-\begin{center}
-\footnotesize Provenance de la structure et provenance des valeurs, côte à côte. Les paramètres sont
-répartis sur \chiffre{parametres-fichiers} fichiers de configuration.
-\end{center}
+Les paramètres y sont comptés sur les \chiffre{parametres-fichiers} fichiers de configuration
+qui les portent.
 
 \medskip
 
@@ -398,13 +400,15 @@ présentés partout comme relevant d'une hypothèse.
 \section{Distributions et leurs sources}
 
 Les valeurs que le générateur tire suivent des distributions, et chacune est rattachée à ce qui
-l'établit. Le tableau distingue ce qui vient d'une source documentaire de ce qui est posé.
+l'établit. Le tableau des distributions distingue ce qui vient d'une source documentaire de ce qui
+est posé (cf. tableau~\ref{tab:distributions}).
 
 % SÉCABLE POUR LA MÊME RAISON QUE LE TABLEAU DE LA SECTION 4.3 : rendu insécable, il partait d'un
 % bloc et laissait une demi-page blanche en plein chapitre. Le premier remède avait déplacé le
 % blanc de la page 28 à la page 32 plutôt que de le supprimer ; la relecture image par image l'a
 % montré, et c'est pourquoi les deux tableaux sont traités ensemble.
 \begin{longtable}{@{}p{4.6cm}p{4.4cm}p{1.7cm}p{2.6cm}@{}}
+\caption[Les distributions du générateur]{Les distributions du générateur et l'étiquette de provenance de chacune}\label{tab:distributions}\\
 \toprule
 Distribution & Valeur ou forme & Étiquette & Ce qui l'étaye \\
 \midrule
@@ -424,10 +428,6 @@ Part du niveau de tri 5 & \chiffre{part-tri-niveau-5} & \texttt{DOC} & échelle 
 Séjours provenant des urgences & \chiffre{part-sejours-depuis-urgences} & \texttt{HYP} & convention posée \\
 \bottomrule
 \end{longtable}
-
-\begin{center}
-\footnotesize Distributions du générateur, avec l'étiquette de provenance de chacune.
-\end{center}
 
 \medskip
 

@@ -11,7 +11,7 @@
 % LA PLACE EST RÉSERVÉE MAINTENANT ET REMPLIE PLUS TARD. Chaque commande teste
 % l'existence du fichier attendu. S'il existe, elle l'inclut. S'il n'existe pas,
 % elle compose un cadre de la MÊME hauteur ou de la même largeur déclarée, portant
-% la légende et la mention « à insérer ». Le document compose donc à tous les
+% le nom du fichier attendu et la mention « à insérer ». Le document compose donc à tous les
 % stades, et la pagination ne bouge presque pas à l'insertion — c'est tout
 % l'intérêt du mécanisme, et une commande qui composerait un cadre d'une autre
 % taille que l'image finale l'annulerait.
@@ -179,7 +179,11 @@
 % ------------------------------------------------------------------------------
 % Une capture du tableau de bord produit par ce projet.
 %
-%   \captureTdb{fichier}{largeur}{légende}{label}
+%   \captureTdb{fichier}{largeur}
+%
+% La commande ne compose QUE L'IMAGE, dans sa boîte réservée. Le titre, le numéro
+% et l'étiquette sont ceux de l'environnement `figure` du chapitre qui l'appelle,
+% par `\caption` et `\label`, comme pour toute autre figure du rapport.
 %
 % `fichier` est le nom seul, sans répertoire ni extension : la commande le cherche
 % sous `figures/tableau-de-bord/`, en `.png` puis en `.pdf`. Écrire le répertoire à
@@ -216,18 +220,11 @@
 \declarerCapture{page-donnees}{0.50680}%   1714/3382
 \declarerCapture{page-sejours}{0.50918}%   1720/3378
 
-% La numérotation. Le rapport ne porte aujourd'hui aucun environnement flottant et
-% aucune `\caption` ; un `\label` posé sans compteur renverrait à la section
-% courante, ce qui ferait mentir tout `\ref`. Un compteur propre est donc déclaré,
-% et `\refstepcounter` en fait la cible du `\label` qui suit.
-\newcounter{capturetdb}
-\renewcommand{\thecapturetdb}{\arabic{capturetdb}}
-
-\newcommand{\legendeCapture}[2]{%
-  \begin{center}%
-    \footnotesize Figure~\thecapturetdb~— #1\label{#2}%
-  \end{center}%
-}
+% La numérotation n'est pas ici. Chaque capture est posée dans un environnement
+% `figure` du chapitre, qui porte son `\caption` et son `\label` : elle est numérotée
+% par le compteur de la classe, avec toutes les figures du rapport, et paraît dans
+% leur liste. Un compteur propre, qui composait « Figure n » à la main, numérotait
+% les captures à part des autres figures ; il est retiré.
 
 % L'IMAGE EST POSÉE DANS LA BOÎTE RÉSERVÉE, ET NON À CÔTÉ. La boîte a la hauteur
 % déclarée pour ce fichier ; l'image y entre bornée en largeur ET en hauteur, à
@@ -235,32 +232,23 @@
 % déborderait donc pas de la réservation : il y laisserait un peu de blanc. C'est
 % ce qui rend la pagination indépendante de la présence du fichier, au lieu de la
 % faire dépendre d'une supposition écrite ailleurs.
-% LA CAPTURE ET SA LÉGENDE NE SE SÉPARENT PAS. Elles étaient deux blocs successifs, qu'une
-% coupure de page pouvait disjoindre : la capture de la page « Données » finissait une page et
-% « Figure 2 — La page Données… » ouvrait la suivante, orpheline de l'image qu'elle nommait. Le
-% `minipage` en fait un bloc unique, insécable par construction. Il peut laisser du blanc en bas
-% d'une page quand l'ensemble n'y tient plus ; c'est le prix, et il est moindre.
-\newcommand{\captureTdb}[4]{%
-  \refstepcounter{capturetdb}%
+% LA CAPTURE ET SON TITRE NE SE SÉPARENT PAS : l'environnement `figure` qui les
+% porte est insécable, comme l'était le bloc qui les réunissait auparavant.
+\newcommand{\captureTdb}[2]{%
   \setlength{\largeurEmplacement}{#2}%
   \edef\facteurDeLaCapture{\rapportDeLaCapture{#1}}%
   \setlength{\hauteurEmplacement}{\facteurDeLaCapture\largeurEmplacement}%
-  \par\noindent\begin{minipage}{\linewidth}%
-  \begin{center}%
-    \IfFileExists{figures/tableau-de-bord/#1.png}{%
+  \IfFileExists{figures/tableau-de-bord/#1.png}{%
+    \parbox[b][\hauteurEmplacement][c]{\largeurEmplacement}{\centering%
+      \includegraphics[width=\largeurEmplacement,height=\hauteurEmplacement,keepaspectratio]{figures/tableau-de-bord/#1.png}}%
+  }{%
+    \IfFileExists{figures/tableau-de-bord/#1.pdf}{%
       \parbox[b][\hauteurEmplacement][c]{\largeurEmplacement}{\centering%
-        \includegraphics[width=\largeurEmplacement,height=\hauteurEmplacement,keepaspectratio]{figures/tableau-de-bord/#1.png}}%
+        \includegraphics[width=\largeurEmplacement,height=\hauteurEmplacement,keepaspectratio]{figures/tableau-de-bord/#1.pdf}}%
     }{%
-      \IfFileExists{figures/tableau-de-bord/#1.pdf}{%
-        \parbox[b][\hauteurEmplacement][c]{\largeurEmplacement}{\centering%
-          \includegraphics[width=\largeurEmplacement,height=\hauteurEmplacement,keepaspectratio]{figures/tableau-de-bord/#1.pdf}}%
-      }{%
-        \cadreDAttente{\largeurEmplacement}{\hauteurEmplacement}{#3\\capture à insérer}%
-      }%
+      \cadreDAttente{\largeurEmplacement}{\hauteurEmplacement}{#1\\capture à insérer}%
     }%
-  \end{center}%
-  \legendeCapture{#3}{#4}%
-  \end{minipage}\par%
+  }%
 }
 
 % ------------------------------------------------------------------------------
