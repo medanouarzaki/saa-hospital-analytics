@@ -22,6 +22,16 @@
 \usepackage[english,french]{babel}
 \usepackage{csquotes}
 
+% Les noms des objets et de leurs listes. babel-french compose « Table » pour un tableau et
+% « Table des figures » pour la liste des figures, alors que la prose appelle « tableau » et que
+% l'autre liste s'intitule « Liste des tableaux ». Les noms sont redéfinis par le moyen que la
+% documentation de babel-french donne pour ses traductions (`\addto\captionsfrench`).
+\addto\captionsfrench{%
+  \def\tablename{Tableau}%
+  \def\listfigurename{Liste des figures}%
+  \def\listtablename{Liste des tableaux}%
+}
+
 \usepackage[a4paper,margin=2.5cm]{geometry}
 \usepackage{microtype}
 
@@ -39,6 +49,20 @@
 \setlength{\parindent}{0pt}
 \usepackage{longtable}
 \usepackage{booktabs}
+
+% UNE SEULE FORME DE LÉGENDE, pour les figures, les tableaux et les longtables. Sans réglage, une
+% longtable composait son titre « Table 4.2: » sur une largeur réduite, les autres « Table 4.1 – »
+% sur toute la largeur, et un titre posé au-dessus d'un tableau touchait son filet supérieur.
+% `caption` uniformise le séparateur, la largeur et le corps, et pose un espace entre un titre
+% placé au-dessus et le tableau qui le suit. Il appartient à `collection-latexrecommended`, comme
+% `booktabs`.
+\usepackage{caption}
+\captionsetup{labelsep=endash, skip=6pt}
+\captionsetup[table]{position=top}
+% La largeur d'un titre de longtable se règle par `caption`, évaluée au moment de composer :
+% `\setlength{\LTcapwidth}{\linewidth}` posé ici prendrait la largeur du texte d'AVANT `geometry`
+% — 390 pt mesurés sur un document témoin, au lieu de la largeur de la page.
+\captionsetup[longtable]{width=\linewidth}
 \usepackage{fancyhdr}
 
 % L'inclusion d'images. Le paquet appartient à l'ensemble `graphics`, requis par
@@ -200,8 +224,17 @@
 \input{liminaires/resume}
 
 \tableofcontents
+% Les trois listes entrent à la table des matières, comme les remerciements, le résumé et
+% l'abstract. L'entrée est posée après le saut de page qui ouvre la liste, pour porter sa page.
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{\listfigurename}
 \listoffigures
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{\listtablename}
 \listoftables
+\input{liminaires/abreviations}
 
 \cleardoublepage
 \pagenumbering{arabic}
