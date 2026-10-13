@@ -100,8 +100,11 @@ _DECLARATION = re.compile(r"^\s*%\s*(DOC|OBS|HYP)\s*:\s*(.*)$")
 _NON_EMPLOYEE = re.compile(r"^\s*%\s*NON-EMPLOYEE\s*:\s*(\S+)\s*—\s*(.+)$")
 
 # La commande de citation, et elle seule : le mot « cite » doit être suivi immédiatement de
-# l'accolade ouvrante, sans quoi \citeauthor et ses variantes seraient prises pour elle.
-_CITE = re.compile(r"\\cite\{([^}]*)\}")
+# l'accolade ouvrante ou de ses arguments optionnels, sans quoi \citeauthor et ses variantes
+# seraient prises pour elle. biblatex admet jusqu'à deux arguments optionnels, `\cite[p.~46]{…}`
+# et `\cite[voir][p.~46]{…}` : une localisation dans la source s'y écrit, et un motif qui ne les
+# lirait pas tiendrait pour non citée une source citée seulement avec sa page.
+_CITE = re.compile(r"\\cite(?:\[[^\]]*\]){0,2}\{([^}]*)\}")
 _RELEVE = re.compile(r"\\releve\{([^}]*)\}")
 _CONVENTION = re.compile(r"\\convention\{([^}]*)\}")
 _A_REDIGER = re.compile(r"\\aRediger\{([^}]*)\}")
@@ -263,6 +266,8 @@ TEMOINS_POSITIFS = (
     ("citation multiple espacée", r"texte \cite{ s01 , s29 } suite", {"s01", "s29"}),
     ("deux citations séparées", r"\cite{s05} et \cite{s20}", {"s05", "s20"}),
     ("citation en fin de ligne", r"fin de phrase \cite{s12}", {"s12"}),
+    ("localisation en argument optionnel", r"le recueil \cite[tableau~32]{s30}", {"s30"}),
+    ("deux arguments optionnels", r"\cite[voir][p.~46]{s30}", {"s30"}),
 )
 
 TEMOINS_NEGATIFS = (
@@ -272,6 +277,7 @@ TEMOINS_NEGATIFS = (
     ("clé préfixe d'une autre", r"\cite{s301}", {"s301"}),
     ("la chaîne hors de toute commande de citation", r"la clé s30 est mentionnée", set()),
     ("commande homographe", r"\citeauthor{s30}", set()),
+    ("commande préfixée par cite, à argument optionnel", r"\citetitle[p.~1]{s30}", set()),
 )
 
 

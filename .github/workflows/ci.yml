@@ -128,6 +128,11 @@ jobs:
       # typographique, plutôt que dans le travail qui compile.
       - run: uv run pytest tests/test_annonce_du_plan.py -v
 
+      # Les abréviations : registre, liste produite, et développé à la première occurrence dans la
+      # prose. Le contrôle lit le registre, le générateur et les sources du rapport, et n'ouvre
+      # aucune base.
+      - run: uv run pytest tests/test_abreviations.py -v
+
   tests-matrice:
     runs-on: ubuntu-latest
     strategy:
