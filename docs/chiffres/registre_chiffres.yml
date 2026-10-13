@@ -2382,7 +2382,7 @@ chiffres:
     exceptée. Le critère est ASYMÉTRIQUE : un échec d'échange, lui, est journalisé et relançable. La
     commande est la constante elle-même, faute d'artefact qui la porte ailleurs.
 - id: chapitres-numerotes
-  valeur: 9
+  valeur: 10
   unite: chapitres
   type: python
   commande: 'len([n for n in __import__(''re'').findall(r''\\input\{chapitres/([a-z0-9-]+)\}'', (R/''report/rapport.tex'').read_text(encoding=''utf-8'')) if __import__(''re'').search(r''\\chapter\{'', (R/''report/chapitres''/(n+''.tex'')).read_text(encoding=''utf-8''))])'
@@ -2391,7 +2391,7 @@ chiffres:
     Chapitres numérotés du rapport, comptés dans l'ordre des inclusions du fichier principal. Un
     chapitre non numéroté — l'introduction, la conclusion — n'y entre pas.
 - id: sections-du-rapport
-  valeur: 51
+  valeur: 52
   unite: sections
   type: python
   commande: 'sum(len([l for l in c.read_text(encoding=''utf-8'').splitlines() if l.startswith(''\\section{'')]) for c in sorted((R/''report/chapitres'').glob(''*.tex'')))'
