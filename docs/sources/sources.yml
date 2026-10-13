@@ -597,3 +597,25 @@
   fiabilite: secondaire
   verification: non_verifiable_par_outil
   utilise_pour: "Graphiques composés depuis les fichiers de données du registre des chiffres."
+
+- id: S-51
+  titre: "Edge Metrics — Splink"
+  auteur: "Ministry of Justice Analytical Services, Royaume-Uni"
+  type: documentation technique
+  url: https://moj-analytical-services.github.io/splink/topic_guides/evaluation/edge_metrics.html
+  date_publication: non_datee
+  date_consultation: "2026-10-13"
+  fiabilite: secondaire
+  verification: contenu_lu
+  utilise_pour: "Définition de la précision, du rappel et de la F-mesure d'un rapprochement, rapportés à une vérité terrain."
+
+- id: S-52
+  titre: "Fact Table Structure"
+  auteur: "Kimball Group"
+  type: documentation technique
+  url: https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/kimball-techniques/dimensional-modeling-techniques/fact-table-structure/
+  date_publication: non_datee
+  date_consultation: "2026-10-13"
+  fiabilite: secondaire
+  verification: contenu_lu
+  utilise_pour: "Définition d'une table de faits : une ligne par événement mesuré, avec ses mesures et ses clés de dimension."
