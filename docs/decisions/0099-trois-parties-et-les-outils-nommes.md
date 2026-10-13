@@ -46,9 +46,11 @@ de renvoi au nouveau chapitre.
 ### La désignation fonctionnelle de l'`0088` est remplacée
 
 L'`0088` faisait porter à chaque brique de la figure de la pile technique la désignation
-fonctionnelle que le chapitre de cadrage lui donnait. Cette désignation est remplacée, au motif
-de la consigne K11–K12 : les outils sont désormais nommés, avec leur référence ; la légende de la
-figure renvoie au chapitre qui les nomme. L'absence de logotype d'éditeur est maintenue.
+fonctionnelle que le chapitre de cadrage lui donnait. Cette désignation est remplacée, au motif de
+la consigne du référentiel de la filière, qui demande « pour chaque outil : brève description,
+comment il est utilisé dans l'application, motivation de son choix » et d'« utiliser des
+références bibliographiques » : les outils sont désormais nommés, avec leur référence ; la légende
+de la figure renvoie au chapitre qui les nomme. L'absence de logotype d'éditeur est maintenue.
 
 ### Les renvois passent par une étiquette
 

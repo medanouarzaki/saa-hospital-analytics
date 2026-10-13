@@ -57,9 +57,12 @@ provenance a été bâti.
 
 Une observation et une reconstruction n'ont pas la même valeur, et les confondre reviendrait à
 présenter comme vu ce qui a été déduit. Chaque colonne du modèle de données porte donc une
-étiquette de provenance, et l'exigence de preuve diffère par étiquette.
+étiquette de provenance, et l'exigence de preuve diffère par étiquette (cf.
+tableau~\ref{tab:etiquettes-provenance}).
 
-\begin{center}
+\begin{table}[htbp]
+\centering
+\caption[Les étiquettes de provenance et leur exigence de preuve]{Les étiquettes de provenance et leur exigence de preuve, sur les \chiffre{colonnes-source-registre} colonnes de la couche source}\label{tab:etiquettes-provenance}
 \begin{tabular}{@{}p{1.9cm}p{4.9cm}p{1.6cm}p{5.3cm}@{}}
 \toprule
 Étiquette & Sens & Colonnes & Ce que la preuve doit être \\
@@ -71,12 +74,7 @@ présenter comme vu ce qui a été déduit. Chaque colonne du modèle de donnée
 \texttt{HYP} & champ posé sans preuve externe & \chiffre{colonnes-source-hyp} & la mention explicite qu'aucune preuve n'existe \\
 \bottomrule
 \end{tabular}
-\end{center}
-
-\begin{center}
-\footnotesize Les trois étiquettes de provenance et leur exigence de preuve, sur les
-\chiffre{colonnes-source-registre} colonnes de la couche source.
-\end{center}
+\end{table}
 
 \medskip
 
@@ -88,15 +86,17 @@ Le même dispositif s'étend à la prose de ce rapport. Chaque affirmation y rel
 mêmes catégories, chaque chapitre déclare en tête ce sur quoi il repose, et un contrôle vérifie que
 la déclaration coïncide avec ce que le fichier porte.
 
-Aucune image du système d'information n'entre dans ce rapport, et le motif tient en une phrase :
-les écrans d'un dossier patient en production affichent des identifiants de session, des libellés
-de compte et la structure des dossiers d'un établissement réel, et le dépôt de ce projet est
-public.
+Aucune image du système d'information observé n'entre dans ce rapport, et le motif tient en une
+phrase : les écrans d'un dossier patient en production affichent des identifiants de session, des
+libellés de compte et la structure des dossiers d'un établissement réel, et le dépôt de ce projet
+est public. L'interdiction ne vise que ce système. Le tableau de bord est le travail de ce projet,
+bâti sur des données engendrées : il se montre, et le chapitre~\ref{chap:tableau-de-bord} en
+compose des captures.
 
 Ce que les images auraient montré, le relevé de champs le porte sous une forme plus exploitable :
 quatre écrans, cent quarante-trois éléments, chacun avec son identifiant, son libellé exact, son
-type apparent et sa valeur observée le cas échéant. Deux schémas d'écran redessinés restituent
-l'agencement des blocs, sans aucun contenu.
+type apparent et sa valeur observée le cas échéant. Le chapitre~\ref{chap:systeme} en reprend, en
+tableaux, les éléments dont la suite se sert.
 
 \section{La contrainte de confidentialité et la décision de générer}
 
@@ -179,9 +179,12 @@ chapitre~\ref{chap:outils}.
 
 \section{Organisation du projet en phases}
 
-Le projet se découpe en sept phases, nommées par ce qu'elles font\releve{organisation-en-phases}.
+Le projet se découpe en sept phases, nommées par ce qu'elles font\releve{organisation-en-phases}
+(cf. tableau~\ref{tab:phases}).
 
-\begin{center}
+\begin{table}[htbp]
+\centering
+\caption{Les phases du projet, leur objectif et leur livrable}\label{tab:phases}
 \begin{tabular}{@{}p{4.6cm}p{4.6cm}p{4.6cm}@{}}
 \toprule
 Phase & Objectif & Ce qu'elle produit \\
@@ -201,17 +204,17 @@ Restituer & rendre les indicateurs lisibles par le service & le tableau de bord 
 Rédiger & rendre compte du travail et de ses limites & le présent rapport \\
 \bottomrule
 \end{tabular}
-\end{center}
+\end{table}
 
-\begin{center}
-\footnotesize Les sept phases, leur objectif et leur livrable.
-\end{center}
+Chaque phase y est nommée par ce qu'elle fait, et le livrable dit ce qui en atteste
+l'achèvement.
 
 \medskip
 
-Leurs dépendances comptent davantage que leur ordre, et la figure ci-dessous les restitue.
+Leurs dépendances comptent davantage que leur ordre (voir figure~\ref{fig:dependances-phases}).
 
-\begin{center}
+\begin{figure}[htbp]
+\centering
 \begin{tabular}{@{}c@{}}
 \fbox{\begin{minipage}{0.92\linewidth}
 \centering\small
@@ -238,12 +241,11 @@ $\downarrow$\\[3pt]
 \fbox{\begin{minipage}{0.62\linewidth}\centering Rédiger\end{minipage}}
 \end{minipage}}
 \end{tabular}
-\end{center}
+\caption{Les dépendances entre les phases du projet}\label{fig:dependances-phases}
+\end{figure}
 
-\begin{center}
-\footnotesize Dépendances entre phases. Aucun calendrier : une flèche dit qu'une phase exige la
-précédente, non qu'elle la suit dans le temps.
-\end{center}
+Le dessin ne porte aucun calendrier : une flèche dit qu'une phase exige la précédente, non
+qu'elle la suit dans le temps.
 
 \medskip
 

@@ -46,9 +46,10 @@ La période couverte va du \chiffre{periode-debut} au \chiffre{periode-fin}, soi
 Le fait de passage réunit \chiffre{flux-passages-total} lignes (§\ref{sec:sensibilite}), dont
 \chiffre{flux-programme-total} relèvent de l'activité programmée — consultation externe et
 hospitalisation — et le reste des urgences. La séparation se lit sur le code de type de passage, jamais sur son libellé, qu'aucune source ne
-documente.
+documente. Les deux flux se suivent mois par mois (voir figure~\ref{fig:passages-mois}).
 
-\begin{center}
+\begin{figure}[htbp]
+\centering
 \begin{tikzpicture}
 \begin{axis}[
   width=12cm, height=5.4cm,
@@ -71,11 +72,8 @@ documente.
 \addlegendentry{activité programmée}
 \end{axis}
 \end{tikzpicture}
-\end{center}
-
-\begin{center}
-\footnotesize Passages par mois, sur les trente mois de la période.
-\end{center}
+\caption{Passages par mois, sur les trente mois de la période}\label{fig:passages-mois}
+\end{figure}
 
 \conclusion{C-01} \textbf{Les deux flux ne se ressemblent pas dans le temps.} Celui des urgences
 est plat d'un bout à l'autre — le service accueille \chiffre{flux-urgences-moyenne} passages par
@@ -87,7 +85,10 @@ mécaniquement plus basse d'un cinquième, sans qu'aucune activité ait changé.
 ne vient d'aucune relation injectée ; elle est un effet des paramètres de volumétrie et n'établit
 rien sur le service.}
 
-\begin{center}
+Leur profil horaire est tout autre (voir figure~\ref{fig:passages-heure}).
+
+\begin{figure}[htbp]
+\centering
 \begin{tikzpicture}
 \begin{axis}[
   width=12cm, height=5cm, ybar, bar width=3.4pt,
@@ -108,11 +109,8 @@ rien sur le service.}
 \addlegendentry{activité programmée}
 \end{axis}
 \end{tikzpicture}
-\end{center}
-
-\begin{center}
-\footnotesize Passages par heure d'entrée, cumulés sur la période entière.
-\end{center}
+\caption{Passages par heure d'entrée, cumulés sur la période entière}\label{fig:passages-heure}
+\end{figure}
 
 \conclusion{C-02} \textbf{L'activité programmée tient dans une amplitude d'ouverture, les urgences
 non.} La première culmine à \chiffre{flux-heure-pointe} heures, avec
@@ -168,9 +166,11 @@ pas : leurs \chiffre{honores-sans-fiche-en-quarantaine} fiches sont en quarantai
 population de \chiffre{honores-avec-fiche}, \chiffre{artefact-nombre} rendez-vous portent un délai
 égal à la marge disponible, soit \chiffre{artefact-part}~\%, et \chiffre{complement-nombre} ne le
 portent pas. \textbf{Toute relation qui met en jeu le délai est donc donnée deux fois dans ce
-chapitre} — sur l'ensemble et sur le seul complément.
+chapitre} — sur l'ensemble et sur le seul complément, à commencer par la répartition cumulée du
+délai (voir figure~\ref{fig:delai-repartition}).
 
-\begin{center}
+\begin{figure}[htbp]
+\centering
 \begin{tikzpicture}
 \begin{axis}[
   width=11cm, height=5.2cm,
@@ -193,12 +193,11 @@ chapitre} — sur l'ensemble et sur le seul complément.
 \addlegendentry{complément}
 \end{axis}
 \end{tikzpicture}
-\end{center}
+\caption{Répartition cumulée du délai d'obtention, sur les deux parts de la partition}\label{fig:delai-repartition}
+\end{figure}
 
-\begin{center}
-\footnotesize Répartition cumulée du délai d'obtention sur les deux parts de la partition.
-Dénominateurs distincts : \chiffre{artefact-nombre} et \chiffre{complement-nombre}.
-\end{center}
+Les deux courbes ont des dénominateurs distincts : \chiffre{artefact-nombre} et
+\chiffre{complement-nombre}.
 
 \conclusion{C-06} \textbf{Les deux courbes se superposent presque.} La médiane vaut
 \chiffre{delai-mediane-ensemble} jours sur l'ensemble et \chiffre{delai-mediane-complement} sur le
@@ -207,7 +206,12 @@ c'est ce qui rend les médianes de ce chapitre utilisables malgré lui. \emph{Ce
 vient d'aucune relation injectée ; elle est un effet du mécanisme de plafonnement, et n'établit
 rien sur le service.}
 
-\begin{center}
+Le délai se lit aussi par activité, sur les deux populations (cf.
+tableau~\ref{tab:delai-activite}).
+
+\begin{table}[htbp]
+\centering
+\caption{Délai d'obtention par activité, sur les rendez-vous honorés à délai strictement positif}\label{tab:delai-activite}
 \footnotesize
 \pgfplotstabletypeset[
   col sep=comma,
@@ -223,16 +227,13 @@ rien sur le service.}
   every head row/.style={before row=\toprule, after row=\midrule},
   every last row/.style={after row=\bottomrule},
 ]{\serie{delais-par-activite}}
-\end{center}
+\end{table}
 
-\begin{center}
-\footnotesize Délai d'obtention par activité, en jours, sur les rendez-vous honorés à délai
-strictement positif. Les trois premières colonnes portent l'ensemble, les trois dernières le seul
-complément de l'artefact. Les codes d'activité renvoient à la nomenclature nationale des
+Les délais y sont en jours. Les trois premières colonnes portent l'ensemble, les trois dernières le
+seul complément de l'artefact. Les codes d'activité renvoient à la nomenclature nationale des
 spécialités médicales \cite{s30} : 4 cardiologie, 11 dermatologie, 14 gynéco-obstétrique,
 20 médecine générale, 21 médecine interne, 28 ophtalmologie, 29 oto-rhino-laryngologie,
 30 pédiatrie.
-\end{center}
 
 \conclusion{C-07} \textbf{Le classement des activités par délai est stable d'une sous-population à
 l'autre}, et l'écart entre les deux médianes ne dépasse jamais un jour sur aucune activité. Le
@@ -276,7 +277,11 @@ que parce que le premier, mesuré par la même requête, n'est pas nul. \emph{Ce
 pas une relation injectée — R-16 le dit explicitement : elle relève du modèle de données, et c'est
 donc l'une des rares conclusions de ce chapitre que la chaîne établit vraiment.}
 
-\begin{center}
+Par activité, la part des absences se lit en regard du délai médian d'obtention (voir
+figure~\ref{fig:delai-absenteisme}).
+
+\begin{figure}[htbp]
+\centering
 \begin{tikzpicture}
 \begin{axis}[
   width=11cm, height=5.4cm,
@@ -298,13 +303,12 @@ donc l'une des rares conclusions de ce chapitre que la chaîne établit vraiment
 \addlegendentry{complément}
 \end{axis}
 \end{tikzpicture}
-\end{center}
+\caption{Part des absences et délai médian d'obtention, par activité}\label{fig:delai-absenteisme}
+\end{figure}
 
-\begin{center}
-\footnotesize Une activité par point. La part des absences du complément a un autre dénominateur
-que celle de l'ensemble — les honorés d'artefact en sont retirés, les absences non — et son niveau
+Chaque point y est une activité. La part des absences du complément a un autre dénominateur que
+celle de l'ensemble — les honorés d'artefact en sont retirés, les absences non — et son niveau
 n'est donc pas comparable ; seule la pente des deux nuages l'est.
-\end{center}
 
 \conclusion{C-11} \textbf{La relation entre délai et absentéisme change de signe selon la forme
 qu'on lui donne, et c'est le résultat central de ce chapitre.} Trois formes, sur la même population
@@ -347,12 +351,17 @@ tout ce qui suit sous une autre calibration.
 
 \conclusion{C-13} \textbf{Le profil horaire des urgences est un renflement diurne, pas un pic.} La
 pointe est à \chiffre{urgences-heure-pointe} heures, le creux à \chiffre{urgences-heure-creux}, et
-le rapport de l'un à l'autre vaut \chiffre{urgences-rapport-pointe-creux}. Le graphique de la
-première section le montre en regard de l'activité programmée, dont le rapport correspondant est
+le rapport de l'un à l'autre vaut \chiffre{urgences-rapport-pointe-creux}. Le graphique des passages par
+heure (voir figure~\ref{fig:passages-heure}) le montre en regard de l'activité programmée, dont le rapport correspondant est
 infini : \chiffre{flux-heures-vides-programme} heures y portent zéro passage. \emph{Reproduit R-04, dont la seconde moitié pose
 vingt-quatre poids horaires strictement positifs pour ce flux.}
 
-\begin{center}
+Les passages et le délai avant prise en charge se ventilent par niveau de tri (cf.
+tableau~\ref{tab:urgences-tri}).
+
+\begin{table}[htbp]
+\centering
+\caption{Passages et délai avant prise en charge médicale, par niveau de tri}\label{tab:urgences-tri}
 \footnotesize
 \pgfplotstabletypeset[
   col sep=comma,
@@ -365,14 +374,11 @@ vingt-quatre poids horaires strictement positifs pour ce flux.}
   every head row/.style={before row=\toprule, after row=\midrule},
   every last row/.style={after row=\bottomrule},
 ]{\serie{urgences-par-niveau}}
-\end{center}
+\end{table}
 
-\begin{center}
-\footnotesize Passages et délai avant prise en charge médicale, par niveau de tri. Les cinq codes
-s'affichent nus : la source qui décrit la nomenclature ne distingue que trois groupes de gravité
-\cite{s12} là où les données en portent cinq, et la correspondance d'un code à un groupe n'est donc
-pas établie.
-\end{center}
+Les cinq codes s'y affichent nus : la source qui décrit la nomenclature ne distingue que trois
+groupes de gravité \cite{s12} là où les données en portent cinq, et la correspondance d'un code à
+un groupe n'est donc pas établie.
 
 \conclusion{C-14} \textbf{La pyramide de gravité est régulière et le délai croît avec le numéro du
 niveau.} Les cibles de délai que la calibration retient, adossées à l'échelle de tri publiée
@@ -409,7 +415,11 @@ le nombre mesuré ici.}
 
 \section{La facturation et le recouvrement}
 
-\begin{center}
+Le montant facturé se ventile par type d'épisode (cf. tableau~\ref{tab:montants-episode}).
+
+\begin{table}[htbp]
+\centering
+\caption{Montants facturés par type d'épisode, en dirhams}\label{tab:montants-episode}
 \footnotesize
 \pgfplotstabletypeset[
   col sep=comma,
@@ -423,13 +433,10 @@ le nombre mesuré ici.}
   every head row/.style={before row=\toprule, after row=\midrule},
   every last row/.style={after row=\bottomrule},
 ]{\serie{facturation-par-type}}
-\end{center}
+\end{table}
 
-\begin{center}
-\footnotesize Montants facturés par type d'épisode, en dirhams. Les trois codes s'affichent nus :
-la taxonomie réglementaire des modes d'utilisation de l'hôpital est établie sans être énumérée
-\cite{s27}.
-\end{center}
+Les trois codes s'y affichent nus : la taxonomie réglementaire des modes d'utilisation de
+l'hôpital est établie sans être énumérée \cite{s27}.
 
 \conclusion{C-17} \textbf{Le montant facturé ne suit pas le volume.} Le type d'épisode le moins
 nombreux porte la majorité du montant, et le plus nombreux un quart. Sur
@@ -451,7 +458,11 @@ sur des populations différentes, et la seconde vaut près de quatre fois la pre
 taux de facturation et de recouvrement par type d'épisode sont imposés, et toute priorisation des
 relances qui s'en déduirait serait circulaire.}
 
-\begin{center}
+L'ancienneté des créances non soldées pèse sur le restant dû (voir
+figure~\ref{fig:anciennete-creances}).
+
+\begin{figure}[htbp]
+\centering
 \begin{tikzpicture}
 \begin{axis}[
   width=11cm, height=4.8cm,
@@ -464,12 +475,11 @@ relances qui s'en déduirait serait circulaire.}
   {\serie{anciennete-creances}};
 \end{axis}
 \end{tikzpicture}
-\end{center}
+\caption{Part du montant restant dû selon l'ancienneté des créances}\label{fig:anciennete-creances}
+\end{figure}
 
-\begin{center}
-\footnotesize Part du montant restant dû portée par des créances plus anciennes que l'abscisse.
-Dénominateur : le montant restant des seules créances non soldées.
-\end{center}
+La courbe donne, pour chaque ancienneté, la part du montant restant dû portée par des créances plus
+anciennes. Dénominateur : le montant restant des seules créances non soldées.
 
 \conclusion{C-19} \textbf{Le restant dû est vieux.} Sur \chiffre{recouvrement-montant-restant}
 dirhams restant à recouvrer, \chiffre{creances-part-au-dela-un-an}~\% sont portés par des créances
@@ -480,7 +490,11 @@ l'ancienneté des créances.}
 
 \section{La qualité du fichier patient}
 
-\begin{center}
+Le taux de renseignement des colonnes incomplètes se lit rang par rang (voir
+figure~\ref{fig:completude-colonnes}).
+
+\begin{figure}[htbp]
+\centering
 \begin{tikzpicture}
 \begin{axis}[
   width=11cm, height=4.8cm,
@@ -494,12 +508,10 @@ l'ancienneté des créances.}
   {\serie{completude-champs}};
 \end{axis}
 \end{tikzpicture}
-\end{center}
+\caption{Taux de renseignement des colonnes incomplètes, par complétude croissante}\label{fig:completude-colonnes}
+\end{figure}
 
-\begin{center}
-\footnotesize Les seules colonnes incomplètes, rangées par complétude croissante. L'abscisse est un
-rang, non un identifiant de colonne.
-\end{center}
+L'abscisse y est un rang, non un identifiant de colonne.
 
 \conclusion{C-20} \textbf{L'incomplétude se concentre.} Sur \chiffre{qualite-colonnes} colonnes des
 couches aval, \chiffre{qualite-colonnes-incompletes} sont incomplètes et
@@ -508,7 +520,12 @@ ce qui signifie qu'un petit nombre de colonnes concentre presque tout le défaut
 \emph{Reproduit R-15 : le classement des champs par complétude est imposé, et une recommandation de
 saisie obligatoire fondée sur ce classement serait circulaire.}
 
-\begin{center}
+Table par table, la complétude et la quarantaine se lisent ensemble (cf.
+tableau~\ref{tab:qualite-par-table}).
+
+\begin{table}[htbp]
+\centering
+\caption{Complétude et quarantaine par table de la couche intermédiaire}\label{tab:qualite-par-table}
 \footnotesize
 % L'espacement entre colonnes est resserré POUR CE TABLEAU SEUL, et la mesure dit de combien : à
 % 6 pt, l'intitulé abrégé laissait encore 0,33 cm de débordement ; à 4 pt, les six colonnes
@@ -537,12 +554,10 @@ saisie obligatoire fondée sur ce classement serait circulaire.}
   every head row/.style={before row=\toprule, after row=\midrule},
   every last row/.style={after row=\bottomrule},
 ]{\serie{qualite-par-table}}
-\end{center}
+\end{table}
 
-\begin{center}
-\footnotesize Complétude et quarantaine par table de la couche intermédiaire. La colonne
-« Complétude min. » porte la complétude minimale observée sur les colonnes de la table.
-\end{center}
+La colonne « Complétude min. » y porte la complétude minimale observée sur les colonnes de la
+table.
 
 \conclusion{C-21} \textbf{La quarantaine est marginale et concentrée sur deux tables.} Sur
 \chiffre{qualite-lignes-examinees} lignes examinées, \chiffre{quarantaine-lignes-total-analyse}
@@ -567,7 +582,7 @@ précédent l'est contre cette distribution injectée.}
 \section*{Ce que le chapitre reproduit, et ce qu'il n'établit pas}
 \addcontentsline{toc}{section}{Ce que le chapitre reproduit, et ce qu'il n'établit pas}
 
-Chacune des conclusions ci-dessus porte un identifiant, et le jeu de données porte des relations
+Chacune des conclusions de ce chapitre porte un identifiant, et le jeu de données porte des relations
 injectées qui portent le leur. L'annexe~\ref{annexe:correspondance} met les deux en regard, dans
 les deux sens : toute relation injectée y est reprise par une conclusion ou déclarée non reprise
 avec son motif, et toute conclusion y renvoie à une relation ou est déclarée comme n'en venant pas.

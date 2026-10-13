@@ -14,10 +14,10 @@
 
 \chapter{Le tableau de bord}\label{chap:tableau-de-bord}
 
-\textbf{Ce chapitre ne porte aucune capture d'écran.} Les figures qui suivent sont des maquettes
-redessinées et des graphiques composés. Une capture lisible d'une page dense n'existerait pas à la
-taille dont ce chapitre dispose, et une reconstitution composée se relit dans une comparaison de
-versions, ce qu'une image ne fait pas.
+\textbf{Ce chapitre montre le tableau de bord.} Il est le travail de ce projet, bâti sur des
+données engendrées, et trois de ses pages y sont reproduites par capture d'écran. Ses autres
+figures et ses tableaux sont composés depuis les séries du registre des chiffres, et se relisent
+dans une comparaison de versions.
 
 \section{Conception et ergonomie}
 
@@ -69,16 +69,23 @@ responsable se demander si la seconde section le concerne.
 
 Le tableau de bord compte \chiffre{tdb-pages} pages, dont \chiffre{tdb-pages-pilotage} en pilotage
 et \chiffre{tdb-pages-methode} en méthode, portant \chiffre{tdb-indicateurs} indicateurs et
-\chiffre{tdb-graphiques} tracés. Toutes partagent le même agencement.
+\chiffre{tdb-graphiques} tracés (cf. tableau~\ref{tab:pages-tdb}). Toutes partagent le même
+agencement.
 
-La capture ci-dessous en montre l'agencement rempli, sur la page ouverte par défaut : barre
+Une capture en montre l'agencement rempli, sur la page ouverte par défaut (voir
+figure~\ref{fig:tdb-activite}) : barre
 latérale à deux sections, titre et état de l'instantané, filtre de période, puis un bloc par
 indicateur portant son libellé, sa définition, sa filtrabilité et la source de sa valeur.
 
-\captureTdb{page-activite}{0.92\linewidth}{La page \emph{Activité}, première de la section de
-pilotage : le volume d'événements par jour, ventilé par famille}{fig:tdb-activite}
+\begin{figure}[htbp]
+\centering
+\captureTdb{page-activite}{0.92\linewidth}
+\caption[La page Activité du tableau de bord]{La page \emph{Activité}, première de la section de pilotage : le volume d'événements par jour, ventilé par famille}\label{fig:tdb-activite}
+\end{figure}
 
-\begin{center}
+\begin{table}[htbp]
+\centering
+\caption[Les pages du tableau de bord]{Les pages du tableau de bord, dans l'ordre du registre des indicateurs}\label{tab:pages-tdb}
 \footnotesize
 \pgfplotstabletypeset[
   col sep=comma,
@@ -94,12 +101,10 @@ pilotage : le volume d'événements par jour, ventilé par famille}{fig:tdb-acti
   every head row/.style={before row=\toprule, after row=\midrule},
   every last row/.style={after row=\bottomrule},
 ]{\serie{tableau-de-bord-par-page}}
-\end{center}
+\end{table}
 
-\begin{center}
-\footnotesize Les pages, dans l'ordre du registre des indicateurs, avec leur section, le nombre
-d'indicateurs qu'elles portent et le nombre de tracés que leur fichier appelle.
-\end{center}
+Chaque page y porte sa section, le nombre d'indicateurs qu'elle affiche et le nombre de tracés que
+son fichier appelle.
 
 \textbf{Section de pilotage : chaque page sert une décision.} \emph{Activité} dimensionne les
 plages d'ouverture et les effectifs. \emph{Rendez-vous} ouvre ou ferme des créneaux, et sépare
@@ -124,7 +129,11 @@ construction, et aucune décision de service ne peut s'y adosser. \textbf{Aucun 
 n'est classé en pilotage}, et cette absence n'est pas un hasard de rédaction : elle est une
 conséquence de la règle, vérifiée par un contrôle.
 
-\begin{center}
+Ces pages lisent un instantané, dont les objets se rangent par effectif (voir
+figure~\ref{fig:objets-instantane}).
+
+\begin{figure}[htbp]
+\centering
 \begin{tikzpicture}
 \begin{axis}[
   width=11cm, height=4.6cm, ymode=log,
@@ -138,12 +147,11 @@ conséquence de la règle, vérifiée par un contrôle.
   {\serie{instantane-objets}};
 \end{axis}
 \end{tikzpicture}
-\end{center}
+\caption{Les objets que le tableau de bord lit, par effectif}\label{fig:objets-instantane}
+\end{figure}
 
-\begin{center}
-\footnotesize Les \chiffre{instantane-objets-copies} objets que le tableau de bord lit, par
-effectif. L'abscisse est un rang, non un nom d'objet.
-\end{center}
+La figure range les \chiffre{instantane-objets-copies} objets par effectif ; l'abscisse est un
+rang, non un nom d'objet.
 
 \textbf{Ce que les pages lisent tient en \chiffre{instantane-tables} tables}, dont
 \chiffre{instantane-objets-copies} copies et deux tables de service portant l'état et les
@@ -170,14 +178,18 @@ lequel des trois motifs s'applique.
 
 \textbf{Filtrer.} Le filtre de période est porté par la page et non par l'application : une page
 dont aucun indicateur n'est filtrable n'en affiche pas, et le dit. La page des données porte en
-outre des filtres de service et d'activité, et un sélecteur de table.
+outre des filtres de service et d'activité, et un sélecteur de table (voir
+figure~\ref{fig:tdb-donnees}).
 
 \textbf{Exporter.} La page des données télécharge la sélection courante en un fichier tabulaire, au
 format des livrables de la chaîne : séparateur virgule, encodage universel avec marque d'ordre
 d'octets, pour qu'un tableur ouvrant le fichier par double-clic n'abîme pas les accents.
 
-\captureTdb{page-donnees}{0.92\linewidth}{La page \emph{Données} : les trois filtres, le sélecteur
-de table, le décompte des lignes retenues et le bouton de téléchargement}{fig:tdb-donnees}
+\begin{figure}[htbp]
+\centering
+\captureTdb{page-donnees}{0.92\linewidth}
+\caption[La page Données du tableau de bord]{La page \emph{Données} : les trois filtres, le sélecteur de table, le décompte des lignes retenues et le bouton de téléchargement}\label{fig:tdb-donnees}
+\end{figure}
 
 \textbf{Le paragraphe qui manque à la plupart des rapports de ce genre.} Un indicateur
 réglementaire affiché a été faux, et longtemps. Le taux de rotation valait
@@ -210,9 +222,12 @@ Le logiciel observé porte un profil applicatif dédié aux rapports et aux
 statistiques\releve{REL-DEM.P05}. Ce que ce profil doit produire n'est pas défini par le règlement
 intérieur : la liste se lit dans la nomenclature nationale \cite{s30}, dont un inventaire exhaustif
 établit que quatre tableaux seulement descendent à l'établissement nommé. Ces quatre donnent la
-liste exacte des indicateurs attendus, et c'est elle qui justifie le contenu du tableau de bord.
+liste exacte des indicateurs attendus, et c'est elle qui justifie le contenu du tableau de bord (cf.
+tableau~\ref{tab:exigences-restitution}).
 
-\begin{center}
+\begin{table}[htbp]
+\centering
+\caption[Les rubriques attendues par la nomenclature nationale]{Les rubriques que la nomenclature nationale attend d'un établissement nommé, et l'état de chacune}\label{tab:exigences-restitution}
 \footnotesize
 \pgfplotstabletypeset[
   col sep=tab, string type,
@@ -222,18 +237,21 @@ liste exacte des indicateurs attendus, et c'est elle qui justifie le contenu du 
   every head row/.style={before row=\toprule, after row=\midrule},
   every last row/.style={after row=\bottomrule},
 ]{\serie{exigences-restitution}}
-\end{center}
+\end{table}
 
-\begin{center}
-\footnotesize Les \chiffre{exigences-rubriques} rubriques que la nomenclature nationale attend d'un
-établissement nommé, et l'état de chacune. Les tables mobilisées et le champ manquant de chaque
-rubrique non calculable figurent au registre des indicateurs.
-\end{center}
+Les rubriques y sont au nombre de \chiffre{exigences-rubriques}. Les tables mobilisées et le champ
+manquant de chaque rubrique non calculable figurent au registre des indicateurs.
 
 \medskip
 
-\captureTdb{page-sejours}{0.92\linewidth}{La page \emph{Séjours} : les quatre indicateurs
-réglementaires annualisés, chacun affichant la source de sa valeur}{fig:tdb-sejours}
+La page des séjours affiche les quatre indicateurs réglementaires annualisés, chacun avec la source
+de sa valeur (voir figure~\ref{fig:tdb-sejours}).
+
+\begin{figure}[htbp]
+\centering
+\captureTdb{page-sejours}{0.92\linewidth}
+\caption[La page Séjours du tableau de bord]{La page \emph{Séjours} : les indicateurs réglementaires annualisés, chacun affichant la source de sa valeur}\label{fig:tdb-sejours}
+\end{figure}
 
 \textbf{Une distinction compte plus que les autres} : \emph{non calculable faute de champ} désigne
 un manque du système d'information et fonde une recommandation ; \emph{sans objet pour ce site}

@@ -6,6 +6,10 @@
 %   SER: (aucune)
 %   SECTIONS: 2
 
+% La colonne Outil est composée en drapeau à gauche : justifiée sur sa largeur étroite, elle
+% coupait « Apache Air-flow » et « Docker Com-pose ». En drapeau, chaque nom d'outil tient sur sa
+% ligne et n'a plus à être coupé.
+%
 % Chaque ligne des deux tableaux porte exactement une commande de citation, vers la documentation
 % officielle de l'outil qu'elle nomme ; un contrôle le vérifie. Le motif d'un choix porte
 % l'étiquette `decision-…` quand un enregistrement de décision du projet l'a consigné, et
@@ -24,10 +28,15 @@ consigné ce motif, il en est repris ; sinon, il est déclaré comme un choix po
 
 La chaîne va du fichier déposé à l'écran du tableau de bord. Chaque étape a son outil, et le motif de
 chaque choix est la propriété que le travail doit démontrer, ou la contrainte qu'il ne faut pas
-violer.
+violer (cf. tableau~\ref{tab:briques}).
 
 {\footnotesize
-\begin{longtable}{@{}p{2.6cm}p{3.4cm}p{4.0cm}p{4.6cm}@{}}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.6cm}p{3.4cm}p{4.0cm}p{4.6cm}@{}}
+\caption[Les outils de la chaîne]{Les outils de la chaîne, ce que chacun est, ce que le projet en fait, et le motif de son choix}\label{tab:briques}\\
+\toprule
+Outil & Ce qu'il est & Ce que le projet en fait & Motif du choix \\
+\midrule
+\endfirsthead
 \toprule
 Outil & Ce qu'il est & Ce que le projet en fait & Motif du choix \\
 \midrule
@@ -55,11 +64,6 @@ Docker Compose\cite{s43} & outil de composition de conteneurs & démarre la base
 \end{longtable}
 }
 
-\begin{center}
-\footnotesize Les outils de la chaîne, ce que chacun est, ce que le projet en fait, et le motif de
-son choix.
-\end{center}
-
 Le motif d'un choix n'est presque jamais la performance. Le serveur relationnel en est l'exemple le
 plus net : un moteur embarqué aurait produit les mêmes tables plus vite, et le choix tient aux
 propriétés que la chaîne exerce réellement, que la section~\ref{sec:choix-serveur} détaille.
@@ -67,10 +71,15 @@ propriétés que la chaîne exerce réellement, que la section~\ref{sec:choix-se
 \section{Les outils de qualité et de composition}
 
 Trois autres familles d'outils ne transforment aucune donnée : elles vérifient la chaîne et
-composent ce document.
+composent ce document (cf. tableau~\ref{tab:outils-qualite}).
 
 {\footnotesize
-\begin{longtable}{@{}p{2.6cm}p{3.4cm}p{4.0cm}p{4.6cm}@{}}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.6cm}p{3.4cm}p{4.0cm}p{4.6cm}@{}}
+\caption[Les outils de vérification et de composition]{Les outils de vérification et de composition, regroupés par fonction}\label{tab:outils-qualite}\\
+\toprule
+Outils & Ce qu'ils sont & Ce que le projet en fait & Motif du choix \\
+\midrule
+\endfirsthead
 \toprule
 Outils & Ce qu'ils sont & Ce que le projet en fait & Motif du choix \\
 \midrule
@@ -83,10 +92,6 @@ LaTeX, biblatex et pgfplots\cite{s48, s49, s50} & système de composition, gesti
 \bottomrule
 \end{longtable}
 }
-
-\begin{center}
-\footnotesize Les outils de vérification et de composition, regroupés par fonction.
-\end{center}
 
 Chaque choix est consigné avec ce qui l'aurait invalidé. Un choix qu'on ne sait pas décrire comme
 réfutable n'est pas un choix, c'est une préférence.

@@ -318,18 +318,24 @@ def test_les_parties_annoncees_sont_celles_du_document() -> None:
 
 
 # --------------------------------------------------------------------------------------------
-# Les renvois tapés. Un numéro de chapitre, de section ou d'annexe écrit à la main devient faux au
-# premier chapitre inséré ; un renvoi passe donc par une étiquette. La recherche porte sur la
-# partie active des fichiers de prose — chapitres et liminaires —, lignes jointes, pour qu'un
-# renvoi coupé par un retour à la ligne soit vu.
+# Les renvois tapés. Un numéro de chapitre, de section, d'annexe, de figure, de tableau ou de page
+# écrit à la main devient faux au premier objet inséré ; un renvoi interne passe donc par une
+# étiquette, et une localisation dans une source externe par l'argument optionnel de la citation,
+# `\cite[tableau~32]{…}`, qui est retiré avant la recherche. La recherche porte sur la partie active
+# des fichiers de prose — chapitres et liminaires —, lignes jointes, pour qu'un renvoi coupé par un
+# retour à la ligne soit vu.
 # --------------------------------------------------------------------------------------------
 
 # Le mot est lu sans égard à la casse ; la lettre d'annexe, elle, est une capitale isolée — sans
 # quoi « le chapitre s'ouvre » serait pris pour un renvoi à une annexe.
 _RENVOI_TAPE = re.compile(
     r"(?<![\w\\])(?i:chapitres?|sections?|annexes?)(?:~|\s)+(?:\d+(?:\.\d+)*|[A-Z])(?![\w'’])"
+    r"|(?<![\w\\])(?i:figures?|tableaux?|pages?)(?:~|\s)+\d"
+    r"|(?<![\w\\])p\.(?:~|\s)*\d"
     r"|§\s*~?\d"
 )
+# L'argument optionnel d'une citation porte la localisation dans la source citée : il est retiré.
+_ARGUMENT_DE_CITATION = re.compile(r"(\\cite\*?)(?:\[[^\]]*\])+")
 
 TEMOINS_RENVOI_VUS = (
     "voir le chapitre 4 pour la suite",
@@ -338,6 +344,11 @@ TEMOINS_RENVOI_VUS = (
     "un renvoi (§4.6) collé",
     "l'annexe B porte le relevé",
     "le chapitre\n4 coupé",
+    "le tableau~32 de la source",
+    "à la page~46",
+    "voir la figure 3",
+    "le Tableau\n3 coupé",
+    "le recueil (p.~46)",
 )
 
 TEMOINS_RENVOI_NON_VUS = (
@@ -351,11 +362,19 @@ TEMOINS_RENVOI_NON_VUS = (
     "le chapitre s'ouvre",
     "ce chapitre n'est pas",
     "Section d'un tableau",
+    "\\cite[tableau~32]{x}",
+    "\\cite[p.~46]{x}",
+    "\\cite[tableau~32, p.~46]{s30}",
+    "(voir figure~\\ref{fig:x})",
+    "les tableaux de bord",
+    "la page d'accueil",
+    "le cap.~5",
 )
 
 
 def renvois_tapes(source: str) -> list[str]:
-    return _RENVOI_TAPE.findall(" ".join(partie_active(source).splitlines()))
+    texte = _ARGUMENT_DE_CITATION.sub(r"\1", " ".join(partie_active(source).splitlines()))
+    return _RENVOI_TAPE.findall(texte)
 
 
 def test_le_motif_voit_chaque_forme_de_renvoi_tape() -> None:
@@ -383,15 +402,14 @@ def test_aucun_renvoi_tape_dans_la_prose() -> None:
 
 # --------------------------------------------------------------------------------------------
 # Les références des outils. Dans le chapitre qui les nomme, chaque ligne des tableaux d'outils
-# porte EXACTEMENT UNE commande de citation, et chaque clé citée existe au registre des sources.
-# Le registre suffit : le contrôle de synchronisation existant garantit que le fichier
-# bibliographique en est le rendu.
+# porte EXACTEMENT UNE commande de citation. Que chaque clé citée existe est la propriété d'un autre
+# contrôle, `tests/test_provenance_des_chapitres.py`, qui la tient pour tous les chapitres : elle
+# n'est pas répétée ici.
 # --------------------------------------------------------------------------------------------
 
 OUTILS = REPORT / "chapitres" / "environnement-et-outils.tex"
-REGISTRE_DES_SOURCES = RACINE / "docs" / "sources" / "sources.yml"
 _CORPS_DE_TABLEAU = re.compile(r"\\endhead([\s\S]*?)\\bottomrule")
-_CITE = re.compile(r"\\cite\{([^}]*)\}")
+_CITE = re.compile(r"\\cite(?:\[[^\]]*\])*\{([^}]*)\}")
 
 
 def lignes_de_tableau(source: str) -> list[str]:
@@ -403,33 +421,21 @@ def lignes_de_tableau(source: str) -> list[str]:
     return lignes
 
 
-def cles_du_registre() -> set[str]:
-    import yaml
-
-    entrees = yaml.safe_load(REGISTRE_DES_SOURCES.read_text(encoding="utf-8"))
-    return {entree["id"].lower().replace("-", "") for entree in entrees}
-
-
 def test_le_motif_lit_les_lignes_de_tableau_et_leurs_citations() -> None:
     source = (
         "\\midrule\n\\endhead\nA\\cite{s1} & x \\\\\n\\addlinespace\nB & y \\\\\n"
-        "C\\cite{s2, s3}\\cite{s4} & z \\\\\n\\bottomrule"
+        "C\\cite{s2, s3}\\cite[p.~4]{s4} & z \\\\\n\\bottomrule"
     )
     lignes = lignes_de_tableau(source)
     assert [len(_CITE.findall(ligne)) for ligne in lignes] == [1, 0, 2], lignes
 
 
-def test_chaque_outil_porte_une_reference_du_registre() -> None:
+def test_chaque_outil_porte_exactement_une_citation() -> None:
     lignes = lignes_de_tableau(OUTILS.read_text(encoding="utf-8"))
     assert lignes, "aucune ligne de tableau d'outils : la propriété ne vérifierait rien"
-    connues = cles_du_registre()
-    fautes = []
-    for ligne in lignes:
-        citations = _CITE.findall(ligne)
-        if len(citations) != 1:
-            fautes.append(f"{len(citations)} citation(s) : {ligne[:60]}")
-            continue
-        absentes = sorted({c.strip() for c in citations[0].split(",")} - connues)
-        if absentes:
-            fautes.append(f"clés absentes du registre {absentes} : {ligne[:60]}")
+    fautes = [
+        f"{len(_CITE.findall(ligne))} citation(s) : {ligne[:60]}"
+        for ligne in lignes
+        if len(_CITE.findall(ligne)) != 1
+    ]
     assert not fautes, "lignes d'outils fautives :\n  " + "\n  ".join(fautes)

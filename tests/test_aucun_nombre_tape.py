@@ -100,13 +100,10 @@ EXCEPTIONS = (
     ),
     (r"\b(?:19|20)\d{2}\b", "une année"),
     (r"\b\d{4}[-/]\d{2}[-/]\d{2}\b", "une date au format ISO"),
-    (r"\bchapitre~?\s?\d+", "un renvoi de chapitre"),
-    (r"\bparagraphe~?\s?\d+", "un renvoi de paragraphe"),
-    (
-        r"\b(?:section|tableau|figure|page|message|messages|planche)~?\s?\d+(?:\.\d+)?",
-        "un renvoi interne",
-    ),
-    (r"\bet~\d+\b", "le second terme d'un renvoi"),
+    # AUCUN RENVOI N'EST EXEMPTÉ. Un numéro de chapitre, de section, de figure, de tableau ou de
+    # page tapé dans la prose est un nombre tapé : un renvoi interne passe par `\ref`, retiré avec
+    # son argument, et une localisation dans une source citée par l'argument optionnel de `\cite`,
+    # retiré avec la commande. Une exemption de ces formes avait survécu à leur dernier usage.
     (r"\bniveaux? de tri~?\s?\d+", "un rang de l'échelle de tri publiée"),
     (r"\bNom de famille \d\b", "un libellé d'écran reproduit à l'identique"),
     (r"\bTéléphone \d\b", "un libellé d'écran reproduit à l'identique"),
@@ -372,6 +369,8 @@ def test_la_liste_des_restes_ne_porte_rien_de_perime() -> None:
         r"la marge vaut 270,87 sur le modèle complet",
         r"le taux atteint 53,8 \% en 2024",
         r"& 0,9995 & \chiffre{ablation-ecart-variante-a} \\",
+        r"le tableau~32 du recueil",
+        r"voir le chapitre~4",
     ],
 )
 def test_le_motif_voit_un_nombre_tape(source: str) -> None:
@@ -386,6 +385,8 @@ def test_le_motif_voit_un_nombre_tape(source: str) -> None:
         r"l'arrêté n\textsuperscript{o}~456-11 du 6~juillet 2010",
         r"la classification des maladies, soit la CIM-10",
         r"le chapitre~\ref{chap:qualite} le reprend",
+        r"le recueil le donne \cite[tableau~32]{s30}",
+        r"\cite[tableau~32, p.~46]{s30}",
         r"un relevé\releve{REL-PAT.D09} l'atteste",
         r"la chaîne compte \chiffre{modeles-total} modèles",
         r"\vspace{12mm}",

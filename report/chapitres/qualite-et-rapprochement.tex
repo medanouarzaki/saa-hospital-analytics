@@ -108,9 +108,11 @@ version courante forment \chiffre{paires-possibles} paires — plus que la chaî
 
 Le \emph{blocage} résout cela : il ne compare que les paires qui s'accordent déjà sur un critère
 grossier, par exemple le même nom de famille et le même téléphone. Quatre règles retiennent ainsi
-\chiffre{paires-candidates} paires.
+\chiffre{paires-candidates} paires (cf. tableau~\ref{tab:regles-blocage}).
 
-\begin{center}
+\begin{table}[htbp]
+\centering
+\caption{Les règles de blocage, les paires que chacune produit et la réduction qu'elle opère}\label{tab:regles-blocage}
 \begin{tabular}{@{}p{6.6cm}rr@{}}
 \toprule
 Règle de blocage & Paires & Réduction \\
@@ -123,12 +125,9 @@ nom du père \emph{et} nom de la mère \emph{et} date de naissance & \chiffre{bl
 \textbf{Union des quatre} & \textbf{\chiffre{paires-candidates}} & \textbf{99,99850~\%} \\
 \bottomrule
 \end{tabular}
-\end{center}
+\end{table}
 
-\begin{center}
-\footnotesize Les quatre règles de blocage, le nombre de paires que chacune produit et la réduction
-qu'elle opère sur les \chiffre{paires-possibles} paires possibles.
-\end{center}
+La réduction y est rapportée aux \chiffre{paires-possibles} paires possibles.
 
 \medskip
 
@@ -181,9 +180,11 @@ niveau de la paire.
 donnent la même F-mesure de 1. Le plateau s'étend sur plus de soixante-dix ordres de grandeur de
 probabilité. \textbf{Ce n'est pas le signe d'un modèle finement réglé : c'est le signe que les deux
 populations sont si séparées que le seuil ne fait presque rien} — et la section~\ref{sec:limites-rapprochement} montre ce
-qui arrive quand cette séparation disparaît.
+qui arrive quand cette séparation disparaît. La courbe de précision en fonction du rappel fait
+voir ce plateau (voir figure~\ref{fig:precision-rappel}).
 
-\begin{center}
+\begin{figure}[htbp]
+\centering
 \begin{tikzpicture}
 \begin{axis}[
   width=10.5cm, height=6.2cm,
@@ -203,12 +204,11 @@ qui arrive quand cette séparation disparaît.
 \addlegendentry{collision exacte, union des deux critères}
 \end{axis}
 \end{tikzpicture}
-\end{center}
+\caption{Précision en fonction du rappel, sur le balayage de seuils}\label{fig:precision-rappel}
+\end{figure}
 
-\begin{center}
-\footnotesize Précision en fonction du rappel, sur les \chiffre{balayage-points} points du balayage
-de seuils. Le point carré est la référence par collision exacte, qui ne dépend d'aucun seuil.
-\end{center}
+Chaque point y est un seuil du balayage, qui en compte \chiffre{balayage-points} ; le point carré
+est la référence par collision exacte, qui ne dépend d'aucun seuil.
 
 \medskip
 
@@ -232,9 +232,11 @@ numéro de pièce d'identité. Sa F-mesure vaut \chiffre{baseline-f-mesure} — 
 et c'est pourquoi la comparaison en moyenne ne dit rien d'intéressant.
 
 \textbf{Ce qui est intéressant est la ventilation de son rappel}, variation injectée par variation
-injectée.
+injectée (cf. tableau~\ref{tab:rappel-collision}).
 
-\begin{center}
+\begin{table}[htbp]
+\centering
+\caption{Rappel de la collision exacte, par variation injectée}\label{tab:rappel-collision}
 \begin{tabular}{@{}p{6.2cm}rrr@{}}
 \toprule
 Variation injectée & Paires & Retrouvées & Rappel \\
@@ -247,13 +249,10 @@ prénom composé inversé & 243 & 197 & 0,8107 \\
 \textbf{pièce d'identité absente} & \textbf{267} & \textbf{146} & \textbf{0,5468} \\
 \bottomrule
 \end{tabular}
-\end{center}
+\end{table}
 
-\begin{center}
-\footnotesize Rappel de la collision exacte par variation injectée, sur les
-\chiffre{vt-paires-presentes} paires présentes. Une paire porte souvent plusieurs variations et
-compte dans chaque ligne qui la concerne.
-\end{center}
+Le rappel y porte sur les \chiffre{vt-paires-presentes} paires présentes. Une paire porte souvent
+plusieurs variations et compte dans chaque ligne qui la concerne.
 
 \medskip
 
@@ -329,9 +328,12 @@ recopie certains champs d'une fiche à l'autre lorsqu'il crée un doublon — le
 les noms des parents, le quartier, la ville. Ces champs sont donc \emph{identiques par
 construction} sur une paire vraie, et le modèle apprend à s'y fier. Deux variantes ont été
 construites : l'une privant le modèle de ces champs recopiés, l'autre neutralisant en outre le
-niveau d'absence de la pièce d'identité, et une troisième cumulant les deux.
+niveau d'absence de la pièce d'identité, et une troisième cumulant les deux (cf.
+tableau~\ref{tab:ablation}).
 
-\begin{center}
+\begin{table}[htbp]
+\centering
+\caption{Ablation des champs recopiés par le générateur}\label{tab:ablation}
 \begin{tabular}{@{}p{4.6cm}rrr@{}}
 \toprule
 Variante & Comparaisons & F-mesure & Marge \\
@@ -341,13 +343,10 @@ sans les champs recopiés & \chiffre{ablation-comparaisons-variante-a} & \chiffr
 les deux retraits cumulés & \chiffre{ablation-comparaisons-variante-a} & \chiffre{ablation-f-variante-c} & \chiffre{ablation-ecart-variante-c} \\
 \bottomrule
 \end{tabular}
-\end{center}
+\end{table}
 
-\begin{center}
-\footnotesize Ablation des champs recopiés par le générateur. La marge est l'écart entre le poids
-minimal d'une paire vraie et le poids maximal d'une paire fausse : positive, un seuil sépare les
-deux populations ; négative, aucun ne le fait.
-\end{center}
+La marge y est l'écart entre le poids minimal d'une paire vraie et le poids maximal d'une paire
+fausse : positive, un seuil sépare les deux populations ; négative, aucun ne le fait.
 
 \medskip
 
