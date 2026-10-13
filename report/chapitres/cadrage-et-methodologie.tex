@@ -4,7 +4,7 @@
 %   HYP: (aucun)
 %   CHI: colonnes-source-doc, colonnes-source-hyp, colonnes-source-obs, colonnes-source-registre
 %   SER: (aucune)
-%   SECTIONS: 6
+%   SECTIONS: 5
 
 \chapter{Cadrage et méthodologie}\label{chap:cadrage}
 
@@ -174,44 +174,8 @@ L'observation a été courte et bornée à un poste ; l'essentiel du temps est a
 et à la rédaction. \textbf{La rédaction a été menée en fin de projet alors qu'elle devait être
 répartie sur toute sa durée}, et c'est une erreur de méthode.
 
-\section{Outils et justification}
-
-Chaque brique de la pile technique est retenue pour un motif écrit, et non par habitude.
-
-\begin{center}
-\begin{tabular}{@{}p{3.4cm}p{4.0cm}p{6.4cm}@{}}
-\toprule
-Brique & Rôle & Motif du choix \\
-\midrule
-Serveur de base de données relationnelle & couche de persistance & un moteur client-serveur, non un moteur embarqué : trois services attaquent la même base par le réseau, et le chargement écrit pendant que le tableau de bord lit \\
-\addlinespace
-Schéma en étoile & couche analytique & des faits entourés de dimensions, forme que l'interrogation analytique exploite \\
-\addlinespace
-Outil de transformation déclaratif & modélisation & matérialisation en vues, configuration de connexion hors dépôt, macros de conversion adossées aux formats mesurés à l'extraction \\
-\addlinespace
-Bibliothèque de rapprochement probabiliste & identités & un modèle de vraisemblance dont les paramètres s'estiment sur les données, plutôt qu'une collision exacte qui ne retrouve que l'identique \\
-\addlinespace
-Moteur en mémoire pour le rapprochement & exécution & le rapprochement écrit des tables intermédiaires nombreuses ; les tenir hors du serveur évite d'y laisser des résidus \\
-\addlinespace
-Orchestrateur de graphes de tâches & ordonnancement & le conteneur ordonnance sans exécuter : les tâches sont des commandes qui s'exécutent dans l'environnement du projet \\
-\addlinespace
-Bibliothèque d'application web analytique & tableau de bord & un service qui lit un schéma dédié, rafraîchi par échange de noms en une transaction \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\begin{center}
-\footnotesize Pile technique et motif de chaque choix.
-\end{center}
-
-\medskip
-
-Deux traits de cette liste méritent d'être relevés. Le premier est que le motif d'un choix n'est
-presque jamais la performance : c'est la propriété que le dossier doit démontrer, ou la contrainte
-qu'il ne faut pas violer.
-
-Le second est que chaque choix est consigné avec ce qui l'aurait invalidé. Un choix qu'on ne sait
-pas décrire comme réfutable n'est pas un choix, c'est une préférence.
+Les outils qui portent ce travail, ce que chacun est et le motif de son choix sont présentés au
+chapitre~\ref{chap:outils}.
 
 \section{Organisation du projet en phases}
 
