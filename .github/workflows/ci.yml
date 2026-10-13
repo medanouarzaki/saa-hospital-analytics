@@ -601,6 +601,8 @@ jobs:
   # s'exécute en parallèle des neuf autres.
   document:
     runs-on: ubuntu-latest
+    env:
+      MOTIF_JOURNAL: '^LaTeX Warning: (Reference|Citation) |^LaTeX Warning: There were undefined references|Please \(re\)run Biber|Rerun to get|Rerun LaTeX'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -652,12 +654,41 @@ jobs:
           working_directory: report
           args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
 
+      # UNE COMPOSITION RÉUSSIE N'EST PAS UNE COMPOSITION JUSTE. latexmk rend 0 sur un renvoi ou une
+      # citation indéfinis — mesuré : le document se compose, avec « ?? » à la place du numéro, et
+      # le travail reste vert. Cette étape lit le journal de la dernière passe et échoue s'il porte
+      # un renvoi ou une citation indéfinis, ou une demande de nouvelle passe restée sans suite.
+      # Les motifs sont les lignes exactes que LaTeX, biblatex, longtable et rerunfilecheck
+      # écrivent ; un journal absent échoue aussi, plutôt que de passer sans rien avoir lu.
+      - name: Refuser un renvoi indéfini dans le rapport
+        env:
+          JOURNAL: report/rapport.log
+        run: |
+          test -f "$JOURNAL" || { echo "journal absent : $JOURNAL"; exit 1; }
+          if grep -n -E "$MOTIF_JOURNAL" "$JOURNAL"; then
+            echo "renvoi ou citation indefinis, ou passe manquante, dans $JOURNAL"
+            exit 1
+          fi
+          echo "aucun renvoi ni citation indefinis dans $JOURNAL"
+
       - name: Compiler la présentation
         uses: xu-cheng/latex-action@6549dc21effb2730855a1281407ecfcececc6c1b # v4.1.0
         with:
           root_file: presentation.tex
           working_directory: slides
           args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+
+      # La même lecture du journal, pour la présentation.
+      - name: Refuser un renvoi indéfini dans la présentation
+        env:
+          JOURNAL: slides/presentation.log
+        run: |
+          test -f "$JOURNAL" || { echo "journal absent : $JOURNAL"; exit 1; }
+          if grep -n -E "$MOTIF_JOURNAL" "$JOURNAL"; then
+            echo "renvoi ou citation indefinis, ou passe manquante, dans $JOURNAL"
+            exit 1
+          fi
+          echo "aucun renvoi ni citation indefinis dans $JOURNAL"
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
