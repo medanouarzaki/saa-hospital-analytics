@@ -673,7 +673,7 @@ chiffres:
   commande: (R/'airflow/saa_daily.py').read_text(encoding='utf-8').count('task_id=')
   portee: independant-des-donnees
 - id: fichiers-de-controle
-  valeur: 77
+  valeur: 78
   unite: fichiers
   type: python
   commande: len(list((R/'tests').glob('test_*.py')))
@@ -2472,7 +2472,7 @@ chiffres:
     renvoient à une autre source qui fait foi. Écrire ce décompte en conclusion ferait passer une
     propriété du registre pour une limite du travail.
   type: python
-  commande: 'len([s for s in yaml.safe_load((R/''docs/sources/sources.yml'').read_text(encoding=''utf-8'')) if s[''id''].lower().replace(''-'','''') not in {x.strip() for g in __import__(''re'').findall(r''\\cite\{([^}]*)\}'', chr(10).join(c.read_text(encoding=''utf-8'') for c in sorted((R/''report/chapitres'').glob(''*.tex'')))) for x in g.split('','') if x.strip()}])'
+  commande: 'len([s for s in yaml.safe_load((R/''docs/sources/sources.yml'').read_text(encoding=''utf-8'')) if s[''id''].lower().replace(''-'','''') not in {x.strip() for g in __import__(''re'').findall(r''\\cite(?:\[[^\]]*\]){0,2}\{([^}]*)\}'', chr(10).join(c.read_text(encoding=''utf-8'') for c in sorted((R/''report/chapitres'').glob(''*.tex'')))) for x in g.split('','') if x.strip()}])'
   portee: independant-des-donnees
   note: >-
     Entrées du registre des sources qu'aucun chapitre ne cite. Le registre conserve ce qu'il a

@@ -114,3 +114,4 @@ chaque exécution.
 | [0098](0098-un-seul-nom.md) | Un seul nom |
 | [0099](0099-trois-parties-et-les-outils-nommes.md) | Trois parties, et les outils nommés |
 | [0100](0100-figures-et-tableaux-numerotes-et-appeles.md) | Figures et tableaux numérotés, titrés et appelés |
+| [0101](0101-abreviations-definitions-et-legendes.md) | Abréviations, définitions et réglages de légende |

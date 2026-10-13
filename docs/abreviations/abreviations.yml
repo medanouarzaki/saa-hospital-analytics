@@ -1,0 +1,36 @@
+# Registre des abréviations
+#
+# Une entrée par sigle employé dans la prose du rapport, avec son développé. La liste des
+# abréviations des pages préliminaires, report/liminaires/abreviations.tex, en est le rendu :
+# docs/abreviations/to_tex.py l'écrit, et tests/test_abreviations.py vérifie qu'elle n'a pas été
+# retouchée à la main.
+#
+# UN SIGLE, AU SENS DE CE REGISTRE, est un jeton de la prose composée qui commence par une capitale
+# et en porte au moins deux, chiffres et tirets admis. Ne sont pas cherchés : les arguments des
+# commandes que le contrôle des nombres tapés retire déjà, ceux de \texttt, \cite, \ref, \label,
+# \chiffre, \serie, \releve, \convention, des annonces du plan, de \pageref, \url et \href ; les
+# environnements de tracé ; les commentaires ; les fichiers produits.
+#
+# LE DÉVELOPPÉ suit la source quand le sigle vient d'une source, l'usage du rapport sinon. Il figure
+# dans la même phrase que la première occurrence du sigle dans la prose du corps, à partir de
+# l'introduction ; le résumé et l'abstract en sont exemptés.
+#
+# Champs d'une abréviation : sigle, developpe ; non_employe, facultatif, porte le motif pour lequel
+# un sigle du registre n'est employé nulle part. Champs d'une exception : jeton, motif.
+
+abreviations:
+  - sigle: IPP
+    developpe: identifiant patient permanent
+  - sigle: MPI
+    developpe: index maître des patients
+  - sigle: SMS
+    developpe: service de messages courts
+  - sigle: SQL
+    developpe: Structured Query Language
+
+# Les jetons capitaux de la prose qui ne sont pas des abréviations.
+exceptions:
+  - jeton: NET
+    motif: "fragment du nom du progiciel Hosix.NET, nom de marque et non abréviation"
+  - jeton: SIVSA
+    motif: "raison sociale de l'éditeur du progiciel, nom propre en capitales"

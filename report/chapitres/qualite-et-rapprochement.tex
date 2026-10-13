@@ -1,5 +1,5 @@
 % Ce chapitre repose sur :
-%   DOC: s20, s22, s23
+%   DOC: s20, s22, s23, s51
 %   OBS: REL-IPP.O03, REL-IPP.R12
 %   HYP: (aucun)
 %   CHI: ablation-comparaisons-variante-a, ablation-ecart-complet, ablation-ecart-variante-a, ablation-ecart-variante-c, ablation-f-variante-a, ablation-f-variante-c
@@ -132,7 +132,8 @@ La réduction y est rapportée aux \chiffre{paires-possibles} paires possibles.
 \medskip
 
 Une quatrième règle a été ajoutée aux trois prévues, et le motif est mesuré : l'union des quatre
-atteint le rappel maximal pour \chiffre{paires-candidates} paires, là où la meilleure union à trois
+atteint le rappel maximal — la part des paires de doublons de la vérité terrain que les paires
+candidates retiennent \cite{s51} — pour \chiffre{paires-candidates} paires, là où la meilleure union à trois
 règles atteignant ce rappel en coûtait quatre-vingts fois plus.
 
 \textbf{Les comparaisons par champ, et les colonnes écartées.} Treize colonnes sont comparées, sous
@@ -171,9 +172,12 @@ retrouvée —, et l'évaluation porte donc sur les \chiffre{vt-paires-presentes
 fiches sont présentes. \textbf{Imputer au rapprochement une paire qu'il n'a jamais pu voir serait faux},
 et le dénominateur est choisi en conséquence.
 
-Au seuil retenu de \chiffre{seuil-retenu}, la précision vaut \chiffre{precision-seuil-retenu}, le
-rappel \chiffre{rappel-seuil-retenu} et la F-mesure \chiffre{f-mesure-seuil-retenu}, mesurés au
-niveau de la paire.
+Au seuil retenu de \chiffre{seuil-retenu}, la précision vaut \chiffre{precision-seuil-retenu} :
+c'est la part des paires que le modèle déclare doublons et qui le sont dans la vérité terrain
+\cite{s51}. Le rappel vaut \chiffre{rappel-seuil-retenu}, rapporté cette fois aux paires que le
+modèle retrouve parmi celles de la vérité terrain. La F-mesure, moyenne harmonique de la précision
+et du rappel, qui ne s'élève que si les deux s'élèvent ensemble \cite{s51}, vaut
+\chiffre{f-mesure-seuil-retenu} ; les trois sont mesurées au niveau de la paire.
 
 \textbf{Un résultat parfait doit être relativisé sur-le-champ.} Le balayage porte
 \chiffre{balayage-points} points de seuil, et \chiffre{balayage-points-f-parfaite} d'entre eux

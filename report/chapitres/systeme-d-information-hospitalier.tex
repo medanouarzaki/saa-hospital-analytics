@@ -180,7 +180,8 @@ telle quelle, séparateur compris. C'est le premier signe d'une pratique que les
 confirment : le système code ses références et affiche le code avec son libellé.
 
 \textbf{L'identifiant du patient, et la façon dont on le retrouve.} C'est par cet écran qu'un agent
-retrouve un dossier avant toute opération. Quatre de ses éléments portent le diagnostic que le
+retrouve un dossier avant toute opération. Quatre de ses éléments, qui nomment l'identifiant
+patient permanent (IPP) et l'index maître des patients (MPI), portent le diagnostic que le
 chapitre~\ref{chap:qualite} reprend (cf. tableau~\ref{tab:ecran-recherche}).
 
 \begin{table}[htbp]
@@ -202,12 +203,11 @@ Identifiant & Libellé à l'écran & Bloc \\
 \medskip
 
 Deux termes du système apparaissent ici, et le rapport les emploie ensuite sans les redéfinir.
-L'\emph{identifiant patient permanent} — l'IPP — est le numéro unique qu'un établissement attribue
-à une personne et qui la suit d'un séjour à l'autre. L'\emph{index maître des patients} — MPI dans
-les libellés de l'écran — est le registre qui rassemble ces identifiants et sert à retrouver une
-personne déjà connue.
+L'IPP est le numéro unique qu'un établissement attribue à une personne et qui la suit d'un séjour à
+l'autre. Le MPI — ainsi le nomment les libellés de l'écran — est le registre qui rassemble ces
+identifiants et sert à retrouver une personne déjà connue.
 
-Un index maître des patients existe donc dans le système, et deux onglets s'y adressent
+Un MPI existe donc dans le système, et deux onglets s'y adressent
 explicitement, dont l'un en recherche pondérée\releve{REL-IPP.O03}. La dernière colonne de résultat
 affiche une \emph{probabilité}\releve{REL-IPP.R12} : une recherche qui rend des probabilités n'est
 pas une recherche exacte, c'est un rapprochement. Le relevé s'arrête là — il atteste qu'un index
@@ -221,7 +221,8 @@ des dossiers dont la date de naissance est incertaine ou absente.
 
 \textbf{L'identité du patient.} La fiche patient est l'écran le plus dense du périmètre observé, et
 c'est de lui que vient la plus grande part des colonnes du modèle. Un extrait retient
-celles dont le rapport se sert explicitement plus loin (cf. tableau~\ref{tab:fiche-patient}).
+celles dont le rapport se sert explicitement plus loin, jusqu'aux avertissements par service de
+messages courts, ou SMS (cf. tableau~\ref{tab:fiche-patient}).
 
 \begin{table}[htbp]
 \centering
