@@ -399,3 +399,201 @@
   verification: introuvable
   utilise_pour: "Aucun usage. Le texte fixe ce que l'hôpital facture, là où la TNR fixe ce que l'organisme rembourse."
   note: "Cité par la Cour des comptes S-20, qui l'oppose à la gratuité de fait constatée aux urgences. Le texte n'a pas été retrouvé. Le générateur assimile le montant facturé au tarif TNR, et cette assimilation est déclarée HYP."
+
+- id: S-33
+  titre: "Python — documentation officielle"
+  auteur: "Python Software Foundation"
+  type: documentation technique
+  url: https://docs.python.org/3/
+  date_publication: non_datee
+  date_consultation: "2026-10-13"
+  fiabilite: secondaire
+  verification: non_verifiable_par_outil
+  utilise_pour: "Langage de la chaîne : générateur, chargement, rapprochement, tableau de bord, contrôles."
+
+- id: S-34
+  titre: "uv — documentation"
+  auteur: "Astral"
+  type: documentation technique
+  url: https://docs.astral.sh/uv/
+  date_publication: non_datee
+  date_consultation: "2026-10-13"
+  fiabilite: secondaire
+  verification: non_verifiable_par_outil
+  utilise_pour: "Gestionnaire d'environnement et de dépendances Python du projet, verrouillées par un fichier de verrouillage."
+
+- id: S-35
+  titre: "Faker — documentation"
+  auteur: "Projet Faker"
+  type: documentation technique
+  url: https://faker.readthedocs.io/en/master/
+  date_publication: non_datee
+  date_consultation: "2026-10-13"
+  fiabilite: secondaire
+  verification: non_verifiable_par_outil
+  utilise_pour: "Bibliothèque de valeurs synthétiques employée par le générateur du jeu de données."
+
+- id: S-36
+  titre: "pandas — documentation"
+  auteur: "Projet pandas"
+  type: documentation technique
+  url: https://pandas.pydata.org/docs/
+  date_publication: non_datee
+  date_consultation: "2026-10-13"
+  fiabilite: secondaire
+  verification: non_verifiable_par_outil
+  utilise_pour: "Manipulation tabulaire des données générées et des exports."
+
+- id: S-37
+  titre: "Apache Arrow — documentation Python"
+  auteur: "Apache Software Foundation"
+  type: documentation technique
+  url: https://arrow.apache.org/docs/python/
+  date_publication: non_datee
+  date_consultation: "2026-10-13"
+  fiabilite: secondaire
+  verification: non_verifiable_par_outil
+  utilise_pour: "Écriture du format colonnaire des partitions de la zone d'atterrissage."
+
+- id: S-38
+  titre: "PostgreSQL — documentation"
+  auteur: "PostgreSQL Global Development Group"
+  type: documentation technique
+  url: https://www.postgresql.org/docs/
+  date_publication: non_datee
+  date_consultation: "2026-10-13"
+  fiabilite: secondaire
+  verification: non_verifiable_par_outil
+  utilise_pour: "Serveur de base de données relationnelle de la chaîne."
+
+- id: S-39
+  titre: "dbt — documentation"
+  auteur: "dbt Labs"
+  type: documentation technique
+  url: https://docs.getdbt.com/docs/introduction
+  date_publication: non_datee
+  date_consultation: "2026-10-13"
+  fiabilite: secondaire
+  verification: non_verifiable_par_outil
+  utilise_pour: "Outil de transformation déclaratif des couches intermédiaire et analytique."
+
+- id: S-40
+  titre: "DuckDB — documentation"
+  auteur: "DuckDB Foundation"
+  type: documentation technique
+  url: https://duckdb.org/docs/
+  date_publication: non_datee
+  date_consultation: "2026-10-13"
+  fiabilite: secondaire
+  verification: non_verifiable_par_outil
+  utilise_pour: "Moteur en mémoire sur lequel s'exécute le rapprochement d'identités."
+
+- id: S-41
+  titre: "Apache Airflow — documentation"
+  auteur: "Apache Software Foundation"
+  type: documentation technique
+  url: https://airflow.apache.org/docs/
+  date_publication: non_datee
+  date_consultation: "2026-10-13"
+  fiabilite: secondaire
+  verification: non_verifiable_par_outil
+  utilise_pour: "Orchestrateur du graphe quotidien de tâches."
+
+- id: S-42
+  titre: "Streamlit — documentation"
+  auteur: "Snowflake"
+  type: documentation technique
+  url: https://docs.streamlit.io/
+  date_publication: non_datee
+  date_consultation: "2026-10-13"
+  fiabilite: secondaire
+  verification: non_verifiable_par_outil
+  utilise_pour: "Bibliothèque d'application web du tableau de bord."
+
+- id: S-43
+  titre: "Docker Compose — documentation"
+  auteur: "Docker"
+  type: documentation technique
+  url: https://docs.docker.com/compose/
+  date_publication: non_datee
+  date_consultation: "2026-10-13"
+  fiabilite: secondaire
+  verification: non_verifiable_par_outil
+  utilise_pour: "Composition de conteneurs qui porte la base, l'orchestrateur et le tableau de bord."
+
+- id: S-44
+  titre: "pytest — documentation"
+  auteur: "Projet pytest"
+  type: documentation technique
+  url: https://docs.pytest.org/
+  date_publication: non_datee
+  date_consultation: "2026-10-13"
+  fiabilite: secondaire
+  verification: non_verifiable_par_outil
+  utilise_pour: "Cadre des contrôles automatisés du dépôt."
+
+- id: S-45
+  titre: "Ruff — documentation"
+  auteur: "Astral"
+  type: documentation technique
+  url: https://docs.astral.sh/ruff/
+  date_publication: non_datee
+  date_consultation: "2026-10-13"
+  fiabilite: secondaire
+  verification: non_verifiable_par_outil
+  utilise_pour: "Analyse statique et mise en forme du code Python."
+
+- id: S-46
+  titre: "SQLFluff — documentation"
+  auteur: "Projet SQLFluff"
+  type: documentation technique
+  url: https://docs.sqlfluff.com/
+  date_publication: non_datee
+  date_consultation: "2026-10-13"
+  fiabilite: secondaire
+  verification: non_verifiable_par_outil
+  utilise_pour: "Analyse statique du SQL des modèles et des définitions de schéma."
+
+- id: S-47
+  titre: "GitHub Actions — documentation"
+  auteur: "GitHub"
+  type: documentation technique
+  url: https://docs.github.com/en/actions
+  date_publication: non_datee
+  date_consultation: "2026-10-13"
+  fiabilite: secondaire
+  verification: non_verifiable_par_outil
+  utilise_pour: "Intégration continue qui exécute les contrôles et compose les documents."
+
+- id: S-48
+  titre: "LaTeX — documentation"
+  auteur: "LaTeX Project"
+  type: documentation technique
+  url: https://www.latex-project.org/help/documentation/
+  date_publication: non_datee
+  date_consultation: "2026-10-13"
+  fiabilite: secondaire
+  verification: non_verifiable_par_outil
+  utilise_pour: "Composition du rapport et de la présentation."
+
+- id: S-49
+  titre: "biblatex — fiche CTAN"
+  auteur: "CTAN"
+  type: documentation technique
+  url: https://ctan.org/pkg/biblatex
+  date_publication: non_datee
+  date_consultation: "2026-10-13"
+  fiabilite: secondaire
+  verification: non_verifiable_par_outil
+  utilise_pour: "Gestion de la bibliographie du rapport."
+
+- id: S-50
+  titre: "pgfplots — fiche CTAN"
+  auteur: "CTAN"
+  type: documentation technique
+  url: https://ctan.org/pkg/pgfplots
+  date_publication: non_datee
+  date_consultation: "2026-10-13"
+  fiabilite: secondaire
+  verification: non_verifiable_par_outil
+  utilise_pour: "Graphiques composés depuis les fichiers de données du registre des chiffres."

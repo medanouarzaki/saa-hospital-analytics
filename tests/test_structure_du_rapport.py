@@ -89,18 +89,30 @@ def test_chaque_inclusion_du_rapport_existe() -> None:
     assert not manquantes, f"fichiers inclus par le rapport et absents du disque : {manquantes}"
 
 
-def test_les_neuf_chapitres_et_les_deux_bornes_sont_inclus() -> None:
+# L'annonce d'un chapitre dans l'introduction, hors commentaire. Le même motif que celui du contrôle
+# de l'annonce du plan : la garde de fin interdit une commande homographe.
+_ANNONCE_CHAPITRE = re.compile(r"\\annonceChapitre\{(\d+)\}")
+
+
+def test_les_chapitres_presents_sont_ceux_que_l_introduction_annonce() -> None:
     """Le document porte bien la structure du plan, et non une partie d'elle.
 
-    Le décompte n'est pas écrit : il est celui des fichiers présents sous `report/chapitres/`, dont
-    la propriété précédente garantit qu'ils sont tous inclus. Ce que celle-ci ajoute est que le
-    répertoire n'a pas été vidé — deux fichiers absents des deux côtés passeraient les deux autres.
+    AUCUN DÉCOMPTE N'EST ÉCRIT ICI. La propriété est une égalité entre deux mesures : le nombre de
+    fichiers de chapitres numérotés sous `report/chapitres/` et le nombre de chapitres que
+    l'introduction annonce. Un nombre écrit en dur devenait faux au premier chapitre ajouté, et
+    rougissait sur un document juste ; l'égalité suit le document. Ce qu'elle ajoute aux deux
+    propriétés précédentes est que le répertoire n'a pas été vidé ni grossi d'un fichier que le
+    plan ignore — deux fichiers absents des deux côtés passeraient les deux autres.
     """
     chapitres = sorted(p.name for p in (REPORT / "chapitres").glob("*.tex"))
     assert "introduction.tex" in chapitres, "l'introduction générale manque"
     assert "conclusion.tex" in chapitres, "la conclusion générale manque"
     numerotes = [n for n in chapitres if n not in {"introduction.tex", "conclusion.tex"}]
-    assert len(numerotes) == 9, (
-        f"{len(numerotes)} chapitres numérotés sous report/chapitres/, le plan en compte neuf : "
-        f"{numerotes}"
+    introduction = (REPORT / "chapitres" / "introduction.tex").read_text(encoding="utf-8")
+    actives = "\n".join(_sans_commentaire(ligne) for ligne in introduction.splitlines())
+    annonces = _ANNONCE_CHAPITRE.findall(actives)
+    assert annonces, "l'introduction n'annonce aucun chapitre : l'égalité ne vérifierait rien"
+    assert len(numerotes) == len(annonces), (
+        f"{len(numerotes)} chapitres numérotés sous report/chapitres/, l'introduction en annonce "
+        f"{len(annonces)} : {numerotes}"
     )

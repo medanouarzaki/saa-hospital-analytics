@@ -1,0 +1,92 @@
+% Ce chapitre repose sur :
+%   DOC: s22, s33, s34, s35, s36, s37, s38, s39, s40, s41, s42, s43, s44, s45, s46, s47, s48, s49, s50
+%   OBS: (aucun)
+%   HYP: choix-composition, choix-conteneurs, choix-controles, choix-environnement-verrouille, choix-generation, choix-integration-continue, choix-langage-unique, decision-moteur-en-memoire, decision-orchestrateur, decision-rapprochement-probabiliste, decision-schema-du-tableau-de-bord, decision-serveur-de-base, decision-transformation-declarative
+%   CHI: (aucun)
+%   SER: (aucune)
+%   SECTIONS: 2
+
+% Chaque ligne des deux tableaux porte exactement une commande de citation, vers la documentation
+% officielle de l'outil qu'elle nomme ; un contrôle le vérifie. Le motif d'un choix porte
+% l'étiquette `decision-…` quand un enregistrement de décision du projet l'a consigné, et
+% `choix-…` quand il est un choix posé sans enregistrement.
+
+\chapter{Environnement et outils}\label{chap:outils}
+
+Ce chapitre nomme les outils sur lesquels la chaîne est construite, dit en quelques mots ce que
+chacun est, ce que le projet en fait, et pourquoi il a été retenu. Il ouvre la réalisation : les
+chapitres qui suivent montrent ce que ces outils produisent.
+
+Chaque brique est retenue pour un motif écrit, et non par habitude. Quand une décision du projet a
+consigné ce motif, il en est repris ; sinon, il est déclaré comme un choix posé.
+
+\section{Les briques de la chaîne}
+
+La chaîne va du fichier déposé à l'écran du tableau de bord. Chaque étape a son outil, et le motif de
+chaque choix est la propriété que le travail doit démontrer, ou la contrainte qu'il ne faut pas
+violer.
+
+{\footnotesize
+\begin{longtable}{@{}p{2.6cm}p{3.4cm}p{4.0cm}p{4.6cm}@{}}
+\toprule
+Outil & Ce qu'il est & Ce que le projet en fait & Motif du choix \\
+\midrule
+\endhead
+Python\cite{s33} & langage de programmation généraliste & génère le jeu de données, charge les partitions, exécute le rapprochement et sert le tableau de bord & un seul langage pour toute la chaîne\convention{choix-langage-unique} \\
+\addlinespace
+uv\cite{s34} & gestionnaire d'environnement et de dépendances Python & installe le même environnement sur le poste et chez l'exécuteur d'intégration continue, depuis un fichier de verrouillage & un environnement reproductible à l'identique\convention{choix-environnement-verrouille} \\
+\addlinespace
+Faker, pandas et Arrow\cite{s35, s36, s37} & bibliothèques de valeurs synthétiques, de tables en mémoire et de format colonnaire & produisent le jeu de données et l'écrivent en fichiers de valeurs séparées et en fichiers colonnaires & des valeurs plausibles sans aucune donnée réelle\convention{choix-generation} \\
+\addlinespace
+PostgreSQL\cite{s38} & serveur de base de données relationnelle & porte la couche source, la quarantaine, les couches intermédiaire et analytique, et l'instantané & un moteur client-serveur et non embarqué : trois services attaquent la même base par le réseau, et le chargement écrit pendant que le tableau de bord lit\convention{decision-serveur-de-base} \\
+\addlinespace
+dbt\cite{s39} & outil de transformation déclaratif en SQL & type et normalise la couche intermédiaire, modélise le schéma en étoile, teste chaque couche & matérialisation en vues, configuration de connexion hors dépôt, macros de conversion adossées aux formats mesurés\convention{decision-transformation-declarative} \\
+\addlinespace
+Splink\cite{s22} & bibliothèque de rapprochement probabiliste d'enregistrements & estime le modèle de Fellegi-Sunter et prédit les paires de fiches qui désignent la même personne & un modèle de vraisemblance estimé sur les données, plutôt qu'une collision exacte qui ne retrouve que l'identique\convention{decision-rapprochement-probabiliste} \\
+\addlinespace
+DuckDB\cite{s40} & moteur de base de données en mémoire & exécute les calculs du rapprochement & le rapprochement écrit des tables intermédiaires nombreuses ; les tenir hors du serveur évite d'y laisser des résidus\convention{decision-moteur-en-memoire} \\
+\addlinespace
+Apache Airflow\cite{s41} & orchestrateur de graphes de tâches & déclenche chaque jour les tâches de la chaîne dans l'ordre de leurs dépendances & le conteneur ordonnance sans exécuter : les tâches sont des commandes qui s'exécutent dans l'environnement du projet\convention{decision-orchestrateur} \\
+\addlinespace
+Streamlit\cite{s42} & bibliothèque d'application web analytique & sert les pages du tableau de bord & un service qui lit un schéma dédié, rafraîchi par échange de noms en une transaction\convention{decision-schema-du-tableau-de-bord} \\
+\addlinespace
+Docker Compose\cite{s43} & outil de composition de conteneurs & démarre la base, l'orchestrateur et le tableau de bord avec la même configuration partout & une base identique sur le poste et chez l'exécuteur d'intégration continue\convention{choix-conteneurs} \\
+\bottomrule
+\end{longtable}
+}
+
+\begin{center}
+\footnotesize Les outils de la chaîne, ce que chacun est, ce que le projet en fait, et le motif de
+son choix.
+\end{center}
+
+Le motif d'un choix n'est presque jamais la performance. Le serveur relationnel en est l'exemple le
+plus net : un moteur embarqué aurait produit les mêmes tables plus vite, et le choix tient aux
+propriétés que la chaîne exerce réellement, que la section~\ref{sec:choix-serveur} détaille.
+
+\section{Les outils de qualité et de composition}
+
+Trois autres familles d'outils ne transforment aucune donnée : elles vérifient la chaîne et
+composent ce document.
+
+{\footnotesize
+\begin{longtable}{@{}p{2.6cm}p{3.4cm}p{4.0cm}p{4.6cm}@{}}
+\toprule
+Outils & Ce qu'ils sont & Ce que le projet en fait & Motif du choix \\
+\midrule
+\endhead
+pytest, Ruff et SQLFluff\cite{s44, s45, s46} & cadre de contrôles automatisés, et analyseurs statiques du code Python et du SQL & exécutent les contrôles du dépôt et bloquent tout écart de forme du code & un défaut qui fait échouer un contrôle avant la publication plutôt qu'après\convention{choix-controles} \\
+\addlinespace
+GitHub Actions\cite{s47} & service d'intégration continue & rejoue les contrôles à chaque publication et compose le rapport et la présentation & une vérification sur un clone frais, hors du poste de travail\convention{choix-integration-continue} \\
+\addlinespace
+LaTeX, biblatex et pgfplots\cite{s48, s49, s50} & système de composition, gestion bibliographique et graphiques composés & composent ce rapport, sa bibliographie et ses graphiques depuis les fichiers de données du registre des chiffres & un document recomposé à l'identique depuis ses sources\convention{choix-composition} \\
+\bottomrule
+\end{longtable}
+}
+
+\begin{center}
+\footnotesize Les outils de vérification et de composition, regroupés par fonction.
+\end{center}
+
+Chaque choix est consigné avec ce qui l'aurait invalidé. Un choix qu'on ne sait pas décrire comme
+réfutable n'est pas un choix, c'est une préférence.

@@ -84,9 +84,9 @@ la pile, son rôle, et la couche à laquelle elle appartient.
 \end{center}
 
 \begin{center}
-\footnotesize La pile technique, couche par couche. Chaque brique porte la désignation que le
-chapitre~\ref{chap:cadrage} lui donne — une désignation fonctionnelle et non un nom de produit — et
-son rôle en trois verbes. Les flèches pleines montent d'une couche à la suivante ; les deux briques
+\footnotesize La pile technique, couche par couche. Chaque brique porte sa désignation
+fonctionnelle — le chapitre~\ref{chap:outils} nomme l'outil qui l'incarne — et son rôle en trois
+verbes. Les flèches pleines montent d'une couche à la suivante ; les deux briques
 en pointillé ne sont pas des couches mais des choix internes à celle qu'elles rejoignent. Aucun
 logotype d'éditeur ne figure ici : ce sont des marques déposées. La figure ne montre ni les versions,
 ni les dépendances, ni le conteneur qui porte chaque service.
@@ -135,14 +135,14 @@ la couche source porte \chiffre{source-lignes-total} lignes.
 \textbf{Le chargement d'une partition est une transaction unique.} Il commence par supprimer, pour
 la date concernée, le contenu des deux schémas — la couche source et la quarantaine —, puis insère
 les lignes acceptées d'un côté et les lignes rejetées de l'autre. Le retrait préalable est ce qui
-rend l'opération rejouable : c'est le mécanisme d'idempotence de la section~5.7, et il vit ici, à
+rend l'opération rejouable : c'est le mécanisme d'idempotence de la section~\ref{sec:orchestration}, et il vit ici, à
 l'entrée, plutôt que dans la couche dimensionnelle.
 
 Un contrôle porte sur la partition elle-même : chaque ligne d'un fichier doit déclarer la date
 d'extraction du répertoire qui la contient, et une ligne qui en déclarerait une autre part en
 quarantaine.
 
-\section{Le choix du serveur de base de données}
+\section{Le choix du serveur de base de données}\label{sec:choix-serveur}
 
 Un moteur embarqué aurait suffi à produire les mêmes tables. Le serveur relationnel est retenu pour
 des propriétés que le moteur embarqué ne met pas en jeu, et que cette chaîne exerce réellement : le
@@ -310,7 +310,7 @@ Le décompte le dit : \chiffre{dim-patient-lignes} lignes pour
 \chiffre{identifiants-distincts} identifiants, soit un surcoût de stockage d'environ un huitième,
 pour une propriété que rien d'autre ne rendrait.
 
-\section{Orchestration, idempotence et rattrapage}
+\section{Orchestration, idempotence et rattrapage}\label{sec:orchestration}
 
 Le graphe compte \chiffre{taches-graphe} tâches, en chaîne, et son ordre porte une contrainte de
 modélisation : \textbf{les dimensions se construisent avant les faits}, un fait se rattachant à une

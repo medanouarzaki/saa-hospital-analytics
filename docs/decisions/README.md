@@ -112,3 +112,4 @@ chaque exécution.
 | [0096](0096-la-fermeture.md) | La fermeture : une propriété de contrôle corrigée, et deux phrases fausses |
 | [0097](0097-regenerable-n-est-pas-jetable.md) | Régénérable n'est pas jetable |
 | [0098](0098-un-seul-nom.md) | Un seul nom |
+| [0099](0099-trois-parties-et-les-outils-nommes.md) | Trois parties, et les outils nommés |

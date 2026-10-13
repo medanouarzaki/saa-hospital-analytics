@@ -108,6 +108,11 @@
 % ------------------------------------------------------------------------------------------
 \newcommand{\annonceChapitre}[2]{\emph{#2}}
 
+% L'annonce d'une partie s'écrit `\annoncePartie{titre}`, SANS numéro : son rang est son ordre
+% d'apparition dans l'introduction. Elle se compose comme une annonce de chapitre, et le même contrôle
+% la confronte aux `\part` de ce fichier, dans les deux sens, titre exact et rattachement compris.
+\newcommand{\annoncePartie}[1]{\emph{#1}}
+
 \newcommand{\conclusion}[1]{\textbf{#1.}}
 \newcommand{\relreprise}[4]{#1 & #2 & #3 & #4 \\}
 \newcommand{\relnonreprise}[2]{#1 & --- & \multicolumn{2}{p{0.55\linewidth}}{#2} \\}
@@ -201,12 +206,18 @@
 
 \input{chapitres/introduction}
 
+\part{Contexte et cadrage}
 \input{chapitres/organisme-d-accueil}
 \input{chapitres/systeme-d-information-hospitalier}
 \input{chapitres/cadrage-et-methodologie}
+
+\part{Analyse et conception}
 \input{chapitres/conception-du-jeu-de-donnees}
 \input{chapitres/architecture-de-la-chaine}
 \input{chapitres/qualite-et-rapprochement}
+
+\part{Réalisation}
+\input{chapitres/environnement-et-outils}
 \input{chapitres/analyse-de-l-activite}
 \input{chapitres/tableau-de-bord}
 \input{chapitres/recommandations}
