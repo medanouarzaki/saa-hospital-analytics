@@ -113,3 +113,4 @@ chaque exécution.
 | [0097](0097-regenerable-n-est-pas-jetable.md) | Régénérable n'est pas jetable |
 | [0098](0098-un-seul-nom.md) | Un seul nom |
 | [0099](0099-trois-parties-et-les-outils-nommes.md) | Trois parties, et les outils nommés |
+| [0100](0100-figures-et-tableaux-numerotes-et-appeles.md) | Figures et tableaux numérotés, titrés et appelés |
