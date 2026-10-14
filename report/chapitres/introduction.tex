@@ -15,108 +15,96 @@
 % conclusion. Le défaut ne se voit qu'en regardant le document composé.
 \markboth{\MakeUppercase{Introduction générale}}{\MakeUppercase{Introduction générale}}
 
-Le service d'accueil et d'admission est le point d'entrée administratif de l'hôpital. Il ouvre les
-dossiers, enregistre les rendez-vous, admet et oriente, facture et recouvre. Chacun de ces gestes
-laisse une trace dans le système d'information hospitalier, c'est-à-dire le logiciel par lequel
-l'établissement enregistre son activité administrative et médicale. Ces traces s'accumulent jour
-après jour depuis des années. Ce travail a été conduit dans ce service, à l'hôpital provincial Sidi
-Saïd de Meknès.
+\section*{Contexte général}
 
-\section*{La problématique}
+Le stage s'est déroulé au service d'accueil et d'admission de l'hôpital provincial Sidi Saïd de
+Meknès. Ce service est le point d'entrée administratif de l'hôpital. Il ouvre les dossiers,
+enregistre les rendez-vous, admet et oriente, facture et recouvre. Chacun de ces gestes laisse une
+trace dans le système d'information hospitalier, c'est-à-dire le logiciel par lequel
+l'établissement enregistre son activité administrative et médicale.
+
+\section*{Problématique}
 
 Le règlement intérieur des hôpitaux range l'établissement des statistiques et la gestion de
-l'information hospitalière parmi les missions propres de ce service \cite{s27}. Ce n'est pas une
-fonction déléguée à un service technique. Le responsable du service assure le secrétariat du comité
-qui examine chaque mois les indicateurs d'activité, le comité d'établissement se prononce chaque
-trimestre sur le rapport d'activité, et le directeur établit un rapport annuel.
+l'information hospitalière parmi les missions propres de ce service \cite{s27}. Le responsable du
+service assure le secrétariat du comité qui examine chaque mois les indicateurs d'activité. Le
+comité d'établissement se prononce chaque trimestre sur le rapport d'activité, et le directeur
+établit un rapport annuel. Ces trois périodicités reposent sur une seule source, les données que
+le service saisit lui-même.
 
-Trois périodicités réglementaires, donc, et une seule source : les données que le service saisit
-lui-même.
+La liste des indicateurs attendus se lit dans la nomenclature statistique nationale \cite{s30}.
+Quatre de ses tableaux descendent jusqu'à l'établissement nommé : capacité litière, journées
+d'hospitalisation, admissions, taux d'occupation, durée moyenne de séjour, rotation, consultations
+et activité de laboratoire.
 
-La liste de ce qu'il faut remonter n'est pas laissée à l'appréciation de l'établissement. Elle se
-lit dans la nomenclature statistique nationale \cite{s30}, dont quatre tableaux descendent jusqu'à
-l'établissement nommé : capacité litière, journées d'hospitalisation, admissions, taux d'occupation,
-durée moyenne de séjour, rotation, consultations et activité de laboratoire.
+L'écran de démarrage du logiciel porte cinq profils applicatifs, dont un profil dédié aux rapports
+et aux statistiques\releve{REL-DEM.P05}. L'accès d'un stagiaire se limite au profil des
+rendez-vous, et ce que produit le profil de restitution n'a pas été observé.
 
-Entre ces données saisies et ces indicateurs attendus, il manque un chemin. Le service dispose bien
-d'un système d'information, et son écran de démarrage porte cinq profils applicatifs distincts, dont
-l'un est explicitement dédié aux rapports et aux statistiques\releve{REL-DEM.P05}. Mais l'accès
-accordé à un stagiaire n'ouvre qu'un seul de ces cinq profils, et celui de la restitution n'en fait
-pas partie.
+La question traitée est donc celle-ci. À partir des seules données que le service saisit, une
+chaîne de traitement peut-elle produire les indicateurs que la réglementation attend ? Pour chaque
+indicateur, il s'agit aussi de dire s'il est calculable, ce qui l'en empêche et ce qu'il vaut.
 
-Ce que ce profil produit réellement n'a donc pas été observé, et rien n'en sera affirmé ici.
+\section*{Solution envisagée}
 
-La question de ce travail est celle-ci : à partir des seules données que le service saisit, peut-on
-construire une chaîne qui produise les indicateurs que la réglementation attend, et dire, pour
-chacun, s'il est calculable, ce qui l'en empêche, et ce qu'il vaut ?
+La solution proposée est une chaîne de données complète, des fichiers extraits du logiciel jusqu'à
+un tableau de bord. Elle se construit en quatre temps.
 
-La dernière partie de la question n'est pas rhétorique. Un indicateur affiché sans qu'on sache d'où
-il vient est un chiffre, non une mesure. Un tableau de bord qui affiche un chiffre faux est pire
-qu'un tableau de bord absent, parce qu'on lui fait confiance.
+Le premier temps documente la source avant de la transformer. Chaque champ vu à l'écran est relevé
+avec son identifiant, son écran et la valeur affichée.
 
-\section*{Les objectifs}
+Le deuxième construit la chaîne de traitement. Elle reçoit les fichiers bruts, type leurs valeurs,
+met à part les lignes rejetées et organise le reste en tables d'analyse. Elle compte
+\chiffre{modeles-total} modèles de transformation et se rejoue en entier.
 
-Quatre objectifs découlent de cette question, et le rapport les traite dans cet ordre.
+Le troisième restitue les résultats dans un tableau de bord de \chiffre{tdb-pages} pages et
+\chiffre{tdb-indicateurs} indicateurs. Chaque indicateur affiche sa définition, la décision qu'il
+sert et les tables dont sa valeur est recalculée.
 
-\textbf{Documenter la source avant de la transformer.} Un système d'information qu'on n'a vu que par
-un profil ne se décrit pas de mémoire. Chaque champ observé est relevé avec son identifiant, son
-écran et sa valeur vue.
+Le quatrième sépare, pour chaque résultat, ce qu'il démontre de ce qu'il établit. Un résultat
+démontre que la chaîne sait produire une grandeur. Il établit le plus souvent peu de chose sur
+l'établissement lui-même.
 
-\textbf{Construire une chaîne complète et vérifiable.} De la zone d'atterrissage des fichiers
-jusqu'aux tables que l'écran lit, en passant par le typage, la quarantaine des lignes rejetées et
-la modélisation. Elle compte \chiffre{modeles-total} modèles de transformation et se rejoue en
-entier.
+\subsection*{Les données}
 
-\textbf{Restituer ce qui sert à décider.} Un tableau de bord de \chiffre{tdb-pages} pages portant
-\chiffre{tdb-indicateurs} indicateurs, dont chacun affiche sa définition, la décision qu'il sert et
-ce dont sa valeur est recalculée.
+Aucune donnée réelle ne sort du service, car la confidentialité des données de santé l'interdit.
+La chaîne est donc bâtie sur un jeu de données synthétiques, c'est-à-dire produit par un programme
+écrit pour ce projet plutôt qu'extrait du système observé. Sa volumétrie est relevée par
+établissement nommé dans le recueil statistique national \cite{s30}, puis mise à l'échelle de la
+période. Le jeu compte \chiffre{source-lignes-total} lignes sur \chiffre{source-tables} tables, du
+\chiffre{periode-debut} au \chiffre{periode-fin}, soit \chiffre{periode-jours} jours.
 
-\textbf{Dire ce que tout cela ne prouve pas.} C'est l'objectif le moins ordinaire et le plus tenu.
-Chaque résultat sépare ce qu'il démontre — que la chaîne sait produire la grandeur — de ce qu'il
-établit, qui est le plus souvent rien.
+Aucune grandeur produite par cette chaîne n'est donc une mesure de l'établissement. Une relation
+injectée dans le jeu se retrouve nécessairement à la sortie.
 
-\section*{Les données}
-
-Une contrainte de cadrage domine l'ensemble : aucune donnée réelle ne sort du service, et la
-confidentialité des données de santé n'en fait pas une clause négociable. La chaîne est donc bâtie
-sur un jeu de données synthétiques, c'est-à-dire produit par un programme écrit pour ce projet
-plutôt qu'extrait du système observé. Sa volumétrie est relevée par établissement nommé dans le
-recueil statistique national et mise à l'échelle de la période : \chiffre{source-lignes-total}
-lignes sur \chiffre{source-tables} tables, du \chiffre{periode-debut} au \chiffre{periode-fin}, soit
-\chiffre{periode-jours} jours.
-
-La conséquence est nette, et le rapport la tient d'un bout à l'autre. Aucune grandeur produite par
-cette chaîne n'est une mesure de l'établissement, et une relation qu'on y a injectée se retrouve
-nécessairement à la sortie. Le chapitre de cadrage expose cette décision, ce qu'elle permet et ce
-qu'elle interdit de conclure.
-
-\section*{Le plan}
+\section*{Plan du rapport}
 
 Le rapport suit l'ordre du travail, en \chiffre{chapitres-numerotes} chapitres et
 \chiffre{sections-du-rapport} sections.
 
-La première partie, \annoncePartie{Contexte et cadrage}, pose le terrain.
-\annonceChapitre{1}{L'organisme d'accueil} situe l'établissement dans le réseau hospitalier public
-et décrit le service où le travail s'est déroulé. \annonceChapitre{2}{Le système d'information
-hospitalier} rend compte de ce qui a été observé au poste, écran par écran, et de ce que les sources
-établissent des modules auxquels l'observation n'a pas eu accès. \annonceChapitre{3}{Cadrage et
-méthodologie} expose le besoin, le périmètre, la contrainte de confidentialité et la démarche suivie.
+La première partie, \annoncePartie{Contexte et cadrage}, présente le terrain.
+\annonceChapitre{1}{L'organisme d'accueil} présente l'hôpital et son service d'accueil et
+d'admission. \annonceChapitre{2}{Le système d'information hospitalier} décrit le logiciel du service
+et ce que le relevé des écrans a établi. \annonceChapitre{3}{Cadrage et méthodologie} expose le
+besoin, la contrainte de confidentialité et la méthode du projet.
 
 La deuxième partie, \annoncePartie{Analyse et conception}, conçoit la chaîne.
-\annonceChapitre{4}{Conception du jeu de données} dit comment le jeu est calibré, quelles relations
-y sont injectées et quels défauts y sont semés à dessein. \annonceChapitre{5}{Architecture de la
-chaîne de données} décrit les couches traversées et l'orchestration qui les enchaîne.
-\annonceChapitre{6}{Qualité des données et rapprochement d'identités} mesure ce que valent les
-données produites et ce que retrouve un rapprochement probabiliste, méthode qui estime la
-probabilité que deux fiches désignent la même personne.
+\annonceChapitre{4}{Conception du jeu de données} explique comment le jeu est calibré, quelles
+relations y sont injectées et quels défauts y sont semés à dessein. \annonceChapitre{5}{Architecture
+de la chaîne de données} décrit les couches traversées et l'orchestration qui les enchaîne.
+\annonceChapitre{6}{Qualité des données et rapprochement d'identités} mesure la qualité des données
+produites. Il évalue aussi un rapprochement probabiliste, méthode qui estime la probabilité que deux
+fiches désignent la même personne.
 
 La troisième partie, \annoncePartie{Réalisation}, restitue. \annonceChapitre{7}{Environnement et
 outils} nomme les outils de la chaîne et le motif de chaque choix. \annonceChapitre{8}{Analyse de
-l'activité} ventile l'activité du service et confronte, relation par relation, ce que la chaîne
-retrouve à ce qui y a été mis. \annonceChapitre{9}{Le tableau de bord} décrit l'écran de
-restitution, ses deux publics et la correspondance entre ce qu'il produit et ce que la nomenclature
-attend. \annonceChapitre{10}{Recommandations} tire les conséquences, en séparant pour chacune ce qui
-établit le constat de ce que l'indicateur démontre.
+l'activité} ventile l'activité du service et compare ce que la chaîne retrouve aux relations
+injectées. \annonceChapitre{9}{Le tableau de bord} décrit l'écran de restitution, ses deux publics
+et sa correspondance avec la nomenclature nationale. \annonceChapitre{10}{Recommandations} tire les
+conséquences, en séparant pour chacune le constat qui la fonde de ce que l'indicateur démontre.
 
-Une conclusion générale referme le rapport en disant ce qui a été fait, ce qui ne l'a pas été, et ce
-qu'il faudrait pour porter cette chaîne sur des données réelles.
+Une conclusion générale dit ce qui a été fait, ce qui ne l'a pas été et ce qu'il faudrait pour
+porter la chaîne sur des données réelles.
+
+Le rapport est rédigé à la forme impersonnelle, et la première personne est réservée aux passages
+qui relatent le déroulement du stage.
