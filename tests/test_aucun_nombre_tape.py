@@ -151,43 +151,6 @@ RESTES_CONNUS = (
     ("conception-du-jeu-de-donnees.tex", "& & 41,1~\\% & & 20,3~\\% \\\\"),
     ("conception-du-jeu-de-donnees.tex", "& & 12,6~\\% & & 77,7~\\% \\\\"),
     (
-        "organisme-d-accueil.tex",
-        "Pour l'exercice , ce tableau imprime 177~établissements hospitaliers publics, dont",
-    ),  # noqa: E501
-    (
-        "organisme-d-accueil.tex",
-        "75~hôpitaux provinciaux ou préfectoraux . La catégorie de l'établissement étudié est donc,",  # noqa: E501
-    ),  # noqa: E501
-    (
-        "organisme-d-accueil.tex",
-        "148~services d'urgence dans le secteur hospitalier public, dont 94~services d'urgences",
-    ),  # noqa: E501
-    (
-        "organisme-d-accueil.tex",
-        "Le recensement général de dénombre 4~467~911~habitants dans la région Fès-Meknès, dont",
-    ),  # noqa: E501
-    (
-        "organisme-d-accueil.tex",
-        "2~855~366 en milieu urbain et 1~612~545 en milieu rural . Ces trois valeurs sont",
-    ),  # noqa: E501
-    (
-        "organisme-d-accueil.tex",
-        "Meknès 4~hôpitaux provinciaux ou préfectoraux sur 5~établissements hospitaliers . La",
-    ),  # noqa: E501
-    (
-        "organisme-d-accueil.tex",
-        "résidence porté par chaque fiche patient, à hauteur de 63,9~\\% et 36,1~\\%. Elle est la seule part",  # noqa: E501
-    ),  # noqa: E501
-    (
-        "organisme-d-accueil.tex",
-        "L'hôpital Sidi Saïd est mis en fonction en et occupe une superficie de 4,5~hectares",
-    ),  # noqa: E501
-    (
-        "organisme-d-accueil.tex",
-        "Une dépêche d'agence de février~ annonce une capacité de 140~lits . Le recueil",
-    ),  # noqa: E501
-    ("organisme-d-accueil.tex", "40~lits ."),
-    (
         "qualite-et-rapprochement.tex",
         "premier nom de famille \\emph{et} adresse & & 99,99929~\\% \\\\",
     ),  # noqa: E501
