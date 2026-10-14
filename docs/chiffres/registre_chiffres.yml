@@ -291,6 +291,17 @@ chiffres:
   commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/volumetrie.yml'').read_text(encoding=''utf-8''))[''parametres'']
     if p[''nom'']==''capacite_litiere_fonctionnelle''][0]'
   portee: releve-2024
+- id: capacite-annoncee
+  valeur: 140
+  unite: lits
+  type: python
+  commande: >-
+    int([s for s in yaml.safe_load((R/'docs/sources/sources.yml').read_text(encoding='utf-8')) if
+    s['id']=='S-29'][0]['note'].split('Les ')[1].split(' lits')[0])
+  portee: independant-des-donnees
+  note: >-
+    Capacité litière annoncée par la dépêche d'agence S-29, telle que la note de cette source la
+    donne. Elle se cite séparément de la capacité fonctionnelle, sans rapport calculé entre les deux.
 - id: journees-2024
   valeur: 7851
   unite: journées
@@ -2391,7 +2402,7 @@ chiffres:
     Chapitres numérotés du rapport, comptés dans l'ordre des inclusions du fichier principal. Un
     chapitre non numéroté — l'introduction, la conclusion — n'y entre pas.
 - id: sections-du-rapport
-  valeur: 52
+  valeur: 50
   unite: sections
   type: python
   commande: 'sum(len([l for l in c.read_text(encoding=''utf-8'').splitlines() if l.startswith(''\\section{'')]) for c in sorted((R/''report/chapitres'').glob(''*.tex'')))'

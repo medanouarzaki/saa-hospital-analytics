@@ -1,11 +1,8 @@
 % Ce chapitre repose sur :
 %   DOC: s06, s07, s08, s09, s10, s27
-%   OBS: REL-DEM.I01, REL-DEM.I02, REL-DEM.P02, REL-IPP.O01, REL-IPP.O02, REL-IPP.O03
-%   OBS: REL-IPP.O04, REL-IPP.R12, REL-PAT.A01, REL-PAT.D01, REL-PAT.D02, REL-PAT.D03
-%   OBS: REL-PAT.D04, REL-PAT.D09, REL-PAT.D10, REL-PAT.D11, REL-PAT.H06, REL-PAT.H08
-%   OBS: REL-PAT.H12, REL-PAT.H14, REL-PAT.H15, REL-PAT.N01, REL-PAT.N02, REL-RDV.C02
-%   OBS: REL-RDV.C07, REL-RDV.C08, REL-RDV.R01, REL-RDV.R02, REL-RDV.R03, REL-RDV.R08
-%   OBS: REL-RDV.R11, REL-RDV.R12, aucune-collision-observee, saisie-de-patients-de-test, saisie-telephone-invente
+%   OBS: REL-DEM.I01, REL-DEM.P02, REL-IPP.O02, REL-IPP.O03, REL-IPP.R12, REL-PAT.D01
+%   OBS: REL-PAT.D09, REL-PAT.H12, REL-RDV.C02, REL-RDV.C07, REL-RDV.R01, REL-RDV.R03, REL-RDV.R08
+%   OBS: aucune-collision-observee, saisie-de-patients-de-test, saisie-telephone-invente
 %   HYP: (aucun)
 %   CHI: (aucun)
 %   SER: (aucune)
@@ -13,44 +10,35 @@
 
 \chapter{Le système d'information hospitalier}\label{chap:systeme}
 
+Le service d'accueil et d'admission enregistre son activité dans un progiciel, Hosix.NET. Deux
+questions se posent à son sujet. Que contient ce logiciel, d'après les documents de son éditeur ?
+Que montre-t-il réellement au poste observé, et qu'en tirer pour construire un modèle de données ?
+
 \section{Hosix.NET, origine et architecture}
 
 Le système d'information en place est Hosix.NET, édité par SIVSA Soluciones Informáticas
 \cite{s06}. C'est un progiciel, c'est-à-dire un logiciel du commerce paramétré pour
-l'établissement, et non un développement propre au ministère. Sa conception remonte aux années
-1980, et l'éditeur en revendique le déploiement dans plus de trente hôpitaux répartis sur six pays
-\cite{s07}.
+l'établissement. Sa conception remonte aux années 1980, et l'éditeur en revendique le déploiement
+dans plus de trente hôpitaux répartis sur six pays \cite{s07}.
 
-Son origine se lit dans sa nomenclature avant de se lire dans sa documentation. La raison sociale
-de l'éditeur est espagnole, et les modules portent des noms espagnols que la documentation reprend
-sans les traduire : \emph{Consultas} pour les agendas et les rendez-vous \cite{s08},
-\emph{Facturación} pour l'émission des factures \cite{s09}, auxquels s'ajoutent \emph{Médicos},
-\emph{Urgencias} et \emph{admisión}. Un produit servi en français conserve donc, dans son
-organisation interne, la langue de son concepteur.
+La raison sociale de l'éditeur est espagnole, et les modules portent des noms espagnols que la
+documentation reprend sans les traduire : \emph{Consultas} pour les agendas et les rendez-vous
+\cite{s08}, \emph{Facturación} pour l'émission des factures \cite{s09}, ainsi que \emph{Médicos},
+\emph{Urgencias} et \emph{admisión}.
 
-L'architecture fonctionnelle se contracte en trois paquets — Core, Clinic et Extension Packs — qui
-rassemblent vingt-six modules \cite{s06}. Le Core porte les fonctions administratives du dossier,
-le Clinic les fonctions médicales, et les Extension Packs des compléments contractables séparément.
-
-Un établissement peut donc exploiter la gestion administrative des patients sans exploiter la
-couche clinique. Le périmètre installé ici n'est pas connu : la documentation de l'éditeur décrit ce
-qui est contractable, jamais ce qui est contracté.
-
-Une précision vaut pour tout le dossier documentaire. La documentation de l'éditeur est
-commerciale : ses fiches énoncent des fonctions, jamais des schémas de données. Aucune colonne du
-modèle construit plus loin ne peut donc être justifiée par elle, et tout ce qui touche aux champs
-vient du relevé conduit au poste.
+Vingt-six modules se regroupent en trois paquets, Core, Clinic et Extension Packs \cite{s06}. Le
+Core porte les fonctions administratives du dossier, le Clinic les fonctions médicales, et les
+Extension Packs des compléments contractables séparément. Un établissement peut donc exploiter la
+gestion administrative des patients sans la couche clinique. La documentation décrit ce qui est
+contractable, et le périmètre installé à l'hôpital reste inconnu. Elle énonce des fonctions et ne
+publie aucun schéma de données. Tout ce qui touche aux champs vient donc du relevé conduit au poste.
 
 \section{Les cinq profils applicatifs et les processus qu'ils portent}
 
-L'écran de démarrage propose cinq profils applicatifs, et le relevé les reproduit sous leur libellé
-exact, irrégularité de ponctuation comprise : un libellé se reproduit, il ne se corrige
-pas\releve{REL-DEM.P02}.
-
-Ces cinq profils ne sont pas cinq vues d'un même écran. Chacun ouvre un jeu de modules distinct, et
-les habilitations cloisonnent l'accès. Un seul a été ouvert au poste ; les quatre autres n'ont été
-relevés qu'à l'écran de démarrage. Chacun porte un processus, établi par le relevé ou par la
-documentation (cf. tableau~\ref{tab:profils-applicatifs}).
+L'écran de démarrage propose cinq profils applicatifs, que le relevé reproduit sous leur libellé
+exact\releve{REL-DEM.P02}. Chacun ouvre un jeu de modules distinct, et les habilitations
+cloisonnent l'accès. Le tableau~\ref{tab:profils-applicatifs} associe à chaque profil le processus
+qu'il porte et ce qui l'établit, observation ou documentation.
 
 \begin{table}[htbp]
 \centering
@@ -74,16 +62,14 @@ Profil & Processus porté & Module & Établi par \\
 
 \medskip
 
-L'éditeur ne publie aucune fiche distincte pour le recouvrement : la fonction est intégrée au
-module de facturation, ce qui explique que deux profils s'y rattachent. Le cinquième profil est le
-seul dont le contenu se déduise d'une source extérieure à l'éditeur, la nomenclature des
-indicateurs qu'un hôpital nommé remonte à la statistique nationale \cite{s10}.
+L'éditeur ne publie aucune fiche distincte pour le recouvrement. La fonction est intégrée au module
+de facturation, et deux profils s'y rattachent donc. Le contenu du cinquième profil se déduit d'une
+source extérieure à l'éditeur, la nomenclature des indicateurs qu'un hôpital nommé remonte à la
+statistique nationale \cite{s10}.
 
-Le découpage en cinq profils et les missions que le règlement prescrit ne se recouvrent pas terme
-à terme, et le diagramme des cas d'utilisation le montre mieux qu'un tableau (voir
-figure~\ref{fig:cas-utilisation}) : quatre
-missions sur neuf reçoivent un profil, cinq n'en reçoivent aucun, et un profil ne répond à aucune
-mission de l'article~35.
+Les profils et les missions du règlement ne se recouvrent pas terme à terme (voir
+figure~\ref{fig:cas-utilisation}). Quatre missions sur neuf reçoivent un profil, cinq n'en reçoivent
+aucun, et un profil ne répond à aucune mission de l'article~35.
 
 \begin{figure}[htbp]
 \centering
@@ -124,12 +110,9 @@ mission de l'article~35.
 \caption[Les missions du service et les profils applicatifs]{Les missions que le règlement intérieur prescrit au service \cite{s27}, et les profils applicatifs relevés à l'écran de démarrage\releve{REL-DEM.P02}}\label{fig:cas-utilisation}
 \end{figure}
 
-Chaque mission est reproduite dans les termes du texte, chaque profil sous son libellé exact. Un
-trait joint un profil à la mission qu'il porte. Les cinq missions sans trait ne sont pas un oubli
-du dessin : aucun des cinq profils ne les porte. Le profil de recouvrement est posé à l'écart, sans
-trait, parce que le recouvrement ne figure pas à l'article~35 — il relève de l'article~9,
-paragraphe~b, qui en charge le pôle des affaires administratives \cite{s27}. La figure ne montre
-ni les habilitations qui cloisonnent les profils, ni les modules que chacun ouvre.
+Chaque mission figure dans les termes du texte, chaque profil sous son libellé exact. Un trait joint
+un profil à la mission qu'il porte. Le profil de recouvrement est posé à l'écart, sans trait, car le
+règlement confie le recouvrement au pôle des affaires administratives \cite{s27}.
 
 \medskip
 
@@ -139,228 +122,103 @@ L'observation a porté sur un poste du service, sur le profil \texttt{MSM - GEST
 28 juillet 2026. Quatre écrans ont été parcourus : l'écran de démarrage, la recherche d'identifiant
 patient, la fiche patient et l'écran de prise de rendez-vous.
 
-L'observation n'a pas été passive. Des patients de test ont été saisis dans le système pour
-comprendre ce qui distingue les cas, et les cas rencontrés étaient variés : patient déjà présent
-dans la base ou patient à créer, types de couverture différents\releve{saisie-de-patients-de-test}.
+L'observation a été active. Des patients de test ont été saisis dans le système pour comprendre ce
+qui distingue les cas. Les cas rencontrés étaient variés, patient déjà présent dans la base ou
+patient à créer, types de couverture différents\releve{saisie-de-patients-de-test}.
 
-Chaque élément est consigné avec un identifiant stable, le bloc de l'écran auquel il appartient,
-son libellé reproduit à l'identique, son type apparent, et la valeur affichée lorsqu'une valeur
-l'était. L'identifiant n'est pas une commodité de rédaction : c'est la clé par laquelle chaque
-colonne du modèle de données désigne son témoin d'observation.
-
-Une convention gouverne la restitution : le caractère obligatoire ou facultatif d'un champ n'a été
-relevé sur aucun écran, et n'est donc affirmé nulle part.
-
-\textbf{Ce chapitre ne décrit pas une interface, il décrit ce que le service saisit.} Les boutons,
-les barres d'actions et les agencements de blocs ne portent aucune donnée et ne figurent pas ici ;
-le relevé intégral, élément par élément, est reporté à l'annexe~\ref{annexe:releve}.
+Chaque élément est consigné avec un identifiant stable, le bloc de l'écran auquel il appartient, son
+libellé reproduit à l'identique, son type apparent et la valeur affichée lorsqu'une valeur l'était.
+Cet identifiant relie ensuite chaque colonne du modèle de données à l'élément observé. Le caractère
+obligatoire ou facultatif d'un champ n'a été relevé sur aucun écran. Les boutons et l'agencement des
+blocs ne portent aucune donnée, et l'annexe~\ref{annexe:releve} reproduit le relevé intégral,
+élément par élément.
 
 \section{Ce que le service saisit}
 
-\textbf{L'établissement et sa tutelle.} L'écran de démarrage n'entre au modèle de données par aucun
-champ — il ne porte aucune donnée de dossier —, mais deux valeurs y comptent pour la suite (cf. tableau~\ref{tab:ecran-demarrage}).
+L'écran de démarrage ne porte aucune donnée de dossier. Il affiche le ministère de tutelle et
+l'identification du site, où le code de région précède le nom de l'établissement\releve{REL-DEM.I01}.
+Ce premier écran montre une pratique que les suivants confirment, car le système affiche chaque code
+avec son libellé.
 
-\begin{table}[htbp]
-\centering
-\caption{L'écran de démarrage : l'établissement et sa tutelle}\label{tab:ecran-demarrage}
-\begin{tabular}{@{}p{2.6cm}p{4.4cm}p{7.4cm}@{}}
-\toprule
-Identifiant & Libellé à l'écran & Valeur observée \\
-\midrule
-\texttt{REL-DEM.I01} & Identification du site & \texttt{005 Fès-Meknès; Sidi Said} \\
-\texttt{REL-DEM.I02} & Ministère de tutelle & \texttt{Ministère de la Santé} \\
-\bottomrule
-\end{tabular}
-\end{table}
+L'écran de recherche d'identifiant patient sert à retrouver un dossier avant toute opération. Il
+nomme l'identifiant patient permanent (IPP), numéro unique qu'un établissement attribue à une
+personne et qui la suit d'un séjour à l'autre. Il nomme aussi l'index maître des patients (MPI),
+registre qui rassemble ces identifiants et sert à retrouver une personne déjà connue. Deux onglets
+s'adressent au MPI\releve{REL-IPP.O02}, dont l'un en recherche pondérée\releve{REL-IPP.O03}. La
+colonne de résultat affiche une probabilité\releve{REL-IPP.R12}, ce qui fait de la recherche un
+rapprochement plutôt qu'une recherche exacte. Le relevé atteste ces fonctions dans l'installation
+observée, et rien de leur déploiement ailleurs.
 
-\medskip
+Les critères de recherche vont au-delà de l'identifiant : nom, prénom, date de naissance, mais aussi
+mois et année seuls, âge et approximation en années. Un écran qui permet de chercher à l'âge approché
+est conçu pour des dossiers dont la date de naissance est incertaine ou absente.
 
-Le code de région est accolé au nom de l'établissement sous une graphie que le relevé conserve
-telle quelle, séparateur compris. C'est le premier signe d'une pratique que les écrans suivants
-confirment : le système code ses références et affiche le code avec son libellé.
+La fiche patient est l'écran le plus dense, et la plus grande part des colonnes du modèle en vient.
+Elle porte le numéro IPP\releve{REL-PAT.D01}, plusieurs champs de nom, dont les noms du père et de la
+mère, la pièce d'identité, l'état civil, la compagnie d'assurance, le quartier et quatre lignes de
+téléphone. La compagnie d'assurance et la nationalité y sont des couples code-libellé. Le type de
+pièce d'identité et l'état civil s'écrivent par une lettre suivie de son libellé
+développé\releve{REL-PAT.D09}. Ces couples permettent de reconstituer plus loin des dimensions sans
+inventer de libellés.
 
-\textbf{L'identifiant du patient, et la façon dont on le retrouve.} C'est par cet écran qu'un agent
-retrouve un dossier avant toute opération. Quatre de ses éléments, qui nomment l'identifiant
-patient permanent (IPP) et l'index maître des patients (MPI), portent le diagnostic que le
-chapitre~\ref{chap:qualite} reprend (cf. tableau~\ref{tab:ecran-recherche}).
+La fiche porte aussi deux cases d'avertissement, l'une par service de messages courts, ou SMS,
+l'autre par courrier électronique\releve{REL-PAT.H12}. Les canaux de rappel existent donc déjà dans
+le dossier.
 
-\begin{table}[htbp]
-\centering
-\caption{La recherche d'identifiant patient : les éléments relevés}\label{tab:ecran-recherche}
-\begin{tabular}{@{}p{2.6cm}p{4.6cm}p{7.2cm}@{}}
-\toprule
-Identifiant & Libellé à l'écran & Bloc \\
-\midrule
-\texttt{REL-IPP.O01} & Chercher & onglet \\
-\texttt{REL-IPP.O02} & Chercher MPI & onglet \\
-\texttt{REL-IPP.O03} & Chercher MPI Pondéré & onglet \\
-\texttt{REL-IPP.O04} & Nouvel IPP & onglet \\
-\texttt{REL-IPP.R12} & Probabilité & colonne de résultat \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\medskip
-
-Deux termes du système apparaissent ici, et le rapport les emploie ensuite sans les redéfinir.
-L'IPP est le numéro unique qu'un établissement attribue à une personne et qui la suit d'un séjour à
-l'autre. Le MPI — ainsi le nomment les libellés de l'écran — est le registre qui rassemble ces
-identifiants et sert à retrouver une personne déjà connue.
-
-Un MPI existe donc dans le système, et deux onglets s'y adressent
-explicitement, dont l'un en recherche pondérée\releve{REL-IPP.O03}. La dernière colonne de résultat
-affiche une \emph{probabilité}\releve{REL-IPP.R12} : une recherche qui rend des probabilités n'est
-pas une recherche exacte, c'est un rapprochement. Le relevé s'arrête là — il atteste qu'un index
-maître et une recherche pondérée existent dans l'installation observée, et rien sur leur
-déploiement ailleurs.
-
-Les critères de recherche méritent enfin une lecture. Ils ne cherchent pas seulement par
-identifiant : nom, prénom, date de naissance, mais aussi mois et année seuls, âge, et une
-approximation en années. Un écran qui offre de chercher à l'âge approché est un écran conçu pour
-des dossiers dont la date de naissance est incertaine ou absente.
-
-\textbf{L'identité du patient.} La fiche patient est l'écran le plus dense du périmètre observé, et
-c'est de lui que vient la plus grande part des colonnes du modèle. Un extrait retient
-celles dont le rapport se sert explicitement plus loin, jusqu'aux avertissements par service de
-messages courts, ou SMS (cf. tableau~\ref{tab:fiche-patient}).
-
-\begin{table}[htbp]
-\centering
-\caption{La fiche patient : les éléments dont le rapport se sert}\label{tab:fiche-patient}
-\begin{tabular}{@{}p{2.6cm}p{4.2cm}p{7.6cm}@{}}
-\toprule
-Identifiant & Libellé à l'écran & Ce que la suite en fait \\
-\midrule
-\texttt{REL-PAT.D01} & N° IPP & la clé du dossier, reprise par tous les faits \\
-\texttt{REL-PAT.D02} & Nom & un des cinq champs de nom du rapprochement \\
-\texttt{REL-PAT.D03} & Nom de famille 1 & idem, avec \texttt{REL-PAT.D04} \\
-\texttt{REL-PAT.D09} & Type pièce d'identité & couple code-libellé, base d'une dimension \\
-\texttt{REL-PAT.D10} & N° pièce d'identité & critère de collision exacte \\
-\texttt{REL-PAT.D11} & E. Civil & couple code-libellé \\
-\texttt{REL-PAT.A01} & Compagnie d'assur. & couple code-libellé, dimension organisme \\
-\texttt{REL-PAT.H06} & Quartier & champ de blocage du rapprochement \\
-\texttt{REL-PAT.H08} & Téléphone 1 & champ de blocage du rapprochement \\
-\texttt{REL-PAT.H12} & Avertissements SMS & canal de rappel, repris aux recommandations \\
-\texttt{REL-PAT.H14} & Avertissements e-mail & idem \\
-\texttt{REL-PAT.H15} & Environnement & urbain ou rural, calé sur le recensement \\
-\texttt{REL-PAT.N01} & Nom. Père & champ de rapprochement \\
-\texttt{REL-PAT.N02} & Nom. Mère & champ de rapprochement \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\medskip
-
-Quatre valeurs affichées documentent la forme des nomenclatures du système\releve{REL-PAT.D09}.
-Deux sont des couples code-libellé : la compagnie d'assurance et la nationalité, cette dernière
-relevée deux fois — au domicile et au lieu de naissance — sous le même couple. Deux autres sont des
-couples de valeurs codées : le type de pièce d'identité et l'état civil, tous deux abrégés par une
-lettre suivie de son libellé développé. Le système code donc ses références et affiche les deux
-faces du couple, ce qui permet plus loin de reconstituer des dimensions sans inventer de libellés.
-
-La fiche porte enfin quatre lignes de téléphone et deux cases d'avertissement, l'une par message
-court, l'autre par courrier électronique\releve{REL-PAT.H12} : les canaux de contact existent déjà
-dans le dossier.
-
-\textbf{Le rendez-vous.} C'est le seul processus observé de bout en bout. Les éléments qui
-identifient le patient y sont rappelés de la fiche et le modèle ne les enregistre pas deux fois ;
-ceux du rendez-vous lui-même sont relevés à part (cf. tableau~\ref{tab:ecran-rendez-vous}).
-
-\begin{table}[htbp]
-\centering
-\caption{L'écran de prise de rendez-vous : les éléments propres au rendez-vous}\label{tab:ecran-rendez-vous}
-\begin{tabular}{@{}p{2.6cm}p{4.2cm}p{7.6cm}@{}}
-\toprule
-Identifiant & Libellé à l'écran & Ce que la suite en fait \\
-\midrule
-\texttt{REL-RDV.R01} & Agenda & rattachement au service \\
-\texttt{REL-RDV.R02} & Activité & la dimension d'activité du fait \\
-\texttt{REL-RDV.R03} & Origine & couple code-libellé ; adressage externe observé \\
-\texttt{REL-RDV.R08} & Date rendez-vous & la date de tenue \\
-\texttt{REL-RDV.R11} & État & honoré, annulé, absent, en instance \\
-\texttt{REL-RDV.R12} & Durée & la durée du créneau \\
-\texttt{REL-RDV.C02} & Date création & la date de prise, d'où le délai d'obtention \\
-\texttt{REL-RDV.C07} & Annulé par & agent d'annulation \\
-\texttt{REL-RDV.C08} & Date annul. & date d'annulation \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\medskip
-
-L'origine de la demande est un couple code-libellé, et la valeur observée désigne un adressage par
-une autre structure hospitalière\releve{REL-RDV.R03}. Le bloc de contrôle des modifications porte
-quatre couples d'auteur et d'horodatage — création, modification, confirmation, annulation — dont
-la portée est traitée à la section suivante.
+L'écran de prise de rendez-vous porte le seul processus observé de bout en bout. Il enregistre
+l'agenda, l'activité, l'origine de la demande, la date, l'état et la durée du
+rendez-vous\releve{REL-RDV.R01}. L'origine est un couple code-libellé, et la valeur observée désigne
+un adressage par une autre structure hospitalière\releve{REL-RDV.R03}. Un bloc de contrôle porte
+quatre couples d'auteur et d'horodatage, pour la création, la modification, la confirmation et
+l'annulation.
 
 \section{Les observations exploitables}
 
-Quatre observations dépassent la description : elles fondent une grandeur, une distinction, un
-diagnostic et une mise en garde que le reste du rapport reprend. Les trois premières se lisent sur
-un écran ; la quatrième vient de la saisie elle-même. Chacune est une observation, et rien
-d'autre.
+Certaines observations vont au-delà de la description. Elles fondent une grandeur, une distinction,
+un diagnostic ou une contrainte que la chaîne reprend.
 
-\textbf{L'écart entre la création et le rendez-vous est le délai
-d'obtention}\releve{REL-RDV.C02}. Le bloc de contrôle des modifications horodate la création ; le
-bloc du rendez-vous horodate la date convenue. Leur différence est le délai qu'un patient attend,
-grandeur que ni l'un ni l'autre des deux champs ne porte seul.
+\paragraph{Le délai d'obtention.} Le bloc de contrôle horodate la création du
+rendez-vous\releve{REL-RDV.C02}, et le bloc du rendez-vous porte la date convenue. Leur différence
+est le délai qu'un patient attend, une grandeur qu'aucun des deux champs ne porte seul. Sur le
+rendez-vous observé, ce délai vaut une seconde, entre la création à \texttt{10:57:06} et le
+rendez-vous à \texttt{10:57:07} du même jour. Le système accepte donc un délai nul, et la grandeur
+est bornée à zéro. Le chapitre~\ref{chap:activite} en fait un indicateur.
 
-Sur le rendez-vous observé, cette différence vaut une seconde : la création à \texttt{10:57:06} et
-le rendez-vous à \texttt{10:57:07} du même jour, soit un rendez-vous donné pour l'instant même. Le
-cas est extrême et il est instructif : il montre que le système accepte un délai nul, donc que la
-grandeur est bornée à zéro et non strictement positive. Le chapitre~\ref{chap:activite} en fait un
-indicateur.
+\paragraph{L'annulation et l'absence.} Le bloc de contrôle porte un auteur de confirmation et un
+auteur d'annulation, chacun avec son horodatage\releve{REL-RDV.C07}. Ce couple distingue
+l'annulation déclarée, qui laisse au service le temps de réaffecter le créneau, de l'absence non
+prévenue, qui le perd. Les deux taux appellent des remèdes différents, et le
+chapitre~\ref{chap:activite} les mesure séparément.
 
-\textbf{Un couple de champs sépare l'annulation de l'absence}\releve{REL-RDV.C07}. Le bloc de
-contrôle porte un champ d'auteur de confirmation et un champ d'auteur d'annulation, chacun avec son
-horodatage. Sans ce couple, un rendez-vous non honoré serait un état unique.
+\paragraph{La recherche pondérée.} Un système qui cherche un patient par similarité et affiche une
+probabilité admet que la recherche exacte ne suffit pas\releve{REL-IPP.O03}. Elle ne suffit pas
+parce qu'une même personne y possède plusieurs dossiers. Le relevé ne dit pas si le service emploie
+la fonction, ni combien de dossiers sont concernés. Aucune recherche conduite au poste n'a rendu
+plusieurs résultats proches d'un même patient\releve{aucune-collision-observee}. Le problème est
+établi par l'existence de la fonction dans l'outil et par le rapport d'audit consacré à
+l'établissement. Le chapitre~\ref{chap:qualite} construit un rapprochement probabiliste sur ce
+constat.
 
-Avec lui, deux situations se distinguent : l'annulation déclarée, qui laisse au service le temps de
-réaffecter le créneau, et l'absence non prévenue, qui le perd. La distinction n'est pas cosmétique
-— elle sépare deux taux dont les remèdes diffèrent, et le chapitre~\ref{chap:activite} les mesure
-séparément.
+\paragraph{Le champ renseigné et le champ juste.} Certains champs restent vides en pratique, jugés
+non essentiels à la rapidité de la saisie. Le numéro de téléphone est parfois rempli d'un numéro
+inventé, lorsqu'une personne âgée ne connaît pas le sien\releve{saisie-telephone-invente}. Cette
+observation vient de la saisie elle-même et ne se lit sur aucun écran. Le taux de renseignement
+d'une colonne mesure donc ce qui a été saisi, et non ce qui est vrai.
 
-\textbf{La recherche pondérée est un aveu}\releve{REL-IPP.O03}. Un système qui offre de chercher un
-patient par similarité, et qui affiche une probabilité en regard de chaque résultat, admet que la
-recherche exacte ne suffit pas. Elle ne suffit pas parce qu'une même personne y possède plusieurs
-dossiers.
+\paragraph{Le format des dates.} Les horodatages s'affichent au format mois-jour-année avec un
+indicateur de méridien, dans une interface par ailleurs française\releve{REL-RDV.R08}. La date
+observée le montre sans ambiguïté, car son quantième vaut vingt-huit. Une extraction rend les dates
+dans la forme où l'écran les compose, et toute date entrant dans la chaîne doit être convertie
+depuis ce format. Une conversion absente ou fausse échangerait un jour et un mois onze fois sur
+douze sans qu'aucune valeur ne devienne invalide. Le chapitre~\ref{chap:architecture} reprend cette
+contrainte de chargement.
 
-La fonction existe dans le produit installé. Ce que le relevé ne dit pas, c'est si le service
-l'emploie, ni combien de dossiers sont concernés.
+\section*{Synthèse}
 
-Une réserve s'impose, et elle est forte : \textbf{aucune recherche conduite au poste n'a rendu
-plusieurs résultats proches d'un même patient}\releve{aucune-collision-observee}. Le problème n'a
-pas été constaté sur place. Il est établi par l'existence de la fonction dans l'outil, et par le
-rapport d'audit consacré à l'établissement.
-
-Le chapitre~\ref{chap:qualite} construit un rapprochement probabiliste sur ce constat, et le
-confronte à une collision exacte.
-
-\textbf{Un champ renseigné n'est pas un champ juste}\releve{saisie-telephone-invente}. Certains
-champs restent vides en pratique, jugés non essentiels à la rapidité de la saisie. Le numéro de
-téléphone, lui, ne reste pas vide : il est parfois rempli d'un numéro inventé, lorsqu'une personne
-âgée ne connaît pas le sien.
-
-Cette observation ne se lit sur aucun écran, et elle porte loin. Le taux de renseignement d'une
-colonne mesure ce qui a été saisi, jamais ce qui est vrai, et le rapport ne confond nulle part les
-deux.
-
-Une dernière observation, mineure et têtue, court à travers les précédentes : les
-horodatages s'affichent au format mois-jour-année avec un indicateur de méridien, dans une
-interface par ailleurs française\releve{REL-RDV.R08}. La date observée le montre sans ambiguïté —
-le quantième vaut vingt-huit, ce qui exclut toute lecture jour-mois.
-
-Ce détail d'affichage n'est pas cosmétique. Une extraction du système rend ses dates dans la forme
-où l'écran les compose ; toute date entrant dans la chaîne doit donc être convertie depuis ce
-format, et la conversion doit être écrite une fois et vérifiée. Faute de quoi un jour et un mois
-s'échangent silencieusement onze fois sur douze sans qu'aucune valeur ne devienne invalide. C'est
-une contrainte de chargement, reprise au chapitre~\ref{chap:architecture}.
-
-Ces observations partagent une propriété qui gouverne la suite. Aucune ne vient d'un entretien ni
-d'une documentation : les trois premières se lisent sur un écran, sous un identifiant que le
-lecteur retrouve à l'annexe~\ref{annexe:releve}, et la quatrième vient de la saisie.
-
-Elles ne disent rien de la fréquence des situations qu'elles révèlent — un seul rendez-vous a été
-observé, et un cas n'est pas une distribution. Ce qu'elles établissent est qu'une grandeur est
-calculable, qu'une distinction est enregistrée, qu'un champ renseigné peut être faux et qu'un
-format s'impose.
+Le service travaille sur Hosix.NET, un progiciel dont la documentation décrit des fonctions et aucun
+schéma de données. Ses cinq profils applicatifs découpent l'activité du service autrement que les
+missions du règlement. Le relevé des écrans établit les champs que le service saisit, et ses
+observations rendent calculables un délai d'obtention et deux taux distincts. Elles montrent aussi
+qu'un champ renseigné peut être faux et qu'un format de date s'impose au chargement, sans rien dire
+de la fréquence de ces situations. Le chapitre~\ref{chap:cadrage} expose le besoin et la méthode
+du projet, qui s'appuient sur ces constats.

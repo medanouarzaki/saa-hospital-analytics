@@ -1,65 +1,62 @@
 % Ce chapitre repose sur :
-%   DOC: s30, s52
+%   DOC: s06, s27, s30, s52
 %   OBS: organisation-en-phases, rattachement-du-travail
 %   HYP: (aucun)
 %   CHI: colonnes-source-doc, colonnes-source-hyp, colonnes-source-obs, colonnes-source-registre
+%   CHI: releve-champs-total
 %   SER: (aucune)
 %   SECTIONS: 5
 
 \chapter{Cadrage et méthodologie}\label{chap:cadrage}
 
+Le projet répond à un besoin écrit, avec un accès limité au système observé et sans aucune donnée
+réelle. Trois questions en découlent. Que demande le besoin ? Que permet l'accès au poste, et comment
+travailler sans les données du service ? Quelle méthode permet d'en tirer des résultats
+vérifiables ?
+
 \section{Le besoin exprimé}
 
-Le travail répond à un cahier de charges portant sur l'activité du service d'accueil et
-d'admission dans son ensemble, et non sur le seul processus observable depuis un poste.
+Le travail répond à un cahier de charges portant sur l'activité du service d'accueil et d'admission
+dans son ensemble, et non sur le seul processus observable depuis un poste. Ce périmètre oblige à
+documenter quatre processus que l'observation directe n'a pas atteints, et il explique la place de
+la reconstruction documentaire dans le projet.
 
-Ce périmètre est déterminant pour la suite. Il oblige à documenter quatre processus auxquels
-l'observation directe n'a pas donné accès, et il explique la place que tient dans ce projet la
-reconstruction par voie documentaire.
+Le document lui-même ne figure pas au dépôt, mais trois de ses exigences y sont consignées. Tout
+indicateur affiché doit être recalculé depuis les tables de faits, dont chaque ligne enregistre un
+événement de l'activité, comme un passage ou une facture, avec ses mesures \cite{s52}. Le tableau de
+bord ne doit lire que la base. Les valeurs affichées doivent rester lisibles par un lecteur qui ne
+connaît pas les codes du système d'origine.
 
-Le document lui-même ne figure pas au dépôt. Trois de ses exigences y sont en revanche consignées :
-tout indicateur affiché doit être recalculé depuis les tables de faits — celles dont chaque ligne
-enregistre un événement de l'activité, un passage ou une facture, avec ses mesures \cite{s52} —, le
-tableau de bord ne doit lire que la base, et les valeurs affichées doivent être lisibles par un lecteur qui ne connaît pas
-les codes du système d'origine.
-
-Les trois sont tenues en partie et manquées en partie, et les écarts sont écrits plutôt que
-contournés. Six indicateurs ne sont pas recalculés depuis les faits, dont cinq parce qu'aucune
-table de faits ne porte la matière — il n'existe ni fait des créances ni fait des relances — et un
-parce que le recalcul changerait sa valeur en changeant sa population.
-
-La capacité litière, dont dépendent quatre indicateurs de séjour, n'est lisible nulle part dans la
-base et transite par une table de paramètres portant sa provenance. Quatre dimensions sur six
-affichent enfin leur code nu, faute de libellé qu'une source établisse.
-
-Cette dernière abstention est délibérée : un code nu est illisible et le montre, un libellé inventé
-est lisible et le cache.
+Ces exigences sont tenues en partie. Six indicateurs ne sont pas recalculés depuis les faits. Pour
+cinq d'entre eux, aucune table de faits ne porte la matière, puisqu'il n'existe ni fait des
+créances ni fait des relances. Le sixième changerait de valeur en changeant de population. La
+capacité litière, dont dépendent quatre indicateurs de séjour, est absente de la base et transite
+par une table de paramètres qui porte sa provenance. Quatre dimensions sur six affichent enfin leur
+code nu, faute de libellé qu'une source établisse.
 
 Le besoin est arrivé par ce document, remis en début de stage.
 
 Toute liberté d'action a été laissée dans le cadre ainsi fixé. Aucune démarche n'a été imposée,
 aucun outil prescrit, aucun découpage suggéré.
 
-Cette liberté a une conséquence qu'il faut écrire, parce qu'elle porte tout ce chapitre : \textbf{le
+Cette liberté a une conséquence : \textbf{le
 cadrage est l'œuvre du stagiaire}. Le périmètre retenu, la décision de générer les données, la pile
 technique et la méthode de vérification ne sont pas des consignes reçues — ce sont des choix, et
-ils appartiennent à celui qui les a faits. Le reste du chapitre les assume comme tels.
+ils appartiennent à celui qui les a faits.
 
 Le besoin n'a pas changé en cours de stage.
 
 \section{Périmètre d'observation}
 
-Le système d'information cloisonne l'accès par profil applicatif, et le service n'accorde à un
-stagiaire qu'un seul des cinq profils que porte l'écran de démarrage. Un processus a donc été
-observé, quatre ont été reconstruits par voie documentaire.
+Faute d'accès aux quatre autres profils applicatifs, un processus a été observé au poste et quatre
+ont été reconstruits à partir de documents. Une observation et une reconstruction n'ont pas la même
+valeur, et les confondre présenterait comme vu ce qui a été déduit.
 
-Ce n'est pas une commodité : c'est la contrainte à partir de laquelle tout le dispositif de
-provenance a été bâti.
-
-Une observation et une reconstruction n'ont pas la même valeur, et les confondre reviendrait à
-présenter comme vu ce qui a été déduit. Chaque colonne du modèle de données porte donc une
-étiquette de provenance, et l'exigence de preuve diffère par étiquette (cf.
-tableau~\ref{tab:etiquettes-provenance}).
+Chaque colonne du modèle de données porte donc une \textbf{étiquette de provenance}, c'est-à-dire
+une mention qui dit d'où elle vient : vue à l'écran, tirée d'un document ou posée par hypothèse. Le
+tableau~\ref{tab:etiquettes-provenance} donne la preuve exigée pour chaque étiquette. La chaîne garde
+aussi la trace de chaque ligne, car la date d'extraction devient une colonne et une ligne refusée
+est conservée à part, dans une quarantaine (chapitre~\ref{chap:architecture}).
 
 \begin{table}[htbp]
 \centering
@@ -79,87 +76,43 @@ tableau~\ref{tab:etiquettes-provenance}).
 
 \medskip
 
-La proportion est elle-même un résultat : un peu moins de la moitié des colonnes est observée, et
-le lecteur sait laquelle. Les colonnes hypothétiques portent toutes la mention d'absence de preuve
-externe.
+Un peu moins de la moitié des colonnes est observée. Les colonnes hypothétiques portent toutes la
+mention d'absence de preuve externe.
 
-Le même dispositif s'étend à la prose de ce rapport. Chaque affirmation y relève d'une des trois
-mêmes catégories, chaque chapitre déclare en tête ce sur quoi il repose, et un contrôle vérifie que
-la déclaration coïncide avec ce que le fichier porte.
-
-Aucune image du système d'information observé n'entre dans ce rapport, et le motif tient en une
-phrase : les écrans d'un dossier patient en production affichent des identifiants de session, des
-libellés de compte et la structure des dossiers d'un établissement réel, et le dépôt de ce projet
-est public. L'interdiction ne vise que ce système. Le tableau de bord est le travail de ce projet,
-bâti sur des données engendrées : il se montre, et le chapitre~\ref{chap:tableau-de-bord} en
-compose des captures.
-
-Ce que les images auraient montré, le relevé de champs le porte sous une forme plus exploitable :
-quatre écrans, cent quarante-trois éléments, chacun avec son identifiant, son libellé exact, son
-type apparent et sa valeur observée le cas échéant. Le chapitre~\ref{chap:systeme} en reprend, en
-tableaux, les éléments dont la suite se sert.
+Aucune image du système d'information observé n'entre dans le rapport. Les écrans d'un dossier
+patient en production affichent des identifiants de session, des libellés de compte et la structure
+des dossiers d'un établissement réel, et le dépôt du projet est public. Le tableau de bord, bâti sur
+des données engendrées, se montre en revanche, et le chapitre~\ref{chap:tableau-de-bord} en compose
+des captures. Le relevé de champs porte ce que les images auraient montré : quatre écrans et
+\chiffre{releve-champs-total} éléments, chacun avec son identifiant, son libellé exact, son type
+apparent et sa valeur observée le cas échéant.
 
 \section{La contrainte de confidentialité et la décision de générer}
 
-Une décision de cadrage domine tout le projet : aucune donnée réelle ne sort du service. Elle n'est
-pas négociable et elle n'a pas été négociée. Elle interdit d'extraire un échantillon, fût-il
-anonymisé, et elle interdit donc de bâtir une chaîne de données sur des lignes venues du système
-observé.
+La confidentialité des données de santé interdit d'extraire du système observé un échantillon, même
+anonymisé. Le jeu de données du projet est donc produit par un générateur. Ses relations internes y
+sont injectées une par une, et chacune est consignée avec son paramètre et son effet sur ce que le
+tableau de bord affiche.
 
-La conséquence est qu'un jeu de données est produit. Sa volumétrie n'est pas inventée : elle est
-relevée par établissement nommé dans le recueil statistique national \cite{s30} et mise à l'échelle
-de la période. Ses relations internes ne sont pas davantage improvisées — elles sont injectées
-délibérément, une par une, et chacune est consignée avec son paramètre et sa conséquence sur ce que
-le tableau de bord donne à voir.
+La génération permet de démontrer une chaîne complète sur des volumes réalistes. Elle permet aussi
+d'injecter des défauts dont la vérité est connue, et donc de mesurer ce qu'un traitement retrouve.
+Un rapprochement d'identités s'évalue ainsi contre des doublons dont les vrais sont connus, ce que
+des données réelles ne permettraient pas. Le registre des relations injectées indique, pour chacune,
+ce que la page affiche et ce qu'il est interdit d'en conclure.
 
-\textbf{Ce que la génération permet.} Elle permet de démontrer une chaîne complète sur des volumes
-réalistes, d'y injecter des défauts dont on connaît la vérité terrain, et donc de mesurer ce qu'un
-traitement retrouve. Un rapprochement probabiliste évalué contre des doublons dont on sait lesquels
-sont vrais est mesurable ; le même rapprochement sur des données réelles ne le serait pas.
-
-\textbf{Ce qu'elle interdit de conclure.} Aucune grandeur produite par la chaîne n'est une mesure
-de l'établissement. Une relation injectée se retrouve nécessairement à la sortie, et la lire comme
-un résultat serait circulaire.
-
-Le projet écrit cette limite là où elle se lit. Le registre des relations injectées porte, pour
-chacune, ce que la page affiche et ce qu'on n'a pas le droit d'en conclure, et le chapitre de
-recommandations en tire une conséquence de forme.
-
-\section{Démarche}
-
-Trois principes gouvernent le travail, et ils se lisent dans le dépôt plutôt que dans une
-déclaration d'intention.
-
-\textbf{Mesurer avant d'affirmer.} Aucune correction n'est proposée avant que sa cause soit
-mesurée. Une décision de conception n'est jamais présentée comme définitive, mais comme vraie sous
-des conditions nommées, et plusieurs portent la consigne de re-mesurer leur prémisse avant toute
-modification qui la mettrait en jeu.
-
-\textbf{Vérifier ce qu'on avance.} Une propriété n'est pas tenue pour vérifiée parce qu'un contrôle
-est vert : le contrôle est délibérément mis en défaut, on s'assure qu'il rougit, et l'état initial
-est restauré. Un contrôle vert qui reste vert quand on casse ce qu'il surveille ne surveille rien.
-
-\textbf{Tracer d'où vient chaque chiffre.} Aucun nombre de ce rapport n'est tapé dans la prose.
-Chaque valeur vit dans un registre avec la commande exacte qui la produit, et le texte l'appelle
-par son identifiant. Un nombre écrit en clair est un nombre que plus rien ne rattache à une mesure,
-et il devient faux sans que personne ne s'en aperçoive.
+\section{La méthode du projet}
 
 Le travail a commencé par le service, et non par la technique : lecture du cahier de charges,
 observation au poste, puis relevé des écrans\releve{rattachement-du-travail}.
 
 L'ordre n'est pas anodin. Le modèle de données est calqué sur les champs réellement vus, non sur un
-modèle hospitalier générique ; commencer par la technique aurait produit un modèle plausible, et
-c'est exactement ce que ce rapport refuse.
+modèle hospitalier générique ; commencer par la technique aurait produit un modèle plausible.
 
 Ont suivi la recherche documentaire qui établit les chiffres de référence, la conception et la
 génération du jeu de données, la chaîne de traitement, le rapprochement d'identités et les
 contrôles de qualité, la restitution, puis la rédaction.
 
-Le rapport suit l'ordre de construction, chaque chapitre s'appuyant sur le précédent. Une seule
-inversion mérite d'être signalée : les sources documentaires sont présentées au fil des chapitres
-qui les emploient, alors qu'elles ont toutes été établies en amont.
-
-\textbf{Deux travaux ont été entièrement repris}, et le dire vaut mieux qu'un récit lisse.
+\textbf{Deux travaux ont été entièrement repris}.
 
 La volumétrie a été redérivée d'un bout à l'autre. Le cadrage initial tirait les volumes d'une
 capacité annoncée et d'indicateurs nationaux ; en cherchant ces chiffres à la source,
@@ -175,8 +128,17 @@ L'observation a été courte et bornée à un poste ; l'essentiel du temps est a
 et à la rédaction. \textbf{La rédaction a été menée en fin de projet alors qu'elle devait être
 répartie sur toute sa durée}, et c'est une erreur de méthode.
 
-Les outils qui portent ce travail, ce que chacun est et le motif de son choix sont présentés au
-chapitre~\ref{chap:outils}.
+La reconstruction documentaire couvre les quatre processus que l'observation n'a pas atteints. Elle
+s'appuie sur la documentation de l'éditeur \cite{s06}, sur le règlement intérieur des hôpitaux
+\cite{s27} et sur le recueil statistique national \cite{s30}. La génération produit ensuite le jeu
+de données à partir des champs relevés et des valeurs sourcées. La chaîne de traitement charge ce
+jeu, type chaque valeur, met à part les lignes refusées et construit les tables que lit le tableau
+de bord.
+
+La vérification accompagne chaque étape. Une cause est mesurée avant toute correction. Une décision
+de conception est présentée comme vraie sous des conditions nommées, et plusieurs demandent de
+re-mesurer leur prémisse avant toute modification. Chaque contrôle automatique est volontairement
+mis en défaut, pour s'assurer qu'il échoue, puis l'état initial est restauré.
 
 \section{Organisation du projet en phases}
 
@@ -262,3 +224,12 @@ rend compte.
 l'ensemble, menée entre la construction et la rédaction, a ouvert un travail de reprise et de
 vérification qui a coûté du temps. Il a corrigé des défauts qui, sans lui, auraient été découverts
 dans un rapport déjà remis. C'est un fait, pas une excuse.
+
+\section*{Synthèse}
+
+Le besoin porte sur tout le service, alors qu'un seul processus a pu être observé. Les quatre autres
+ont été reconstruits à partir de documents, et chaque colonne du modèle indique d'où elle vient.
+Faute de données réelles, le projet engendre un jeu de données dont les défauts sont connus, ce qui
+rend les traitements mesurables. Le travail s'organise en sept phases, de l'observation au poste
+jusqu'à la rédaction. Le chapitre~\ref{chap:jeu-de-donnees} décrit la conception de ce jeu de
+données.
