@@ -186,15 +186,49 @@ chiffres:
   commande: sum(1 for e in yaml.safe_load((R/'docs/champs/registre_champs.yml').read_text(encoding='utf-8'))
     if e['provenance']=='HYP')
   portee: independant-des-donnees
+- id: colonnes-part-obs
+  valeur: 46.285714285714285
+  decimales: 1
+  unite: '%'
+  type: python
+  commande: >-
+    (lambda c: 100 * sum(1 for e in c if e['provenance']=='OBS') / len(c))(yaml.safe_load((R/'docs/champs/registre_champs.yml').read_text(encoding='utf-8')))
+  portee: independant-des-donnees
+  note: >-
+    Part des colonnes de la couche source étiquetées OBS au registre des champs, en pour cent de colonnes-source-registre. Rapport de colonnes-source-obs à colonnes-source-registre.
+- id: colonnes-part-doc
+  valeur: 41.142857142857146
+  decimales: 1
+  unite: '%'
+  type: python
+  commande: >-
+    (lambda c: 100 * sum(1 for e in c if e['provenance']=='DOC') / len(c))(yaml.safe_load((R/'docs/champs/registre_champs.yml').read_text(encoding='utf-8')))
+  portee: independant-des-donnees
+  note: >-
+    Part des colonnes de la couche source étiquetées DOC au registre des champs, en pour cent de colonnes-source-registre. Rapport de colonnes-source-doc à colonnes-source-registre.
+- id: colonnes-part-hyp
+  valeur: 12.571428571428571
+  decimales: 1
+  unite: '%'
+  type: python
+  commande: >-
+    (lambda c: 100 * sum(1 for e in c if e['provenance']=='HYP') / len(c))(yaml.safe_load((R/'docs/champs/registre_champs.yml').read_text(encoding='utf-8')))
+  portee: independant-des-donnees
+  note: >-
+    Part des colonnes de la couche source étiquetées HYP au registre des champs, en pour cent de colonnes-source-registre. Rapport de colonnes-source-hyp à colonnes-source-registre.
 - id: colonnes-source-catalogue
   valeur: 175
   unite: colonnes
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: select count(*) from information_schema.columns where table_schema='source'
   portee: periode-entiere
 - id: colonnes-source-catalogue-obs
   valeur: 81
   unite: colonnes
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: select count(*) from information_schema.columns c join pg_class p on p.relname=c.table_name
     join pg_namespace n on n.oid=p.relnamespace and n.nspname=c.table_schema join pg_description d on
@@ -204,6 +238,8 @@ chiffres:
 - id: colonnes-source-catalogue-doc
   valeur: 72
   unite: colonnes
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: select count(*) from information_schema.columns c join pg_class p on p.relname=c.table_name
     join pg_namespace n on n.oid=p.relnamespace and n.nspname=c.table_schema join pg_description d on
@@ -213,6 +249,8 @@ chiffres:
 - id: colonnes-source-catalogue-hyp
   valeur: 22
   unite: colonnes
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: select count(*) from information_schema.columns c join pg_class p on p.relname=c.table_name
     join pg_namespace n on n.oid=p.relnamespace and n.nspname=c.table_schema join pg_description d on
@@ -222,6 +260,8 @@ chiffres:
 - id: colonnes-aval-total
   valeur: 398
   unite: colonnes
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: select count(*) from information_schema.columns c join information_schema.tables t on t.table_schema=c.table_schema
     and t.table_name=c.table_name where c.table_schema in ('intermediate','marts')
@@ -230,6 +270,8 @@ chiffres:
 - id: colonnes-aval-decrites
   valeur: 398
   unite: colonnes
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: select count(*) from information_schema.columns c join information_schema.tables t on t.table_schema=c.table_schema
     and t.table_name=c.table_name where c.table_schema in ('intermediate','marts')
@@ -240,6 +282,8 @@ chiffres:
 - id: colonnes-intermediate
   valeur: 175
   unite: colonnes
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: select count(*) from information_schema.columns c join information_schema.tables t on t.table_schema=c.table_schema
     and t.table_name=c.table_name where c.table_schema='intermediate'
@@ -247,6 +291,8 @@ chiffres:
 - id: colonnes-marts
   valeur: 223
   unite: colonnes
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: select count(*) from information_schema.columns c join information_schema.tables t on t.table_schema=c.table_schema
     and t.table_name=c.table_name where c.table_schema='marts'
@@ -257,6 +303,36 @@ chiffres:
   type: python
   commande: sum(len(yaml.safe_load(f.read_text(encoding='utf-8')).get('parametres',[])) for f in sorted((R/'generator/config').glob('*.yml')))
   portee: independant-des-donnees
+- id: parametres-part-obs
+  valeur: 1.953125
+  decimales: 1
+  unite: '%'
+  type: python
+  commande: >-
+    (lambda ps: 100 * sum(1 for p in ps if p.get('provenance')=='OBS') / len(ps))([p for f in sorted((R/'generator/config').glob('*.yml')) for p in yaml.safe_load(f.read_text(encoding='utf-8')).get('parametres',[])])
+  portee: independant-des-donnees
+  note: >-
+    Part des paramètres du générateur étiquetés OBS, en pour cent de parametres-total. Rapport de parametres-obs à parametres-total.
+- id: parametres-part-doc
+  valeur: 20.3125
+  decimales: 1
+  unite: '%'
+  type: python
+  commande: >-
+    (lambda ps: 100 * sum(1 for p in ps if p.get('provenance')=='DOC') / len(ps))([p for f in sorted((R/'generator/config').glob('*.yml')) for p in yaml.safe_load(f.read_text(encoding='utf-8')).get('parametres',[])])
+  portee: independant-des-donnees
+  note: >-
+    Part des paramètres du générateur étiquetés DOC, en pour cent de parametres-total. Rapport de parametres-doc à parametres-total.
+- id: parametres-part-hyp
+  valeur: 77.734375
+  decimales: 1
+  unite: '%'
+  type: python
+  commande: >-
+    (lambda ps: 100 * sum(1 for p in ps if p.get('provenance')=='HYP') / len(ps))([p for f in sorted((R/'generator/config').glob('*.yml')) for p in yaml.safe_load(f.read_text(encoding='utf-8')).get('parametres',[])])
+  portee: independant-des-donnees
+  note: >-
+    Part des paramètres du générateur étiquetés HYP, en pour cent de parametres-total. Rapport de parametres-hyp à parametres-total.
 - id: parametres-fichiers
   valeur: 25
   unite: fichiers
@@ -444,6 +520,16 @@ chiffres:
   commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/volumetrie.yml'').read_text(encoding=''utf-8''))[''parametres'']
     if p[''nom'']==''scenarios_passages_urgences''][0][1]'
   portee: independant-des-donnees
+- id: urgences-milieu-fourchette
+  valeur: 34
+  unite: passages/jour
+  type: python
+  commande: >-
+    (lambda s: (s[0] + s[2]) // 2)([p['valeur'] for p in yaml.safe_load((R/'generator/config/volumetrie.yml').read_text(encoding='utf-8'))['parametres'] if p['nom']=='scenarios_passages_urgences'][0])
+  portee: independant-des-donnees
+  note: >-
+    Milieu de la fourchette des passages aux urgences : demi-somme de urgences-borne-basse et de
+    urgences-borne-haute, en division entière. Le scénario retenu est placé sous ce milieu.
 - id: urgences-borne-haute
   valeur: 54
   unite: passages/jour
@@ -495,6 +581,8 @@ chiffres:
 - id: part-sexe-masculin
   valeur: 0.497
   unite: proportion
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: python
   commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/demographie.yml'').read_text(encoding=''utf-8''))[''parametres'']
     if p[''nom'']==''repartition_sexe''][0][''M'']'
@@ -502,6 +590,8 @@ chiffres:
 - id: part-urbain
   valeur: 0.639
   unite: proportion
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: python
   commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/demographie.yml'').read_text(encoding=''utf-8''))[''parametres'']
     if p[''nom'']==''repartition_residence''][0][''environnement''][''U'']'
@@ -509,6 +599,8 @@ chiffres:
 - id: part-sans-couverture
   valeur: 0.2
   unite: proportion
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: python
   commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/demographie.yml'').read_text(encoding=''utf-8''))[''parametres'']
     if p[''nom'']==''repartition_couverture''][0][''SANS'']'
@@ -516,6 +608,8 @@ chiffres:
 - id: part-couverture-principale
   valeur: 0.5
   unite: proportion
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: python
   commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/demographie.yml'').read_text(encoding=''utf-8''))[''parametres'']
     if p[''nom'']==''repartition_couverture''][0][''00116'']'
@@ -523,6 +617,8 @@ chiffres:
 - id: tranches-age
   valeur: 6
   unite: tranches
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: python
   commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/demographie.yml'').read_text(encoding=''utf-8''))[''parametres'']
     if p[''nom'']==''structure_age''][0][''tranches''].__len__()'
@@ -530,6 +626,8 @@ chiffres:
 - id: niveaux-tri
   valeur: 5
   unite: niveaux
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: python
   commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/urgences.yml'').read_text(encoding=''utf-8''))[''parametres'']
     if p[''nom'']==''repartition_niveaux_tri''][0].__len__()'
@@ -537,6 +635,8 @@ chiffres:
 - id: part-tri-niveau-4
   valeur: 0.41
   unite: proportion
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: python
   commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/urgences.yml'').read_text(encoding=''utf-8''))[''parametres'']
     if p[''nom'']==''repartition_niveaux_tri''][0][''4'']'
@@ -544,6 +644,8 @@ chiffres:
 - id: part-tri-niveau-5
   valeur: 0.22
   unite: proportion
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: python
   commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/urgences.yml'').read_text(encoding=''utf-8''))[''parametres'']
     if p[''nom'']==''repartition_niveaux_tri''][0][''5'']'
@@ -586,6 +688,16 @@ chiffres:
   portee: periode-entiere
   note: 'Toutes les colonnes de la couche source sont de type texte, sans contrainte : le décompte égale
     celui des colonnes de la couche.'
+- id: colonnes-intermediate-typees
+  valeur: 52
+  unite: colonnes
+  type: sql
+  commande: >-
+    select count(*) from information_schema.columns where table_schema='intermediate' and data_type in ('date', 'timestamp with time zone', 'numeric')
+  portee: periode-entiere
+  note: >-
+    Colonnes de la couche intermédiaire typées en date, en horodatage ou en numérique, celles que les
+    conversions produisent depuis le texte de la couche source. Les colonnes booléennes n'y sont pas.
 - id: seuil-quarantaine
   valeur: 0.05
   unite: proportion
@@ -707,6 +819,8 @@ chiffres:
 - id: blocage-nom-adresse
   valeur: 2371
   unite: paires
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: select count(*) from linkage.paires_candidates where regle_blocage = 'nom_famille_adresse'
   portee: periode-entiere
@@ -715,6 +829,8 @@ chiffres:
 - id: blocage-nom-telephone
   valeur: 1843
   unite: paires
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: select count(*) from linkage.paires_candidates where regle_blocage = 'nom_famille_telephone'
   portee: periode-entiere
@@ -723,6 +839,8 @@ chiffres:
 - id: blocage-piece-identite
   valeur: 767
   unite: paires
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: select count(*) from linkage.paires_candidates where regle_blocage = 'piece_identite'
   portee: periode-entiere
@@ -731,11 +849,106 @@ chiffres:
 - id: blocage-parents-naissance
   valeur: 33
   unite: paires
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: select count(*) from linkage.paires_candidates where regle_blocage = 'parents_date_naissance'
   portee: periode-entiere
   note: Paires attribuées à cette règle. Une paire porte la règle qui l'a produite ; la somme des quatre
     égale paires-candidates.
+- id: blocage-reduction-nom-adresse
+  valeur: 99.99928988921047
+  decimales: 5
+  unite: '%'
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
+  type: sql
+  commande: >-
+    select 100 * (1 - count(*)::numeric / (select (count(*)::bigint*(count(*)-1)/2) from marts.dim_patient where est_courante)) from linkage.paires_candidates where regle_blocage = 'nom_famille_adresse'
+  portee: periode-entiere
+  note: >-
+    Réduction opérée par la règle de blocage nom_famille_adresse, en pour cent des paires possibles : 100 × (1 − paires de la règle / paires-possibles).
+- id: blocage-reduction-nom-telephone
+  valeur: 99.99944802438418
+  decimales: 5
+  unite: '%'
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
+  type: sql
+  commande: >-
+    select 100 * (1 - count(*)::numeric / (select (count(*)::bigint*(count(*)-1)/2) from marts.dim_patient where est_courante)) from linkage.paires_candidates where regle_blocage = 'nom_famille_telephone'
+  portee: periode-entiere
+  note: >-
+    Réduction opérée par la règle de blocage nom_famille_telephone, en pour cent des paires possibles : 100 × (1 − paires de la règle / paires-possibles).
+- id: blocage-reduction-piece-identite
+  valeur: 99.9997702847003
+  decimales: 5
+  unite: '%'
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
+  type: sql
+  commande: >-
+    select 100 * (1 - count(*)::numeric / (select (count(*)::bigint*(count(*)-1)/2) from marts.dim_patient where est_courante)) from linkage.paires_candidates where regle_blocage = 'piece_identite'
+  portee: periode-entiere
+  note: >-
+    Réduction opérée par la règle de blocage piece_identite, en pour cent des paires possibles : 100 × (1 − paires de la règle / paires-possibles).
+- id: blocage-reduction-parents-naissance
+  valeur: 99.99999011655164
+  decimales: 5
+  unite: '%'
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
+  type: sql
+  commande: >-
+    select 100 * (1 - count(*)::numeric / (select (count(*)::bigint*(count(*)-1)/2) from marts.dim_patient where est_courante)) from linkage.paires_candidates where regle_blocage = 'parents_date_naissance'
+  portee: periode-entiere
+  note: >-
+    Réduction opérée par la règle de blocage parents_date_naissance, en pour cent des paires possibles : 100 × (1 − paires de la règle / paires-possibles).
+- id: blocage-reduction-union
+  valeur: 99.9984983148466
+  decimales: 5
+  unite: '%'
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
+  type: sql
+  commande: >-
+    select 100 * (1 - count(*)::numeric / (select (count(*)::bigint*(count(*)-1)/2) from marts.dim_patient where est_courante)) from linkage.paires_candidates
+  portee: periode-entiere
+  note: >-
+    Réduction opérée par l'union des quatre règles de blocage, en pour cent des paires possibles : 100 × (1 − paires-candidates / paires-possibles).
+- id: rapport-accord-etat
+  valeur: 1.1
+  unite: proportion
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
+  type: python
+  commande: >-
+    float(__import__('re').search(r'colonne="etat",\s*motif="[^"]*rapport mesuré ([0-9]+,[0-9]+)', (R/'linkage/champs.py').read_text(encoding='utf-8')).group(1).replace(',', '.'))
+  portee: independant-des-donnees
+  note: >-
+    Rapport entre la probabilité d'accord chez les vrais couples et chez les faux pour une colonne écartée du modèle, tel que le motif d'exclusion de linkage/champs.py le consigne. La commande lit le motif écrit au code ; elle ne remesure pas le rapport. Nombre sans dimension, porté sous l'unité « proportion » faute d'une unité de rapport au registre.
+- id: rapport-accord-pays-naissance
+  valeur: 1.15
+  unite: proportion
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
+  type: python
+  commande: >-
+    float(__import__('re').search(r'colonne="pays_naissance",\s*motif="[^"]*rapport mesuré ([0-9]+,[0-9]+)', (R/'linkage/champs.py').read_text(encoding='utf-8')).group(1).replace(',', '.'))
+  portee: independant-des-donnees
+  note: >-
+    Rapport entre la probabilité d'accord chez les vrais couples et chez les faux pour une colonne écartée du modèle, tel que le motif d'exclusion de linkage/champs.py le consigne. La commande lit le motif écrit au code ; elle ne remesure pas le rapport. Nombre sans dimension, porté sous l'unité « proportion » faute d'une unité de rapport au registre.
+- id: rapport-accord-etat-naissance
+  valeur: 1.29
+  unite: proportion
+  motif_non_emploi: >-
+    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
+  type: python
+  commande: >-
+    float(__import__('re').search(r'colonne="etat_naissance",\s*motif=\(\s*"[^"]*rapport mesuré ([0-9]+,[0-9]+)', (R/'linkage/champs.py').read_text(encoding='utf-8')).group(1).replace(',', '.'))
+  portee: independant-des-donnees
+  note: >-
+    Rapport entre la probabilité d'accord chez les vrais couples et chez les faux pour une colonne écartée du modèle, tel que le motif d'exclusion de linkage/champs.py le consigne. La commande lit le motif écrit au code ; elle ne remesure pas le rapport. Nombre sans dimension, porté sous l'unité « proportion » faute d'une unité de rapport au registre.
 - id: comparaisons-modele
   valeur: 12
   unite: comparaisons
@@ -928,6 +1141,173 @@ chiffres:
   commande: select patients_valeur_vide from marts.agg_doublons_identite where critere = 'piece_identite'
   portee: periode-entiere
   note: Fiches sans pièce d'identité, donc invisibles à ce critère de collision exacte.
+- id: collision-telephone-paires
+  valeur: 254
+  unite: paires
+  type: python
+  commande: >-
+    (lambda p, vt, v, cle: (lambda s: {'paires': len(s), 'retrouvees': sum(s), 'rappel': (sum(s) / len(s) if s else 0.0)}[cle])([bool((a[0] and a[1] and a[2] and a[:3] == b[:3]) or (a[3] and a[4] and a[3:] == b[3:])) for q in vt if v in q['variations'] and q['n_ipp_1'] in p and q['n_ipp_2'] in p for a, b in [(p[q['n_ipp_1']], p[q['n_ipp_2']])]]))({r[0]: r[1:] for r in __import__('__main__').connexion().execute('select n_ipp, nom, nom_famille_1, date_naissance, type_piece_identite, n_piece_identite from marts.dim_patient where est_courante').fetchall()}, yaml.load(Path(__import__('os').environ.get('VERITE_TERRAIN_PATIENTS', str(R/'generator/output/scenario_30/verite_terrain.yml'))).read_text(encoding='utf-8'), Loader=getattr(yaml, 'CSafeLoader', yaml.SafeLoader))['doublons']['paires'], 'telephone_different', 'paires')
+  portee: periode-entiere
+  note: >-
+    Paires de vérité terrain présentes (les deux fiches en version courante) qui portent la variation « téléphone différent ». Une paire à plusieurs variations compte pour chacune.
+- id: collision-telephone-retrouvees
+  valeur: 254
+  unite: paires
+  type: python
+  commande: >-
+    (lambda p, vt, v, cle: (lambda s: {'paires': len(s), 'retrouvees': sum(s), 'rappel': (sum(s) / len(s) if s else 0.0)}[cle])([bool((a[0] and a[1] and a[2] and a[:3] == b[:3]) or (a[3] and a[4] and a[3:] == b[3:])) for q in vt if v in q['variations'] and q['n_ipp_1'] in p and q['n_ipp_2'] in p for a, b in [(p[q['n_ipp_1']], p[q['n_ipp_2']])]]))({r[0]: r[1:] for r in __import__('__main__').connexion().execute('select n_ipp, nom, nom_famille_1, date_naissance, type_piece_identite, n_piece_identite from marts.dim_patient where est_courante').fetchall()}, yaml.load(Path(__import__('os').environ.get('VERITE_TERRAIN_PATIENTS', str(R/'generator/output/scenario_30/verite_terrain.yml'))).read_text(encoding='utf-8'), Loader=getattr(yaml, 'CSafeLoader', yaml.SafeLoader))['doublons']['paires'], 'telephone_different', 'retrouvees')
+  portee: periode-entiere
+  note: >-
+    Parmi les paires de collision-telephone-paires, celles que la collision exacte retrouve : mêmes nom, premier nom de famille et date de naissance renseignés, ou mêmes type et numéro de pièce d'identité renseignés — les deux critères de marts.agg_doublons_identite.
+- id: collision-telephone-rappel
+  valeur: 1.0
+  unite: proportion
+  type: python
+  commande: >-
+    (lambda p, vt, v, cle: (lambda s: {'paires': len(s), 'retrouvees': sum(s), 'rappel': (sum(s) / len(s) if s else 0.0)}[cle])([bool((a[0] and a[1] and a[2] and a[:3] == b[:3]) or (a[3] and a[4] and a[3:] == b[3:])) for q in vt if v in q['variations'] and q['n_ipp_1'] in p and q['n_ipp_2'] in p for a, b in [(p[q['n_ipp_1']], p[q['n_ipp_2']])]]))({r[0]: r[1:] for r in __import__('__main__').connexion().execute('select n_ipp, nom, nom_famille_1, date_naissance, type_piece_identite, n_piece_identite from marts.dim_patient where est_courante').fetchall()}, yaml.load(Path(__import__('os').environ.get('VERITE_TERRAIN_PATIENTS', str(R/'generator/output/scenario_30/verite_terrain.yml'))).read_text(encoding='utf-8'), Loader=getattr(yaml, 'CSafeLoader', yaml.SafeLoader))['doublons']['paires'], 'telephone_different', 'rappel')
+  portee: periode-entiere
+  note: >-
+    Rappel de la collision exacte sur la variation « téléphone différent » : collision-telephone-retrouvees rapporté à collision-telephone-paires, au niveau de la paire.
+- id: collision-adresse-paires
+  valeur: 261
+  unite: paires
+  type: python
+  commande: >-
+    (lambda p, vt, v, cle: (lambda s: {'paires': len(s), 'retrouvees': sum(s), 'rappel': (sum(s) / len(s) if s else 0.0)}[cle])([bool((a[0] and a[1] and a[2] and a[:3] == b[:3]) or (a[3] and a[4] and a[3:] == b[3:])) for q in vt if v in q['variations'] and q['n_ipp_1'] in p and q['n_ipp_2'] in p for a, b in [(p[q['n_ipp_1']], p[q['n_ipp_2']])]]))({r[0]: r[1:] for r in __import__('__main__').connexion().execute('select n_ipp, nom, nom_famille_1, date_naissance, type_piece_identite, n_piece_identite from marts.dim_patient where est_courante').fetchall()}, yaml.load(Path(__import__('os').environ.get('VERITE_TERRAIN_PATIENTS', str(R/'generator/output/scenario_30/verite_terrain.yml'))).read_text(encoding='utf-8'), Loader=getattr(yaml, 'CSafeLoader', yaml.SafeLoader))['doublons']['paires'], 'adresse_mise_a_jour', 'paires')
+  portee: periode-entiere
+  note: >-
+    Paires de vérité terrain présentes (les deux fiches en version courante) qui portent la variation « adresse mise à jour ». Une paire à plusieurs variations compte pour chacune.
+- id: collision-adresse-retrouvees
+  valeur: 260
+  unite: paires
+  type: python
+  commande: >-
+    (lambda p, vt, v, cle: (lambda s: {'paires': len(s), 'retrouvees': sum(s), 'rappel': (sum(s) / len(s) if s else 0.0)}[cle])([bool((a[0] and a[1] and a[2] and a[:3] == b[:3]) or (a[3] and a[4] and a[3:] == b[3:])) for q in vt if v in q['variations'] and q['n_ipp_1'] in p and q['n_ipp_2'] in p for a, b in [(p[q['n_ipp_1']], p[q['n_ipp_2']])]]))({r[0]: r[1:] for r in __import__('__main__').connexion().execute('select n_ipp, nom, nom_famille_1, date_naissance, type_piece_identite, n_piece_identite from marts.dim_patient where est_courante').fetchall()}, yaml.load(Path(__import__('os').environ.get('VERITE_TERRAIN_PATIENTS', str(R/'generator/output/scenario_30/verite_terrain.yml'))).read_text(encoding='utf-8'), Loader=getattr(yaml, 'CSafeLoader', yaml.SafeLoader))['doublons']['paires'], 'adresse_mise_a_jour', 'retrouvees')
+  portee: periode-entiere
+  note: >-
+    Parmi les paires de collision-adresse-paires, celles que la collision exacte retrouve : mêmes nom, premier nom de famille et date de naissance renseignés, ou mêmes type et numéro de pièce d'identité renseignés — les deux critères de marts.agg_doublons_identite.
+- id: collision-adresse-rappel
+  valeur: 0.9961685823754789
+  decimales: 4
+  unite: proportion
+  type: python
+  commande: >-
+    (lambda p, vt, v, cle: (lambda s: {'paires': len(s), 'retrouvees': sum(s), 'rappel': (sum(s) / len(s) if s else 0.0)}[cle])([bool((a[0] and a[1] and a[2] and a[:3] == b[:3]) or (a[3] and a[4] and a[3:] == b[3:])) for q in vt if v in q['variations'] and q['n_ipp_1'] in p and q['n_ipp_2'] in p for a, b in [(p[q['n_ipp_1']], p[q['n_ipp_2']])]]))({r[0]: r[1:] for r in __import__('__main__').connexion().execute('select n_ipp, nom, nom_famille_1, date_naissance, type_piece_identite, n_piece_identite from marts.dim_patient where est_courante').fetchall()}, yaml.load(Path(__import__('os').environ.get('VERITE_TERRAIN_PATIENTS', str(R/'generator/output/scenario_30/verite_terrain.yml'))).read_text(encoding='utf-8'), Loader=getattr(yaml, 'CSafeLoader', yaml.SafeLoader))['doublons']['paires'], 'adresse_mise_a_jour', 'rappel')
+  portee: periode-entiere
+  note: >-
+    Rappel de la collision exacte sur la variation « adresse mise à jour » : collision-adresse-retrouvees rapporté à collision-adresse-paires, au niveau de la paire.
+- id: collision-date-naissance-paires
+  valeur: 332
+  unite: paires
+  type: python
+  commande: >-
+    (lambda p, vt, v, cle: (lambda s: {'paires': len(s), 'retrouvees': sum(s), 'rappel': (sum(s) / len(s) if s else 0.0)}[cle])([bool((a[0] and a[1] and a[2] and a[:3] == b[:3]) or (a[3] and a[4] and a[3:] == b[3:])) for q in vt if v in q['variations'] and q['n_ipp_1'] in p and q['n_ipp_2'] in p for a, b in [(p[q['n_ipp_1']], p[q['n_ipp_2']])]]))({r[0]: r[1:] for r in __import__('__main__').connexion().execute('select n_ipp, nom, nom_famille_1, date_naissance, type_piece_identite, n_piece_identite from marts.dim_patient where est_courante').fetchall()}, yaml.load(Path(__import__('os').environ.get('VERITE_TERRAIN_PATIENTS', str(R/'generator/output/scenario_30/verite_terrain.yml'))).read_text(encoding='utf-8'), Loader=getattr(yaml, 'CSafeLoader', yaml.SafeLoader))['doublons']['paires'], 'faute_frappe_date_naissance', 'paires')
+  portee: periode-entiere
+  note: >-
+    Paires de vérité terrain présentes (les deux fiches en version courante) qui portent la variation « faute de frappe sur la date de naissance ». Une paire à plusieurs variations compte pour chacune.
+- id: collision-date-naissance-retrouvees
+  valeur: 282
+  unite: paires
+  type: python
+  commande: >-
+    (lambda p, vt, v, cle: (lambda s: {'paires': len(s), 'retrouvees': sum(s), 'rappel': (sum(s) / len(s) if s else 0.0)}[cle])([bool((a[0] and a[1] and a[2] and a[:3] == b[:3]) or (a[3] and a[4] and a[3:] == b[3:])) for q in vt if v in q['variations'] and q['n_ipp_1'] in p and q['n_ipp_2'] in p for a, b in [(p[q['n_ipp_1']], p[q['n_ipp_2']])]]))({r[0]: r[1:] for r in __import__('__main__').connexion().execute('select n_ipp, nom, nom_famille_1, date_naissance, type_piece_identite, n_piece_identite from marts.dim_patient where est_courante').fetchall()}, yaml.load(Path(__import__('os').environ.get('VERITE_TERRAIN_PATIENTS', str(R/'generator/output/scenario_30/verite_terrain.yml'))).read_text(encoding='utf-8'), Loader=getattr(yaml, 'CSafeLoader', yaml.SafeLoader))['doublons']['paires'], 'faute_frappe_date_naissance', 'retrouvees')
+  portee: periode-entiere
+  note: >-
+    Parmi les paires de collision-date-naissance-paires, celles que la collision exacte retrouve : mêmes nom, premier nom de famille et date de naissance renseignés, ou mêmes type et numéro de pièce d'identité renseignés — les deux critères de marts.agg_doublons_identite.
+- id: collision-date-naissance-rappel
+  valeur: 0.8493975903614458
+  decimales: 4
+  unite: proportion
+  type: python
+  commande: >-
+    (lambda p, vt, v, cle: (lambda s: {'paires': len(s), 'retrouvees': sum(s), 'rappel': (sum(s) / len(s) if s else 0.0)}[cle])([bool((a[0] and a[1] and a[2] and a[:3] == b[:3]) or (a[3] and a[4] and a[3:] == b[3:])) for q in vt if v in q['variations'] and q['n_ipp_1'] in p and q['n_ipp_2'] in p for a, b in [(p[q['n_ipp_1']], p[q['n_ipp_2']])]]))({r[0]: r[1:] for r in __import__('__main__').connexion().execute('select n_ipp, nom, nom_famille_1, date_naissance, type_piece_identite, n_piece_identite from marts.dim_patient where est_courante').fetchall()}, yaml.load(Path(__import__('os').environ.get('VERITE_TERRAIN_PATIENTS', str(R/'generator/output/scenario_30/verite_terrain.yml'))).read_text(encoding='utf-8'), Loader=getattr(yaml, 'CSafeLoader', yaml.SafeLoader))['doublons']['paires'], 'faute_frappe_date_naissance', 'rappel')
+  portee: periode-entiere
+  note: >-
+    Rappel de la collision exacte sur la variation « faute de frappe sur la date de naissance » : collision-date-naissance-retrouvees rapporté à collision-date-naissance-paires, au niveau de la paire.
+- id: collision-translitteration-paires
+  valeur: 148
+  unite: paires
+  type: python
+  commande: >-
+    (lambda p, vt, v, cle: (lambda s: {'paires': len(s), 'retrouvees': sum(s), 'rappel': (sum(s) / len(s) if s else 0.0)}[cle])([bool((a[0] and a[1] and a[2] and a[:3] == b[:3]) or (a[3] and a[4] and a[3:] == b[3:])) for q in vt if v in q['variations'] and q['n_ipp_1'] in p and q['n_ipp_2'] in p for a, b in [(p[q['n_ipp_1']], p[q['n_ipp_2']])]]))({r[0]: r[1:] for r in __import__('__main__').connexion().execute('select n_ipp, nom, nom_famille_1, date_naissance, type_piece_identite, n_piece_identite from marts.dim_patient where est_courante').fetchall()}, yaml.load(Path(__import__('os').environ.get('VERITE_TERRAIN_PATIENTS', str(R/'generator/output/scenario_30/verite_terrain.yml'))).read_text(encoding='utf-8'), Loader=getattr(yaml, 'CSafeLoader', yaml.SafeLoader))['doublons']['paires'], 'translitteration_prenom', 'paires')
+  portee: periode-entiere
+  note: >-
+    Paires de vérité terrain présentes (les deux fiches en version courante) qui portent la variation « translittération du prénom ». Une paire à plusieurs variations compte pour chacune.
+- id: collision-translitteration-retrouvees
+  valeur: 125
+  unite: paires
+  type: python
+  commande: >-
+    (lambda p, vt, v, cle: (lambda s: {'paires': len(s), 'retrouvees': sum(s), 'rappel': (sum(s) / len(s) if s else 0.0)}[cle])([bool((a[0] and a[1] and a[2] and a[:3] == b[:3]) or (a[3] and a[4] and a[3:] == b[3:])) for q in vt if v in q['variations'] and q['n_ipp_1'] in p and q['n_ipp_2'] in p for a, b in [(p[q['n_ipp_1']], p[q['n_ipp_2']])]]))({r[0]: r[1:] for r in __import__('__main__').connexion().execute('select n_ipp, nom, nom_famille_1, date_naissance, type_piece_identite, n_piece_identite from marts.dim_patient where est_courante').fetchall()}, yaml.load(Path(__import__('os').environ.get('VERITE_TERRAIN_PATIENTS', str(R/'generator/output/scenario_30/verite_terrain.yml'))).read_text(encoding='utf-8'), Loader=getattr(yaml, 'CSafeLoader', yaml.SafeLoader))['doublons']['paires'], 'translitteration_prenom', 'retrouvees')
+  portee: periode-entiere
+  note: >-
+    Parmi les paires de collision-translitteration-paires, celles que la collision exacte retrouve : mêmes nom, premier nom de famille et date de naissance renseignés, ou mêmes type et numéro de pièce d'identité renseignés — les deux critères de marts.agg_doublons_identite.
+- id: collision-translitteration-rappel
+  valeur: 0.8445945945945946
+  decimales: 4
+  unite: proportion
+  type: python
+  commande: >-
+    (lambda p, vt, v, cle: (lambda s: {'paires': len(s), 'retrouvees': sum(s), 'rappel': (sum(s) / len(s) if s else 0.0)}[cle])([bool((a[0] and a[1] and a[2] and a[:3] == b[:3]) or (a[3] and a[4] and a[3:] == b[3:])) for q in vt if v in q['variations'] and q['n_ipp_1'] in p and q['n_ipp_2'] in p for a, b in [(p[q['n_ipp_1']], p[q['n_ipp_2']])]]))({r[0]: r[1:] for r in __import__('__main__').connexion().execute('select n_ipp, nom, nom_famille_1, date_naissance, type_piece_identite, n_piece_identite from marts.dim_patient where est_courante').fetchall()}, yaml.load(Path(__import__('os').environ.get('VERITE_TERRAIN_PATIENTS', str(R/'generator/output/scenario_30/verite_terrain.yml'))).read_text(encoding='utf-8'), Loader=getattr(yaml, 'CSafeLoader', yaml.SafeLoader))['doublons']['paires'], 'translitteration_prenom', 'rappel')
+  portee: periode-entiere
+  note: >-
+    Rappel de la collision exacte sur la variation « translittération du prénom » : collision-translitteration-retrouvees rapporté à collision-translitteration-paires, au niveau de la paire.
+- id: collision-prenom-compose-paires
+  valeur: 243
+  unite: paires
+  type: python
+  commande: >-
+    (lambda p, vt, v, cle: (lambda s: {'paires': len(s), 'retrouvees': sum(s), 'rappel': (sum(s) / len(s) if s else 0.0)}[cle])([bool((a[0] and a[1] and a[2] and a[:3] == b[:3]) or (a[3] and a[4] and a[3:] == b[3:])) for q in vt if v in q['variations'] and q['n_ipp_1'] in p and q['n_ipp_2'] in p for a, b in [(p[q['n_ipp_1']], p[q['n_ipp_2']])]]))({r[0]: r[1:] for r in __import__('__main__').connexion().execute('select n_ipp, nom, nom_famille_1, date_naissance, type_piece_identite, n_piece_identite from marts.dim_patient where est_courante').fetchall()}, yaml.load(Path(__import__('os').environ.get('VERITE_TERRAIN_PATIENTS', str(R/'generator/output/scenario_30/verite_terrain.yml'))).read_text(encoding='utf-8'), Loader=getattr(yaml, 'CSafeLoader', yaml.SafeLoader))['doublons']['paires'], 'prenom_compose_inverse', 'paires')
+  portee: periode-entiere
+  note: >-
+    Paires de vérité terrain présentes (les deux fiches en version courante) qui portent la variation « prénom composé inversé ». Une paire à plusieurs variations compte pour chacune.
+- id: collision-prenom-compose-retrouvees
+  valeur: 197
+  unite: paires
+  type: python
+  commande: >-
+    (lambda p, vt, v, cle: (lambda s: {'paires': len(s), 'retrouvees': sum(s), 'rappel': (sum(s) / len(s) if s else 0.0)}[cle])([bool((a[0] and a[1] and a[2] and a[:3] == b[:3]) or (a[3] and a[4] and a[3:] == b[3:])) for q in vt if v in q['variations'] and q['n_ipp_1'] in p and q['n_ipp_2'] in p for a, b in [(p[q['n_ipp_1']], p[q['n_ipp_2']])]]))({r[0]: r[1:] for r in __import__('__main__').connexion().execute('select n_ipp, nom, nom_famille_1, date_naissance, type_piece_identite, n_piece_identite from marts.dim_patient where est_courante').fetchall()}, yaml.load(Path(__import__('os').environ.get('VERITE_TERRAIN_PATIENTS', str(R/'generator/output/scenario_30/verite_terrain.yml'))).read_text(encoding='utf-8'), Loader=getattr(yaml, 'CSafeLoader', yaml.SafeLoader))['doublons']['paires'], 'prenom_compose_inverse', 'retrouvees')
+  portee: periode-entiere
+  note: >-
+    Parmi les paires de collision-prenom-compose-paires, celles que la collision exacte retrouve : mêmes nom, premier nom de famille et date de naissance renseignés, ou mêmes type et numéro de pièce d'identité renseignés — les deux critères de marts.agg_doublons_identite.
+- id: collision-prenom-compose-rappel
+  valeur: 0.8106995884773662
+  decimales: 4
+  unite: proportion
+  type: python
+  commande: >-
+    (lambda p, vt, v, cle: (lambda s: {'paires': len(s), 'retrouvees': sum(s), 'rappel': (sum(s) / len(s) if s else 0.0)}[cle])([bool((a[0] and a[1] and a[2] and a[:3] == b[:3]) or (a[3] and a[4] and a[3:] == b[3:])) for q in vt if v in q['variations'] and q['n_ipp_1'] in p and q['n_ipp_2'] in p for a, b in [(p[q['n_ipp_1']], p[q['n_ipp_2']])]]))({r[0]: r[1:] for r in __import__('__main__').connexion().execute('select n_ipp, nom, nom_famille_1, date_naissance, type_piece_identite, n_piece_identite from marts.dim_patient where est_courante').fetchall()}, yaml.load(Path(__import__('os').environ.get('VERITE_TERRAIN_PATIENTS', str(R/'generator/output/scenario_30/verite_terrain.yml'))).read_text(encoding='utf-8'), Loader=getattr(yaml, 'CSafeLoader', yaml.SafeLoader))['doublons']['paires'], 'prenom_compose_inverse', 'rappel')
+  portee: periode-entiere
+  note: >-
+    Rappel de la collision exacte sur la variation « prénom composé inversé » : collision-prenom-compose-retrouvees rapporté à collision-prenom-compose-paires, au niveau de la paire.
+- id: collision-piece-absente-paires
+  valeur: 267
+  unite: paires
+  type: python
+  commande: >-
+    (lambda p, vt, v, cle: (lambda s: {'paires': len(s), 'retrouvees': sum(s), 'rappel': (sum(s) / len(s) if s else 0.0)}[cle])([bool((a[0] and a[1] and a[2] and a[:3] == b[:3]) or (a[3] and a[4] and a[3:] == b[3:])) for q in vt if v in q['variations'] and q['n_ipp_1'] in p and q['n_ipp_2'] in p for a, b in [(p[q['n_ipp_1']], p[q['n_ipp_2']])]]))({r[0]: r[1:] for r in __import__('__main__').connexion().execute('select n_ipp, nom, nom_famille_1, date_naissance, type_piece_identite, n_piece_identite from marts.dim_patient where est_courante').fetchall()}, yaml.load(Path(__import__('os').environ.get('VERITE_TERRAIN_PATIENTS', str(R/'generator/output/scenario_30/verite_terrain.yml'))).read_text(encoding='utf-8'), Loader=getattr(yaml, 'CSafeLoader', yaml.SafeLoader))['doublons']['paires'], 'piece_identite_absente', 'paires')
+  portee: periode-entiere
+  note: >-
+    Paires de vérité terrain présentes (les deux fiches en version courante) qui portent la variation « pièce d'identité absente ». Une paire à plusieurs variations compte pour chacune.
+- id: collision-piece-absente-retrouvees
+  valeur: 146
+  unite: paires
+  type: python
+  commande: >-
+    (lambda p, vt, v, cle: (lambda s: {'paires': len(s), 'retrouvees': sum(s), 'rappel': (sum(s) / len(s) if s else 0.0)}[cle])([bool((a[0] and a[1] and a[2] and a[:3] == b[:3]) or (a[3] and a[4] and a[3:] == b[3:])) for q in vt if v in q['variations'] and q['n_ipp_1'] in p and q['n_ipp_2'] in p for a, b in [(p[q['n_ipp_1']], p[q['n_ipp_2']])]]))({r[0]: r[1:] for r in __import__('__main__').connexion().execute('select n_ipp, nom, nom_famille_1, date_naissance, type_piece_identite, n_piece_identite from marts.dim_patient where est_courante').fetchall()}, yaml.load(Path(__import__('os').environ.get('VERITE_TERRAIN_PATIENTS', str(R/'generator/output/scenario_30/verite_terrain.yml'))).read_text(encoding='utf-8'), Loader=getattr(yaml, 'CSafeLoader', yaml.SafeLoader))['doublons']['paires'], 'piece_identite_absente', 'retrouvees')
+  portee: periode-entiere
+  note: >-
+    Parmi les paires de collision-piece-absente-paires, celles que la collision exacte retrouve : mêmes nom, premier nom de famille et date de naissance renseignés, ou mêmes type et numéro de pièce d'identité renseignés — les deux critères de marts.agg_doublons_identite.
+- id: collision-piece-absente-rappel
+  valeur: 0.5468164794007491
+  decimales: 4
+  unite: proportion
+  type: python
+  commande: >-
+    (lambda p, vt, v, cle: (lambda s: {'paires': len(s), 'retrouvees': sum(s), 'rappel': (sum(s) / len(s) if s else 0.0)}[cle])([bool((a[0] and a[1] and a[2] and a[:3] == b[:3]) or (a[3] and a[4] and a[3:] == b[3:])) for q in vt if v in q['variations'] and q['n_ipp_1'] in p and q['n_ipp_2'] in p for a, b in [(p[q['n_ipp_1']], p[q['n_ipp_2']])]]))({r[0]: r[1:] for r in __import__('__main__').connexion().execute('select n_ipp, nom, nom_famille_1, date_naissance, type_piece_identite, n_piece_identite from marts.dim_patient where est_courante').fetchall()}, yaml.load(Path(__import__('os').environ.get('VERITE_TERRAIN_PATIENTS', str(R/'generator/output/scenario_30/verite_terrain.yml'))).read_text(encoding='utf-8'), Loader=getattr(yaml, 'CSafeLoader', yaml.SafeLoader))['doublons']['paires'], 'piece_identite_absente', 'rappel')
+  portee: periode-entiere
+  note: >-
+    Rappel de la collision exacte sur la variation « pièce d'identité absente » : collision-piece-absente-retrouvees rapporté à collision-piece-absente-paires, au niveau de la paire.
 - id: grappes-exactes-restreint
   valeur: 991
   unite: grappes
@@ -2402,7 +2782,7 @@ chiffres:
     Chapitres numérotés du rapport, comptés dans l'ordre des inclusions du fichier principal. Un
     chapitre non numéroté — l'introduction, la conclusion — n'y entre pas.
 - id: sections-du-rapport
-  valeur: 50
+  valeur: 46
   unite: sections
   type: python
   commande: 'sum(len([l for l in c.read_text(encoding=''utf-8'').splitlines() if l.startswith(''\\section{'')]) for c in sorted((R/''report/chapitres'').glob(''*.tex'')))'
