@@ -144,61 +144,6 @@ RESTES_CONNUS = (
     ),  # noqa: E501
     ("analyse-de-l-activite.tex", "30 pédiatrie."),
     (
-        "architecture-de-la-chaine.tex",
-        "toucher aux autres.} Si les journées du 12, 13 et manquent, les charger les rattrape, et",
-    ),  # noqa: E501
-    ("conception-du-jeu-de-donnees.tex", "& & 46,3~\\% & & 2,0~\\% \\\\"),
-    ("conception-du-jeu-de-donnees.tex", "& & 41,1~\\% & & 20,3~\\% \\\\"),
-    ("conception-du-jeu-de-donnees.tex", "& & 12,6~\\% & & 77,7~\\% \\\\"),
-    (
-        "qualite-et-rapprochement.tex",
-        "premier nom de famille \\emph{et} adresse & & 99,99929~\\% \\\\",
-    ),  # noqa: E501
-    (
-        "qualite-et-rapprochement.tex",
-        "premier nom de famille \\emph{et} téléphone & & 99,99948~\\% \\\\",
-    ),  # noqa: E501
-    (
-        "qualite-et-rapprochement.tex",
-        "type \\emph{et} numéro de pièce d'identité & & 99,99770~\\% \\\\",
-    ),  # noqa: E501
-    (
-        "qualite-et-rapprochement.tex",
-        "nom du père \\emph{et} nom de la mère \\emph{et} date de naissance & & 99,99999~\\% \\\\",
-    ),  # noqa: E501
-    (
-        "qualite-et-rapprochement.tex",
-        "\\textbf{Union des quatre} & \\textbf{ } & \\textbf{99,99850~\\%} \\\\",
-    ),  # noqa: E501
-    (
-        "qualite-et-rapprochement.tex",
-        "d'accord chez les vrais couples et chez les faux y vaut 1,10 pour l'état, 1,15 pour le pays de",  # noqa: E501
-    ),  # noqa: E501
-    (
-        "qualite-et-rapprochement.tex",
-        "naissance, 1,29 pour l'état de naissance. Le second est plus intéressant : certaines colonnes sont",  # noqa: E501
-    ),  # noqa: E501
-    (
-        "qualite-et-rapprochement.tex",
-        "donnent la même F-mesure de 1. Le plateau s'étend sur plus de soixante-dix ordres de grandeur de",  # noqa: E501
-    ),  # noqa: E501
-    ("qualite-et-rapprochement.tex", "téléphone différent & 254 & 254 & 1,0000 \\\\"),
-    ("qualite-et-rapprochement.tex", "adresse mise à jour & 261 & 260 & 0,9962 \\\\"),
-    (
-        "qualite-et-rapprochement.tex",
-        "faute de frappe sur la date de naissance & 332 & 282 & 0,8494 \\\\",
-    ),  # noqa: E501
-    ("qualite-et-rapprochement.tex", "translittération du prénom & 148 & 125 & 0,8446 \\\\"),
-    ("qualite-et-rapprochement.tex", "prénom composé inversé & 243 & 197 & 0,8107 \\\\"),
-    (
-        "qualite-et-rapprochement.tex",
-        "\\textbf{pièce d'identité absente} & \\textbf{267} & \\textbf{146} & \\textbf{0,5468} \\\\",  # noqa: E501
-    ),  # noqa: E501
-    (
-        "qualite-et-rapprochement.tex",
-        "\\textbf{La F-mesure ne dit rien : elle passe de 1 à un peu moins de 0,999.} Un lecteur qui ne",  # noqa: E501
-    ),  # noqa: E501
-    (
         "recommandations.tex",
         "l'absentéisme ambulatoire est documenté par ailleurs — une moyenne mondiale de 23,5~\\% et une",  # noqa: E501
     ),  # noqa: E501

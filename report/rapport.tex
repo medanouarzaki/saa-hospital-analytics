@@ -223,6 +223,10 @@
 \input{liminaires/remerciements}
 \input{liminaires/resume}
 
+% La table des matières s'arrête aux sections : parties, chapitres et sections y figurent, les
+% sous-sections et les paragraphes non. Les entrées des pages préliminaires et des trois listes,
+% posées au niveau du chapitre, y restent.
+\setcounter{tocdepth}{1}
 \tableofcontents
 % Les trois listes entrent à la table des matières, comme les remerciements, le résumé et
 % l'abstract. L'entrée est posée après le saut de page qui ouvre la liste, pour porter sa page.

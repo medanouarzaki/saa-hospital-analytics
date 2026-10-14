@@ -2,18 +2,22 @@
 %   DOC: (aucun)
 %   OBS: REL-RDV.C02, REL-RDV.R08
 %   HYP: (aucun)
-%   CHI: agregats, dim-patient-fiches-plusieurs-versions, dim-patient-lignes, dimensions, faits, identifiants-distincts
-%   CHI: modeles-intermediate, modeles-marts, modeles-total, partitions-par-table, plancher-rejets, quarantaine-lignes-total
-%   CHI: quarantaine-patients-lignes, quarantaine-rendez-vous-lignes, seuil-quarantaine, source-colonnes-texte, source-lignes-total, source-tables
-%   CHI: taches-graphe
+%   CHI: agregats, colonnes-intermediate-typees, dim-patient-fiches-plusieurs-versions, dim-patient-lignes, dimensions, faits
+%   CHI: identifiants-distincts, modeles-intermediate, modeles-marts, modeles-total, partitions-par-table, plancher-rejets
+%   CHI: quarantaine-lignes-total, quarantaine-patients-lignes, quarantaine-rendez-vous-lignes, seuil-quarantaine, source-colonnes-texte, source-lignes-total
+%   CHI: source-tables, taches-graphe
 %   SER: (aucune)
-%   SECTIONS: 7
+%   SECTIONS: 6
 \chapter{Architecture de la chaîne de données}\label{chap:architecture}
+
+La chaîne transforme les fichiers extraits en tables qu'un tableau de bord peut lire. La question
+traitée est celle de son découpage : quelles couches elle traverse, pourquoi chacune existe, et
+comment elles s'enchaînent chaque jour.
 
 \section{Vue d'ensemble}
 
-La chaîne va d'un dépôt de fichiers partitionnés à un tableau de bord, en cinq étapes dont chacune
-a une raison d'exister distincte des autres (voir figure~\ref{fig:architecture}).
+La chaîne va d'un dépôt de fichiers à un tableau de bord en cinq étapes (voir
+figure~\ref{fig:architecture}).
 
 \begin{figure}[htbp]
 \centering
@@ -42,280 +46,108 @@ $\downarrow$ \footnotesize échange de noms en une transaction\\[2pt]
 \caption{Architecture de la chaîne de données}\label{fig:architecture}
 \end{figure}
 
-Chaque cadre y porte le nom que le code donne au schéma ou au répertoire correspondant.
+Aucune couche ne modifie la précédente. La couche source copie les fichiers avec leurs défauts, la
+couche intermédiaire type et normalise sans juger, et la couche analytique modélise. Corriger à
+l'entrée effacerait ce qu'il faut mesurer, et corriger en sortie empêcherait de rejouer la chaîne.
 
-\medskip
-
-Le principe qui gouverne cet enchaînement est qu'\textbf{aucune couche ne modifie la précédente}. La
-couche source est une copie fidèle des fichiers, défauts compris ; la couche intermédiaire type et
-normalise sans juger ; la couche analytique modélise. Une correction appliquée à l'entrée aurait
-effacé ce qu'il fallait mesurer, et une correction appliquée en sortie aurait rendu la chaîne
-irreproductible.
-
-Ce que cette architecture dit des données, une seconde figure le dit des outils : chaque brique de
-la pile, son rôle, et la couche à laquelle elle appartient (voir figure~\ref{fig:pile-technique}).
-
-\begin{figure}[htbp]
-\centering
-\begin{tikzpicture}[x=1mm, y=1mm]
-
-\node[coucheUML, anchor=east] at (-4,0)   {restitution};
-\node[coucheUML, anchor=east] at (-4,-20) {ordonnancement};
-\node[coucheUML, anchor=east] at (-4,-40) {identités};
-\node[coucheUML, anchor=east] at (-4,-60) {modélisation};
-\node[coucheUML, anchor=east] at (-4,-80) {persistance};
-
-\node[briqueUML, text width=52mm] (res) at (26,0)   {Bibliothèque d'application web analytique\\[1pt]\emph{lire, filtrer, afficher}};
-\node[briqueUML, text width=52mm] (ord) at (26,-20) {Orchestrateur de graphes de tâches\\[1pt]\emph{déclencher dans l'ordre}};
-\node[briqueUML, text width=52mm] (rap) at (26,-40) {Bibliothèque de rapprochement probabiliste\\[1pt]\emph{estimer, apparier, regrouper}};
-\node[briqueUML, text width=52mm] (mod) at (26,-60) {Outil de transformation déclaratif\\[1pt]\emph{typer, modéliser, tester}};
-\node[briqueUML, text width=52mm] (per) at (26,-80) {Serveur de base de données relationnelle\\[1pt]\emph{stocker, servir, transiger}};
-
-\node[briqueOptUML, text width=44mm] (sch) at (96,-60) {Schéma en étoile\\[1pt]\emph{faits, dimensions, agrégats}};
-\node[briqueOptUML, text width=44mm] (mem) at (96,-40) {Moteur en mémoire\\[1pt]\emph{calculer hors du serveur}};
-
-\draw[fluxUML] (per) -- (mod);
-\draw[fluxUML] (mod) -- (rap);
-\draw[fluxUML] (rap) -- (ord);
-\draw[fluxUML] (ord) -- (res);
-\draw[fluxUML] (sch.west) -- (mod.east);
-\draw[fluxUML] (mem.west) -- (rap.east);
-\end{tikzpicture}
-\caption{La pile technique, couche par couche}\label{fig:pile-technique}
-\end{figure}
-
-Chaque brique porte sa désignation fonctionnelle — le chapitre~\ref{chap:outils} nomme l'outil
-qui l'incarne — et son rôle en trois verbes. Les flèches pleines montent d'une couche à la
-suivante ; les deux briques en pointillé ne sont pas des couches mais des choix internes à celle
-qu'elles rejoignent. Aucun logotype d'éditeur ne figure ici : ce sont des marques déposées. La
-figure ne montre ni les versions, ni les dépendances, ni le conteneur qui porte chaque service.
-
-\medskip
-
-La chaîne compte \chiffre{modeles-total} modèles de transformation —
-\chiffre{modeles-intermediate} intermédiaires et \chiffre{modeles-marts} analytiques — et
-\chiffre{taches-graphe} tâches d'\emph{orchestration}, c'est-à-dire de tâches qu'un ordonnanceur
-déclenche dans un ordre imposé par leurs dépendances.
-
-\textbf{Une sixième étape mérite d'être expliquée, parce qu'elle n'est pas une couche de
-transformation.} Le tableau de bord ne lit pas la couche analytique directement : il lit un schéma
-d'\emph{instantané} — une copie figée et datée de l'état construit —, fait de tables et non de
-vues. Le motif est mesuré — une reconstruction de la couche
-analytique fait disparaître ses vues pendant environ trois dixièmes de seconde, et un lecteur
-concurrent y rencontre une erreur d'objet inexistant, non une attente. Le rafraîchissement construit
-donc des tables neuves sous des noms provisoires, puis échange tous les noms dans \emph{une seule}
-transaction. Ce que l'instantané porte est une règle et non une liste : une copie de chaque vue
-analytique, de chaque table de rapprochement, plus deux tables de service. La construction vise à
-ce qu'un lecteur ne voie jamais un instantané mi-neuf mi-ancien ; aucun contrôle du dépôt ne
-l'établit.
+Les outils de chaque couche sont présentés en section~\ref{sec:complements-pile}, et le
+chapitre~\ref{chap:outils} les nomme. La chaîne compte \chiffre{modeles-total} modèles de transformation, dont
+\chiffre{modeles-intermediate} intermédiaires et \chiffre{modeles-marts} analytiques, et
+\chiffre{taches-graphe} tâches d'orchestration. Le tableau de bord ne lit pas la couche analytique
+mais un instantané, copie figée de l'état construit, décrit en section~\ref{sec:orchestration}.
 
 \section{Zone d'atterrissage et couche source}
 
-La zone d'atterrissage est un dépôt de fichiers, partitionné par table et par date d'extraction :
-\chiffre{partitions-par-table} partitions par table sur la période, soit une par jour. Cette
-partition n'existe pas dans le système observé — c'est une construction de la chaîne, et elle a deux
-effets : elle rend le chargement rejouable partition par partition, et elle donne à chaque ligne une
-date d'extraction qui devient une colonne de la couche source.
+La zone d'atterrissage range les fichiers par table et par date d'extraction, et la couche source
+les copie sans contrainte. Chaque table compte \chiffre{partitions-par-table} partitions sur la
+période, une par jour. Ce découpage est une construction de la chaîne, absente du système observé.
+Il rend le chargement rejouable jour par jour et donne à chaque ligne une date d'extraction, qui
+devient une colonne.
 
-Chaque partition est écrite \textbf{en deux formats}, un fichier de valeurs séparées et un fichier
-colonnaire, et un contrôle vérifie que les deux portent le même contenu, colonne par colonne. Le
-chargeur lit le format tabulaire ; le format colonnaire est un livrable d'échange, non une entrée
-de la chaîne.
+Chaque partition est écrite en deux formats : un fichier de valeurs séparées, que le chargeur lit,
+et un fichier colonnaire livré pour l'échange. Un contrôle vérifie que les deux portent le même
+contenu, colonne par colonne. Chaque ligne doit aussi déclarer la date d'extraction du
+répertoire qui la contient, sans quoi elle part en quarantaine.
 
-\textbf{La couche source ne porte aucune contrainte, et c'est délibéré.} Ses
-\chiffre{source-tables} tables comptent \chiffre{source-colonnes-texte} colonnes, \emph{toutes de
-type texte} — pas de clé primaire, pas de clé étrangère, pas de contrainte de domaine, pas de type
-date ni numérique. Une contrainte y ferait échouer le chargement sur une ligne défectueuse, alors
-que ces lignes sont précisément la matière du travail de qualité. Le typage est reporté à la couche
-suivante, où il devient une transformation observable. Sur la période,
-la couche source porte \chiffre{source-lignes-total} lignes.
-
-\textbf{Le chargement d'une partition est une transaction unique.} Il commence par supprimer, pour
-la date concernée, le contenu des deux schémas — la couche source et la quarantaine —, puis insère
-les lignes acceptées d'un côté et les lignes rejetées de l'autre. Le retrait préalable est ce qui
-rend l'opération rejouable : c'est le mécanisme d'idempotence de la section~\ref{sec:orchestration}, et il vit ici, à
-l'entrée, plutôt que dans la couche dimensionnelle.
-
-Un contrôle porte sur la partition elle-même : chaque ligne d'un fichier doit déclarer la date
-d'extraction du répertoire qui la contient, et une ligne qui en déclarerait une autre part en
-quarantaine.
+Les \chiffre{source-tables} tables de la couche source comptent \chiffre{source-colonnes-texte}
+colonnes, toutes de type texte, sans clé ni contrainte. Une contrainte ferait échouer le chargement
+sur une ligne défectueuse, alors que ces lignes sont la matière du travail de qualité. Le typage a
+lieu à la couche suivante, où il devient une transformation observable. Sur la période, la couche
+source porte \chiffre{source-lignes-total} lignes.
 
 \section{Le choix du serveur de base de données}\label{sec:choix-serveur}
 
-Un moteur embarqué aurait suffi à produire les mêmes tables. Le serveur relationnel est retenu pour
-des propriétés que le moteur embarqué ne met pas en jeu, et que cette chaîne exerce réellement : le
-modèle client-serveur — plusieurs services attaquent la même base par le réseau, avec des
-identifiants distincts —, les transactions concurrentes — le chargement écrit pendant que le tableau
-de bord lit —, et le catalogue interrogeable, dont ce rapport se sert pour compter ses propres
-colonnes.
+Le serveur relationnel a été retenu pour trois propriétés que la chaîne utilise vraiment. Plusieurs
+services interrogent la même base par le réseau, avec des identifiants distincts. Le chargement
+écrit pendant que le tableau de bord lit, ce qui demande des transactions concurrentes. Le catalogue
+de la base sert enfin à compter les colonnes que le registre déclare. Un moteur embarqué aurait
+produit les mêmes tables, et plus vite sur ce volume : le choix ne tient donc pas à la performance.
 
-Le motif n'est donc pas la performance : un moteur embarqué serait plus rapide sur ce volume.
+Le serveur tourne dans un conteneur, si bien que la base est la même sur le poste de développement
+et dans l'intégration continue. Seul le rapprochement d'identités s'exécute sur un moteur en
+mémoire. Il écrit de nombreuses tables intermédiaires, et les tenir hors du serveur évite d'y
+laisser des résidus.
 
-Le serveur est conteneurisé, ce qui donne une base identique sur la machine de développement et chez
-l'exécuteur d'intégration continue.
+\section{Couche intermédiaire et quarantaine}\label{sec:quarantaine}
 
-Le rapprochement d'identités fait exception et s'exécute sur un moteur en mémoire : il écrit de
-nombreuses tables intermédiaires, et les tenir hors du serveur évite d'y laisser des résidus.
+La couche intermédiaire compte \chiffre{modeles-intermediate} modèles, un par table source : elle
+type, normalise et ne rejette rien. Les formats de date ont été mesurés avant d'être écrits. Au
+poste, les dates sont au format mois-jour-année, et les horodatages y ajoutent l'indicateur du
+matin ou de l'après-midi. Ce format a été relevé sur la date de création d'un
+rendez-vous\releve{REL-RDV.C02} comme sur sa date de tenue\releve{REL-RDV.R08}.
 
-\section{Couche intermédiaire et quarantaine}
+La conversion est écrite une fois, dans une macro, et appliquée partout. Sans elle, le jour et le
+mois s'échangeraient sans bruit onze fois sur douze. Les mesures faites sur la base avant d'écrire
+les conversions ont aussi montré trois faits : la valeur manquante est toujours la chaîne vide et
+jamais l'absence de valeur, les dates et les horodatages se convertissent tous sur les
+\chiffre{colonnes-intermediate-typees} colonnes typées, et le domaine booléen compte exactement deux
+valeurs et la chaîne vide.
 
-La couche intermédiaire compte \chiffre{modeles-intermediate} modèles, un par table source, et fait
-trois choses : elle type, elle normalise, elle ne rejette rien.
+Une ligne refusée au chargement est mise en quarantaine : elle est écrite dans un schéma parallèle,
+avec le motif de son rejet et sa partition, et jamais supprimée. Sur la période,
+\chiffre{quarantaine-lignes-total} lignes y sont, dont \chiffre{quarantaine-patients-lignes} fiches
+patient et \chiffre{quarantaine-rendez-vous-lignes} rendez-vous, pour
+\chiffre{source-lignes-total} lignes chargées. Ce sont les défauts injectés que les contrôles
+d'entrée ont attrapés : dates hors domaine, âges incohérents avec la date de naissance, valeurs hors
+nomenclature. Les autres tables n'en portent aucune, parce que leurs défauts ne se voient pas sur
+une ligne seule, et garder ces lignes permet de mesurer la qualité d'entrée.
 
-\textbf{Le typage s'appuie sur des formats mesurés, non supposés.} Les dates de la couche source
-sont au format mois-jour-année et les horodatages y ajoutent un indicateur de méridien — c'est une
-observation de l'écran, relevée au poste sur la date de création d'un
-rendez-vous\releve{REL-RDV.C02} comme sur sa date de tenue\releve{REL-RDV.R08}, et non une
-convention posée. La
-conversion est écrite une fois, dans une macro, et appliquée partout : sans cela, un jour et un mois
-s'échangeraient silencieusement onze fois sur douze sans qu'aucune valeur ne devienne invalide. La
-valeur manquante est de même la chaîne vide et jamais l'absence de valeur, ce qui a été mesuré sur
-la base avant d'être écrit dans les macros.
-
-\textbf{Une ligne refusée est mise en \emph{quarantaine} — un schéma parallèle où elle est conservée
-avec le motif de son rejet — et jamais supprimée.} Le chargeur applique ses
-contrôles d'entrée, écrit les lignes acceptées dans la couche source et les lignes rejetées dans un
-schéma parallèle, avec le motif du rejet et la partition dont elles proviennent. Sur la période,
-\chiffre{quarantaine-lignes-total} lignes y sont — \chiffre{quarantaine-patients-lignes} fiches
-patient et \chiffre{quarantaine-rendez-vous-lignes} rendez-vous. Supprimer ces lignes aurait rendu impossible toute mesure de la qualité d'entrée.
-
-\textbf{Un seuil bloque le chargement, et il est doublé d'un plancher.} Au-delà de
-\chiffre{seuil-quarantaine} de lignes rejetées dans une partition, le fichier est bloqué plutôt que
-chargé partiellement : un taux de rejet aussi élevé signale plus probablement un défaut d'extraction
-en amont qu'une accumulation de défauts de saisie. Le plancher de \chiffre{plancher-rejets} rejets
-évite l'effet de bord d'une petite partition, où un rejet unique dépasse mécaniquement tout seuil
-exprimé en proportion. \textbf{Les deux conditions doivent être réunies pour bloquer.}
-
-Un second contrôle porte sur le cumul de la journée, toutes tables confondues, et compare ce cumul
-au même seuil. Sans lui, \chiffre{source-tables} fichiers restant chacun sous le seuil passeraient
-alors que la journée entière serait mauvaise.
-
-\textbf{Trois faits de la couche source ont été mesurés avant d'être écrits dans les conversions.}
-La valeur manquante est toujours la chaîne vide et jamais l'absence de valeur. Les dates et
-horodatages se convertissent tous, sur les cinquante-deux colonnes typées, sans une seule valeur non
-convertible. Le domaine booléen est exactement composé de deux valeurs et de la chaîne vide.
+Un seuil bloque le chargement d'un fichier trop défectueux. Au-delà de
+\chiffre{seuil-quarantaine} de lignes rejetées, le fichier est bloqué plutôt que chargé en partie,
+car un tel taux signale plutôt un défaut d'extraction qu'une suite de défauts de saisie. Un plancher
+de \chiffre{plancher-rejets} rejets évite qu'un seul rejet, dans une petite partition, dépasse le
+seuil à lui seul, et il faut les deux conditions pour bloquer. Un second contrôle compare au même
+seuil le cumul de la journée, toutes tables confondues, pour qu'une mauvaise journée ne passe pas
+fichier par fichier.
 
 \section{Modélisation dimensionnelle}
 
-La couche analytique compte \chiffre{modeles-marts} modèles, et le schéma qu'ils produisent porte
-\chiffre{dimensions} dimensions, \chiffre{faits} faits et \chiffre{agregats} agrégats. Les deux
-décomptes ne sont pas le même et ne s'additionnent pas : l'un des agrégats est une vue
-\emph{posée hors de l'outil de transformation}, par un fichier de définition de schéma appliqué en
-préalable d'initialisation, et il n'est donc pas l'un des modèles. Son fichier de propriétés le dit
-explicitement et donne le motif de ce maintien à part ; l'outil de transformation le signale
-d'ailleurs de lui-même à l'analyse, ne trouvant aucun modèle qui corresponde à cet objet
-documenté.
+La couche analytique suit un schéma en étoile : chaque table de faits porte un événement, et les
+dimensions qui l'entourent le décrivent (voir figure~\ref{fig:schema-etoile}). Elle compte
+\chiffre{modeles-marts} modèles, qui produisent \chiffre{dimensions} dimensions,
+\chiffre{faits} faits et \chiffre{agregats} agrégats. Les deux décomptes diffèrent parce qu'un des
+agrégats est une vue posée hors de l'outil de transformation (section~\ref{sec:complements-analytique}).
 
-Ces objets sont organisés en \emph{schéma en étoile} — une forme où chaque table de faits est
-entourée des tables qui la décrivent, et où toute interrogation part du centre pour aller vers les
-branches (voir figure~\ref{fig:schema-etoile}).
+Quatre dimensions sur six ne portent que leur code, sans libellé. Aucune source ne nomme ces
+libellés, et en écrire un plausible afficherait une hypothèse sous l'apparence d'une donnée
+relevée. Le calendrier est construit, et la dimension patient garde l'historique des fiches.
 
-\begin{figure}[htbp]
-\centering
-\begin{tabular}{@{}c@{}}
-\fbox{\begin{minipage}{0.92\linewidth}\centering\small
-\fbox{\begin{minipage}{0.28\linewidth}\centering \texttt{dim\_date}\end{minipage}}%
-\hfill
-\fbox{\begin{minipage}{0.28\linewidth}\centering \texttt{dim\_patient} \\ \footnotesize historisée\end{minipage}}%
-\hfill
-\fbox{\begin{minipage}{0.28\linewidth}\centering \texttt{dim\_service}\end{minipage}}\\[3pt]
-% CHAQUE FLÈCHE EST CENTRÉE DANS UNE BOÎTE DE LA LARGEUR DE LA DIMENSION QU'ELLE RELIE. Avec un
-% `\hfill` entre elles, les deux flèches obliques étaient rejetées aux bords du cadre et
-% s'arrêtaient dans le vide, à côté des boîtes qu'elles devaient joindre. Les trois dimensions
-% occupent chacune 0,28 de la largeur ; les trois boîtes de flèche prennent la même largeur.
-\makebox[0.28\linewidth]{$\searrow$}\hfill\makebox[0.28\linewidth]{$\downarrow$}\hfill\makebox[0.28\linewidth]{$\swarrow$}\\[3pt]
-\fbox{\begin{minipage}{0.94\linewidth}\centering \textbf{Les six faits} \\[2pt]
-\footnotesize
-\texttt{fct\_sejour} — un séjour \quad
-\texttt{fct\_passage} — un passage, les trois types \\
-\texttt{fct\_passage\_urgence} — un passage aux urgences \quad
-\texttt{fct\_rendez\_vous} — un rendez-vous \\
-\texttt{fct\_facturation} — une facture \quad
-\texttt{fct\_encaissement} — un encaissement
-\end{minipage}}\\[3pt]
-\makebox[0.28\linewidth]{$\nearrow$}\hfill\makebox[0.28\linewidth]{$\uparrow$}\hfill\makebox[0.28\linewidth]{$\nwarrow$}\\[3pt]
-\fbox{\begin{minipage}{0.28\linewidth}\centering \texttt{dim\_activite}\end{minipage}}%
-\hfill
-\fbox{\begin{minipage}{0.28\linewidth}\centering \texttt{dim\_agent}\end{minipage}}%
-\hfill
-\fbox{\begin{minipage}{0.28\linewidth}\centering \texttt{dim\_organisme}\end{minipage}}
-\end{minipage}}
-\end{tabular}
-\caption{Le schéma en étoile de la couche analytique}\label{fig:schema-etoile}
-\end{figure}
+Les agrégats portent des décomptes déjà calculés pour l'affichage, comme l'activité par jour ou
+l'absentéisme par activité. Ils existent pour que le tableau de bord rende une page en un temps
+borné. Le registre des indicateurs dit, pour chaque valeur affichée, de quelles tables elle est
+recalculée. Les créances et les relances n'ont pas de table de faits, et leurs agrégats partent de
+la couche intermédiaire.
 
-Six dimensions y entourent six faits. Les \chiffre{agregats} agrégats, non représentés, se
-calculent depuis les faits.
-
-\medskip
-
-\textbf{Le grain de chaque fait est déclaré, et deux d'entre eux méritent d'être dits.} Le fait des
-séjours porte un séjour par ligne, et il n'est pas une reprise ligne à ligne : il \emph{agrège} la
-couche des mouvements, qui porte une ligne par mouvement — une admission, au plus une mutation, au
-plus une sortie. Le fait des passages est une table pivot couvrant les trois types d'épisode, et
-c'est à elle que se raccordent les factures et les prises en charge ; le fait des passages aux
-urgences en est un satellite, dont l'espace de clés est un sous-ensemble strict.
-
-Les autres grains sont directs : une facture, un encaissement — le grain est l'encaissement et non
-la facture, une facture pouvant recevoir plusieurs règlements —, un rendez-vous.
-
-\textbf{Quatre dimensions sur six ne portent que leur clé naturelle}, sans aucun attribut, et sans
-clé de substitution. Ce n'est pas un oubli : aucune source ne nomme les libellés correspondants, et
-écrire un libellé plausible en face d'un code reviendrait à afficher une hypothèse avec l'apparence
-d'une donnée relevée. Les deux dimensions restantes font exception : le calendrier est construit et
-non extrait, et la dimension patient porte l'historique, objet de la section suivante.
-
-\textbf{Les \chiffre{agregats} agrégats ne sont pas des faits.} Un fait porte un événement, un
-agrégat porte un décompte déjà calculé sur une maille d'affichage — l'activité par jour,
-l'absentéisme par activité, le recouvrement par type de débiteur. Ils existent parce que le tableau
-de bord doit rendre une page en un temps borné, et qu'un calcul sur les faits à chaque affichage ne
-le permettrait pas. Un chiffre repris d'un agrégat n'est donc pas recalculé depuis les faits, et le
-registre des indicateurs porte, pour chaque entrée affichée, ce dont sa valeur est recalculée.
-
-Deux agrégats ne pourraient pas l'être de toute façon : il n'existe ni fait des créances ni fait des
-relances, et la matière n'est disponible qu'en couche intermédiaire.
-
-\section{La dimension patient historisée}
-
-Les cinq autres dimensions écrasent leurs valeurs ; la dimension patient conserve l'historique.
-Le motif est qu'une fiche patient change — une adresse est corrigée, une couverture est mise à jour
-— et qu'un fait daté doit se rattacher à la version en vigueur au moment de l'événement, non à la
-dernière connue.
-
-Elle porte \chiffre{dim-patient-lignes} lignes, qui sont des versions, pour
-\chiffre{identifiants-distincts} identifiants distincts ;
-\chiffre{dim-patient-fiches-plusieurs-versions} identifiants en portent plus d'une.
-
-\textbf{La clé de fusion est le couple identifiant et début de validité}, et non l'identifiant seul.
-Les intervalles sont semi-ouverts : le début est inclus, la fin est exclue, et la version courante
-porte une fin absente. Deux versions consécutives se touchent donc exactement, sans se chevaucher ni
-laisser de trou.
-
-Trois contrôles distincts la vérifient à chaque construction : la continuité — pour toute version
-non courante, la fin égale exactement le début de la suivante —, le non-chevauchement, et le fait
-qu'un identifiant porte une version courante et une seule. Les trois sont nécessaires : la
-continuité seule laisserait passer deux versions courantes, et le non-chevauchement seul laisserait
-passer un trou.
-
-\textbf{Ce que l'historisation permet en aval.} Un fait daté ne se rattache pas à l'identifiant du
-patient mais au couple identifiant et début de validité : il pointe vers la version en vigueur au
-moment de l'événement. Une adresse corrigée en mai ne réécrit donc pas la provenance géographique
-d'un passage de janvier. C'est la propriété que les cinq autres dimensions n'offrent pas, et c'est
-la raison pour laquelle celle-ci seule est historisée : le coût — une ligne par version plutôt
-qu'une par entité — ne se justifie que là où la valeur change et où l'antériorité compte.
-
-Le décompte le dit : \chiffre{dim-patient-lignes} lignes pour
-\chiffre{identifiants-distincts} identifiants, soit un surcoût de stockage d'environ un huitième,
-pour une propriété que rien d'autre ne rendrait.
+La dimension patient est la seule à garder une ligne par version de fiche. Un passage de janvier
+reste ainsi rattaché à l'adresse connue en janvier, même si elle a été corrigée en mai. Elle porte
+\chiffre{dim-patient-lignes} lignes pour \chiffre{identifiants-distincts} identifiants, dont
+\chiffre{dim-patient-fiches-plusieurs-versions} ont plus d'une version. La clé des versions et les
+trois contrôles qui la vérifient sont décrits en section~\ref{sec:complements-analytique}.
 
 \section{Orchestration, idempotence et rattrapage}\label{sec:orchestration}
 
-Le graphe compte \chiffre{taches-graphe} tâches, en chaîne, et son ordre porte une contrainte de
-modélisation : \textbf{les dimensions se construisent avant les faits}, un fait se rattachant à une
-version de dimension.
-
-Le diagramme de séquence les porte dans leur ordre, entre les participants réels de la chaîne
-(voir figure~\ref{fig:sequence-quotidienne}).
+Un orchestrateur enchaîne chaque jour les \chiffre{taches-graphe} tâches de la chaîne, dans l'ordre
+que montre la figure~\ref{fig:sequence-quotidienne}.
 
 \begin{figure}[htbp]
 \centering
@@ -358,49 +190,40 @@ Le diagramme de séquence les porte dans leur ordre, entre les participants rée
 \caption{Le traitement quotidien entre les participants de la chaîne}\label{fig:sequence-quotidienne}
 \end{figure}
 
-{\raggedright Les douze messages sont les douze tâches du graphe, dans leur ordre, et chacune porte
-au code l'identifiant que voici : \texttt{verifier\_disponibilite\_extraction}, \texttt{charger\_journee},
-\texttt{controle\_qualite}, \texttt{dbt\_intermediaire}, \texttt{dbt\_dimensions},
-\texttt{dbt\_faits}, \texttt{dbt\_tests}, \texttt{rapprochement\_prediction},
-\texttt{rapprochement\_regroupement\_evaluation}, \texttt{dbt\_agregats},
-\texttt{rafraichir\_instantane}, \texttt{exporter}.\par}
+Les dimensions se construisent avant les faits, parce qu'un fait se rattache à une version de
+dimension. La construction des modèles tourne sur un seul fil : en parallèle, un modèle lirait un
+objet en cours de remplacement. Les identifiants des tâches dans le code sont listés en
+section~\ref{sec:complements-analytique}.
 
-Deux traits de ce dessin ne se lisent pas sur la liste des tâches. \textbf{Les dimensions se
-construisent avant les faits} — le message qui construit les dimensions précède celui qui
-construit les faits —, un fait se rattachant à une version de dimension. Et le rafraîchissement de
-l'instantané n'est pas une reconstruction : les tables neuves sont bâties à côté, puis \textbf{tous
-les noms sont échangés en une seule transaction}, si bien qu'un lecteur ne voit jamais un état
-mixte. Le douzième message sort du diagramme parce que son destinataire n'est pas un participant :
-ce sont des fichiers. La figure ne montre ni les reprises sur échec, ni le verrou consultatif qui
-interdit deux rafraîchissements simultanés, ni le rattrapage d'une journée manquante.
+Le chargement est idempotent : le refaire donne le même état que le faire une fois. Le fichier du
+12~mars est par exemple chargé, puis trouvé incomplet, corrigé et rechargé. Le chargement supprime
+d'abord, dans la même transaction, tout ce qui porte la date du 12~mars dans la couche source et en
+quarantaine, puis il insère. La journée est remplacée, jamais dédoublée.
 
-\medskip
+Le rattrapage en découle : une journée manquante se charge sans toucher aux autres. Si les journées
+du 12~mars, du 13~mars et du 14~mars manquent, les charger dans n'importe quel ordre donne le même
+état final. Deux contrôles le vérifient, l'un en chargeant deux fois la même partition, l'autre en
+chargeant les mêmes partitions dans deux ordres différents.
 
-\textbf{Une opération est \emph{idempotente} lorsque la refaire ne change rien : la faire deux fois
-donne le même résultat que la faire une fois.} C'est le chargement qui porte cette propriété ici,
-et non la couche dimensionnelle.
+La production et l'application du schéma restent hors du graphe. Leurs fichiers de définition
+suppriment les tables avant de les recréer, et les placer dans un graphe quotidien viderait la base
+chaque nuit. Elles s'exécutent à la main, quand le modèle change.
 
-Prenons le cas concret. Le fichier du 12 mars a été chargé, puis on s'aperçoit qu'il était
-incomplet ; on le corrige et on le recharge. Le chargement commence par supprimer, dans une même
-transaction, tout ce qui portait la date du 12 mars — dans la couche source comme en quarantaine —
-avant d'insérer. La journée du 12 mars est donc remplacée, jamais dédoublée.
+Le graphe finit par deux tâches de sortie. La première rafraîchit l'instantané que lit le tableau
+de bord, fait de tables et non de vues. Une reconstruction de la couche analytique fait en effet
+disparaître ses vues pendant environ trois dixièmes de seconde, et un lecteur y rencontre alors une
+erreur d'objet inexistant. Le rafraîchissement bâtit donc des tables neuves sous des noms
+provisoires, puis échange tous les noms en une seule transaction.
 
-\textbf{Le \emph{rattrapage} en découle : c'est le fait de rejouer une journée manquante sans
-toucher aux autres.} Si les journées du 12, 13 et 14 mars manquent, les charger les rattrape, et
-l'ordre dans lequel on le fait ne change pas l'état final. Deux contrôles l'établissent, l'un en
-chargeant deux fois la même partition, l'autre en chargeant les mêmes partitions dans deux ordres
-différents.
+Le rafraîchissement copie chaque vue analytique et chaque table de rapprochement, plus deux tables
+de service. Un lecteur ne devrait jamais voir un instantané à moitié neuf, mais aucun contrôle du
+dépôt ne le vérifie. La seconde tâche exporte un fichier par table, régénéré à chaque exécution et
+non suivi par le gestionnaire de versions.
 
-\textbf{Deux tâches manquent volontairement à ce graphe.} La production du schéma et son
-application à la base sont des opérations destructrices — les fichiers de définition suppriment
-leurs tables avant de les recréer — et les placer dans un graphe quotidien reviendrait à vider la
-base chaque nuit. Elles s'exécutent à la main, au moment où le modèle change.
+\section*{Synthèse}
 
-\textbf{La construction des modèles s'exécute sur un seul fil.} Les modèles se lisent les uns les
-autres pendant leur construction, et un parallélisme y produit des lectures d'objets en cours de
-remplacement — le même phénomène qui a motivé le schéma d'instantané.
-
-\textbf{Le graphe se termine par deux tâches de sortie} : le rafraîchissement de l'instantané, qui
-rend l'état construit visible au tableau de bord en une transaction, et l'export tabulaire, qui
-écrit un fichier par table. Ce livrable est régénéré à chaque exécution, et son répertoire n'est pas
-suivi par le gestionnaire de versions.
+La chaîne copie, type, modélise puis fige les données, et aucune étape ne corrige la précédente.
+Les lignes refusées sont gardées en quarantaine avec leur motif. La couche analytique suit un schéma
+en étoile, et seule la dimension patient garde l'historique des fiches. Le chargement se rejoue jour
+par jour sans rien dédoubler, et le tableau de bord lit un instantané échangé en une transaction.
+Le chapitre~\ref{chap:qualite} mesure la qualité des données que cette chaîne produit.
