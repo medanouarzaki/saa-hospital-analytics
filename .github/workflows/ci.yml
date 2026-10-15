@@ -133,6 +133,10 @@ jobs:
       # aucune base.
       - run: uv run pytest tests/test_abreviations.py -v
 
+      # La langue de la prose : les cinq propriétés de la charte de style. Le contrôle lit les
+      # sources du rapport et n'ouvre aucune base.
+      - run: uv run pytest tests/test_langue.py -v
+
   tests-matrice:
     runs-on: ubuntu-latest
     strategy:

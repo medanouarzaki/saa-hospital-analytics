@@ -25,6 +25,7 @@ les rattraperait ; ils se vérifient à la main, contre le registre.
 from __future__ import annotations
 
 import re
+from collections import Counter
 from pathlib import Path
 
 import pytest
@@ -262,3 +263,422 @@ def test_le_motif_voit_un_nombre_tape(source: str) -> None:
 def test_le_motif_laisse_passer_ce_qui_n_est_pas_une_grandeur(source: str) -> None:
     """Témoin négatif — sans lui, le contrôle rougirait partout et ne prouverait rien."""
     assert not nombres_tapes(source), f"forme légitime prise pour un nombre tapé : {source}"
+
+
+# ------------------------------------------------------------------------------------------
+# LES NOMBRES ÉCRITS EN LETTRES. Le motif ci-dessus ne voit que les chiffres : « cinq appareils »
+# et « les huit activités » ont vieilli sans bruit. Un nombre écrit en lettres à partir de
+# « trois » peut être une donnée — un décompte du dépôt, des données générées ou d'une mesure du
+# projet — et une donnée passe par le registre. « Un » et « deux » relèvent de la langue courante
+# plus que de la mesure, et ne sont pas examinés.
+#
+# Ce qui reste en lettres est déclaré ici, occurrence par occurrence, avec sa classe :
+#   ÉNUMÉRATION  les éléments comptés sont nommés un à un dans la phrase, la suivante, ou le
+#                tableau, la figure ou la liste qu'elle introduit ;
+#   SOURCE       le nombre est repris d'une source citée dans la phrase, tel qu'elle le donne ;
+#   STRUCTURE    structure du document ou d'une méthode fixe ;
+#   LOCUTION     locution figée, ou rapport arithmétique sans donnée ;
+#   PERSONNEL    passage d'écriture personnelle, gardé dans la forme de l'auteur.
+# La liste casse dans les deux sens : une occurrence non déclarée rougit, une déclaration qui ne
+# correspond plus à rien rougit aussi. L'abstract anglais est hors du périmètre des lettres.
+# ------------------------------------------------------------------------------------------
+
+_UNITES_EN_LETTRES = (
+    r"trois|quatre|cinq|six|sept|huit|neuf|dix|onze|douze|treize|quatorze|quinze|seize|"
+    r"vingts?|trente|quarante|cinquante|soixante|cents?|mille"
+)
+_NOMBRE_EN_LETTRES = re.compile(
+    rf"(?<![\wÀ-ÿ-])(?:(?:deux|un|une)-(?:et-)?)?(?:{_UNITES_EN_LETTRES})"
+    rf"(?:-(?:et-)?(?:{_UNITES_EN_LETTRES}|deux|un|une))*(?![\wÀ-ÿ-])",
+    re.I,
+)
+_TEXTE_ANGLAIS = re.compile(r"\\begin\{otherlanguage\}\{english\}.*?\\end\{otherlanguage\}", re.S)
+
+CLASSES_EN_LETTRES = ("ÉNUMÉRATION", "SOURCE", "STRUCTURE", "LOCUTION", "PERSONNEL")
+
+EXEMPTIONS_LETTRES = (
+    (
+        "analyse-de-l-activite.tex",
+        "Les délais y sont en jours. Les trois premières colonnes portent l'ensemble, les trois dernières le",  # noqa: E501
+        "STRUCTURE",
+        "« trois » : colonnes du tableau qui précède",
+    ),
+    (
+        "analyse-de-l-activite.tex",
+        "Les délais y sont en jours. Les trois premières colonnes portent l'ensemble, les trois dernières le",  # noqa: E501
+        "STRUCTURE",
+        "« trois » : colonnes du tableau qui précède",
+    ),
+    (
+        "analyse-de-l-activite.tex",
+        "en quatre états : honorés,",  # noqa: E501
+        "ÉNUMÉRATION",
+        "« quatre » : honorés, absences, annulations, encore ouverts, dans la phrase",
+    ),
+    (
+        "analyse-de-l-activite.tex",
+        "mesurer.} Les trois mesures portent sur rendez-vous à issue",  # noqa: E501
+        "STRUCTURE",
+        "« trois » : les trois formes de mesure de la méthode",
+    ),
+    (
+        "analyse-de-l-activite.tex",
+        "\\textbf{Sur le complément, les trois mesures se rapprochent de la relation",  # noqa: E501
+        "STRUCTURE",
+        "« trois » : les trois formes de mesure de la méthode",
+    ),
+    (
+        "analyse-de-l-activite.tex",
+        "trois groupes de gravité , et les données en portent .",  # noqa: E501
+        "SOURCE",
+        "« trois » : \\cite{s12} dans la phrase",
+    ),
+    (
+        "analyse-de-l-activite.tex",
+        "~\\%. Le règlement intérieur nomme les cinq issues du",  # noqa: E501
+        "SOURCE",
+        "« cinq » : \\cite{s27} dans la phrase",
+    ),
+    (
+        "architecture-de-la-chaine.tex",
+        "La chaîne va d'un dépôt de fichiers à un tableau de bord en cinq étapes (voir",  # noqa: E501
+        "ÉNUMÉRATION",
+        "« cinq » : étapes nommées dans la figure que la phrase introduit",
+    ),
+    (
+        "architecture-de-la-chaine.tex",
+        "Le serveur relationnel a été retenu pour trois propriétés que la chaîne utilise vraiment. Plusieurs",  # noqa: E501
+        "ÉNUMÉRATION",
+        "« trois » : les trois propriétés nommées dans les phrases qui suivent",
+    ),
+    (
+        "architecture-de-la-chaine.tex",
+        "mois s'échangeraient sans bruit onze fois sur douze. Les mesures faites sur la base avant d'écrire",  # noqa: E501
+        "LOCUTION",
+        "« onze » : rapport arithmétique jours sur mois",
+    ),
+    (
+        "architecture-de-la-chaine.tex",
+        "mois s'échangeraient sans bruit onze fois sur douze. Les mesures faites sur la base avant d'écrire",  # noqa: E501
+        "LOCUTION",
+        "« douze » : rapport arithmétique jours sur mois",
+    ),
+    (
+        "architecture-de-la-chaine.tex",
+        "les conversions ont aussi montré trois faits : la valeur manquante est toujours la chaîne vide et",  # noqa: E501
+        "ÉNUMÉRATION",
+        "« trois » : les trois faits nommés après les deux-points",
+    ),
+    (
+        "architecture-de-la-chaine.tex",
+        "de service. Un lecteur ne devrait jamais voir un instantané à moitié neuf, mais aucun contrôle du",  # noqa: E501
+        "LOCUTION",
+        "« neuf » : « neuf » adjectif (nouveau)",
+    ),
+    (
+        "cadrage-et-methodologie.tex",
+        "réelle. Trois questions en découlent. Que demande le besoin ? Que permet l'accès au poste, et comment",  # noqa: E501
+        "STRUCTURE",
+        "« Trois » : les trois questions du chapitre, posées ensuite",
+    ),
+    (
+        "cadrage-et-methodologie.tex",
+        "Le document lui-même ne figure pas au dépôt, mais trois de ses exigences y sont consignées. Tout",  # noqa: E501
+        "ÉNUMÉRATION",
+        "« trois » : les trois exigences énoncées dans les phrases qui suivent",
+    ),
+    (
+        "cadrage-et-methodologie.tex",
+        "Le projet se découpe en sept phases, nommées par ce qu'elles font",  # noqa: E501
+        "ÉNUMÉRATION",
+        "« sept » : les sept phases nommées au tableau que la phrase introduit",
+    ),
+    (
+        "cadrage-et-methodologie.tex",
+        "rend les traitements mesurables. Le travail s'organise en sept phases, de l'observation au poste",  # noqa: E501
+        "STRUCTURE",
+        "« sept » : les phases du projet, méthode fixe",
+    ),
+    (
+        "conception-du-jeu-de-donnees.tex",
+        "rattachent des épisodes de soin de trois familles : consultation externe, passage aux urgences et",  # noqa: E501
+        "ÉNUMÉRATION",
+        "« trois » : consultation externe, passage aux urgences, séjour, dans la phrase",
+    ),
+    (
+        "conception-du-jeu-de-donnees.tex",
+        "Les trois niveaux de l'identité donnent trois décomptes différents. La couche produite porte",  # noqa: E501
+        "ÉNUMÉRATION",
+        "« trois » : les trois décomptes donnés dans la phrase qui suit",
+    ),
+    (
+        "conception-du-jeu-de-donnees.tex",
+        "Les trois niveaux de l'identité donnent trois décomptes différents. La couche produite porte",  # noqa: E501
+        "STRUCTURE",
+        "« trois » : les trois niveaux du modèle de l'identité",
+    ),
+    (
+        "conception-du-jeu-de-donnees.tex",
+        "Ces défauts forment trois classes, selon ce qui les révèle. Une date au format invalide se voit sur",  # noqa: E501
+        "ÉNUMÉRATION",
+        "« trois » : les trois classes décrites dans les phrases qui suivent",
+    ),
+    (
+        "conception-du-jeu-de-donnees.tex",
+        "Une quatrième forme échappe aux trois : un champ renseigné et faux. Au poste, le numéro de",  # noqa: E501
+        "STRUCTURE",
+        "« trois » : renvoi aux trois classes de la méthode",
+    ),
+    (
+        "conclusion.tex",
+        "plusieurs centaines de milliers, réparties sur onze tables et deux ans et demi, avec leurs saisons,",  # noqa: E501
+        "PERSONNEL",
+        "« onze » : sous-section « Le volet professionnel »",
+    ),
+    (
+        "conclusion.tex",
+        "Le passage à des données réelles changerait la nature de trois choses. La vérité terrain",  # noqa: E501
+        "ÉNUMÉRATION",
+        "« trois » : les trois choses nommées dans les phrases qui suivent",
+    ),
+    (
+        "conclusion.tex",
+        "Trois conditions matérielles s'y ajouteraient. Une convention d'accès aux données serait nécessaire,",  # noqa: E501
+        "ÉNUMÉRATION",
+        "« Trois » : les trois conditions nommées dans les phrases qui suivent",
+    ),
+    (
+        "introduction.tex",
+        "établit un rapport annuel. Ces trois périodicités reposent sur une seule source, les données que",  # noqa: E501
+        "ÉNUMÉRATION",
+        "« trois » : mois, trimestre, année, nommés dans les deux phrases qui précèdent",
+    ),
+    (
+        "introduction.tex",
+        "un tableau de bord. Elle se construit en quatre temps.",  # noqa: E501
+        "STRUCTURE",
+        "« quatre » : les quatre temps de l'introduction",
+    ),
+    (
+        "organisme-d-accueil.tex",
+        "l'une des cinq structures . Ce rattachement fixe le niveau auquel les grandeurs sont",  # noqa: E501
+        "SOURCE",
+        "« cinq » : \\cite{s20, s29} dans la phrase",
+    ),
+    (
+        "organisme-d-accueil.tex",
+        "\\fbox{\\begin{minipage}{ }\\centering Centre hospitalier préfectoral Mohammed~V \\\\ \\footnotesize cinq structures\\end{minipage}}\\\\",  # noqa: E501
+        "SOURCE",
+        "« cinq » : nœud de la figure dont la légende cite s29",
+    ),
+    (
+        "organisme-d-accueil.tex",
+        "structure interne du service d'accueil et d'admission. L' fixe les neuf missions du",  # noqa: E501
+        "SOURCE",
+        "« neuf » : \\cite{s27} dans la phrase",
+    ),
+    (
+        "organisme-d-accueil.tex",
+        "{@{}l@{}}{Les neuf activités dont le service d'accueil et d'admission est chargé} \\\\",  # noqa: E501
+        "ÉNUMÉRATION",
+        "« neuf » : les neuf activités numérotées dans le tableau",
+    ),
+    (
+        "organisme-d-accueil.tex",
+        "orientation de sortie ou une sortie d'hospitalisation aboutissent toutes trois à une facture. Une",  # noqa: E501
+        "ÉNUMÉRATION",
+        "« trois » : consultation, orientation de sortie, sortie d'hospitalisation, dans la phrase",
+    ),
+    (
+        "qualite-et-rapprochement.tex",
+        "Parmi elles, sont renseignées à moins de cent pour cent, et",  # noqa: E501
+        "LOCUTION",
+        "« cent » : locution « cent pour cent »",
+    ),
+    (
+        "qualite-et-rapprochement.tex",
+        "Parmi elles, sont renseignées à moins de cent pour cent, et",  # noqa: E501
+        "LOCUTION",
+        "« cent » : locution « cent pour cent »",
+    ),
+    (
+        "qualite-et-rapprochement.tex",
+        "moyenne harmonique des deux, vaut . Les trois sont",  # noqa: E501
+        "STRUCTURE",
+        "« trois » : les trois mesures de l'évaluation, méthode fixe",
+    ),
+    (
+        "recommandations.tex",
+        "Cinq recommandations découlent des constats du travail. La question traitée est ce que le service",  # noqa: E501
+        "STRUCTURE",
+        "« Cinq » : structure du chapitre des recommandations",
+    ),
+    (
+        "recommandations.tex",
+        "Cinq recommandations portent sur les rendez-vous, les urgences, le recouvrement, le fichier patient",  # noqa: E501
+        "STRUCTURE",
+        "« Cinq » : structure du chapitre des recommandations",
+    ),
+    (
+        "systeme-d-information-hospitalier.tex",
+        "dans plus de trente hôpitaux répartis sur six pays .",  # noqa: E501
+        "SOURCE",
+        "« trente » : \\cite{s07} dans la phrase",
+    ),
+    (
+        "systeme-d-information-hospitalier.tex",
+        "dans plus de trente hôpitaux répartis sur six pays .",  # noqa: E501
+        "SOURCE",
+        "« six » : \\cite{s07} dans la phrase",
+    ),
+    (
+        "systeme-d-information-hospitalier.tex",
+        "Vingt-six modules se regroupent en trois paquets, Core, Clinic et Extension Packs . Le",  # noqa: E501
+        "SOURCE",
+        "« Vingt-six » : \\cite{s06} dans la phrase",
+    ),
+    (
+        "systeme-d-information-hospitalier.tex",
+        "Vingt-six modules se regroupent en trois paquets, Core, Clinic et Extension Packs . Le",  # noqa: E501
+        "SOURCE",
+        "« trois » : \\cite{s06} dans la phrase",
+    ),
+    (
+        "systeme-d-information-hospitalier.tex",
+        ". Quatre écrans ont été parcourus : l'écran de démarrage, la recherche d'identifiant",  # noqa: E501
+        "ÉNUMÉRATION",
+        "« Quatre » : les quatre écrans nommés après les deux-points",
+    ),
+    (
+        "systeme-d-information-hospitalier.tex",
+        "quatre couples d'auteur et d'horodatage, pour la création, la modification, la confirmation et",  # noqa: E501
+        "ÉNUMÉRATION",
+        "« quatre » : création, modification, confirmation, annulation, dans la phrase",
+    ),
+    (
+        "systeme-d-information-hospitalier.tex",
+        "depuis ce format. Une conversion absente ou fausse échangerait un jour et un mois onze fois sur",  # noqa: E501
+        "LOCUTION",
+        "« onze » : rapport arithmétique jours sur mois",
+    ),
+    (
+        "systeme-d-information-hospitalier.tex",
+        "douze sans qu'aucune valeur ne devienne invalide. Le chapitre~ reprend cette",  # noqa: E501
+        "LOCUTION",
+        "« douze » : rapport arithmétique jours sur mois",
+    ),
+    (
+        "tableau-de-bord.tex",
+        "Trois pages lui suffisent pour y répondre.",  # noqa: E501
+        "ÉNUMÉRATION",
+        "« Trois » : les trois pages du scénario, nommées dans les paragraphes qui suivent",
+    ),
+    (
+        "tableau-de-bord.tex",
+        "implémentation écrite séparément dans un autre langage. Les quatre valeurs affichées valent",  # noqa: E501
+        "ÉNUMÉRATION",
+        "« quatre » : occupation, durée moyenne, rotation, intervalle, dans la phrase",
+    ),
+    (
+        "complements_techniques.tex",
+        "\\fbox{\\begin{minipage}{ }\\centering \\textbf{Les six faits} \\\\",  # noqa: E501
+        "ÉNUMÉRATION",
+        "« six » : les six faits nommés dans la figure",
+    ),
+    (
+        "complements_techniques.tex",
+        "Trois contrôles vérifient ces versions à chaque construction. La fin d'une version non courante",  # noqa: E501
+        "ÉNUMÉRATION",
+        "« Trois » : les trois contrôles décrits dans la phrase qui suit",
+    ),
+)
+
+
+def nombres_en_lettres(source: str) -> list[tuple[str, str]]:
+    """(ligne dépouillée, nombre) pour chaque nombre écrit en lettres de la prose française."""
+    depouille = depouiller(_TEXTE_ANGLAIS.sub(" ", source))
+    trouves = []
+    for ligne in depouille.splitlines():
+        cle = " ".join(ligne.split())
+        trouves.extend((cle, m.group(0)) for m in _NOMBRE_EN_LETTRES.finditer(cle))
+    return trouves
+
+
+def occurrences_en_lettres() -> Counter:
+    compte: Counter = Counter()
+    for chemin in fichiers_examines():
+        for cle, _ in nombres_en_lettres(chemin.read_text(encoding="utf-8")):
+            compte[(chemin.name, cle)] += 1
+    return compte
+
+
+def declarations_en_lettres() -> Counter:
+    return Counter((fichier, ligne) for fichier, ligne, _, _ in EXEMPTIONS_LETTRES)
+
+
+def test_tout_nombre_en_lettres_passe_par_le_registre_ou_est_declare() -> None:
+    """Une occurrence non déclarée est une donnée écrite en clair : elle passe par \\chiffre."""
+    trouvees, declarees = occurrences_en_lettres(), declarations_en_lettres()
+    assert trouvees, "aucun nombre en lettres trouvé : le motif ne lit plus rien"
+    manquantes = [
+        f"{f} : {ligne[:110]} ({n - declarees[(f, ligne)]} non déclaré(s))"
+        for (f, ligne), n in sorted(trouvees.items())
+        if n > declarees[(f, ligne)]
+    ]
+    assert not manquantes, (
+        f"{len(manquantes)} ligne(s) portent un nombre en lettres ni passé par le registre ni "
+        "déclaré :\n  " + "\n  ".join(manquantes)
+    )
+
+
+def test_toute_exemption_en_lettres_correspond_a_une_occurrence() -> None:
+    """L'autre sens : une exemption qui ne correspond plus à rien est une dette qui ment."""
+    trouvees, declarees = occurrences_en_lettres(), declarations_en_lettres()
+    perimees = [
+        f"{f} : {ligne[:80]}"
+        for (f, ligne), n in sorted(declarees.items())
+        if n > trouvees[(f, ligne)]
+    ]
+    assert not perimees, (
+        f"{len(perimees)} exemption(s) sans occurrence — retirez-les de EXEMPTIONS_LETTRES :\n  "
+        + "\n  ".join(perimees)
+    )
+
+
+def test_chaque_exemption_porte_une_classe_et_un_motif() -> None:
+    fautes = [
+        f"{f} : {ligne[:60]} ({classe})"
+        for f, ligne, classe, motif in EXEMPTIONS_LETTRES
+        if classe not in CLASSES_EN_LETTRES or len(motif.strip()) < 15
+    ]
+    assert not fautes, "exemptions sans classe connue ou sans motif :\n  " + "\n  ".join(fautes)
+
+
+@pytest.mark.parametrize(
+    ("source", "attendus"),
+    [
+        (r"les huit activités", ["huit"]),
+        (r"Vingt-deux tables et quatre-vingts fois plus", ["Vingt-deux", "quatre-vingts"]),
+        (r"Trois questions en découlent", ["Trois"]),
+        (r"onze fois sur douze", ["onze", "douze"]),
+    ],
+)
+def test_le_motif_voit_un_nombre_en_lettres(source: str, attendus: list[str]) -> None:
+    """Témoin positif, trait d'union et majuscule compris."""
+    assert [mot for _, mot in nombres_en_lettres(source)] == attendus
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        r"deux tables et un seul poste",
+        r"la sixième, la troisième et la centième",
+        r"les centres et les milliers de lignes, en septembre",
+        r"il y a \chiffre{trois-tables} tables",
+        "\\begin{otherlanguage}{english}\nthree tables, huit\n\\end{otherlanguage}",
+        r"% les huit activités, en commentaire",
+    ],
+)
+def test_le_motif_laisse_passer_ce_qui_n_est_pas_un_nombre_en_lettres(source: str) -> None:
+    """Témoin négatif : ordinal, mot plus long, argument de commande, anglais, commentaire."""
+    assert not nombres_en_lettres(source), f"forme prise pour un nombre en lettres : {source}"
