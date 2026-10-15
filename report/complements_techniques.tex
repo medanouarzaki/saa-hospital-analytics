@@ -13,11 +13,12 @@
 %   HYP: (aucun)
 %   CHI: artefact-part, creances-part-au-dela-un-an, doublons-part-mesuree, facturation-part-organisme, facturation-part-patient, feries-urgences-hors-moyenne
 %   CHI: feries-urgences-moyenne, flux-lundi-moyenne, flux-programme-moyenne, flux-samedi-moyenne, hebdo-rapport-mesure, injecte-correlation-parametres
-%   CHI: jour-meme-part-marge-nulle, part-jour-meme, qualite-taux-quarantaine-maximal, ramadan-baisse, ramadan-hors-moyenne, ramadan-programme-moyenne
-%   CHI: recouvrement-taux-aboutissement, recouvrement-taux-global, recouvrement-taux-maximal, recouvrement-taux-minimal, relation-brute-complement, relation-brute-ensemble
-%   CHI: relation-inter-complement, relation-inter-ensemble, relation-intra-complement, relation-intra-ensemble, source-part-non-appropriees, taches-graphe
-%   CHI: taux-absenteisme-global, taux-annulation-global, taux-encaissement, urgences-part-consultation-ordinaire, urgences-part-hospitalisation, urgences-part-mode-principal
-%   CHI: urgences-part-retour-domicile, urgences-part-transfert, urgences-rapport-pointe-creux
+%   CHI: jour-meme-part-marge-nulle, part-jour-meme, pile-couches, qualite-taux-quarantaine-maximal, ramadan-baisse, ramadan-hors-moyenne
+%   CHI: ramadan-programme-moyenne, recouvrement-taux-aboutissement, recouvrement-taux-global, recouvrement-taux-maximal, recouvrement-taux-minimal, regles-blocage
+%   CHI: relation-brute-complement, relation-brute-ensemble, relation-inter-complement, relation-inter-ensemble, relation-intra-complement, relation-intra-ensemble
+%   CHI: source-part-non-appropriees, taches-graphe, taux-absenteisme-global, taux-annulation-global, taux-encaissement, types-episode
+%   CHI: urgences-part-consultation-ordinaire, urgences-part-hospitalisation, urgences-part-mode-principal, urgences-part-retour-domicile, urgences-part-transfert, urgences-rapport-pointe-creux
+%   CHI: verifications-recueil
 %   SER: facturation-par-type, qualite-par-table
 %   SECTIONS: 9
 
@@ -37,13 +38,12 @@ des urgences sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/b
 
 \section{L'absence d'activité chirurgicale}\label{sec:complements-chirurgie}
 
-Le recueil statistique ne porte aucune intervention chirurgicale pour l'établissement, et trois
-vérifications excluent une absence due à la recherche ou à l'agrégation \cite{s30}. Elles sont
+Le recueil statistique ne porte aucune intervention chirurgicale pour l'établissement, et \chiffre{verifications-recueil} vérifications excluent une absence due à la recherche ou à l'agrégation \cite{s30}. Elles sont
 consignées sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/main/docs/decisions/0003-volumetrie.md}.
 
 \section{Les outils de la chaîne}\label{sec:complements-pile}
 
-La chaîne empile cinq couches, de la persistance à la restitution, et chaque couche a sa brique.
+La chaîne empile \chiffre{pile-couches} couches, de la persistance à la restitution, et chaque couche a sa brique.
 La désignation de chaque brique et l'outil qui l'incarne sont consignés sous
 \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/main/docs/decisions/0099-trois-parties-et-les-outils-nommes.md}.
 
@@ -70,7 +70,7 @@ faits.
 \fbox{\begin{minipage}{0.94\linewidth}\centering \textbf{Les six faits} \\[2pt]
 \footnotesize
 \texttt{fct\_sejour} — un séjour \quad
-\texttt{fct\_passage} — un passage, les trois types \\
+\texttt{fct\_passage} — un passage, les \chiffre{types-episode} types \\
 \texttt{fct\_passage\_urgence} — un passage aux urgences \quad
 \texttt{fct\_rendez\_vous} — un rendez-vous \\
 \texttt{fct\_facturation} — une facture \quad
@@ -94,7 +94,7 @@ l'analyse, faute de modèle qui corresponde à cet objet documenté.
 
 Le grain de chaque fait est déclaré. Le fait des séjours porte un séjour par ligne et agrège la
 couche des mouvements, qui porte une admission, au plus un transfert et au plus une sortie. Le fait
-des passages couvre les trois types d'épisode, et c'est à lui que se raccordent les factures et les
+des passages couvre les \chiffre{types-episode} types d'épisode, et c'est à lui que se raccordent les factures et les
 prises en charge. Le fait des passages aux urgences en est un satellite, dont toutes les clés sont
 des clés du fait des passages. Le grain du fait des encaissements est l'encaissement et non la
 facture, une facture pouvant recevoir plusieurs règlements.
@@ -120,7 +120,7 @@ suivants, dans l'ordre de la figure~\ref{fig:sequence-quotidienne} :
 \section{Le modèle de rapprochement}\label{sec:complements-modele}
 
 Le modèle de rapprochement pèse chaque champ par le rapport de deux probabilités d'accord
-\cite{s22}, et quatre règles de blocage limitent les paires comparées. Les règles sont écrites
+\cite{s22}, et \chiffre{regles-blocage} règles de blocage limitent les paires comparées. Les règles sont écrites
 sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/main/linkage/blocage.py}, les comparaisons et les colonnes écartées
 sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/main/linkage/champs.py}.
 
@@ -147,7 +147,7 @@ facturé par type d'épisode (cf. tableau~\ref{tab:montants-episode}).
 ]{\serie{facturation-par-type}}
 \end{table}
 
-Les trois codes d'épisode s'y affichent sans libellé : la taxonomie réglementaire des modes
+Les \chiffre{types-episode} codes d'épisode s'y affichent sans libellé : la taxonomie réglementaire des modes
 d'utilisation de l'hôpital est établie sans être énumérée \cite{s27}.
 
 Le second donne la complétude et la quarantaine de chaque table de la couche intermédiaire (cf.

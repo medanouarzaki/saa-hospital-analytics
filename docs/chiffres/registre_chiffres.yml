@@ -3233,6 +3233,350 @@ chiffres:
 # registre à ce que la COMMANDE produit ; `tests/test_registre_des_chiffres.py` la confronte au
 # FICHIER que la composition lit. Retoucher un fichier à la main rompt le second lien ; modifier
 # une valeur du registre sans toucher à sa commande rompt le premier.
+- id: periode-mois
+  valeur: 30
+  unite: tranches
+  type: python
+  commande: >-
+    (lambda d, f: (f.year - d.year) * 12 + f.month - d.month +
+    1)(*[__import__('datetime').date.fromisoformat(str([p['valeur'] for p in
+    yaml.safe_load((R/'generator/config/periode.yml').read_text(encoding='utf-8'))['parametres']
+    if p['nom']==n][0])) for n in ('date_debut', 'date_fin')])
+  portee: independant-des-donnees
+  note: >-
+    Nombre de mois civils couverts par la période du générateur, bornes comprises.
+- id: rdv-etats
+  valeur: 4
+  unite: familles
+  type: sql
+  commande: >-
+    select count(distinct etat)::int from marts.fct_rendez_vous
+  portee: periode-entiere
+  note: >-
+    États distincts du fait de rendez-vous.
+- id: rdv-etats-signification
+  valeur: 3
+  unite: familles
+  type: sql
+  commande: >-
+    select count(distinct etat)::int from marts.fct_rendez_vous where est_honore or est_absence
+    or est_annule
+  portee: periode-entiere
+  note: >-
+    États du fait de rendez-vous qui portent un drapeau de signification (honoré, absence,
+    annulation) ; l'état en instance n'en porte aucun.
+- id: niveaux-tri
+  valeur: 5
+  unite: niveaux
+  type: python
+  commande: >-
+    [p['valeur'] for p in
+    yaml.safe_load((R/'generator/config/urgences.yml').read_text(encoding='utf-8'))['parametres']
+    if p['nom']=='repartition_niveaux_tri'][0].__len__()
+  portee: independant-des-donnees
+  note: >-
+    Niveaux de tri des urgences, lus dans le paramètre du générateur.
+- id: dimensions-sans-libelle
+  valeur: 4
+  unite: dimensions
+  type: sql
+  commande: >-
+    select count(*)::int from information_schema.tables t where t.table_schema='marts' and
+    t.table_name like 'dim\_%' and (select count(*) from information_schema.columns c where
+    c.table_schema=t.table_schema and c.table_name=t.table_name) = 1
+  portee: periode-entiere
+  note: >-
+    Dimensions de la couche analytique qui ne portent qu'une colonne, leur code, sans libellé
+    (enregistrement de décision 0020).
+- id: dim-patient-controles-versions
+  valeur: 3
+  unite: fichiers
+  type: python
+  commande: >-
+    len(list((R/'dbt/tests').glob('dim_patient_*.sql')))
+  portee: independant-des-donnees
+  note: >-
+    Contrôles de la couche analytique qui vérifient les versions de la dimension patient.
+- id: instantane-disparition-vues
+  valeur: 0.3
+  unite: secondes
+  type: python
+  commande: >-
+    round(sum(float([l for l in
+    (R/'docs/decisions/0043-instantane-schema-dedie-du-tableau-de-bord.md').read_text(encoding='utf-8').splitlines()
+    if l.startswith(a)][0].split('|')[5].replace('*', '').replace('s', '').replace(',',
+    '.').strip()) for a in ('| une dimension simple |', '| la vue de complétude')) / 2, 1)
+  portee: independant-des-donnees
+  note: >-
+    Durée moyenne, arrondie au dixième, pendant laquelle les vues disparaissent lors d'une
+    reconstruction : moyenne des deux fenêtres mesurées par l'enregistrement de décision 0043.
+- id: profils-applicatifs
+  valeur: 5
+  unite: familles
+  type: python
+  commande: >-
+    len(set(__import__('re').findall(r'id: (REL-DEM\.P[0-9]{2})',
+    (R/'docs/observation/releve_champs.yml').read_text(encoding='utf-8'))))
+  portee: independant-des-donnees
+  note: >-
+    Profils applicatifs relevés à l'écran de démarrage.
+- id: profils-non-observes
+  valeur: 4
+  unite: familles
+  type: python
+  commande: >-
+    len(set(__import__('re').findall(r'id: (REL-DEM\.P[0-9]{2})',
+    (R/'docs/observation/releve_champs.yml').read_text(encoding='utf-8')))) - 1
+  portee: independant-des-donnees
+  note: >-
+    Profils applicatifs relevés moins le seul profil observé au poste, celui des rendez-vous.
+- id: indicateurs-ecarts-faits
+  valeur: 6
+  unite: indicateurs
+  type: python
+  commande: >-
+    len([e for e in
+    yaml.safe_load((R/'dashboard/indicateurs.yml').read_text(encoding='utf-8'))['indicateurs']
+    if e['recalcule_depuis'] in ('couche_intermediaire', 'dimension')])
+  portee: independant-des-donnees
+  note: >-
+    Indicateurs qui ne sont pas recalculés depuis les faits là où une table de faits pourrait
+    exister : les écarts au cadrage de l'enregistrement 0047.
+- id: indicateurs-sans-fait
+  valeur: 5
+  unite: indicateurs
+  type: python
+  commande: >-
+    len([e for e in
+    yaml.safe_load((R/'dashboard/indicateurs.yml').read_text(encoding='utf-8'))['indicateurs']
+    if e['recalcule_depuis']=='couche_intermediaire'])
+  portee: independant-des-donnees
+  note: >-
+    Indicateurs qui lisent la couche intermédiaire faute de table de faits.
+- id: sejour-indicateurs-reglementaires
+  valeur: 4
+  unite: indicateurs
+  type: python
+  commande: >-
+    (R/'tests/test_indicateurs_sejour_affiches.py').read_text(encoding='utf-8').split('CORRESPONDANCE
+    = (')[1].split('\n)')[0].count('("')
+  portee: independant-des-donnees
+  note: >-
+    Indicateurs réglementaires de séjour affichés et confrontés aux valeurs publiées.
+- id: ecrans-releves
+  valeur: 4
+  unite: familles
+  type: python
+  commande: >-
+    len(set(__import__('re').findall(r'id: (REL-[A-Z]{3})\.',
+    (R/'docs/observation/releve_champs.yml').read_text(encoding='utf-8'))))
+  portee: independant-des-donnees
+  note: >-
+    Écrans parcourus au poste, comptés par leur préfixe d'identifiant au relevé.
+- id: facteur-cadrage-min
+  valeur: 5
+  unite: proportion
+  type: python
+  commande: >-
+    ['zéro', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf',
+    'dix'].index(__import__('re').search(r'facteur (\w+) à (\w+)',
+    (R/'docs/decisions/0003-volumetrie.md').read_text(encoding='utf-8')).group(1))
+  portee: independant-des-donnees
+  note: >-
+    Borne basse du facteur d'erreur de la dérivation initiale, telle que l'enregistrement de
+    décision 0003 la donne.
+- id: facteur-cadrage-max
+  valeur: 7
+  unite: proportion
+  type: python
+  commande: >-
+    ['zéro', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf',
+    'dix'].index(__import__('re').search(r'facteur (\w+) à (\w+)',
+    (R/'docs/decisions/0003-volumetrie.md').read_text(encoding='utf-8')).group(2))
+  portee: independant-des-donnees
+  note: >-
+    Borne haute du facteur d'erreur de la dérivation initiale, telle que l'enregistrement de
+    décision 0003 la donne.
+- id: ecart-annees-sources
+  valeur: 8
+  unite: points
+  type: python
+  commande: >-
+    int([s for s in yaml.safe_load((R/'docs/sources/sources.yml').read_text(encoding='utf-8'))
+    if s['id']=='S-30'][0]['titre'][-4:]) - int(__import__('re').search(r'au
+    [0-9]{2}/[0-9]{2}/([0-9]{4})', [s for s in
+    yaml.safe_load((R/'docs/sources/sources.yml').read_text(encoding='utf-8')) if
+    s['id']=='S-20'][0]['utilise_pour']).group(1))
+  portee: independant-des-donnees
+  note: >-
+    Années d'écart entre le constat de la Cour des comptes (S-20) et l'édition du recueil
+    statistique (S-30).
+- id: verifications-recueil
+  valeur: 3
+  unite: familles
+  type: python
+  commande: >-
+    len([l for l in
+    (R/'docs/decisions/0003-volumetrie.md').read_text(encoding='utf-8').split('**Recherche
+    exhaustive', 1)[1].split(chr(10) + '###')[0].splitlines() if l.startswith('**') and not
+    l.startswith('**Corroboration')]) + 1
+  portee: independant-des-donnees
+  note: >-
+    Vérifications de la lecture du recueil consignées par l'enregistrement de décision 0003,
+    hors la corroboration par une source extérieure.
+- id: tableaux-etablissement
+  valeur: 4
+  unite: tables
+  type: python
+  commande: >-
+    len(__import__('re').findall(r'[Tt]ableau 7[0-9] page', [s for s in
+    yaml.safe_load((R/'docs/sources/sources.yml').read_text(encoding='utf-8')) if
+    s['id']=='S-30'][0]['utilise_pour']))
+  portee: independant-des-donnees
+  note: >-
+    Tableaux du recueil statistique national qui descendent jusqu'à l'établissement nommé
+    (S-30).
+- id: missions-service
+  valeur: 9
+  unite: familles
+  type: python
+  commande: >-
+    (R/'report/chapitres/systeme-d-information-hospitalier.tex').read_text(encoding='utf-8').count(r'\node[casUML')
+  portee: independant-des-donnees
+  note: >-
+    Missions du service, telles que la figure des missions et des profils les pose d'après le
+    règlement intérieur.
+- id: missions-avec-profil
+  valeur: 4
+  unite: familles
+  type: python
+  commande: >-
+    len(set(__import__('re').findall(r'\\draw\[lienUML\] \(l[0-9]\.east\) --
+    \((m[0-9])\.west\)',
+    (R/'report/chapitres/systeme-d-information-hospitalier.tex').read_text(encoding='utf-8'))))
+  portee: independant-des-donnees
+  note: >-
+    Missions reliées à un profil applicatif dans la figure des missions et des profils.
+- id: missions-sans-profil
+  valeur: 5
+  unite: familles
+  type: python
+  commande: >-
+    (R/'report/chapitres/systeme-d-information-hospitalier.tex').read_text(encoding='utf-8').count(r'\node[casUML')
+    - len(set(__import__('re').findall(r'\\draw\[lienUML\] \(l[0-9]\.east\) --
+    \((m[0-9])\.west\)',
+    (R/'report/chapitres/systeme-d-information-hospitalier.tex').read_text(encoding='utf-8'))))
+  portee: independant-des-donnees
+  note: >-
+    Missions qu'aucun profil applicatif ne porte dans la figure des missions et des profils.
+- id: onglets-recherche
+  valeur: 4
+  unite: familles
+  type: python
+  commande: >-
+    len(set(__import__('re').findall(r'id: (REL-IPP\.O[0-9]{2})',
+    (R/'docs/observation/releve_champs.yml').read_text(encoding='utf-8'))))
+  portee: independant-des-donnees
+  note: >-
+    Onglets relevés sur l'écran de recherche d'identifiant patient.
+- id: regles-blocage
+  valeur: 4
+  unite: familles
+  type: python
+  commande: >-
+    (R/'linkage/blocage.py').read_text(encoding='utf-8').count('def regle_')
+  portee: independant-des-donnees
+  note: >-
+    Règles de blocage du rapprochement, définies dans linkage/blocage.py.
+- id: regles-blocage-prevues
+  valeur: 3
+  unite: familles
+  type: python
+  commande: >-
+    ['zéro', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf',
+    'dix'].index(__import__('re').search(r'annonçait (\w+) règles',
+    (R/'docs/decisions/0030-quatre-regles-de-blocage.md').read_text(encoding='utf-8')).group(1))
+  portee: independant-des-donnees
+  note: >-
+    Règles de blocage que le périmètre initial annonçait, telles que l'enregistrement de
+    décision 0030 le rapporte.
+- id: regles-blocage-union-reduite
+  valeur: 3
+  unite: familles
+  type: python
+  commande: >-
+    (R/'linkage/blocage.py').read_text(encoding='utf-8').count('def regle_') - 1
+  portee: independant-des-donnees
+  note: >-
+    Taille d'une union de règles privée d'une règle, celle que la mesure compare à l'union
+    complète.
+- id: blocage-rapport-substitution
+  valeur: 80
+  unite: proportion
+  type: python
+  commande: >-
+    int(round(int(__import__('re').search(r'coûtait ([0-9 ]+) paires',
+    (R/'docs/decisions/0030-quatre-regles-de-blocage.md').read_text(encoding='utf-8')).group(1).replace('
+    ', '')) / int(__import__('re').search(r'mesuré à\s+([0-9 ]+) paires',
+    (R/'docs/decisions/0030-quatre-regles-de-blocage.md').read_text(encoding='utf-8')).group(1).replace('
+    ', '')), -1))
+  portee: independant-des-donnees
+  note: >-
+    Rapport, arrondi à la dizaine, entre les paires de la meilleure union de trois règles et
+    celles des quatre règles, selon l'enregistrement de décision 0030.
+- id: lignes-telephone
+  valeur: 4
+  unite: colonnes
+  type: python
+  commande: >-
+    len(__import__('re').findall(r'libelle: "Téléphone [0-9]"',
+    (R/'docs/observation/releve_champs.yml').read_text(encoding='utf-8')))
+  portee: independant-des-donnees
+  note: >-
+    Lignes de téléphone de la fiche patient relevées au poste.
+- id: quantieme-releve
+  valeur: 28
+  unite: jours
+  type: python
+  commande: >-
+    int(__import__('re').search(r'id: REL-RDV\.R08(?:.*\n)*?\s+valeurs_observees:
+    \["([0-9]{2})/([0-9]{2})',
+    (R/'docs/observation/releve_champs.yml').read_text(encoding='utf-8')).group(2))
+  portee: independant-des-donnees
+  note: >-
+    Quantième de la date de rendez-vous observée au poste (REL-RDV.R08).
+- id: filtres-donnees
+  valeur: 3
+  unite: familles
+  type: python
+  commande: >-
+    (lambda s: s.count('st.date_input(') +
+    len(set(__import__('re').findall(r'st\.multiselect\(\s*"([^"]+)"',
+    s))))((R/'dashboard/pages/donnees.py').read_text(encoding='utf-8'))
+  portee: independant-des-donnees
+  note: >-
+    Filtres de la page des données : la période, puis chaque filtre à choix multiple compté une
+    fois par libellé.
+- id: pile-couches
+  valeur: 5
+  unite: familles
+  type: python
+  commande: >-
+    ['zéro', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf',
+    'dix'].index(__import__('re').search(r'pile technique\*\*[^:]*: (\w+) couches',
+    (R/'docs/decisions/0088-la-correction-de-l-article-35-et-la-passe-de-conversion.md').read_text(encoding='utf-8')).group(1))
+  portee: independant-des-donnees
+  note: >-
+    Couches de la pile technique, telles que l'enregistrement de décision 0088 les compte.
+- id: types-episode
+  valeur: 3
+  unite: familles
+  type: sql
+  commande: >-
+    select count(distinct type_passage)::int from marts.fct_passage
+  portee: periode-entiere
+  note: >-
+    Types d'épisode du fait des passages.
 series:
 - id: flux-mensuel
   fichier: figures/flux-mensuel.csv

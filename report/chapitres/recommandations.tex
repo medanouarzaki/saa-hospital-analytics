@@ -2,8 +2,9 @@
 %   DOC: s12, s13, s20, s24, s30
 %   OBS: REL-IPP.O03, REL-IPP.R12, REL-PAT.H12, REL-PAT.H14
 %   HYP: absentéisme-par-spécialité, ancienneté-des-créances, complétude-par-champ, répartition-des-niveaux-de-tri
-%   CHI: source-absenteisme-fourchette-basse, source-absenteisme-fourchette-haute, source-absenteisme-moyenne-mondiale, source-consultations-urgences-payees, source-consultations-urgences-total, source-creances-non-recouvrees
-%   CHI: source-part-dossiers-non-factures, source-part-non-appropriees-arrondi, source-part-non-urgentes, source-part-urgences-vitales, source-patients-etude-provinciale, source-urgences-consultations-public
+%   CHI: exigences-champs-manquants, exigences-non-calculables, lignes-telephone, source-absenteisme-fourchette-basse, source-absenteisme-fourchette-haute, source-absenteisme-moyenne-mondiale
+%   CHI: source-consultations-urgences-payees, source-consultations-urgences-total, source-creances-non-recouvrees, source-part-dossiers-non-factures, source-part-non-appropriees-arrondi, source-part-non-urgentes
+%   CHI: source-part-urgences-vitales, source-patients-etude-provinciale, source-urgences-consultations-public
 %   SER: (aucune)
 %   SECTIONS: 5
 
@@ -35,7 +36,7 @@ paramètre\convention{absentéisme-par-spécialité}.
 délai le plus long. Une fois la chaîne branchée sur les données réelles, ajuster les créneaux ouverts
 au taux d'absence de chaque activité.
 
-\textbf{Ce qu'elle suppose.} Le canal existe : la fiche patient porte quatre lignes de téléphone, une
+\textbf{Ce qu'elle suppose.} Le canal existe : la fiche patient porte \chiffre{lignes-telephone} lignes de téléphone, une
 adresse électronique et deux cases d'avertissement, par message court et par courrier
 électronique\releve{REL-PAT.H12}. Le relevé note que le service n'exploite pas ces
 cases\releve{REL-PAT.H14}. L'action suppose surtout un numéro juste. Le
@@ -126,7 +127,7 @@ la complétude sans aider le rapprochement.
 
 \textbf{Le constat.} Cette recommandation repose sur des champs absents, et non sur des valeurs
 générées. Le recueil statistique national publie, pour chaque établissement nommé, une liste
-d'indicateurs \cite{s30}. Trois d'entre eux ne sont pas calculables, faute d'un champ que le tableau
+d'indicateurs \cite{s30}. Parmi eux, \chiffre{exigences-non-calculables} ne sont pas calculables, faute d'un champ que le tableau
 nomme (cf. tableau~\ref{tab:indicateurs-non-calculables}).
 
 \begin{table}[htbp]
@@ -149,14 +150,14 @@ Chaque ligne y nomme le champ manquant et ce qu'il débloquerait. Les interventi
 le taux de césarienne n'y figurent pas : ils sont sans objet pour ce site, qui n'exerce pas
 d'activité chirurgicale.
 
-\textbf{L'action.} Ajouter les trois champs, en commençant par le référentiel des médecins, dont
+\textbf{L'action.} Ajouter les \chiffre{exigences-champs-manquants} champs, en commençant par le référentiel des médecins, dont
 dépend le seul indicateur de productivité attendu.
 
 \textbf{Ce qu'elle suppose.} Une intervention sur le paramétrage du produit ou une demande à
 l'éditeur, selon que les champs existent sans être alimentés ou qu'ils manquent. L'observation au
 poste ne permet pas de trancher.
 
-\textbf{L'effet attendu et sa mesure.} Les trois indicateurs deviendraient calculables, ce qui se
+\textbf{L'effet attendu et sa mesure.} Les \chiffre{exigences-non-calculables} indicateurs deviendraient calculables, ce qui se
 constate sans ambiguïté. La confrontation entre la nomenclature et ce que la chaîne produit se refait
 à l'identique.
 

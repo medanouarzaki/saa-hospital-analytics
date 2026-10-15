@@ -2,10 +2,10 @@
 %   DOC: (aucun)
 %   OBS: REL-RDV.C02, REL-RDV.R08
 %   HYP: (aucun)
-%   CHI: agregats, colonnes-intermediate-typees, dim-patient-fiches-plusieurs-versions, dim-patient-lignes, dimensions, faits
-%   CHI: identifiants-distincts, modeles-intermediate, modeles-marts, modeles-total, partitions-par-table, plancher-rejets
-%   CHI: quarantaine-lignes-total, quarantaine-patients-lignes, quarantaine-rendez-vous-lignes, seuil-quarantaine, source-colonnes-texte, source-lignes-total
-%   CHI: source-tables, taches-graphe
+%   CHI: agregats, colonnes-intermediate-typees, dim-patient-controles-versions, dim-patient-fiches-plusieurs-versions, dim-patient-lignes, dimensions
+%   CHI: dimensions-sans-libelle, faits, identifiants-distincts, instantane-disparition-vues, modeles-intermediate, modeles-marts
+%   CHI: modeles-total, partitions-par-table, plancher-rejets, quarantaine-lignes-total, quarantaine-patients-lignes, quarantaine-rendez-vous-lignes
+%   CHI: seuil-quarantaine, source-colonnes-texte, source-lignes-total, source-tables, taches-graphe
 %   SER: (aucune)
 %   SECTIONS: 6
 \chapter{Architecture de la chaîne de données}\label{chap:architecture}
@@ -128,7 +128,7 @@ dimensions qui l'entourent le décrivent (voir figure~\ref{fig:schema-etoile}). 
 \chiffre{faits} faits et \chiffre{agregats} agrégats. Les deux décomptes diffèrent parce qu'un des
 agrégats est une vue posée hors de l'outil de transformation (section~\ref{sec:complements-analytique}).
 
-Quatre dimensions sur six ne portent que leur code, sans libellé. Aucune source ne nomme ces
+Sur les \chiffre{dimensions} dimensions, \chiffre{dimensions-sans-libelle} ne portent que leur code, sans libellé. Aucune source ne nomme ces
 libellés, et en écrire un plausible afficherait une hypothèse sous l'apparence d'une donnée
 relevée. Le calendrier est construit, et la dimension patient garde l'historique des fiches.
 
@@ -141,8 +141,7 @@ la couche intermédiaire.
 La dimension patient est la seule à garder une ligne par version de fiche. Un passage de janvier
 reste ainsi rattaché à l'adresse connue en janvier, même si elle a été corrigée en mai. Elle porte
 \chiffre{dim-patient-lignes} lignes pour \chiffre{identifiants-distincts} identifiants, dont
-\chiffre{dim-patient-fiches-plusieurs-versions} ont plus d'une version. La clé des versions et les
-trois contrôles qui la vérifient sont décrits en section~\ref{sec:complements-analytique}.
+\chiffre{dim-patient-fiches-plusieurs-versions} ont plus d'une version. La clé des versions et les \chiffre{dim-patient-controles-versions} contrôles qui la vérifient sont décrits en section~\ref{sec:complements-analytique}.
 
 \section{Orchestration, idempotence et rattrapage}\label{sec:orchestration}
 
@@ -211,7 +210,7 @@ chaque nuit. Elles s'exécutent à la main, quand le modèle change.
 
 Le graphe finit par deux tâches de sortie. La première rafraîchit l'instantané que lit le tableau
 de bord, fait de tables et non de vues. Une reconstruction de la couche analytique fait en effet
-disparaître ses vues pendant environ trois dixièmes de seconde, et un lecteur y rencontre alors une
+disparaître ses vues pendant environ \chiffre{instantane-disparition-vues} seconde, et un lecteur y rencontre alors une
 erreur d'objet inexistant. Le rafraîchissement bâtit donc des tables neuves sous des noms
 provisoires, puis échange tous les noms en une seule transaction.
 
