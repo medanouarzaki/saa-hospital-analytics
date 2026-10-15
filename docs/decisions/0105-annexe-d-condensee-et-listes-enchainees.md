@@ -45,6 +45,19 @@ saut de page, dans un groupe où le saut de page de leur titre est sans effet ; 
 titre et leur entrée à la table des matières, que suit une interdiction de coupure pour qu'elle porte
 la page du titre. Le générateur de la liste des abréviations n'écrit plus de saut de page.
 
+### Les liens actifs, l'appel des valeurs complètes et les en-têtes des listes
+
+Ce paragraphe révise deux points de ce qui précède. Chaque lien de l'annexe des compléments
+techniques est désormais une adresse active. Le contrôle des nombres tapés retire désormais
+l'argument d'une adresse, comme il retire celui d'une citation : un chemin qui porte des chiffres
+désigne un fichier et ne mesure rien, et le même nombre tapé dans la prose reste refusé. Le tableau
+des valeurs complètes est désormais appelé : le chapitre d'analyse s'ouvre, en tête de sa première
+section, sur une phrase qui dit que ses valeurs sont arrondies et renvoie au tableau des valeurs
+complètes. Cette phrase ne porte aucune étiquette de provenance : elle est une convention de lecture
+du document et n'affirme rien sur le service ; elle est la seule phrase du chapitre qui parle du
+document. Les listes des figures et des tableaux posent leur propre marque d'en-tête au début de la
+liste, comme celle des abréviations.
+
 ### Les registres
 
 Trente-huit entrées du registre des chiffres, que plus rien n'appelle, sont retirées. Trois entrées
