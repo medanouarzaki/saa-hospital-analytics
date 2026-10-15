@@ -30,12 +30,15 @@ DESTINATION = RACINE / "report" / "liminaires" / "abreviations.tex"
 
 TITRE = "Liste des abréviations"
 
+# LA LISTE NE FORCE PAS DE SAUT DE PAGE. Elle suit la liste des tableaux sur la même page quand la
+# place le permet ; c'est `report/rapport.tex` qui ouvre la page de la première liste. L'entrée de
+# table des matières est suivie de `\nopagebreak`, pour porter la page du titre qu'elle précède.
+
 ENTETE = rf"""% Fichier produit mécaniquement depuis docs/abreviations/abreviations.yml.
 % Ne pas modifier à la main : docs/abreviations/to_tex.py le réécrit.
 
-\clearpage
 \phantomsection
-\addcontentsline{{toc}}{{chapter}}{{{TITRE}}}
+\addcontentsline{{toc}}{{chapter}}{{{TITRE}}}\nopagebreak
 \chapter*{{{TITRE}}}
 \markboth{{\MakeUppercase{{{TITRE}}}}}{{\MakeUppercase{{{TITRE}}}}}
 

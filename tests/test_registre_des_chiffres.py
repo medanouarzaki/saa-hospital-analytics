@@ -83,10 +83,10 @@ def identifiants_du_registre() -> set[str]:
 
 
 # Les fichiers d'annexe qui portent des appels de chiffre. La portée suit la matière : le tableau
-# de correspondance est descendu en annexe avec les trente identifiants qu'il appelle, et sans
-# cette liste ils cesseraient d'être vus. Aucun n'est aujourd'hui exclusif à l'annexe — le
-# décompte des identifiants couverts est identique avant et après le déplacement — mais un
-# identifiant qui le deviendrait serait signalé comme inemployé, donc rouge.
+# de correspondance est descendu en annexe avec les identifiants qu'il appelle, et les compléments
+# techniques portent le détail que le corps y renvoie, dont les valeurs du chapitre d'analyse en
+# précision complète. Sans cette liste, leurs appels cesseraient d'être vus : un identifiant que
+# seule une annexe appelle serait signalé comme inemployé, et un appel non déclaré passerait.
 ANNEXES = ("correspondance_relations.tex", "complements_techniques.tex")
 
 # LA PORTÉE SUIT LA MATIÈRE, ET ELLE VIENT DE S'ÉTENDRE AU SUPPORT DE SOUTENANCE. Le répertoire
