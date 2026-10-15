@@ -216,57 +216,6 @@ chiffres:
   portee: independant-des-donnees
   note: >-
     Part des colonnes de la couche source étiquetées HYP au registre des champs, en pour cent de colonnes-source-registre. Rapport de colonnes-source-hyp à colonnes-source-registre.
-- id: colonnes-source-catalogue
-  valeur: 175
-  unite: colonnes
-  type: sql
-  commande: select count(*) from information_schema.columns where table_schema='source'
-  portee: periode-entiere
-- id: colonnes-source-catalogue-obs
-  valeur: 81
-  unite: colonnes
-  type: sql
-  commande: select count(*) from information_schema.columns c join pg_class p on p.relname=c.table_name
-    join pg_namespace n on n.oid=p.relnamespace and n.nspname=c.table_schema join pg_description d on
-    d.objoid=p.oid and d.objsubid=c.ordinal_position where c.table_schema='source' and d.description like
-    'provenance=OBS;%'
-  portee: periode-entiere
-- id: colonnes-source-catalogue-doc
-  valeur: 72
-  unite: colonnes
-  type: sql
-  commande: select count(*) from information_schema.columns c join pg_class p on p.relname=c.table_name
-    join pg_namespace n on n.oid=p.relnamespace and n.nspname=c.table_schema join pg_description d on
-    d.objoid=p.oid and d.objsubid=c.ordinal_position where c.table_schema='source' and d.description like
-    'provenance=DOC;%'
-  portee: periode-entiere
-- id: colonnes-source-catalogue-hyp
-  valeur: 22
-  unite: colonnes
-  type: sql
-  commande: select count(*) from information_schema.columns c join pg_class p on p.relname=c.table_name
-    join pg_namespace n on n.oid=p.relnamespace and n.nspname=c.table_schema join pg_description d on
-    d.objoid=p.oid and d.objsubid=c.ordinal_position where c.table_schema='source' and d.description like
-    'provenance=HYP;%'
-  portee: periode-entiere
-- id: colonnes-aval-total
-  valeur: 398
-  unite: colonnes
-  type: sql
-  commande: select count(*) from information_schema.columns c join information_schema.tables t on t.table_schema=c.table_schema
-    and t.table_name=c.table_name where c.table_schema in ('intermediate','marts')
-  portee: periode-entiere
-  note: 'Colonnes des couches aval : ce sont celles que le registre de provenance NE COUVRE PAS.'
-- id: colonnes-aval-decrites
-  valeur: 398
-  unite: colonnes
-  type: sql
-  commande: select count(*) from information_schema.columns c join information_schema.tables t on t.table_schema=c.table_schema
-    and t.table_name=c.table_name where c.table_schema in ('intermediate','marts')
-  portee: periode-entiere
-  note: 'MEME ENSEMBLE que colonnes-aval-total, décrit autrement : colonnes documentées dans les fichiers
-    de propriétés de la couche de transformation. Deux identifiants parce que le texte dit deux choses
-    différentes du même ensemble.'
 - id: colonnes-intermediate
   valeur: 175
   unite: colonnes
@@ -274,6 +223,10 @@ chiffres:
   commande: select count(*) from information_schema.columns c join information_schema.tables t on t.table_schema=c.table_schema
     and t.table_name=c.table_name where c.table_schema='intermediate'
   portee: periode-entiere
+  motif_non_emploi: >-
+    Aucune page du rapport ne l'affiche ; son identifiant sert de témoin dans
+    tests/test_registre_des_chiffres.py, qui éprouve la lecture des appels de chiffre sur des
+    noms existants.
 - id: colonnes-marts
   valeur: 223
   unite: colonnes
@@ -281,6 +234,10 @@ chiffres:
   commande: select count(*) from information_schema.columns c join information_schema.tables t on t.table_schema=c.table_schema
     and t.table_name=c.table_name where c.table_schema='marts'
   portee: periode-entiere
+  motif_non_emploi: >-
+    Aucune page du rapport ne l'affiche ; son identifiant sert de témoin dans
+    tests/test_registre_des_chiffres.py, qui éprouve la lecture des appels de chiffre sur des
+    noms existants.
 - id: parametres-total
   valeur: 256
   unite: paramètres
@@ -562,62 +519,6 @@ chiffres:
   type: python
   commande: len(yaml.safe_load((R/'generator/config/defauts.yml').read_text(encoding='utf-8'))['parametres'])
   portee: independant-des-donnees
-- id: part-sexe-masculin
-  valeur: 0.497
-  unite: proportion
-  type: python
-  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/demographie.yml'').read_text(encoding=''utf-8''))[''parametres'']
-    if p[''nom'']==''repartition_sexe''][0][''M'']'
-  portee: independant-des-donnees
-- id: part-urbain
-  valeur: 0.639
-  unite: proportion
-  type: python
-  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/demographie.yml'').read_text(encoding=''utf-8''))[''parametres'']
-    if p[''nom'']==''repartition_residence''][0][''environnement''][''U'']'
-  portee: independant-des-donnees
-- id: part-sans-couverture
-  valeur: 0.2
-  unite: proportion
-  type: python
-  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/demographie.yml'').read_text(encoding=''utf-8''))[''parametres'']
-    if p[''nom'']==''repartition_couverture''][0][''SANS'']'
-  portee: independant-des-donnees
-- id: part-couverture-principale
-  valeur: 0.5
-  unite: proportion
-  type: python
-  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/demographie.yml'').read_text(encoding=''utf-8''))[''parametres'']
-    if p[''nom'']==''repartition_couverture''][0][''00116'']'
-  portee: independant-des-donnees
-- id: tranches-age
-  valeur: 6
-  unite: tranches
-  type: python
-  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/demographie.yml'').read_text(encoding=''utf-8''))[''parametres'']
-    if p[''nom'']==''structure_age''][0][''tranches''].__len__()'
-  portee: independant-des-donnees
-- id: niveaux-tri
-  valeur: 5
-  unite: niveaux
-  type: python
-  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/urgences.yml'').read_text(encoding=''utf-8''))[''parametres'']
-    if p[''nom'']==''repartition_niveaux_tri''][0].__len__()'
-  portee: independant-des-donnees
-- id: part-tri-niveau-4
-  valeur: 0.41
-  unite: proportion
-  type: python
-  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/urgences.yml'').read_text(encoding=''utf-8''))[''parametres'']
-    if p[''nom'']==''repartition_niveaux_tri''][0][''4'']'
-  portee: independant-des-donnees
-- id: part-tri-niveau-5
-  valeur: 0.22
-  unite: proportion
-  type: python
-  commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/urgences.yml'').read_text(encoding=''utf-8''))[''parametres'']
-    if p[''nom'']==''repartition_niveaux_tri''][0][''5'']'
-  portee: independant-des-donnees
 - id: part-sejours-depuis-urgences
   valeur: 0.57
   unite: proportion
@@ -784,115 +685,6 @@ chiffres:
   commande: select count(*) from linkage.paires_candidates
   portee: periode-entiere
   note: Paires retenues par l'union des quatre règles de blocage. Numérateur comparé à paires-possibles.
-- id: blocage-nom-adresse
-  valeur: 2371
-  unite: paires
-  type: sql
-  commande: select count(*) from linkage.paires_candidates where regle_blocage = 'nom_famille_adresse'
-  portee: periode-entiere
-  note: Paires attribuées à cette règle. Une paire porte la règle qui l'a produite ; la somme des quatre
-    égale paires-candidates.
-- id: blocage-nom-telephone
-  valeur: 1843
-  unite: paires
-  type: sql
-  commande: select count(*) from linkage.paires_candidates where regle_blocage = 'nom_famille_telephone'
-  portee: periode-entiere
-  note: Paires attribuées à cette règle. Une paire porte la règle qui l'a produite ; la somme des quatre
-    égale paires-candidates.
-- id: blocage-piece-identite
-  valeur: 767
-  unite: paires
-  type: sql
-  commande: select count(*) from linkage.paires_candidates where regle_blocage = 'piece_identite'
-  portee: periode-entiere
-  note: Paires attribuées à cette règle. Une paire porte la règle qui l'a produite ; la somme des quatre
-    égale paires-candidates.
-- id: blocage-parents-naissance
-  valeur: 33
-  unite: paires
-  type: sql
-  commande: select count(*) from linkage.paires_candidates where regle_blocage = 'parents_date_naissance'
-  portee: periode-entiere
-  note: Paires attribuées à cette règle. Une paire porte la règle qui l'a produite ; la somme des quatre
-    égale paires-candidates.
-- id: blocage-reduction-nom-adresse
-  valeur: 99.99928988921047
-  decimales: 5
-  unite: '%'
-  type: sql
-  commande: >-
-    select 100 * (1 - count(*)::numeric / (select (count(*)::bigint*(count(*)-1)/2) from marts.dim_patient where est_courante)) from linkage.paires_candidates where regle_blocage = 'nom_famille_adresse'
-  portee: periode-entiere
-  note: >-
-    Réduction opérée par la règle de blocage nom_famille_adresse, en pour cent des paires possibles : 100 × (1 − paires de la règle / paires-possibles).
-- id: blocage-reduction-nom-telephone
-  valeur: 99.99944802438418
-  decimales: 5
-  unite: '%'
-  type: sql
-  commande: >-
-    select 100 * (1 - count(*)::numeric / (select (count(*)::bigint*(count(*)-1)/2) from marts.dim_patient where est_courante)) from linkage.paires_candidates where regle_blocage = 'nom_famille_telephone'
-  portee: periode-entiere
-  note: >-
-    Réduction opérée par la règle de blocage nom_famille_telephone, en pour cent des paires possibles : 100 × (1 − paires de la règle / paires-possibles).
-- id: blocage-reduction-piece-identite
-  valeur: 99.9997702847003
-  decimales: 5
-  unite: '%'
-  type: sql
-  commande: >-
-    select 100 * (1 - count(*)::numeric / (select (count(*)::bigint*(count(*)-1)/2) from marts.dim_patient where est_courante)) from linkage.paires_candidates where regle_blocage = 'piece_identite'
-  portee: periode-entiere
-  note: >-
-    Réduction opérée par la règle de blocage piece_identite, en pour cent des paires possibles : 100 × (1 − paires de la règle / paires-possibles).
-- id: blocage-reduction-parents-naissance
-  valeur: 99.99999011655164
-  decimales: 5
-  unite: '%'
-  type: sql
-  commande: >-
-    select 100 * (1 - count(*)::numeric / (select (count(*)::bigint*(count(*)-1)/2) from marts.dim_patient where est_courante)) from linkage.paires_candidates where regle_blocage = 'parents_date_naissance'
-  portee: periode-entiere
-  note: >-
-    Réduction opérée par la règle de blocage parents_date_naissance, en pour cent des paires possibles : 100 × (1 − paires de la règle / paires-possibles).
-- id: blocage-reduction-union
-  valeur: 99.9984983148466
-  decimales: 5
-  unite: '%'
-  type: sql
-  commande: >-
-    select 100 * (1 - count(*)::numeric / (select (count(*)::bigint*(count(*)-1)/2) from marts.dim_patient where est_courante)) from linkage.paires_candidates
-  portee: periode-entiere
-  note: >-
-    Réduction opérée par l'union des quatre règles de blocage, en pour cent des paires possibles : 100 × (1 − paires-candidates / paires-possibles).
-- id: rapport-accord-etat
-  valeur: 1.1
-  unite: proportion
-  type: python
-  commande: >-
-    float(__import__('re').search(r'colonne="etat",\s*motif="[^"]*rapport mesuré ([0-9]+,[0-9]+)', (R/'linkage/champs.py').read_text(encoding='utf-8')).group(1).replace(',', '.'))
-  portee: independant-des-donnees
-  note: >-
-    Rapport entre la probabilité d'accord chez les vrais couples et chez les faux pour une colonne écartée du modèle, tel que le motif d'exclusion de linkage/champs.py le consigne. La commande lit le motif écrit au code ; elle ne remesure pas le rapport. Nombre sans dimension, porté sous l'unité « proportion » faute d'une unité de rapport au registre.
-- id: rapport-accord-pays-naissance
-  valeur: 1.15
-  unite: proportion
-  type: python
-  commande: >-
-    float(__import__('re').search(r'colonne="pays_naissance",\s*motif="[^"]*rapport mesuré ([0-9]+,[0-9]+)', (R/'linkage/champs.py').read_text(encoding='utf-8')).group(1).replace(',', '.'))
-  portee: independant-des-donnees
-  note: >-
-    Rapport entre la probabilité d'accord chez les vrais couples et chez les faux pour une colonne écartée du modèle, tel que le motif d'exclusion de linkage/champs.py le consigne. La commande lit le motif écrit au code ; elle ne remesure pas le rapport. Nombre sans dimension, porté sous l'unité « proportion » faute d'une unité de rapport au registre.
-- id: rapport-accord-etat-naissance
-  valeur: 1.29
-  unite: proportion
-  type: python
-  commande: >-
-    float(__import__('re').search(r'colonne="etat_naissance",\s*motif=\(\s*"[^"]*rapport mesuré ([0-9]+,[0-9]+)', (R/'linkage/champs.py').read_text(encoding='utf-8')).group(1).replace(',', '.'))
-  portee: independant-des-donnees
-  note: >-
-    Rapport entre la probabilité d'accord chez les vrais couples et chez les faux pour une colonne écartée du modèle, tel que le motif d'exclusion de linkage/champs.py le consigne. La commande lit le motif écrit au code ; elle ne remesure pas le rapport. Nombre sans dimension, porté sous l'unité « proportion » faute d'une unité de rapport au registre.
 - id: comparaisons-modele
   valeur: 12
   unite: comparaisons
@@ -3134,35 +2926,6 @@ chiffres:
   note: >-
     Indicateurs recalculés depuis les faits, comme la règle du cadrage le demande. Les autres sont
     les écarts assumés, visibles au registre plutôt que relégués ailleurs.
-- id: instantane-tables
-  valeur: 26
-  unite: tables
-  type: sql
-  commande: >-
-    select count(*)::int from information_schema.tables where table_schema = 'instantane'
-  portee: periode-entiere
-  note: >-
-    Tables du schéma d'instantané, les deux tables de service comprises. À ne pas confondre avec
-    instantane-objets-copies, qui ne compte que les copies.
-- id: instantane-objets-copies
-  valeur: 24
-  unite: tables
-  type: sql
-  commande: >-
-    select count(*)::int from instantane.instantane_etat
-  portee: periode-entiere
-  note: >-
-    Objets copiés depuis la couche modélisée, le rapprochement et la couche intermédiaire, chacun
-    daté par la table d'état. Les deux tables de service ne s'y comptent pas.
-- id: instantane-lignes
-  valeur: 216277
-  unite: lignes
-  type: sql
-  commande: >-
-    select sum(lignes)::int from instantane.instantane_etat
-  portee: periode-entiere
-  note: >-
-    Lignes copiées, tous objets confondus, telles que la table d'état les enregistre.
 - id: instantane-volume
   valeur: 32710656
   unite: octets
@@ -3173,76 +2936,10 @@ chiffres:
   portee: periode-entiere
   note: >-
     Volume occupé par le schéma d'instantané, index compris, mesuré au catalogue.
-- id: instantane-lectures-temoin
-  valeur: 200
-  unite: lectures
-  type: python
-  commande: 'int([l for l in (R/''docs/decisions/0043-instantane-schema-dedie-du-tableau-de-bord.md'').read_text(encoding=''utf-8'').splitlines() if l.startswith(''| une dimension simple |'')][0].split(''|'')[2].strip())'
-  portee: independant-des-donnees
-  note: >-
-    Lectures tentées par le témoin concurrent sur chacune des deux vues observées, pendant une
-    reconstruction complète. Valeur lue dans l'enregistrement de décision qui la porte : la mesure
-    exige de rejouer un rafraîchissement, que ce travail n'exécute pas.
-- id: instantane-erreurs-dimension
-  valeur: 7
-  unite: lectures
-  type: python
-  commande: 'int([l for l in (R/''docs/decisions/0043-instantane-schema-dedie-du-tableau-de-bord.md'').read_text(encoding=''utf-8'').splitlines() if l.startswith(''| une dimension simple |'')][0].split(''|'')[4].replace(''*'','''').strip())'
-  portee: independant-des-donnees
-  note: >-
-    Lectures en erreur sur une dimension simple pendant la reconstruction. C'EST LA MESURE QUI
-    MOTIVE L'INSTANTANÉ : le lecteur ne patiente pas, l'objet n'existe pas.
-- id: instantane-erreurs-completude
-  valeur: 6
-  unite: lectures
-  type: python
-  commande: 'int([l for l in (R/''docs/decisions/0043-instantane-schema-dedie-du-tableau-de-bord.md'').read_text(encoding=''utf-8'').splitlines() if l.startswith(''| la vue de complétude'')][0].split(''|'')[4].replace(''*'','''').strip())'
-  portee: independant-des-donnees
-  note: >-
-    Lectures en erreur sur la vue la plus coûteuse à produire, sur le même nombre de tentatives.
-- id: instantane-fenetre-dimension
-  valeur: 0.352
-  unite: secondes
-  type: python
-  commande: 'float([l for l in (R/''docs/decisions/0043-instantane-schema-dedie-du-tableau-de-bord.md'').read_text(encoding=''utf-8'').splitlines() if l.startswith(''| une dimension simple |'')][0].split(''|'')[5].replace(''*'','''').replace('' s'','''').strip().replace('','',''.''))'
-  portee: independant-des-donnees
-  note: >-
-    Durée pendant laquelle la dimension observée n'existe plus, mesurée par le témoin.
-- id: instantane-fenetre-completude
-  valeur: 0.284
-  unite: secondes
-  type: python
-  commande: 'float([l for l in (R/''docs/decisions/0043-instantane-schema-dedie-du-tableau-de-bord.md'').read_text(encoding=''utf-8'').splitlines() if l.startswith(''| la vue de complétude'')][0].split(''|'')[5].replace(''*'','''').replace('' s'','''').strip().replace('','',''.''))'
-  portee: independant-des-donnees
-  note: >-
-    Même durée sur la seconde vue observée.
-- id: instantane-rapport-cout-lecture
-  valeur: 4.08
-  unite: proportion
-  type: python
-  commande: 'float((R/''docs/decisions/0043-instantane-schema-dedie-du-tableau-de-bord.md'').read_text(encoding=''utf-8'').split(''soit un rapport de '')[1].split('' '')[0].replace('','',''.''))'
-  portee: independant-des-donnees
-  note: >-
-    Rapport entre le coût de lecture des indicateurs contre les vues et contre les tables copiées.
-    CE N'EST PAS LE MOTIF de l'instantané, et l'écrire ainsi serait faux.
-- id: instantane-rapport-hors-completude
-  valeur: 3.03
-  unite: proportion
-  type: python
-  commande: 'float((R/''docs/decisions/0043-instantane-schema-dedie-du-tableau-de-bord.md'').read_text(encoding=''utf-8'').split(''le rapport global tombe à '')[1].split('' '')[0].replace('','',''.''))'
-  portee: independant-des-donnees
-  note: >-
-    Le même rapport, une seule page retirée. L'écart avec instantane-rapport-cout-lecture montre que
-    le gain est porté par une minorité d'indicateurs, non réparti sur l'ensemble.
-- id: instantane-duree-rafraichissement
-  valeur: 5.203
-  unite: secondes
-  type: python
-  commande: 'float((R/''docs/decisions/0043-instantane-schema-dedie-du-tableau-de-bord.md'').read_text(encoding=''utf-8'').split(''est mesuré à '')[1].split('' s '')[0].replace('','',''.''))'
-  portee: independant-des-donnees
-  note: >-
-    Durée de construction de la copie, mesurée à la décision. Lue dans l'enregistrement, la mesure
-    exigeant un rafraîchissement.
+  motif_non_emploi: >-
+    Aucune page du rapport ne l'affiche : le motif de l'instantané se lit à son enregistrement
+    de décision. L'entrée reste parce qu'un autre enregistrement de décision la nomme et
+    rapporte sa valeur.
 - id: rotation-affichee-avant
   valeur: 74.5
   unite: proportion
@@ -3422,16 +3119,6 @@ chiffres:
   note: >-
     Le plus grand écart entre valeur calculée et valeur relevée, toutes rubriques confondues. Il
     porte sur la rubrique qu'un champ manquant laisse sans dénominateur.
-- id: tdb-erreurs-lecture-tolerees
-  valeur: 0
-  unite: lectures
-  type: python
-  commande: '0'
-  portee: independant-des-donnees
-  note: >-
-    Échecs de lecture tolérés pendant un rafraîchissement, sous toute charge et sans classe d'erreur
-    exceptée. Le critère est ASYMÉTRIQUE : un échec d'échange, lui, est journalisé et relançable. La
-    commande est la constante elle-même, faute d'artefact qui la porte ailleurs.
 - id: chapitres-numerotes
   valeur: 10
   unite: chapitres
@@ -3772,6 +3459,10 @@ series:
     rang, non un nom d'objet : la courbe donne la FORME de la distribution, et la prose nomme les
     objets des deux extrémités. Les deux tables de service n'y figurent pas — la table d'état ne
     se décrit pas elle-même.
+  motif_non_emploi: >-
+    Aucune page du rapport ne la trace : le motif de l'instantané se lit à son enregistrement de
+    décision. La série reste parce que son fichier de données, produit sous report/figures/, en
+    dépend.
 - id: exigences-restitution
   fichier: figures/exigences-restitution.csv
   colonnes: [indicateur, classement, tables, champ]
