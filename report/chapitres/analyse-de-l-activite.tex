@@ -56,7 +56,7 @@ libellé (voir figure~\ref{fig:passages-mois}).
   xticklabels={2024, , 2025, , 2026, },
   grid=major, grid style={gray!25},
   every axis plot/.append style={thick},
-  legend style={at={(0.5,-0.32)}, anchor=north, legend columns=2, font=\footnotesize,
+  legend style={at={(0.5,-0.42)}, anchor=north, legend columns=2, font=\footnotesize,
     % SÉPARATION ENTRE LES DEUX COLONNES DE LA LÉGENDE. Sans elle, la clé de la seconde entrée
     % touchait le libellé de la première, et les deux se lisaient d'un seul tenant. Le défaut se
     % voyait sur les quatre graphiques à légende en deux colonnes, et sur eux seuls.
@@ -90,7 +90,7 @@ Le profil horaire des deux flux diffère aussi (voir figure~\ref{fig:passages-he
   xlabel={heure d'entrée}, ylabel={passages},
   xmin=-0.8, xmax=23.8, ymin=0, xtick={0,3,6,9,12,15,18,21},
   grid=major, grid style={gray!25},
-  legend style={at={(0.5,-0.34)}, anchor=north, legend columns=2, font=\footnotesize,
+  legend style={at={(0.5,-0.45)}, anchor=north, legend columns=2, font=\footnotesize,
     % SÉPARATION ENTRE LES DEUX COLONNES DE LA LÉGENDE. Sans elle, la clé de la seconde entrée
     % touchait le libellé de la première, et les deux se lisaient d'un seul tenant. Le défaut se
     % voyait sur les quatre graphiques à légende en deux colonnes, et sur eux seuls.
@@ -416,7 +416,7 @@ rang (voir figure~\ref{fig:completude-colonnes}).
 \begin{axis}[
   width=11cm, height=4.2cm,
   xlabel={colonnes incomplètes, rangées par complétude croissante},
-  ylabel={taux de renseignement, en \%},
+  ylabel={renseignement, en \%},
   xmin=0, ymin=0, ymax=105,
   grid=major, grid style={gray!25},
   every axis plot/.append style={thick},
