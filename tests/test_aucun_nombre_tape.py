@@ -49,6 +49,8 @@ ANNEXES_PRODUITES = (
 COMMANDES_A_ARGUMENT = (
     "chiffre",
     "serie",
+    "url",
+    "href",
     "releve",
     "convention",
     "cite",
