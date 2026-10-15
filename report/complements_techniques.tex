@@ -1,4 +1,5 @@
-% Compléments techniques des chapitres de conception, d'architecture et de qualité.
+% Compléments techniques des chapitres de conception, d'architecture, de qualité, d'analyse et du
+% tableau de bord.
 %
 % CE FICHIER EST UNE ANNEXE RÉDIGÉE, ET IL EST LU PAR LE CONTRÔLE DE PROVENANCE au même titre qu'un
 % fichier de chapitre : `tests/test_provenance_des_chapitres.py` le nomme dans sa liste des fichiers
@@ -7,22 +8,30 @@
 % renvoie par `\ref`. Les sections suivent l'ordre des chapitres d'où vient leur matière.
 %
 % Ce fichier repose sur :
-%   DOC: s22, s30
+%   DOC: s22, s27, s30
 %   OBS: REL-PAT.A01, REL-PAT.A03, REL-PAT.D01, REL-PAT.D02, REL-PAT.D03, REL-PAT.D05,
 %   OBS: REL-PAT.D06, REL-PAT.D09, REL-PAT.D10, REL-PAT.D11, REL-PAT.H05, REL-PAT.H07,
 %   OBS: REL-PAT.H12, REL-RDV.C01, REL-RDV.C02, REL-RDV.C05, REL-RDV.C07, REL-RDV.C08,
 %   OBS: REL-RDV.R01, REL-RDV.R02, REL-RDV.R03, REL-RDV.R08, REL-RDV.R10, REL-RDV.R11,
 %   OBS: REL-RDV.R12
 %   HYP: (aucun)
-%   CHI: blocage-nom-adresse, blocage-nom-telephone, blocage-parents-naissance, blocage-piece-identite, blocage-reduction-nom-adresse, blocage-reduction-nom-telephone
-%   CHI: blocage-reduction-parents-naissance, blocage-reduction-piece-identite, blocage-reduction-union, colonnes-aval-decrites, colonnes-aval-total, colonnes-intermediate
-%   CHI: colonnes-marts, colonnes-source-catalogue, colonnes-source-catalogue-doc, colonnes-source-catalogue-hyp, colonnes-source-catalogue-obs, colonnes-source-doc
-%   CHI: colonnes-source-hyp, colonnes-source-obs, colonnes-source-registre, comparaisons-modele, niveaux-tri, paires-candidates
-%   CHI: paires-possibles, part-couverture-principale, part-sans-couverture, part-sejours-depuis-urgences, part-sexe-masculin, part-tri-niveau-4
-%   CHI: part-tri-niveau-5, part-urbain, rapport-accord-etat, rapport-accord-etat-naissance, rapport-accord-pays-naissance, taches-graphe
-%   CHI: tranches-age
-%   SER: (aucune)
-%   SECTIONS: 6
+%   CHI: artefact-part, blocage-nom-adresse, blocage-nom-telephone, blocage-parents-naissance, blocage-piece-identite, blocage-reduction-nom-adresse
+%   CHI: blocage-reduction-nom-telephone, blocage-reduction-parents-naissance, blocage-reduction-piece-identite, blocage-reduction-union, colonnes-aval-decrites, colonnes-aval-total
+%   CHI: colonnes-intermediate, colonnes-marts, colonnes-source-catalogue, colonnes-source-catalogue-doc, colonnes-source-catalogue-hyp, colonnes-source-catalogue-obs
+%   CHI: colonnes-source-doc, colonnes-source-hyp, colonnes-source-obs, colonnes-source-registre, comparaisons-modele, creances-part-au-dela-un-an
+%   CHI: doublons-part-mesuree, facturation-part-organisme, facturation-part-patient, feries-urgences-hors-moyenne, feries-urgences-moyenne, flux-lundi-moyenne
+%   CHI: flux-programme-moyenne, flux-samedi-moyenne, hebdo-rapport-mesure, injecte-correlation-parametres, instantane-duree-rafraichissement, instantane-erreurs-completude
+%   CHI: instantane-erreurs-dimension, instantane-fenetre-completude, instantane-fenetre-dimension, instantane-lectures-temoin, instantane-lignes, instantane-objets-copies
+%   CHI: instantane-rapport-cout-lecture, instantane-rapport-hors-completude, instantane-tables, instantane-volume, jour-meme-part-marge-nulle, niveaux-tri
+%   CHI: paires-candidates, paires-possibles, part-couverture-principale, part-jour-meme, part-sans-couverture, part-sejours-depuis-urgences
+%   CHI: part-sexe-masculin, part-tri-niveau-4, part-tri-niveau-5, part-urbain, qualite-taux-quarantaine-maximal, ramadan-baisse
+%   CHI: ramadan-hors-moyenne, ramadan-programme-moyenne, rapport-accord-etat, rapport-accord-etat-naissance, rapport-accord-pays-naissance, recouvrement-taux-aboutissement
+%   CHI: recouvrement-taux-global, recouvrement-taux-maximal, recouvrement-taux-minimal, relation-brute-complement, relation-brute-ensemble, relation-inter-complement
+%   CHI: relation-inter-ensemble, relation-intra-complement, relation-intra-ensemble, source-part-non-appropriees, taches-graphe, taux-absenteisme-global
+%   CHI: taux-annulation-global, taux-encaissement, tdb-erreurs-lecture-tolerees, tranches-age, urgences-part-consultation-ordinaire, urgences-part-hospitalisation
+%   CHI: urgences-part-mode-principal, urgences-part-retour-domicile, urgences-part-transfert, urgences-rapport-pointe-creux
+%   SER: facturation-par-type, instantane-objets, qualite-par-table
+%   SECTIONS: 9
 
 \chapitreDAnnexe{Compléments techniques}\label{annexe:complements}
 
@@ -307,3 +316,180 @@ naissance et \chiffre{rapport-accord-etat-naissance} pour l'état de naissance. 
 copies d'une autre colonne faites par le programme, égales ligne à ligne sur toute la population.
 L'état de naissance copie ainsi l'état, et la ville de naissance copie la ville. Les comparer compterait
 deux fois le même accord.
+
+\section{Deux tableaux de l'analyse de l'activité}\label{sec:complements-analyse}
+
+La facturation et la quarantaine se détaillent en deux tableaux. Le premier ventile le montant
+facturé par type d'épisode (cf. tableau~\ref{tab:montants-episode}).
+
+\begin{table}[htbp]
+\centering
+\caption{Montants facturés par type d'épisode, en dirhams}\label{tab:montants-episode}
+\footnotesize
+\pgfplotstabletypeset[
+  col sep=comma,
+  columns/episode/.style={column name={Type d'épisode}, string type},
+  columns/factures/.style={column name={Factures}, int detect, 1000 sep={\,}},
+  columns/montant/.style={column name={Montant}, fixed, fixed zerofill, precision=2,
+    1000 sep={\,}},
+  columns/part/.style={column name={Part (\%)}, fixed, fixed zerofill, precision=2},
+  columns/organisme/.style={column name={Part organisme (\%)}, fixed, fixed zerofill,
+    precision=2},
+  every head row/.style={before row=\toprule, after row=\midrule},
+  every last row/.style={after row=\bottomrule},
+]{\serie{facturation-par-type}}
+\end{table}
+
+Les trois codes d'épisode s'y affichent sans libellé : la taxonomie réglementaire des modes
+d'utilisation de l'hôpital est établie sans être énumérée \cite{s27}.
+
+Le second donne la complétude et la quarantaine de chaque table de la couche intermédiaire (cf.
+tableau~\ref{tab:qualite-par-table}).
+
+\begin{table}[htbp]
+\centering
+\caption{Complétude et quarantaine par table de la couche intermédiaire}\label{tab:qualite-par-table}
+\footnotesize
+% L'espacement entre colonnes est resserré POUR CE TABLEAU SEUL, et la mesure dit de combien : à
+% 6 pt, l'intitulé abrégé laissait encore 0,33 cm de débordement ; à 4 pt, les six colonnes
+% tiennent dans le bloc de texte, que le filet d'en-tête de page donne exactement. Le groupe
+% `center` borne la portée du changement.
+\setlength{\tabcolsep}{4pt}
+\pgfplotstabletypeset[
+  col sep=comma,
+  % Les noms de table portent des soulignements, qui sont des caractères actifs en mode texte.
+  % `string replace*` les échappe à la lecture, sans toucher au fichier de données.
+  %
+  % LE NOM DE TABLE SE COMPOSE EN CHASSE FIXE, comme partout ailleurs dans le document. Il était
+  % composé en romain, où `\textunderscore` produit une barre basse démesurée : `int_patients` s'y
+  % lisait `int__patients`. Le défaut ne se voyait qu'à la relecture du document composé.
+  columns/objet/.style={column name={Table}, string type, string replace*={_}{\_},
+    postproc cell content/.append style={@cell content/.add={\texttt\bgroup}{\egroup}}},
+  columns/colonnes/.style={column name={Colonnes}, int detect},
+  columns/incompletes/.style={column name={Incomplètes}, int detect},
+  % L'INTITULÉ EST ABRÉGÉ PARCE QUE LE TABLEAU DÉBORDAIT LA MARGE, mesuré au rendu : son filet
+  % s'étendait 1,05 cm au-delà du bloc de texte, que le filet d'en-tête de page donne exactement.
+  % La légende sous le tableau porte le mot entier.
+  columns/completude_minimale/.style={column name={Complétude min. (\%)}, fixed,
+    fixed zerofill, precision=2},
+  columns/quarantaine/.style={column name={Quarantaine}, int detect, 1000 sep={\,}},
+  columns/taux_quarantaine/.style={column name={Taux (\%)}, fixed, fixed zerofill, precision=2},
+  every head row/.style={before row=\toprule, after row=\midrule},
+  every last row/.style={after row=\bottomrule},
+]{\serie{qualite-par-table}}
+\end{table}
+
+La colonne « Complétude min. » y porte la complétude minimale observée sur les colonnes de la table.
+
+\section{Les valeurs de l'analyse en précision complète}\label{sec:complements-precision}
+
+L'analyse de l'activité affiche ses pourcentages et ses moyennes à une décimale, et ses coefficients
+à deux décimales. Chaque valeur affichée a sa propre entrée au registre des chiffres, dont la
+commande arrondit celle de la valeur complète. Le tableau~\ref{tab:precision-complete} donne ces
+valeurs en précision complète, dans l'ordre où l'analyse les emploie.
+
+{\footnotesize
+\begin{longtable}{@{}p{0.72\linewidth}r@{}}
+\caption[Les valeurs de l'analyse en précision complète]{Les valeurs de l'analyse de l'activité en précision complète}\label{tab:precision-complete}\\
+\toprule
+Grandeur & Valeur \\
+\midrule
+\endfirsthead
+\toprule
+Grandeur & Valeur \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Passages programmés par jour ouvert & \chiffre{flux-programme-moyenne} \\
+Passages programmés par jour, premier jour de la semaine & \chiffre{flux-lundi-moyenne} \\
+Passages programmés par jour, sixième jour de la semaine & \chiffre{flux-samedi-moyenne} \\
+Rapport entre ces deux moyennes & \chiffre{hebdo-rapport-mesure} \\
+Passages programmés par jour ouvert pendant le Ramadan & \chiffre{ramadan-programme-moyenne} \\
+Passages programmés par jour ouvert hors Ramadan & \chiffre{ramadan-hors-moyenne} \\
+Baisse pendant le Ramadan & \chiffre{ramadan-baisse}~\% \\
+Passages aux urgences par jour férié & \chiffre{feries-urgences-moyenne} \\
+Passages aux urgences par jour non férié & \chiffre{feries-urgences-hors-moyenne} \\
+Délais égaux à la marge disponible & \chiffre{artefact-part}~\% \\
+Rendez-vous pris pour le jour même & \chiffre{part-jour-meme}~\% \\
+Part de ces rendez-vous à marge nulle ou négative & \chiffre{jour-meme-part-marge-nulle}~\% \\
+Taux d'absentéisme & \chiffre{taux-absenteisme-global}~\% \\
+Taux d'annulation & \chiffre{taux-annulation-global}~\% \\
+Corrélation entre activités, ensemble & \chiffre{relation-inter-ensemble} \\
+Corrélation à l'intérieur des activités, ensemble & \chiffre{relation-intra-ensemble} \\
+Corrélation sans distinguer les activités, ensemble & \chiffre{relation-brute-ensemble} \\
+Corrélation entre activités, complément & \chiffre{relation-inter-complement} \\
+Corrélation à l'intérieur des activités, complément & \chiffre{relation-intra-complement} \\
+Corrélation sans distinguer les activités, complément & \chiffre{relation-brute-complement} \\
+Corrélation entre les deux tables de paramètres & \chiffre{injecte-correlation-parametres} \\
+Rapport entre pointe et creux horaires des urgences & \chiffre{urgences-rapport-pointe-creux} \\
+Retour à domicile après un passage aux urgences & \chiffre{urgences-part-retour-domicile}~\% \\
+Transfert & \chiffre{urgences-part-transfert}~\% \\
+Hospitalisation & \chiffre{urgences-part-hospitalisation}~\% \\
+Mode d'arrivée le plus fréquent & \chiffre{urgences-part-mode-principal}~\% \\
+Deux niveaux de tri les moins graves & \chiffre{urgences-part-consultation-ordinaire}~\% \\
+Part prise en charge par un organisme & \chiffre{facturation-part-organisme}~\% \\
+Part restant au patient & \chiffre{facturation-part-patient}~\% \\
+Taux de recouvrement global & \chiffre{recouvrement-taux-global}~\% \\
+Taux de recouvrement le plus bas, par débiteur & \chiffre{recouvrement-taux-minimal}~\% \\
+Taux de recouvrement le plus haut, par débiteur & \chiffre{recouvrement-taux-maximal}~\% \\
+Taux d'encaissement & \chiffre{taux-encaissement}~\% \\
+Restant dû porté par des créances d'un an et plus & \chiffre{creances-part-au-dela-un-an}~\% \\
+Relances abouties & \chiffre{recouvrement-taux-aboutissement}~\% \\
+Taux de quarantaine le plus élevé d'une table & \chiffre{qualite-taux-quarantaine-maximal}~\% \\
+Personnes portant deux fiches & \chiffre{doublons-part-mesuree}~\% \\
+Consultations non appropriées dans l'étude provinciale, en proportion & \chiffre{source-part-non-appropriees} \\
+\end{longtable}
+}
+
+\section{Le motif de l'instantané du tableau de bord}\label{sec:complements-instantane}
+
+Le tableau de bord lit un schéma de tables figées parce qu'un lecteur voyait une erreur pendant la
+reconstruction, et non pour le coût des lectures. Ce coût a été mesuré : lire les indicateurs de
+toutes les pages contre les vues coûte \chiffre{instantane-rapport-cout-lecture} fois ce qu'il coûte
+contre des tables copiées. Ce rapport moyen est porté par une minorité d'indicateurs. Sans la page
+la plus coûteuse, il tombe à \chiffre{instantane-rapport-hors-completude}, un gain trop inégal pour
+justifier un schéma de plus à maintenir.
+
+Un lecteur concurrent a lu en boucle pendant une reconstruction complète. Il a compté
+\chiffre{instantane-erreurs-dimension} lectures en erreur sur \chiffre{instantane-lectures-temoin}
+tentatives contre une dimension simple, et \chiffre{instantane-erreurs-completude} contre la vue la
+plus coûteuse à produire. Le message disait que l'objet n'existait plus, pendant
+\chiffre{instantane-fenetre-dimension} seconde dans le premier cas et
+\chiffre{instantane-fenetre-completude} dans le second.
+
+Le critère retenu traite différemment les deux échecs. Le nombre d'échecs de lecture tolérés est de
+\chiffre{tdb-erreurs-lecture-tolerees}, sous toute charge, parce qu'un utilisateur les subit sans
+recours. Un échec de remplacement est journalisé et relançable. La transaction qui l'enveloppe
+laisse alors l'instantané dans sa génération précédente, complète.
+
+Les objets que les pages lisent se rangent par effectif (voir figure~\ref{fig:objets-instantane}).
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=11cm, height=4.6cm, ymode=log,
+  xlabel={objets copiés, rangés par effectif décroissant},
+  ylabel={lignes copiées},
+  xmin=0, xmax=25,
+  grid=major, grid style={gray!25},
+  every axis plot/.append style={thick},
+]
+\addplot[color=black, mark=*, mark size=1.2pt] table[x=rang, y=lignes, col sep=comma]
+  {\serie{instantane-objets}};
+\end{axis}
+\end{tikzpicture}
+\caption{Les objets que le tableau de bord lit, par effectif}\label{fig:objets-instantane}
+\end{figure}
+
+La figure range les \chiffre{instantane-objets-copies} objets par effectif, et son abscisse est un
+rang. L'instantané tient en \chiffre{instantane-tables} tables : ces copies, et deux tables de
+service qui portent l'état et les paramètres. Il pèse \chiffre{instantane-volume} octets pour
+\chiffre{instantane-lignes} lignes, et se reconstruit en \chiffre{instantane-duree-rafraichissement}
+secondes. Les effectifs s'étalent sur quatre ordres de grandeur, du fait de passage à l'agrégat de
+doublons. Cet écart explique que le gain de lecture varie autant d'un indicateur à l'autre.
+
+Le registre des indicateurs déclare des objets de la couche analytique, quand les pages lisent le
+schéma figé. Le registre nomme la couche où un modèle produit l'objet, et le nom de table, privé de
+son schéma, relie les deux.

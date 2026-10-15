@@ -28,13 +28,25 @@ chapitre~\ref{chap:activite} qui reproduit l'une d'elles ne découvre rien — e
 chaîne sait la retrouver.
 
 Les deux tableaux qui suivent tiennent la correspondance dans les deux sens. Le premier va des
-relations aux conclusions ; le second des conclusions à leur origine.
+relations aux conclusions ; le second des conclusions à leur origine. Chaque conclusion y est
+désignée par la page du chapitre~\ref{chap:activite} où elle figure.
+
+% LA COLONNE « CONCLUSION » COMPOSE UNE PAGE, ET NON UN IDENTIFIANT. Chaque marque \conclusion du
+% chapitre d'analyse pose l'étiquette conclusion:C-nn à l'endroit de la conclusion. Les lignes des
+% deux tableaux gardent l'identifiant en argument, parce que le contrôle de correspondance le lit
+% dans cette source ; seule sa composition change, et dans le groupe de chaque tableau seulement.
+% Un argument peut porter plusieurs identifiants séparés par des virgules : chacun rend sa page.
+\newcommand*{\pagesconclusions}[1]{%
+  \def\separateurconclusion{\def\separateurconclusion{, }}%
+  \renewcommand*{\do}[1]{\separateurconclusion p.~\pageref{conclusion:##1}}%
+  \docsvlist{#1}}
 
 \textbf{Premier sens} : toute relation du registre des relations injectées est reprise par une
 conclusion de ce chapitre, avec l'amplitude injectée en regard de l'amplitude mesurée, ou déclarée
 non reprise avec son motif.
 
 {\footnotesize
+\renewcommand{\relreprise}[4]{#1 & \pagesconclusions{#2} & #3 & #4 \\}
 % Un tableau long, et non un tableau ordinaire : vingt et une lignes ne tiennent pas dans le
 % reste d'une page, et un tableau ordinaire les reporte en bloc en laissant la page presque vide.
 \begin{longtable}{@{}llp{0.255\linewidth}p{0.255\linewidth}@{}}
@@ -78,6 +90,7 @@ rien}.
 
 \begin{center}
 \footnotesize
+\renewcommand{\conclusionhors}[2]{\pagesconclusions{#1} & #2 \\}
 \begin{tabular}{@{}lp{0.72\linewidth}@{}}
 \toprule
 Conclusion & Ce dont elle vient \\
