@@ -237,11 +237,13 @@
 \clearpage
 \phantomsection
 \addcontentsline{toc}{chapter}{\listfigurename}
+\markboth{\MakeUppercase{\listfigurename}}{\MakeUppercase{\listfigurename}}
 \listoffigures
 \begingroup
 \let\clearpage\relax
 \phantomsection
 \addcontentsline{toc}{chapter}{\listtablename}\nopagebreak
+\markboth{\MakeUppercase{\listtablename}}{\MakeUppercase{\listtablename}}\nopagebreak
 \listoftables
 \input{liminaires/abreviations}
 \endgroup
