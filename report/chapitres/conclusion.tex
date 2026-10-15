@@ -16,86 +16,48 @@
 % conclusion. Le défaut ne se voit qu'en regardant le document composé.
 \markboth{\MakeUppercase{Conclusion générale}}{\MakeUppercase{Conclusion générale}}
 
-\section*{Ce qui a été fait}
+\section*{Bilan}
 
-Une chaîne de données complète a été construite, du fichier déposé jusqu'à l'écran :
-\chiffre{modeles-total} modèles de transformation, \chiffre{taches-graphe} tâches orchestrées, un
-rapprochement probabiliste d'identités évalué contre une vérité terrain connue, et un tableau de
-bord de \chiffre{tdb-pages} pages portant \chiffre{tdb-indicateurs} indicateurs. Elle se rejoue en
-entier, et \chiffre{fichiers-de-controle} fichiers de contrôle la surveillent.
+\subsection*{Le volet méthodologique}
 
-Ce n'est pas le volume de ce travail qui en fait l'intérêt, mais \textbf{ce qu'il refuse
-d'affirmer}. Chaque nombre du rapport vient d'une commande qui le produit ; chaque affirmation porte
-l'étiquette de ce qui l'étaye — un document, une observation, ou une convention posée ; chaque
-relation injectée est déclarée, et le rapport dit laquelle des conclusions la reproduit.
-\textbf{Le résultat le plus directement utilisable est la correspondance avec ce que la
-nomenclature nationale attend} : sur \chiffre{exigences-rubriques} rubriques attendues d'un
-établissement nommé, \chiffre{exigences-calculables} sont calculables par la chaîne.
+Le travail devait construire une chaîne de données pour le service d'accueil et d'admission, sans
+accès à des données réelles. Un jeu de données a donc été généré, calibré sur des sources publiées,
+avec des défauts semés et des relations injectées à dessein. Chaque nombre écrit est venu d'une
+commande consignée au registre des chiffres. Chaque affirmation a porté l'étiquette de ce qui
+l'étayait : un document, une observation au poste ou une convention posée.
 
-\section*{Ce qui n'a pas été fait, et pourquoi}
+Les relations injectées ont été confrontées une à une aux conclusions de l'analyse. Sur
+\chiffre{relations-injectees} relations, \chiffre{relations-non-reprises} n'étaient reprises par
+aucune conclusion, le plus souvent parce qu'aucune couche aval ne calculait la colonne qui les
+portait. Parmi les conclusions, \chiffre{conclusions-avec-relation} reproduisaient une relation
+injectée, et \chiffre{conclusions-sans-relation} n'en venaient d'aucune. Aucune n'établissait donc un fait sur le
+service, ce qu'imposait un jeu généré.
 
-\textbf{Des rubriques de la nomenclature restent hors d'atteinte, et aucune ne l'est par manque de
-temps.} Elles sont \chiffre{exigences-non-calculables}, bloquées chacune par un champ absent du
-système d'information, et \chiffre{exigences-champs-manquants} champs suffiraient à les débloquer.
+L'observation au poste a servi presque en entier. Sur \chiffre{releve-champs-total} éléments relevés,
+\chiffre{releve-champs-non-employes} seulement, tous des boutons, n'ont été cités nulle part. Deux
+pistes ont été écartées. Inventer les libellés manquants aurait rendu lisible un code en cachant
+qu'il était inventé. Régénérer le jeu jusqu'à effacer le désaccord de deux faits sur la fin d'un
+épisode aurait retiré ce que ce désaccord apprenait.
 
-Il s'y ajoute \chiffre{exigences-sans-objet} rubriques sans objet, et la distinction compte : elles
-ne manquent pas au logiciel, c'est l'établissement qui n'exerce pas l'activité.
+\subsection*{Le volet technique}
 
-\textbf{Le modèle dimensionnel porte \chiffre{limites-des-faits} limites documentées plutôt que
-contournées}, et toutes tiennent à la même cause : la source ne porte pas ce qu'il faudrait pour
-aller plus loin. Fabriquer la distinction manquante aurait produit une donnée qu'aucune ligne
-n'établit.
+Une chaîne complète a été construite, du fichier déposé jusqu'à l'écran. Elle comptait
+\chiffre{modeles-total} modèles de transformation et \chiffre{taches-graphe} tâches orchestrées. Un
+rapprochement probabiliste d'identités a été évalué contre une vérité terrain connue. Un tableau de
+bord de \chiffre{tdb-pages} pages restituait \chiffre{tdb-indicateurs} indicateurs, et
+\chiffre{fichiers-de-controle} fichiers de contrôle surveillaient l'ensemble.
 
-\textbf{Sur \chiffre{relations-injectees} relations injectées,
-\chiffre{relations-non-reprises} ne sont reprises par aucune conclusion}, le plus souvent parce que
-la colonne qui les porterait n'est calculée dans aucune couche aval. Le régime de couverture, l'âge
-et l'adressage existent dans la source et s'arrêtent en chemin.
+Le résultat le plus directement utilisable a été la correspondance avec la nomenclature nationale.
+Sur \chiffre{exigences-rubriques} rubriques attendues d'un établissement nommé,
+\chiffre{exigences-calculables} étaient calculables par la chaîne. Parmi les autres,
+\chiffre{exigences-non-calculables} restaient bloquées, chacune par un champ absent du système
+d'information, et \chiffre{exigences-champs-manquants} champs suffiraient à les débloquer. Enfin,
+\chiffre{exigences-sans-objet} rubriques étaient sans objet, l'établissement n'exerçant pas
+l'activité. Le modèle dimensionnel a
+porté \chiffre{limites-des-faits} limites documentées plutôt que contournées, toutes dues à ce que la
+source ne portait pas.
 
-\textbf{Le relevé d'observation, lui, est employé en entier ou presque.} Sur
-\chiffre{releve-champs-total} éléments relevés au poste,
-\chiffre{releve-champs-non-employes} seulement ne sont cités nulle part — et ce sont tous des
-boutons. Aucun champ de donnée observé n'est resté inemployé.
-
-\textbf{Enfin, aucune conclusion du chapitre d'analyse n'établit un fait sur le service.} Sur les
-vingt-deux qu'il porte, \chiffre{conclusions-avec-relation} reproduisent une relation injectée et
-\chiffre{conclusions-sans-relation} ne viennent d'aucune. Ce n'est pas un défaut d'exécution :
-c'est la conséquence nécessaire d'un jeu produit.
-
-\section*{Les pistes qui n'ont pas été retenues}
-
-Deux pistes ont été écartées, et les deux pour le même genre de raison. \textbf{Inventer les
-libellés manquants} : un code nu est illisible et le montre, un libellé inventé est lisible et cache
-qu'il est inventé. \textbf{Régénérer le jeu de données} pour effacer le désaccord des deux faits sur
-la fin d'un épisode : un jeu qu'on régénère jusqu'à ce qu'il soit propre n'apprend plus rien.
-
-\section*{Ce qu'il faudrait pour passer à des données réelles}
-
-La chaîne est écrite pour lire des fichiers, non pour lire ce générateur : la question n'est pas
-de savoir si elle fonctionnerait, mais \textbf{ce qui changerait de nature}. Trois choses.
-
-\textbf{La vérité terrain disparaît.} Précision et rappel se calculent aujourd'hui parce qu'on sait
-lesquels des doublons sont vrais ; sur des données réelles, cette connaissance n'existe pas.
-L'évaluation changerait donc de nature — il faudrait un échantillon annoté à la main, avec son coût
-et son incertitude propres — et les grandeurs publiées au chapitre du rapprochement cesseraient
-d'être mesurables telles quelles.
-
-\textbf{Les distributions ne sont plus posées.} Délais, taux d'absentéisme, pyramide de gravité aux
-urgences sont aujourd'hui calibrés sur des sources publiées puis injectés. Sur des données réelles,
-les contrôles qui vérifient que la chaîne retrouve le paramètre injecté n'auraient plus de second
-membre, et devraient céder la place à des contrôles de forme, plus faibles et à écrire.
-
-\textbf{Les relations ne sont plus injectées, et c'est le changement décisif : un résultat cesse de
-démontrer et se met à établir.} Aujourd'hui, retrouver que l'absentéisme croît avec le délai à
-l'intérieur d'une spécialité ne prouve rien d'autre que la capacité de la chaîne à retrouver ce
-qu'on y a mis. Sur des données réelles, le même calcul deviendrait un constat sur le service — avec
-tout ce que cela impose de prudence supplémentaire sur la population, le dénominateur et la période.
-
-Trois conditions matérielles s'y ajoutent. Une convention d'accès aux données, que la contrainte de
-confidentialité rend nécessaire et qui n'est pas du ressort d'un stage. Une extraction périodique
-depuis le système d'origine, dont le format et la cadence restent à établir. Et les champs manquants nommés plus haut, qui
-cesseraient d'être une limite documentée pour devenir un obstacle à lever.
-
-\section*{Apport personnel}
+\subsection*{Le volet professionnel}
 
 Je suis arrivé dans ce service sans rien connaître du domaine hospitalier. J'en repars en ayant
 compris comment un établissement enregistre son activité, ce qu'il doit remonter, et par quels
@@ -104,7 +66,7 @@ gestes une donnée naît\releve{apport-personnel}.
 Ce que j'ai le plus appris ne s'apprend pas dans un cours. Au poste d'accueil, j'ai vu défiler des
 situations très différentes — des patients connus du système et d'autres à créer, des couvertures
 qui ouvrent des droits et d'autres qui n'en ouvrent pas, des personnes qui savent répondre aux
-questions qu'on leur pose et d'autres qui ne le savent pas. Un agent qui saisit un numéro de
+questions qui leur sont posées et d'autres qui ne le savent pas. Un agent qui saisit un numéro de
 téléphone au hasard parce que la personne en face ne connaît pas le sien ne fabrique pas une
 erreur : il fait passer un dossier avec ce qu'il a. C'est en voyant cela que j'ai compris qu'un
 champ renseigné n'est pas un champ juste, et que cette distinction gouverne tout le reste.
@@ -121,14 +83,12 @@ plusieurs centaines de milliers, réparties sur onze tables et deux ans et demi,
 leurs jours creux, leurs doublons et leurs champs vides. J'ai passé beaucoup de temps à calibrer
 chaque paramètre sur ce qu'une source publiait plutôt que sur ce qui m'arrangeait, et à semer
 volontairement les défauts qu'un fichier réel porte — parce qu'un jeu propre n'aurait rien permis
-de démontrer. Le résultat n'est pas la réalité, et le rapport le dit partout où il le faut ; mais
-il en a la forme, le volume et les imperfections, et c'est ce qui a rendu la chaîne intéressante à
-construire.
+de démontrer.
 
 Sur le plan technique, j'ai appris à construire une chaîne complète plutôt que des morceaux :
 modéliser, charger, transformer, restituer, et surtout vérifier. La vérification est ce qui m'a le
-plus surpris. J'ai découvert qu'un contrôle vert ne prouve rien tant qu'on ne l'a pas mis en défaut
-volontairement, et que la plupart de ceux que je croyais solides ne surveillaient pas ce que je
+plus surpris. J'ai découvert qu'un contrôle vert ne prouve rien tant qu'il n'a pas été mis en
+défaut volontairement, et que la plupart de ceux que je croyais solides ne surveillaient pas ce que je
 pensais.
 
 La difficulté qui m'a le plus retenu n'était pas technique. C'était de distinguer ce que je pouvais
@@ -137,7 +97,24 @@ résultat est suspect, et il a fallu apprendre à séparer ce que la chaîne dé
 n'établit pas. C'est la partie du travail dont je suis le plus satisfait, et c'est aussi celle qui
 m'a coûté le plus de reprises.
 
-S'il fallait recommencer, j'écrirais au fil de l'eau plutôt qu'à la fin. J'ai mené la rédaction en
-fin de projet alors qu'elle devait être répartie, et j'ai découvert en écrivant des erreurs
-qu'aucun contrôle n'avait vues — ce qui, rétrospectivement, dit quelque chose d'utile : écrire est
-aussi une manière de vérifier.
+\section*{Perspectives}
+
+Plusieurs améliorations prolongeraient ce travail. Le régime de couverture, l'âge et l'adressage
+existent dans la source, mais s'arrêtent avant les couches aval. Les y porter permettrait de
+confronter les relations qui restent sans conclusion. Les trois champs manquants, ajoutés au système
+d'information, rendraient calculables les rubriques qu'ils bloquent.
+
+Le passage à des données réelles changerait la nature de trois choses. La vérité terrain
+disparaîtrait : la précision et le rappel du rapprochement demanderaient un échantillon annoté à la
+main, avec son coût et son incertitude. Les distributions ne seraient plus posées : les contrôles qui
+vérifient que la chaîne retrouve un paramètre céderaient la place à des contrôles de forme, plus
+faibles et encore à écrire. Les relations ne seraient plus injectées : un résultat deviendrait un
+constat sur le service. Il demanderait alors une prudence accrue sur la population, le dénominateur
+et la période.
+
+Trois conditions matérielles s'y ajouteraient. Une convention d'accès aux données serait nécessaire,
+que la confidentialité impose et qui dépasse le cadre d'un stage. Une extraction périodique depuis le
+système d'origine resterait à établir, dans son format comme dans sa cadence. Les champs manquants
+deviendraient alors un obstacle à lever, et non plus une limite documentée. Sur ces données, le même
+calcul de la relation entre délai et absentéisme dirait enfin si attendre fait manquer un
+rendez-vous dans ce service.

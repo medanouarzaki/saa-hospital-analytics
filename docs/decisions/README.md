@@ -117,3 +117,4 @@ chaque exécution.
 | [0101](0101-abreviations-definitions-et-legendes.md) | Abréviations, définitions et réglages de légende |
 | [0102](0102-partie-i-allegee.md) | Une première partie allégée, tenue par un budget et une charte |
 | [0103](0103-partie-ii-allegee.md) | Une deuxième partie allégée, et une annexe pour son détail technique |
+| [0104](0104-partie-iii-allegee.md) | Une troisième partie allégée, une conclusion en deux temps et des nombres arrondis à l'affichage |

@@ -133,51 +133,7 @@ EXCEPTIONS = (
 # Les lignes ci-dessous sont des DONNÉES, pas du code : chacune reproduit à l'identique une ligne
 # de source, et la couper la rendrait inutilisable comme clé. Elles portent donc la dérogation à la
 # longueur, une par une et jamais globalement.
-RESTES_CONNUS = (
-    (
-        "analyse-de-l-activite.tex",
-        "spécialités médicales : 4 cardiologie, 11 dermatologie, 14 gynéco-obstétrique,",
-    ),  # noqa: E501
-    (
-        "analyse-de-l-activite.tex",
-        "20 médecine générale, 21 médecine interne, 28 ophtalmologie, 29 oto-rhino-laryngologie,",
-    ),  # noqa: E501
-    ("analyse-de-l-activite.tex", "30 pédiatrie."),
-    (
-        "recommandations.tex",
-        "l'absentéisme ambulatoire est documenté par ailleurs — une moyenne mondiale de 23,5~\\% et une",  # noqa: E501
-    ),  # noqa: E501
-    ("recommandations.tex", "fourchette de 23 à 33~\\% selon les contextes ."),
-    (
-        "recommandations.tex",
-        "sur les 6~482~185 consultations et soins d'urgence assurés chaque année par le secteur public,",  # noqa: E501
-    ),  # noqa: E501
-    (
-        "recommandations.tex",
-        "\\textbf{64~\\% sont des consultations non urgentes} et 10~\\% seulement des urgences vitales",  # noqa: E501
-    ),  # noqa: E501
-    (
-        "recommandations.tex",
-        ". Une étude conduite dans un hôpital provincial marocain mesure 30,7~\\% de consultations",
-    ),  # noqa: E501
-    (
-        "recommandations.tex",
-        "non appropriées sur 410 patients . Les deux sources concordent sur l'existence du",
-    ),  # noqa: E501
-    (
-        "recommandations.tex",
-        "données. La Cour des comptes relève \\textbf{50~876~365 dirhams de créances non recouvrées} au",  # noqa: E501
-    ),  # noqa: E501
-    (
-        "recommandations.tex",
-        ", \\textbf{57~\\% des dossiers non facturés} en , et \\textbf{3~477 consultations",
-    ),  # noqa: E501
-    (
-        "recommandations.tex",
-        "payées sur 160~659} aux urgences en . Deux problèmes distincts s'y lisent : des",
-    ),  # noqa: E501
-    ("page-de-garde.tex", "\\setstretch{1.0}"),
-)
+RESTES_CONNUS = (("page-de-garde.tex", "\\setstretch{1.0}"),)
 
 
 _COMMENTAIRE = re.compile(r"(?<!\\)%.*")

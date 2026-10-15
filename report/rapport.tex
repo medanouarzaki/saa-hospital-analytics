@@ -137,7 +137,7 @@
 % la confronte aux `\part` de ce fichier, dans les deux sens, titre exact et rattachement compris.
 \newcommand{\annoncePartie}[1]{\emph{#1}}
 
-\newcommand{\conclusion}[1]{\textbf{#1.}}
+\newcommand{\conclusion}[1]{\leavevmode\phantomsection\label{conclusion:#1}\ignorespaces}
 \newcommand{\relreprise}[4]{#1 & #2 & #3 & #4 \\}
 \newcommand{\relnonreprise}[2]{#1 & --- & \multicolumn{2}{p{0.55\linewidth}}{#2} \\}
 \newcommand{\conclusionhors}[2]{#1 & #2 \\}

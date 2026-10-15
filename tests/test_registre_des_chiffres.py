@@ -87,7 +87,7 @@ def identifiants_du_registre() -> set[str]:
 # cette liste ils cesseraient d'être vus. Aucun n'est aujourd'hui exclusif à l'annexe — le
 # décompte des identifiants couverts est identique avant et après le déplacement — mais un
 # identifiant qui le deviendrait serait signalé comme inemployé, donc rouge.
-ANNEXES = ("correspondance_relations.tex",)
+ANNEXES = ("correspondance_relations.tex", "complements_techniques.tex")
 
 # LA PORTÉE SUIT LA MATIÈRE, ET ELLE VIENT DE S'ÉTENDRE AU SUPPORT DE SOUTENANCE. Le répertoire
 # `slides/` n'était couvert par aucun de ces contrôles : une planche pouvait y écrire un nombre à

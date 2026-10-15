@@ -219,16 +219,12 @@ chiffres:
 - id: colonnes-source-catalogue
   valeur: 175
   unite: colonnes
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: select count(*) from information_schema.columns where table_schema='source'
   portee: periode-entiere
 - id: colonnes-source-catalogue-obs
   valeur: 81
   unite: colonnes
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: select count(*) from information_schema.columns c join pg_class p on p.relname=c.table_name
     join pg_namespace n on n.oid=p.relnamespace and n.nspname=c.table_schema join pg_description d on
@@ -238,8 +234,6 @@ chiffres:
 - id: colonnes-source-catalogue-doc
   valeur: 72
   unite: colonnes
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: select count(*) from information_schema.columns c join pg_class p on p.relname=c.table_name
     join pg_namespace n on n.oid=p.relnamespace and n.nspname=c.table_schema join pg_description d on
@@ -249,8 +243,6 @@ chiffres:
 - id: colonnes-source-catalogue-hyp
   valeur: 22
   unite: colonnes
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: select count(*) from information_schema.columns c join pg_class p on p.relname=c.table_name
     join pg_namespace n on n.oid=p.relnamespace and n.nspname=c.table_schema join pg_description d on
@@ -260,8 +252,6 @@ chiffres:
 - id: colonnes-aval-total
   valeur: 398
   unite: colonnes
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: select count(*) from information_schema.columns c join information_schema.tables t on t.table_schema=c.table_schema
     and t.table_name=c.table_name where c.table_schema in ('intermediate','marts')
@@ -270,8 +260,6 @@ chiffres:
 - id: colonnes-aval-decrites
   valeur: 398
   unite: colonnes
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: select count(*) from information_schema.columns c join information_schema.tables t on t.table_schema=c.table_schema
     and t.table_name=c.table_name where c.table_schema in ('intermediate','marts')
@@ -282,8 +270,6 @@ chiffres:
 - id: colonnes-intermediate
   valeur: 175
   unite: colonnes
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: select count(*) from information_schema.columns c join information_schema.tables t on t.table_schema=c.table_schema
     and t.table_name=c.table_name where c.table_schema='intermediate'
@@ -291,8 +277,6 @@ chiffres:
 - id: colonnes-marts
   valeur: 223
   unite: colonnes
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: select count(*) from information_schema.columns c join information_schema.tables t on t.table_schema=c.table_schema
     and t.table_name=c.table_name where c.table_schema='marts'
@@ -581,8 +565,6 @@ chiffres:
 - id: part-sexe-masculin
   valeur: 0.497
   unite: proportion
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: python
   commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/demographie.yml'').read_text(encoding=''utf-8''))[''parametres'']
     if p[''nom'']==''repartition_sexe''][0][''M'']'
@@ -590,8 +572,6 @@ chiffres:
 - id: part-urbain
   valeur: 0.639
   unite: proportion
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: python
   commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/demographie.yml'').read_text(encoding=''utf-8''))[''parametres'']
     if p[''nom'']==''repartition_residence''][0][''environnement''][''U'']'
@@ -599,8 +579,6 @@ chiffres:
 - id: part-sans-couverture
   valeur: 0.2
   unite: proportion
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: python
   commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/demographie.yml'').read_text(encoding=''utf-8''))[''parametres'']
     if p[''nom'']==''repartition_couverture''][0][''SANS'']'
@@ -608,8 +586,6 @@ chiffres:
 - id: part-couverture-principale
   valeur: 0.5
   unite: proportion
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: python
   commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/demographie.yml'').read_text(encoding=''utf-8''))[''parametres'']
     if p[''nom'']==''repartition_couverture''][0][''00116'']'
@@ -617,8 +593,6 @@ chiffres:
 - id: tranches-age
   valeur: 6
   unite: tranches
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: python
   commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/demographie.yml'').read_text(encoding=''utf-8''))[''parametres'']
     if p[''nom'']==''structure_age''][0][''tranches''].__len__()'
@@ -626,8 +600,6 @@ chiffres:
 - id: niveaux-tri
   valeur: 5
   unite: niveaux
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: python
   commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/urgences.yml'').read_text(encoding=''utf-8''))[''parametres'']
     if p[''nom'']==''repartition_niveaux_tri''][0].__len__()'
@@ -635,8 +607,6 @@ chiffres:
 - id: part-tri-niveau-4
   valeur: 0.41
   unite: proportion
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: python
   commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/urgences.yml'').read_text(encoding=''utf-8''))[''parametres'']
     if p[''nom'']==''repartition_niveaux_tri''][0][''4'']'
@@ -644,8 +614,6 @@ chiffres:
 - id: part-tri-niveau-5
   valeur: 0.22
   unite: proportion
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: python
   commande: '[p[''valeur''] for p in yaml.safe_load((R/''generator/config/urgences.yml'').read_text(encoding=''utf-8''))[''parametres'']
     if p[''nom'']==''repartition_niveaux_tri''][0][''5'']'
@@ -819,8 +787,6 @@ chiffres:
 - id: blocage-nom-adresse
   valeur: 2371
   unite: paires
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: select count(*) from linkage.paires_candidates where regle_blocage = 'nom_famille_adresse'
   portee: periode-entiere
@@ -829,8 +795,6 @@ chiffres:
 - id: blocage-nom-telephone
   valeur: 1843
   unite: paires
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: select count(*) from linkage.paires_candidates where regle_blocage = 'nom_famille_telephone'
   portee: periode-entiere
@@ -839,8 +803,6 @@ chiffres:
 - id: blocage-piece-identite
   valeur: 767
   unite: paires
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: select count(*) from linkage.paires_candidates where regle_blocage = 'piece_identite'
   portee: periode-entiere
@@ -849,8 +811,6 @@ chiffres:
 - id: blocage-parents-naissance
   valeur: 33
   unite: paires
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: select count(*) from linkage.paires_candidates where regle_blocage = 'parents_date_naissance'
   portee: periode-entiere
@@ -860,8 +820,6 @@ chiffres:
   valeur: 99.99928988921047
   decimales: 5
   unite: '%'
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: >-
     select 100 * (1 - count(*)::numeric / (select (count(*)::bigint*(count(*)-1)/2) from marts.dim_patient where est_courante)) from linkage.paires_candidates where regle_blocage = 'nom_famille_adresse'
@@ -872,8 +830,6 @@ chiffres:
   valeur: 99.99944802438418
   decimales: 5
   unite: '%'
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: >-
     select 100 * (1 - count(*)::numeric / (select (count(*)::bigint*(count(*)-1)/2) from marts.dim_patient where est_courante)) from linkage.paires_candidates where regle_blocage = 'nom_famille_telephone'
@@ -884,8 +840,6 @@ chiffres:
   valeur: 99.9997702847003
   decimales: 5
   unite: '%'
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: >-
     select 100 * (1 - count(*)::numeric / (select (count(*)::bigint*(count(*)-1)/2) from marts.dim_patient where est_courante)) from linkage.paires_candidates where regle_blocage = 'piece_identite'
@@ -896,8 +850,6 @@ chiffres:
   valeur: 99.99999011655164
   decimales: 5
   unite: '%'
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: >-
     select 100 * (1 - count(*)::numeric / (select (count(*)::bigint*(count(*)-1)/2) from marts.dim_patient where est_courante)) from linkage.paires_candidates where regle_blocage = 'parents_date_naissance'
@@ -908,8 +860,6 @@ chiffres:
   valeur: 99.9984983148466
   decimales: 5
   unite: '%'
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: sql
   commande: >-
     select 100 * (1 - count(*)::numeric / (select (count(*)::bigint*(count(*)-1)/2) from marts.dim_patient where est_courante)) from linkage.paires_candidates
@@ -919,8 +869,6 @@ chiffres:
 - id: rapport-accord-etat
   valeur: 1.1
   unite: proportion
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: python
   commande: >-
     float(__import__('re').search(r'colonne="etat",\s*motif="[^"]*rapport mesuré ([0-9]+,[0-9]+)', (R/'linkage/champs.py').read_text(encoding='utf-8')).group(1).replace(',', '.'))
@@ -930,8 +878,6 @@ chiffres:
 - id: rapport-accord-pays-naissance
   valeur: 1.15
   unite: proportion
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: python
   commande: >-
     float(__import__('re').search(r'colonne="pays_naissance",\s*motif="[^"]*rapport mesuré ([0-9]+,[0-9]+)', (R/'linkage/champs.py').read_text(encoding='utf-8')).group(1).replace(',', '.'))
@@ -941,8 +887,6 @@ chiffres:
 - id: rapport-accord-etat-naissance
   valeur: 1.29
   unite: proportion
-  motif_non_emploi: >-
-    Appelée par l'annexe des compléments techniques seulement, que le contrôle des appels de chiffres ne parcourt pas ; aucun chapitre ne l'appelle.
   type: python
   commande: >-
     float(__import__('re').search(r'colonne="etat_naissance",\s*motif=\(\s*"[^"]*rapport mesuré ([0-9]+,[0-9]+)', (R/'linkage/champs.py').read_text(encoding='utf-8')).group(1).replace(',', '.'))
@@ -1377,6 +1321,18 @@ chiffres:
   note: >-
     Passages programmés par jour ouvert. Dénominateur — les jours ouverts, jamais les 912 jours de
     la période.
+- id: flux-programme-moyenne-arrondi
+  valeur: 17.7
+  unite: jours (moyenne)
+  type: sql
+  commande: >-
+    select round((select round((select count(*)::float8 / count(distinct date_entree) from
+    marts.fct_passage where type_passage <> 'U')::numeric, 4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de flux-programme-moyenne arrondie à une décimale, pour l'affichage dans la prose du
+    chapitre d'analyse. La commande est celle de flux-programme-moyenne, arrondie ; la valeur en
+    précision complète reste à flux-programme-moyenne.
 - id: flux-urgences-moyenne
   valeur: 30.0
   unite: jours (moyenne)
@@ -1399,6 +1355,19 @@ chiffres:
   portee: periode-entiere
   note: >-
     Passages programmés du premier jour de la semaine, par jour de ce rang.
+- id: flux-lundi-moyenne-arrondi
+  valeur: 23.2
+  unite: jours (moyenne)
+  type: sql
+  commande: >-
+    select round((select round((select count(*)::float8 / count(distinct p.date_entree) from
+    marts.fct_passage p join marts.dim_date d on d.date_jour = p.date_entree where
+    p.type_passage <> 'U' and d.jour_semaine_iso = 1)::numeric, 4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de flux-lundi-moyenne arrondie à une décimale, pour l'affichage dans la prose du
+    chapitre d'analyse. La commande est celle de flux-lundi-moyenne, arrondie ; la valeur en
+    précision complète reste à flux-lundi-moyenne.
 - id: flux-samedi-moyenne
   valeur: 7.7165
   unite: jours (moyenne)
@@ -1410,6 +1379,19 @@ chiffres:
   portee: periode-entiere
   note: >-
     Passages programmés du sixième jour de la semaine, par jour de ce rang.
+- id: flux-samedi-moyenne-arrondi
+  valeur: 7.7
+  unite: jours (moyenne)
+  type: sql
+  commande: >-
+    select round((select round((select count(*)::float8 / count(distinct p.date_entree) from
+    marts.fct_passage p join marts.dim_date d on d.date_jour = p.date_entree where
+    p.type_passage <> 'U' and d.jour_semaine_iso = 6)::numeric, 4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de flux-samedi-moyenne arrondie à une décimale, pour l'affichage dans la prose du
+    chapitre d'analyse. La commande est celle de flux-samedi-moyenne, arrondie ; la valeur en
+    précision complète reste à flux-samedi-moyenne.
 - id: flux-dimanche-programme
   valeur: 0
   unite: passages
@@ -1499,6 +1481,22 @@ chiffres:
   portee: periode-entiere
   note: >-
     Baisse relative de l'activité programmée par jour ouvert pendant le Ramadan.
+- id: ramadan-baisse-arrondi
+  valeur: 24.0
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select round((select 100.0 * (1 - (count(*) filter (where
+    d.est_ramadan)::float8 / nullif(count(distinct p.date_entree) filter (where d.est_ramadan),
+    0)) / (count(*) filter (where not d.est_ramadan)::float8 / nullif(count(distinct
+    p.date_entree) filter (where not d.est_ramadan), 0))) from marts.fct_passage p join
+    marts.dim_date d on d.date_jour = p.date_entree where p.type_passage <> 'U')::numeric,
+    4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de ramadan-baisse arrondie à une décimale, pour l'affichage dans la prose du chapitre
+    d'analyse. La commande est celle de ramadan-baisse, arrondie ; la valeur en précision
+    complète reste à ramadan-baisse.
 - id: feries-jours
   valeur: 36
   unite: jours
@@ -1531,6 +1529,19 @@ chiffres:
   portee: periode-entiere
   note: >-
     Passages aux urgences par jour férié.
+- id: feries-urgences-moyenne-arrondi
+  valeur: 29.6
+  unite: jours (moyenne)
+  type: sql
+  commande: >-
+    select round((select round((select count(*)::float8 / count(distinct p.date_entree) from
+    marts.fct_passage p join marts.dim_date d on d.date_jour = p.date_entree where
+    p.type_passage = 'U' and d.est_ferie)::numeric, 4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de feries-urgences-moyenne arrondie à une décimale, pour l'affichage dans la prose du
+    chapitre d'analyse. La commande est celle de feries-urgences-moyenne, arrondie ; la valeur
+    en précision complète reste à feries-urgences-moyenne.
 - id: feries-urgences-hors-moyenne
   valeur: 30.0171
   unite: jours (moyenne)
@@ -1542,6 +1553,19 @@ chiffres:
   portee: periode-entiere
   note: >-
     Passages aux urgences par jour non férié — le terme de comparaison.
+- id: feries-urgences-hors-moyenne-arrondi
+  valeur: 30.0
+  unite: jours (moyenne)
+  type: sql
+  commande: >-
+    select round((select round((select count(*)::float8 / count(distinct p.date_entree) from
+    marts.fct_passage p join marts.dim_date d on d.date_jour = p.date_entree where
+    p.type_passage = 'U' and not d.est_ferie)::numeric, 4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de feries-urgences-hors-moyenne arrondie à une décimale, pour l'affichage dans la
+    prose du chapitre d'analyse. La commande est celle de feries-urgences-hors-moyenne, arrondie
+    ; la valeur en précision complète reste à feries-urgences-hors-moyenne.
 - id: honores-total
   valeur: 10280
   unite: rendez-vous
@@ -1607,6 +1631,20 @@ chiffres:
   portee: periode-entiere
   note: >-
     Dénominateur — les honorés dont la fiche est présente, soit 10 256 et non 10 280.
+- id: artefact-part-arrondi
+  valeur: 66.7
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select round((with p as (select n_ipp, min(date_attribution) as creation from
+    marts.dim_patient group by n_ipp) select 100.0 * count(*) filter (where r.date_prise =
+    p.creation) / count(*) from marts.fct_rendez_vous r join p using (n_ipp) where
+    r.est_honore)::numeric, 4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de artefact-part arrondie à une décimale, pour l'affichage dans la prose du chapitre
+    d'analyse. La commande est celle de artefact-part, arrondie ; la valeur en précision
+    complète reste à artefact-part.
 - id: complement-nombre
   valeur: 3411
   unite: rendez-vous
@@ -1651,6 +1689,18 @@ chiffres:
   portee: periode-entiere
   note: >-
     Part des rendez-vous honorés pris pour le jour même. Dénominateur — tous les honorés.
+- id: part-jour-meme-arrondi
+  valeur: 8.7
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select round((select 100.0 * count(*) filter (where est_jour_meme) / count(*)
+    from marts.fct_rendez_vous where est_honore)::numeric, 4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de part-jour-meme arrondie à une décimale, pour l'affichage dans la prose du chapitre
+    d'analyse. La commande est celle de part-jour-meme, arrondie ; la valeur en précision
+    complète reste à part-jour-meme.
 - id: rdv-en-instance
   valeur: 432
   unite: rendez-vous
@@ -1689,6 +1739,18 @@ chiffres:
   portee: periode-entiere
   note: >-
     Dénominateur — tous les rendez-vous, les quatre états compris.
+- id: taux-absenteisme-global-arrondi
+  valeur: 17.6
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select round((select 100.0 * count(*) filter (where est_absence) / count(*)
+    from marts.fct_rendez_vous)::numeric, 4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de taux-absenteisme-global arrondie à une décimale, pour l'affichage dans la prose du
+    chapitre d'analyse. La commande est celle de taux-absenteisme-global, arrondie ; la valeur
+    en précision complète reste à taux-absenteisme-global.
 - id: taux-annulation-global
   valeur: 6.7824
   unite: '%'
@@ -1699,6 +1761,18 @@ chiffres:
   portee: periode-entiere
   note: >-
     Même dénominateur que `taux-absenteisme-global`.
+- id: taux-annulation-global-arrondi
+  valeur: 6.8
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select round((select 100.0 * count(*) filter (where est_annule) / count(*)
+    from marts.fct_rendez_vous)::numeric, 4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de taux-annulation-global arrondie à une décimale, pour l'affichage dans la prose du
+    chapitre d'analyse. La commande est celle de taux-annulation-global, arrondie ; la valeur en
+    précision complète reste à taux-annulation-global.
 - id: annulations-avec-agent
   valeur: 961
   unite: rendez-vous
@@ -1736,6 +1810,23 @@ chiffres:
   note: >-
     Corrélation entre le délai médian et la part d'absences, sur les huit activités — huit points,
     jamais 11 837. C'est une comparaison ENTRE activités.
+- id: relation-inter-ensemble-arrondi
+  valeur: -0.49
+  unite: corrélation
+  type: sql
+  commande: >-
+    select round((select round((with p as (select n_ipp, min(date_attribution) as creation from
+    marts.dim_patient group by n_ipp), b as (select r.code_activite,
+    r.delai_obtention_jours::float8 as d, r.est_absence::int::float8 as a from
+    marts.fct_rendez_vous r join p using (n_ipp) where (r.est_honore or r.est_absence) and
+    r.delai_obtention_jours > 0), g as (select code_activite, percentile_cont(0.5) within group
+    (order by d) as med, avg(a) as taux from b group by 1) select corr(med, taux) from
+    g)::numeric, 4))::numeric, 2)
+  portee: periode-entiere
+  note: >-
+    Valeur de relation-inter-ensemble arrondie à deux décimales, pour l'affichage dans la prose
+    du chapitre d'analyse. La commande est celle de relation-inter-ensemble, arrondie ; la
+    valeur en précision complète reste à relation-inter-ensemble.
 - id: relation-intra-ensemble
   valeur: 0.0782
   unite: corrélation
@@ -1751,6 +1842,23 @@ chiffres:
   note: >-
     La même relation À L'INTÉRIEUR des activités, l'activité étant retirée des deux grandeurs par
     centrage. Population — 11 837 rendez-vous, jamais huit points.
+- id: relation-intra-ensemble-arrondi
+  valeur: 0.08
+  unite: corrélation
+  type: sql
+  commande: >-
+    select round((select round((with p as (select n_ipp, min(date_attribution) as creation from
+    marts.dim_patient group by n_ipp), b as (select r.code_activite,
+    r.delai_obtention_jours::float8 as d, r.est_absence::int::float8 as a from
+    marts.fct_rendez_vous r join p using (n_ipp) where (r.est_honore or r.est_absence) and
+    r.delai_obtention_jours > 0), c as (select d - avg(d) over (partition by code_activite) as
+    dc, a - avg(a) over (partition by code_activite) as ac from b) select corr(dc, ac) from
+    c)::numeric, 4))::numeric, 2)
+  portee: periode-entiere
+  note: >-
+    Valeur de relation-intra-ensemble arrondie à deux décimales, pour l'affichage dans la prose
+    du chapitre d'analyse. La commande est celle de relation-intra-ensemble, arrondie ; la
+    valeur en précision complète reste à relation-intra-ensemble.
 - id: relation-brute-ensemble
   valeur: 0.028
   unite: corrélation
@@ -1764,6 +1872,21 @@ chiffres:
   note: >-
     La même relation sans distinguer les activités. Même population que `relation-intra-ensemble`,
     et c'est le centrage seul qui les sépare.
+- id: relation-brute-ensemble-arrondi
+  valeur: 0.03
+  unite: corrélation
+  type: sql
+  commande: >-
+    select round((select round((with p as (select n_ipp, min(date_attribution) as creation from
+    marts.dim_patient group by n_ipp), b as (select r.delai_obtention_jours::float8 as d,
+    r.est_absence::int::float8 as a from marts.fct_rendez_vous r join p using (n_ipp) where
+    (r.est_honore or r.est_absence) and r.delai_obtention_jours > 0) select corr(d, a) from
+    b)::numeric, 4))::numeric, 2)
+  portee: periode-entiere
+  note: >-
+    Valeur de relation-brute-ensemble arrondie à deux décimales, pour l'affichage dans la prose
+    du chapitre d'analyse. La commande est celle de relation-brute-ensemble, arrondie ; la
+    valeur en précision complète reste à relation-brute-ensemble.
 - id: relation-inter-complement
   valeur: -0.2946
   unite: corrélation
@@ -1780,6 +1903,23 @@ chiffres:
   note: >-
     Sur le complément de l'artefact. La part d'absences y a un AUTRE dénominateur — les honorés
     d'artefact en sont retirés, les absences non — et son niveau n'est pas comparable.
+- id: relation-inter-complement-arrondi
+  valeur: -0.29
+  unite: corrélation
+  type: sql
+  commande: >-
+    select round((select round((with p as (select n_ipp, min(date_attribution) as creation from
+    marts.dim_patient group by n_ipp), b as (select r.code_activite,
+    r.delai_obtention_jours::float8 as d, r.est_absence::int::float8 as a from
+    marts.fct_rendez_vous r join p using (n_ipp) where (r.est_honore or r.est_absence) and
+    r.delai_obtention_jours > 0 and not (r.est_honore and r.date_prise = p.creation)), g as
+    (select code_activite, percentile_cont(0.5) within group (order by d) as med, avg(a) as taux
+    from b group by 1) select corr(med, taux) from g)::numeric, 4))::numeric, 2)
+  portee: periode-entiere
+  note: >-
+    Valeur de relation-inter-complement arrondie à deux décimales, pour l'affichage dans la
+    prose du chapitre d'analyse. La commande est celle de relation-inter-complement, arrondie ;
+    la valeur en précision complète reste à relation-inter-complement.
 - id: relation-intra-complement
   valeur: 0.123
   unite: corrélation
@@ -1795,6 +1935,23 @@ chiffres:
   portee: periode-entiere
   note: >-
     La relation interne sur le seul complément de l'artefact.
+- id: relation-intra-complement-arrondi
+  valeur: 0.12
+  unite: corrélation
+  type: sql
+  commande: >-
+    select round((select round((with p as (select n_ipp, min(date_attribution) as creation from
+    marts.dim_patient group by n_ipp), b as (select r.code_activite,
+    r.delai_obtention_jours::float8 as d, r.est_absence::int::float8 as a from
+    marts.fct_rendez_vous r join p using (n_ipp) where (r.est_honore or r.est_absence) and
+    r.delai_obtention_jours > 0 and not (r.est_honore and r.date_prise = p.creation)), c as
+    (select d - avg(d) over (partition by code_activite) as dc, a - avg(a) over (partition by
+    code_activite) as ac from b) select corr(dc, ac) from c)::numeric, 4))::numeric, 2)
+  portee: periode-entiere
+  note: >-
+    Valeur de relation-intra-complement arrondie à deux décimales, pour l'affichage dans la
+    prose du chapitre d'analyse. La commande est celle de relation-intra-complement, arrondie ;
+    la valeur en précision complète reste à relation-intra-complement.
 - id: relation-brute-complement
   valeur: 0.0695
   unite: corrélation
@@ -1808,6 +1965,21 @@ chiffres:
   portee: periode-entiere
   note: >-
     La relation sans distinction d'activité, sur le seul complément.
+- id: relation-brute-complement-arrondi
+  valeur: 0.07
+  unite: corrélation
+  type: sql
+  commande: >-
+    select round((select round((with p as (select n_ipp, min(date_attribution) as creation from
+    marts.dim_patient group by n_ipp), b as (select r.delai_obtention_jours::float8 as d,
+    r.est_absence::int::float8 as a from marts.fct_rendez_vous r join p using (n_ipp) where
+    (r.est_honore or r.est_absence) and r.delai_obtention_jours > 0 and not (r.est_honore and
+    r.date_prise = p.creation)) select corr(d, a) from b)::numeric, 4))::numeric, 2)
+  portee: periode-entiere
+  note: >-
+    Valeur de relation-brute-complement arrondie à deux décimales, pour l'affichage dans la
+    prose du chapitre d'analyse. La commande est celle de relation-brute-complement, arrondie ;
+    la valeur en précision complète reste à relation-brute-complement.
 - id: relation-effectif-ensemble
   valeur: 11837
   unite: rendez-vous
@@ -1856,6 +2028,19 @@ chiffres:
   note: >-
     Part des passages classés aux deux niveaux de tri dont la cible de délai est la plus longue. Le
     classement des niveaux vient des cibles de la configuration, jamais de leur numéro.
+- id: urgences-part-consultation-ordinaire-arrondi
+  valeur: 62.7
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select round((select 100.0 * count(*) filter (where niveau_tri in ('4', '5'))
+    / count(*) from marts.fct_passage_urgence)::numeric, 4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de urgences-part-consultation-ordinaire arrondie à une décimale, pour l'affichage
+    dans la prose du chapitre d'analyse. La commande est celle de
+    urgences-part-consultation-ordinaire, arrondie ; la valeur en précision complète reste à
+    urgences-part-consultation-ordinaire.
 - id: urgences-part-mode-principal
   valeur: 71.674
   unite: '%'
@@ -1867,6 +2052,18 @@ chiffres:
   note: >-
     Part du mode d'arrivée le plus fréquent. Le code s'affiche nu — aucune source du registre
     n'établit sa signification.
+- id: urgences-part-mode-principal-arrondi
+  valeur: 71.7
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select round((select 100.0 * count(*) filter (where mode_arrivee = 'MP') /
+    count(*) from marts.fct_passage_urgence)::numeric, 4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de urgences-part-mode-principal arrondie à une décimale, pour l'affichage dans la
+    prose du chapitre d'analyse. La commande est celle de urgences-part-mode-principal, arrondie
+    ; la valeur en précision complète reste à urgences-part-mode-principal.
 - id: urgences-part-retour-domicile
   valeur: 79.9159
   unite: '%'
@@ -1877,6 +2074,18 @@ chiffres:
   portee: periode-entiere
   note: >-
     Part des passages orientés vers le retour à domicile. Le libellé du code est documenté.
+- id: urgences-part-retour-domicile-arrondi
+  valeur: 79.9
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select round((select 100.0 * count(*) filter (where orientation_sortie = 'RD')
+    / count(*) from marts.fct_passage_urgence)::numeric, 4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de urgences-part-retour-domicile arrondie à une décimale, pour l'affichage dans la
+    prose du chapitre d'analyse. La commande est celle de urgences-part-retour-domicile,
+    arrondie ; la valeur en précision complète reste à urgences-part-retour-domicile.
 - id: urgences-part-hospitalisation
   valeur: 5.8808
   unite: '%'
@@ -1888,6 +2097,18 @@ chiffres:
   note: >-
     Part des passages orientés vers une hospitalisation. Dénominateur — les passages aux urgences,
     jamais les hospitalisations.
+- id: urgences-part-hospitalisation-arrondi
+  valeur: 5.9
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select round((select 100.0 * count(*) filter (where orientation_sortie = 'HO')
+    / count(*) from marts.fct_passage_urgence)::numeric, 4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de urgences-part-hospitalisation arrondie à une décimale, pour l'affichage dans la
+    prose du chapitre d'analyse. La commande est celle de urgences-part-hospitalisation,
+    arrondie ; la valeur en précision complète reste à urgences-part-hospitalisation.
 - id: urgences-part-transfert
   valeur: 12.3538
   unite: '%'
@@ -1898,6 +2119,18 @@ chiffres:
   portee: periode-entiere
   note: >-
     Part des passages orientés vers un transfert.
+- id: urgences-part-transfert-arrondi
+  valeur: 12.4
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select round((select 100.0 * count(*) filter (where orientation_sortie = 'TR')
+    / count(*) from marts.fct_passage_urgence)::numeric, 4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de urgences-part-transfert arrondie à une décimale, pour l'affichage dans la prose du
+    chapitre d'analyse. La commande est celle de urgences-part-transfert, arrondie ; la valeur
+    en précision complète reste à urgences-part-transfert.
 - id: urgences-heure-pointe
   valeur: 10
   unite: heures
@@ -1929,6 +2162,19 @@ chiffres:
   note: >-
     Rapport entre l'heure la plus chargée et la moins chargée aux urgences. À comparer au rapport de
     l'activité programmée, qui vaut l'infini — six heures y portent zéro passage.
+- id: urgences-rapport-pointe-creux-arrondi
+  valeur: 2.8
+  unite: proportion
+  type: sql
+  commande: >-
+    select round((select round((with h as (select extract(hour from date_heure_arrivee)::int as
+    heure, count(*) as n from marts.fct_passage_urgence group by 1) select max(n)::float8 /
+    min(n) from h)::numeric, 4))::numeric, 2)
+  portee: periode-entiere
+  note: >-
+    Valeur de urgences-rapport-pointe-creux arrondie à deux décimales, pour l'affichage dans la
+    prose du chapitre d'analyse. La commande est celle de urgences-rapport-pointe-creux,
+    arrondie ; la valeur en précision complète reste à urgences-rapport-pointe-creux.
 - id: source-part-non-urgentes
   valeur: 64
   unite: '%'
@@ -1953,6 +2199,136 @@ chiffres:
     Part des consultations non appropriées mesurée par S-13 sur 410 patients d'un hôpital
     provincial. Elle ne mesure PAS la même chose que `source-part-non-urgentes`, et le générateur ne
     l'applique à aucune colonne.
+- id: source-part-non-appropriees-arrondi
+  valeur: 30.7
+  unite: '%'
+  type: python
+  commande: >-
+    round([p['valeur'] for p in
+    yaml.safe_load((R/'generator/config/urgences.yml').read_text(encoding='utf-8'))['parametres']
+    if p['nom']=='part_passages_consultation_ordinaire'][0] * 100, 1)
+  portee: independant-des-donnees
+  note: >-
+    Valeur de source-part-non-appropriees exprimée en pourcentage et arrondie à une décimale,
+    pour la prose. La commande est celle de source-part-non-appropriees, multipliée par cent et
+    arrondie.
+- id: source-absenteisme-moyenne-mondiale
+  valeur: 23.5
+  unite: '%'
+  type: python
+  commande: >-
+    float([s for s in yaml.safe_load((R/'docs/sources/sources.yml').read_text(encoding='utf-8'))
+    if s['id']=='S-24'][0]['utilise_pour'].split('Moyenne mondiale de ')[1].split('
+    %')[0].replace(',', '.'))
+  portee: independant-des-donnees
+  note: >-
+    Moyenne mondiale de l'absentéisme aux rendez-vous ambulatoires, telle que la source S-24 la
+    donne.
+- id: source-absenteisme-fourchette-basse
+  valeur: 23
+  unite: '%'
+  type: python
+  commande: >-
+    int([s for s in yaml.safe_load((R/'docs/sources/sources.yml').read_text(encoding='utf-8'))
+    if s['id']=='S-24'][0]['utilise_pour'].split('fourchette ambulatoire de ')[1].split(' à
+    ')[0])
+  portee: independant-des-donnees
+  note: >-
+    Borne basse de la fourchette ambulatoire de l'absentéisme, telle que la source S-24 la
+    donne.
+- id: source-absenteisme-fourchette-haute
+  valeur: 33
+  unite: '%'
+  type: python
+  commande: >-
+    int([s for s in yaml.safe_load((R/'docs/sources/sources.yml').read_text(encoding='utf-8'))
+    if s['id']=='S-24'][0]['utilise_pour'].split('fourchette ambulatoire de ')[1].split(' à
+    ')[1].split(' %')[0])
+  portee: independant-des-donnees
+  note: >-
+    Borne haute de la fourchette ambulatoire de l'absentéisme, telle que la source S-24 la
+    donne.
+- id: source-urgences-consultations-public
+  valeur: 6482185
+  unite: consultations
+  type: python
+  commande: >-
+    int([s for s in yaml.safe_load((R/'docs/sources/sources.yml').read_text(encoding='utf-8'))
+    if s['id']=='S-12'][0]['utilise_pour'].split(' consultations et soins')[0].replace(' ', ''))
+  portee: independant-des-donnees
+  note: >-
+    Consultations et soins d'urgence assurés chaque année par le secteur public, tels que la
+    source S-12 les donne.
+- id: source-part-urgences-vitales
+  valeur: 10
+  unite: '%'
+  type: python
+  commande: >-
+    int([s for s in yaml.safe_load((R/'docs/sources/sources.yml').read_text(encoding='utf-8'))
+    if s['id']=='S-12'][0]['utilise_pour'].split('Urgences vitales ')[1].split(' %')[0])
+  portee: independant-des-donnees
+  note: >-
+    Part des urgences vitales parmi les passages aux urgences du secteur public, telle que la
+    source S-12 la donne.
+- id: source-patients-etude-provinciale
+  valeur: 410
+  unite: personnes
+  type: python
+  commande: >-
+    int([s for s in yaml.safe_load((R/'docs/sources/sources.yml').read_text(encoding='utf-8'))
+    if s['id']=='S-13'][0]['utilise_pour'].split(' sur ')[1].split(' patients')[0])
+  portee: independant-des-donnees
+  note: >-
+    Effectif de patients de l'étude conduite dans un hôpital provincial, tel que la source S-13
+    le donne.
+- id: source-creances-non-recouvrees
+  valeur: 50876365
+  unite: dirhams
+  type: python
+  commande: >-
+    int([s for s in yaml.safe_load((R/'docs/sources/sources.yml').read_text(encoding='utf-8'))
+    if s['id']=='S-20'][0]['utilise_pour'].split('Créances non recouvrées de ')[1].split('
+    dirhams')[0].replace(' ', ''))
+  portee: independant-des-donnees
+  note: >-
+    Créances non recouvrées de l'établissement relevées par la Cour des comptes, telles que la
+    source S-20 les donne.
+- id: source-part-dossiers-non-factures
+  valeur: 57
+  unite: '%'
+  type: python
+  commande: >-
+    int([s for s in yaml.safe_load((R/'docs/sources/sources.yml').read_text(encoding='utf-8'))
+    if s['id']=='S-20'][0]['utilise_pour'].split(' des dossiers non facturés')[0].split(',
+    ')[-1].split(' %')[0])
+  portee: independant-des-donnees
+  note: >-
+    Part des dossiers non facturés relevée par la Cour des comptes, telle que la source S-20 la
+    donne.
+- id: source-consultations-urgences-payees
+  valeur: 3477
+  unite: consultations
+  type: python
+  commande: >-
+    int([s for s in yaml.safe_load((R/'docs/sources/sources.yml').read_text(encoding='utf-8'))
+    if s['id']=='S-20'][0]['utilise_pour'].split(' consultations payées sur ')[0].split(',
+    ')[-1].replace(' ', ''))
+  portee: independant-des-donnees
+  note: >-
+    Consultations payées aux urgences relevées par la Cour des comptes, telles que la source
+    S-20 les donne.
+- id: source-consultations-urgences-total
+  valeur: 160659
+  unite: consultations
+  type: python
+  commande: >-
+    int([s for s in yaml.safe_load((R/'docs/sources/sources.yml').read_text(encoding='utf-8'))
+    if s['id']=='S-20'][0]['utilise_pour'].split(' consultations payées sur ')[1].split(' aux
+    urgences')[0].replace(' ', ''))
+  portee: independant-des-donnees
+  note: >-
+    Consultations aux urgences sur lesquelles la Cour des comptes compte les consultations
+    payées, telles que la source S-20 les donne.
 - id: injecte-part-deux-derniers-niveaux
   valeur: 0.63
   unite: proportion
@@ -1994,6 +2370,18 @@ chiffres:
   note: >-
     Part du montant facturé prise en charge par un organisme. Dénominateur — le montant facturé,
     jamais le nombre de factures.
+- id: facturation-part-organisme-arrondi
+  valeur: 46.1
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select round((select 100.0 * sum(part_organisme) / sum(montant_total) from
+    marts.fct_facturation)::numeric, 4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de facturation-part-organisme arrondie à une décimale, pour l'affichage dans la prose
+    du chapitre d'analyse. La commande est celle de facturation-part-organisme, arrondie ; la
+    valeur en précision complète reste à facturation-part-organisme.
 - id: facturation-part-patient
   valeur: 53.9118
   unite: '%'
@@ -2004,6 +2392,18 @@ chiffres:
   portee: periode-entiere
   note: >-
     Le complément du précédent, mesuré séparément et non déduit.
+- id: facturation-part-patient-arrondi
+  valeur: 53.9
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select round((select 100.0 * sum(part_patient) / sum(montant_total) from
+    marts.fct_facturation)::numeric, 4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de facturation-part-patient arrondie à une décimale, pour l'affichage dans la prose
+    du chapitre d'analyse. La commande est celle de facturation-part-patient, arrondie ; la
+    valeur en précision complète reste à facturation-part-patient.
 - id: encaissements-montant
   valeur: 5500289.87
   unite: dirhams
@@ -2025,6 +2425,18 @@ chiffres:
   note: >-
     Montant encaissé rapporté au montant facturé. À NE PAS CONFONDRE avec `recouvrement-taux-
     global`, qui porte sur les seules créances et vaut quatre fois moins.
+- id: taux-encaissement-arrondi
+  valeur: 84.4
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select round((select 100.0 * (select sum(montant) from marts.fct_encaissement)
+    / (select sum(montant_total) from marts.fct_facturation))::numeric, 4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de taux-encaissement arrondie à une décimale, pour l'affichage dans la prose du
+    chapitre d'analyse. La commande est celle de taux-encaissement, arrondie ; la valeur en
+    précision complète reste à taux-encaissement.
 - id: recouvrement-taux-global
   valeur: 21.57
   unite: '%'
@@ -2036,6 +2448,18 @@ chiffres:
   note: >-
     Montant recouvré rapporté au montant dû, sur les seules créances nées. Population — les
     créances, jamais les factures. Voir `taux-encaissement`, qui mesure autre chose.
+- id: recouvrement-taux-global-arrondi
+  valeur: 21.6
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select round((select 100.0 * sum(montant_recouvre) / sum(montant_du) from
+    marts.agg_recouvrement)::numeric, 4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de recouvrement-taux-global arrondie à une décimale, pour l'affichage dans la prose
+    du chapitre d'analyse. La commande est celle de recouvrement-taux-global, arrondie ; la
+    valeur en précision complète reste à recouvrement-taux-global.
 - id: recouvrement-taux-minimal
   valeur: 12.5796
   unite: '%'
@@ -2047,6 +2471,19 @@ chiffres:
   note: >-
     Le plus bas des quatre taux de recouvrement par type de débiteur. L'écart au plus haut est ce
     que le rapport commente.
+- id: recouvrement-taux-minimal-arrondi
+  valeur: 12.6
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select round((with t as (select type_debiteur, 100.0 * sum(montant_recouvre) /
+    sum(montant_du) as taux from marts.agg_recouvrement group by 1) select min(taux) from
+    t)::numeric, 4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de recouvrement-taux-minimal arrondie à une décimale, pour l'affichage dans la prose
+    du chapitre d'analyse. La commande est celle de recouvrement-taux-minimal, arrondie ; la
+    valeur en précision complète reste à recouvrement-taux-minimal.
 - id: recouvrement-taux-maximal
   valeur: 49.5462
   unite: '%'
@@ -2057,6 +2494,19 @@ chiffres:
   portee: periode-entiere
   note: >-
     Le plus haut des quatre taux de recouvrement par type de débiteur.
+- id: recouvrement-taux-maximal-arrondi
+  valeur: 49.5
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select round((with t as (select type_debiteur, 100.0 * sum(montant_recouvre) /
+    sum(montant_du) as taux from marts.agg_recouvrement group by 1) select max(taux) from
+    t)::numeric, 4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de recouvrement-taux-maximal arrondie à une décimale, pour l'affichage dans la prose
+    du chapitre d'analyse. La commande est celle de recouvrement-taux-maximal, arrondie ; la
+    valeur en précision complète reste à recouvrement-taux-maximal.
 - id: recouvrement-creances
   valeur: 5486
   unite: créances
@@ -2106,6 +2556,18 @@ chiffres:
   note: >-
     Relances ayant abouti, complètement ou partiellement, rapportées aux relances émises.
     Dénominateur — les relances, jamais les créances.
+- id: recouvrement-taux-aboutissement-arrondi
+  valeur: 38.5
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select round((select 100.0 * sum(n_relances_abouties) / sum(n_relances) from
+    marts.agg_recouvrement)::numeric, 4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de recouvrement-taux-aboutissement arrondie à une décimale, pour l'affichage dans la
+    prose du chapitre d'analyse. La commande est celle de recouvrement-taux-aboutissement,
+    arrondie ; la valeur en précision complète reste à recouvrement-taux-aboutissement.
 - id: creances-part-au-dela-un-an
   valeur: 56.2678
   unite: '%'
@@ -2123,6 +2585,22 @@ chiffres:
     décoratif : sur une fenêtre de trois mois, aucune créance n'a un an, la somme filtrée est nulle
     au sens de l'absence, et la commande rendait alors un néant là où zéro pour cent est la
     réponse juste.
+- id: creances-part-au-dela-un-an-arrondi
+  valeur: 56.3
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select round((with c as (select montant_restant, (select max(date_extraction)
+    from intermediate.int_creances) - date_naissance_creance as age, row_number() over
+    (partition by n_creance order by date_extraction desc) as rg from intermediate.int_creances)
+    select 100.0 * coalesce(sum(montant_restant) filter (where age >= 365), 0) /
+    nullif(sum(montant_restant), 0) from c where rg = 1 and montant_restant > 0)::numeric,
+    4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de creances-part-au-dela-un-an arrondie à une décimale, pour l'affichage dans la
+    prose du chapitre d'analyse. La commande est celle de creances-part-au-dela-un-an, arrondie
+    ; la valeur en précision complète reste à creances-part-au-dela-un-an.
 - id: quarantaine-lignes-total-analyse
   valeur: 106
   unite: lignes
@@ -2143,6 +2621,18 @@ chiffres:
   portee: periode-entiere
   note: >-
     Le plus haut taux de quarantaine parmi les tables de la couche intermédiaire.
+- id: qualite-taux-quarantaine-maximal-arrondi
+  valeur: 0.3
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select round((select 100.0 * max(taux_quarantaine) from
+    marts.agg_qualite_donnees)::numeric, 4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de qualite-taux-quarantaine-maximal arrondie à une décimale, pour l'affichage dans la
+    prose du chapitre d'analyse. La commande est celle de qualite-taux-quarantaine-maximal,
+    arrondie ; la valeur en précision complète reste à qualite-taux-quarantaine-maximal.
 - id: qualite-lignes-examinees
   valeur: 346149
   unite: lignes
@@ -2276,6 +2766,24 @@ chiffres:
     Corrélation entre les deux tables de paramètres elles-mêmes — délai médian et taux d'absentéisme
     par activité — calculée sur leurs huit valeurs. C'est l'amplitude injectée que `relation-inter-
     ensemble` retrouve sur les données produites.
+- id: injecte-correlation-parametres-arrondi
+  valeur: -0.49
+  unite: corrélation
+  type: python
+  commande: >-
+    round(round((lambda d, a: (lambda x, y, n: (sum(x[i]*y[i] for i in range(n))/n -
+    sum(x)/n*sum(y)/n) / ((sum(v*v for v in x)/n - (sum(x)/n)**2)**0.5 * (sum(v*v for v in y)/n
+    - (sum(y)/n)**2)**0.5))([d[k] for k in sorted(d)], [a[k] for k in sorted(d)],
+    len(d)))([p['valeur'] for p in
+    yaml.safe_load((R/'generator/config/rendez_vous.yml').read_text(encoding='utf-8'))['parametres']
+    if p['nom']=='delai_rdv_par_specialite'][0], [p['valeur'] for p in
+    yaml.safe_load((R/'generator/config/rendez_vous.yml').read_text(encoding='utf-8'))['parametres']
+    if p['nom']=='taux_absenteisme_par_specialite'][0]), 4), 2)
+  portee: independant-des-donnees
+  note: >-
+    Valeur de injecte-correlation-parametres arrondie à deux décimales, pour l'affichage dans la
+    prose du chapitre d'analyse. La commande est celle de injecte-correlation-parametres,
+    arrondie ; la valeur en précision complète reste à injecte-correlation-parametres.
 - id: jour-meme-marge-nulle
   valeur: 644
   unite: rendez-vous
@@ -2302,6 +2810,20 @@ chiffres:
   note: >-
     Part des rendez-vous du jour même qui viennent de la marge nulle et non du tirage. C'est
     l'explication de l'écart entre `injecte-part-jour-meme` et `part-jour-meme`.
+- id: jour-meme-part-marge-nulle-arrondi
+  valeur: 72.3
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select round((with p as (select n_ipp, min(date_attribution) as creation from
+    marts.dim_patient group by n_ipp) select 100.0 * count(*) filter (where r.date_rendez_vous
+    <= p.creation) / count(*) from marts.fct_rendez_vous r join p using (n_ipp) where
+    r.est_honore and r.est_jour_meme)::numeric, 4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de jour-meme-part-marge-nulle arrondie à une décimale, pour l'affichage dans la prose
+    du chapitre d'analyse. La commande est celle de jour-meme-part-marge-nulle, arrondie ; la
+    valeur en précision complète reste à jour-meme-part-marge-nulle.
 - id: doublons-part-mesuree
   valeur: 3.9878
   unite: '%'
@@ -2313,6 +2835,18 @@ chiffres:
   note: >-
     Part des personnes estimées portant deux fiches. Numérateur — les grappes de plus d'une fiche ;
     dénominateur — les grappes, c'est-à-dire les personnes, jamais les identifiants.
+- id: doublons-part-mesuree-arrondi
+  valeur: 4.0
+  unite: '%'
+  type: sql
+  commande: >-
+    select round((select round((select 100.0 * count(*) filter (where taille_grappe > 1) / 2 /
+    count(distinct grappe_id) from linkage.grappes_identite)::numeric, 4))::numeric, 1)
+  portee: periode-entiere
+  note: >-
+    Valeur de doublons-part-mesuree arrondie à une décimale, pour l'affichage dans la prose du
+    chapitre d'analyse. La commande est celle de doublons-part-mesuree, arrondie ; la valeur en
+    précision complète reste à doublons-part-mesuree.
 - id: activites-distinctes
   valeur: 8
   unite: activités
@@ -2323,6 +2857,109 @@ chiffres:
   note: >-
     Codes d'activité distincts de la dimension. C'est le nombre de points de toute grandeur donnée «
     par activité » dans ce chapitre.
+- id: code-activite-cardiologie
+  valeur: 4
+  unite: identifiants
+  type: python
+  commande: >-
+    int([a for a in [p for p in
+    yaml.safe_load((R/'generator/config/nomenclatures_organisation_activite.yml').read_text(encoding='utf-8'))['parametres']
+    if p['nom']=='nomenclature_activite'][0]['valeur'] if
+    a['libelle']=='Cardiologie'][0]['code'])
+  portee: independant-des-donnees
+  note: >-
+    Code de l'activité cardiologie dans la nomenclature nationale des spécialités médicales
+    (S-30, tableau 38), tel que le paramètre du générateur le reprend.
+- id: code-activite-dermatologie
+  valeur: 11
+  unite: identifiants
+  type: python
+  commande: >-
+    int([a for a in [p for p in
+    yaml.safe_load((R/'generator/config/nomenclatures_organisation_activite.yml').read_text(encoding='utf-8'))['parametres']
+    if p['nom']=='nomenclature_activite'][0]['valeur'] if
+    a['libelle']=='Dermatologie'][0]['code'])
+  portee: independant-des-donnees
+  note: >-
+    Code de l'activité dermatologie dans la nomenclature nationale des spécialités médicales
+    (S-30, tableau 38), tel que le paramètre du générateur le reprend.
+- id: code-activite-gyneco-obstetrique
+  valeur: 14
+  unite: identifiants
+  type: python
+  commande: >-
+    int([a for a in [p for p in
+    yaml.safe_load((R/'generator/config/nomenclatures_organisation_activite.yml').read_text(encoding='utf-8'))['parametres']
+    if p['nom']=='nomenclature_activite'][0]['valeur'] if
+    a['libelle']=='Gynécologie-obstétrique'][0]['code'])
+  portee: independant-des-donnees
+  note: >-
+    Code de l'activité gynécologie-obstétrique dans la nomenclature nationale des spécialités
+    médicales (S-30, tableau 38), tel que le paramètre du générateur le reprend.
+- id: code-activite-medecine-generale
+  valeur: 20
+  unite: identifiants
+  type: python
+  commande: >-
+    int([a for a in [p for p in
+    yaml.safe_load((R/'generator/config/nomenclatures_organisation_activite.yml').read_text(encoding='utf-8'))['parametres']
+    if p['nom']=='nomenclature_activite'][0]['valeur'] if a['libelle']=='Médecine
+    générale'][0]['code'])
+  portee: independant-des-donnees
+  note: >-
+    Code de l'activité médecine générale dans la nomenclature nationale des spécialités
+    médicales (S-30, tableau 38), tel que le paramètre du générateur le reprend.
+- id: code-activite-medecine-interne
+  valeur: 21
+  unite: identifiants
+  type: python
+  commande: >-
+    int([a for a in [p for p in
+    yaml.safe_load((R/'generator/config/nomenclatures_organisation_activite.yml').read_text(encoding='utf-8'))['parametres']
+    if p['nom']=='nomenclature_activite'][0]['valeur'] if a['libelle']=='Médecine
+    interne'][0]['code'])
+  portee: independant-des-donnees
+  note: >-
+    Code de l'activité médecine interne dans la nomenclature nationale des spécialités médicales
+    (S-30, tableau 38), tel que le paramètre du générateur le reprend.
+- id: code-activite-ophtalmologie
+  valeur: 28
+  unite: identifiants
+  type: python
+  commande: >-
+    int([a for a in [p for p in
+    yaml.safe_load((R/'generator/config/nomenclatures_organisation_activite.yml').read_text(encoding='utf-8'))['parametres']
+    if p['nom']=='nomenclature_activite'][0]['valeur'] if
+    a['libelle']=='Ophtalmologie'][0]['code'])
+  portee: independant-des-donnees
+  note: >-
+    Code de l'activité ophtalmologie dans la nomenclature nationale des spécialités médicales
+    (S-30, tableau 38), tel que le paramètre du générateur le reprend.
+- id: code-activite-oto-rhino-laryngologie
+  valeur: 29
+  unite: identifiants
+  type: python
+  commande: >-
+    int([a for a in [p for p in
+    yaml.safe_load((R/'generator/config/nomenclatures_organisation_activite.yml').read_text(encoding='utf-8'))['parametres']
+    if p['nom']=='nomenclature_activite'][0]['valeur'] if
+    a['libelle']=='Oto-rhino-laryngologie'][0]['code'])
+  portee: independant-des-donnees
+  note: >-
+    Code de l'activité oto-rhino-laryngologie dans la nomenclature nationale des spécialités
+    médicales (S-30, tableau 38), tel que le paramètre du générateur le reprend.
+- id: code-activite-pediatrie
+  valeur: 30
+  unite: identifiants
+  type: python
+  commande: >-
+    int([a for a in [p for p in
+    yaml.safe_load((R/'generator/config/nomenclatures_organisation_activite.yml').read_text(encoding='utf-8'))['parametres']
+    if p['nom']=='nomenclature_activite'][0]['valeur'] if a['libelle']=='Pédiatrie'][0]['code'])
+  portee: independant-des-donnees
+  note: >-
+    Code de l'activité pédiatrie dans la nomenclature nationale des spécialités médicales (S-30,
+    tableau 38), tel que le paramètre du générateur le reprend.
 - id: hebdo-rapport-mesure
   valeur: 3.0061
   unite: proportion
@@ -2336,6 +2973,20 @@ chiffres:
   note: >-
     Rapport mesuré entre la moyenne du premier jour de la semaine et celle du sixième, pour
     l'activité programmée. À confronter à `injecte-hebdo-rapport`.
+- id: hebdo-rapport-mesure-arrondi
+  valeur: 3.01
+  unite: proportion
+  type: sql
+  commande: >-
+    select round((select round((with j as (select d.jour_semaine_iso as rang, count(*)::float8 /
+    count(distinct p.date_entree) as moyenne from marts.fct_passage p join marts.dim_date d on
+    d.date_jour = p.date_entree where p.type_passage <> 'U' group by 1) select (select moyenne
+    from j where rang = 1) / (select moyenne from j where rang = 6))::numeric, 4))::numeric, 2)
+  portee: periode-entiere
+  note: >-
+    Valeur de hebdo-rapport-mesure arrondie à deux décimales, pour l'affichage dans la prose du
+    chapitre d'analyse. La commande est celle de hebdo-rapport-mesure, arrondie ; la valeur en
+    précision complète reste à hebdo-rapport-mesure.
 - id: delai-rapport-extremes
   valeur: 8.6
   unite: proportion
@@ -2744,6 +3395,15 @@ chiffres:
   note: >-
     Rubriques que l'établissement n'exerce pas. C'est un constat sur l'établissement, jamais un
     reproche au logiciel.
+- id: exigences-classement-mixte
+  valeur: 1
+  unite: rubriques
+  type: python
+  commande: 'len([l for l in (R/''docs/exigences_statistiques.md'').read_text(encoding=''utf-8'').split(''| indicateur | définition en une ligne |'')[1].split(chr(10)+chr(10))[0].splitlines()[2:] if l.split(''|'')[3].replace(''*'','''').strip() not in (''calculable'', ''non calculable faute de champ'', ''sans objet pour ce site'')])'
+  portee: independant-des-donnees
+  note: >-
+    Rubriques dont le classement n'est aucun des trois décomptes : la rubrique des laboratoires
+    reçoit un classement mixte. Avec les trois décomptes, elle complète le total des rubriques.
 - id: exigences-champs-manquants
   valeur: 3
   unite: familles
@@ -2782,7 +3442,7 @@ chiffres:
     Chapitres numérotés du rapport, comptés dans l'ordre des inclusions du fichier principal. Un
     chapitre non numéroté — l'introduction, la conclusion — n'y entre pas.
 - id: sections-du-rapport
-  valeur: 46
+  valeur: 45
   unite: sections
   type: python
   commande: 'sum(len([l for l in c.read_text(encoding=''utf-8'').splitlines() if l.startswith(''\\section{'')]) for c in sorted((R/''report/chapitres'').glob(''*.tex'')))'

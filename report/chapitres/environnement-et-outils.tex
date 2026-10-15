@@ -1,5 +1,8 @@
 % Ce chapitre repose sur :
-%   DOC: s22, s33, s34, s35, s36, s37, s38, s39, s40, s41, s42, s43, s44, s45, s46, s47, s48, s49, s50
+%   DOC: s22, s33, s34, s35, s36, s37
+%   DOC: s38, s39, s40, s41, s42, s43
+%   DOC: s44, s45, s46, s47, s48, s49
+%   DOC: s50
 %   OBS: (aucun)
 %   HYP: choix-composition, choix-conteneurs, choix-controles, choix-environnement-verrouille, choix-generation, choix-integration-continue, choix-langage-unique, decision-moteur-en-memoire, decision-orchestrateur, decision-rapprochement-probabiliste, decision-schema-du-tableau-de-bord, decision-serveur-de-base, decision-transformation-declarative
 %   CHI: (aucun)
@@ -17,24 +20,19 @@
 
 \chapter{Environnement et outils}\label{chap:outils}
 
-Ce chapitre nomme les outils sur lesquels la chaîne est construite, dit en quelques mots ce que
-chacun est, ce que le projet en fait, et pourquoi il a été retenu. Il ouvre la réalisation : les
-chapitres qui suivent montrent ce que ces outils produisent.
-
-Chaque brique est retenue pour un motif écrit, et non par habitude. Quand une décision du projet a
-consigné ce motif, il en est repris ; sinon, il est déclaré comme un choix posé.
+La chaîne repose sur une dizaine d'outils libres. La question traitée est celle de leur choix : ce
+que chacun est, ce que le projet en fait, et le motif qui l'a fait retenir. Un motif vient d'une
+décision consignée par le projet, ou il est déclaré comme un choix posé.
 
 \section{Les briques de la chaîne}
 
-La chaîne va du fichier déposé à l'écran du tableau de bord, et ses transformations s'écrivent en
-SQL (\emph{Structured Query Language}), le langage de requête des bases relationnelles \cite{s38}.
-Chaque étape a son outil, et le motif de
-chaque choix est la propriété que le travail doit démontrer, ou la contrainte qu'il ne faut pas
-violer (cf. tableau~\ref{tab:briques}).
+Chaque étape de la chaîne a son outil, du fichier déposé à l'écran (cf. tableau~\ref{tab:briques}).
+Les transformations s'écrivent en SQL (\emph{Structured Query Language}), le langage de requête des
+bases relationnelles \cite{s38}.
 
 {\footnotesize
 \begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.6cm}p{3.4cm}p{4.0cm}p{4.6cm}@{}}
-\caption[Les outils de la chaîne]{Les outils de la chaîne, ce que chacun est, ce que le projet en fait, et le motif de son choix}\label{tab:briques}\\
+\caption[Les outils de la chaîne]{Les outils de la chaîne et le motif de leur choix}\label{tab:briques}\\
 \toprule
 Outil & Ce qu'il est & Ce que le projet en fait & Motif du choix \\
 \midrule
@@ -43,37 +41,37 @@ Outil & Ce qu'il est & Ce que le projet en fait & Motif du choix \\
 Outil & Ce qu'il est & Ce que le projet en fait & Motif du choix \\
 \midrule
 \endhead
-Python\cite{s33} & langage de programmation généraliste & génère le jeu de données, charge les partitions, exécute le rapprochement et sert le tableau de bord & un seul langage pour toute la chaîne\convention{choix-langage-unique} \\
+Python\cite{s33} & langage de programmation & génère et charge les données, rapproche les fiches, sert le tableau de bord & un seul langage pour toute la chaîne\convention{choix-langage-unique} \\
 \addlinespace
-uv\cite{s34} & gestionnaire d'environnement et de dépendances Python & installe le même environnement sur le poste et chez l'exécuteur d'intégration continue, depuis un fichier de verrouillage & un environnement reproductible à l'identique\convention{choix-environnement-verrouille} \\
+uv\cite{s34} & gestionnaire de dépendances Python & installe le même environnement partout, depuis un fichier de verrouillage & un environnement reproductible\convention{choix-environnement-verrouille} \\
 \addlinespace
-Faker, pandas et Arrow\cite{s35, s36, s37} & bibliothèques de valeurs synthétiques, de tables en mémoire et de format colonnaire & produisent le jeu de données et l'écrivent en fichiers de valeurs séparées et en fichiers colonnaires & des valeurs plausibles sans aucune donnée réelle\convention{choix-generation} \\
+Faker, pandas et Arrow\cite{s35, s36, s37} & bibliothèques de valeurs fictives, de tables et de format colonnaire & produisent le jeu de données et l'écrivent en fichiers & des valeurs plausibles sans donnée réelle\convention{choix-generation} \\
 \addlinespace
-PostgreSQL\cite{s38} & serveur de base de données relationnelle & porte la couche source, la quarantaine, les couches intermédiaire et analytique, et l'instantané & un moteur client-serveur et non embarqué : trois services attaquent la même base par le réseau, et le chargement écrit pendant que le tableau de bord lit\convention{decision-serveur-de-base} \\
+PostgreSQL\cite{s38} & serveur de base de données relationnelle & porte toutes les couches et l'instantané & plusieurs services partagent la base, et le chargement écrit pendant la lecture\convention{decision-serveur-de-base} \\
 \addlinespace
-dbt\cite{s39} & outil de transformation déclaratif en SQL & type et normalise la couche intermédiaire, modélise le schéma en étoile, teste chaque couche & matérialisation en vues, configuration de connexion hors dépôt, macros de conversion adossées aux formats mesurés\convention{decision-transformation-declarative} \\
+dbt\cite{s39} & outil de transformation en SQL & type, modélise et teste chaque couche & des transformations écrites en SQL, testées couche par couche\convention{decision-transformation-declarative} \\
 \addlinespace
-Splink\cite{s22} & bibliothèque de rapprochement probabiliste d'enregistrements & estime le modèle de Fellegi-Sunter et prédit les paires de fiches qui désignent la même personne & un modèle de vraisemblance estimé sur les données, plutôt qu'une collision exacte qui ne retrouve que l'identique\convention{decision-rapprochement-probabiliste} \\
+Splink\cite{s22} & bibliothèque de rapprochement probabiliste & prédit les paires de fiches d'une même personne & un modèle estimé sur les données retrouve aussi les fiches qui diffèrent\convention{decision-rapprochement-probabiliste} \\
 \addlinespace
-DuckDB\cite{s40} & moteur de base de données en mémoire & exécute les calculs du rapprochement & le rapprochement écrit des tables intermédiaires nombreuses ; les tenir hors du serveur évite d'y laisser des résidus\convention{decision-moteur-en-memoire} \\
+DuckDB\cite{s40} & moteur de base de données en mémoire & exécute les calculs du rapprochement & ses tables de travail restent hors du serveur\convention{decision-moteur-en-memoire} \\
 \addlinespace
-Apache Airflow\cite{s41} & orchestrateur de graphes de tâches & déclenche chaque jour les tâches de la chaîne dans l'ordre de leurs dépendances & le conteneur ordonnance sans exécuter : les tâches sont des commandes qui s'exécutent dans l'environnement du projet\convention{decision-orchestrateur} \\
+Apache Airflow\cite{s41} & orchestrateur de tâches & lance chaque jour les tâches dans l'ordre de leurs dépendances & les tâches s'exécutent dans l'environnement du projet\convention{decision-orchestrateur} \\
 \addlinespace
-Streamlit\cite{s42} & bibliothèque d'application web analytique & sert les pages du tableau de bord & un service qui lit un schéma dédié, rafraîchi par échange de noms en une transaction\convention{decision-schema-du-tableau-de-bord} \\
+Streamlit\cite{s42} & bibliothèque d'application web & sert les pages du tableau de bord & un schéma dédié, remplacé en une transaction\convention{decision-schema-du-tableau-de-bord} \\
 \addlinespace
-Docker Compose\cite{s43} & outil de composition de conteneurs & démarre la base, l'orchestrateur et le tableau de bord avec la même configuration partout & une base identique sur le poste et chez l'exécuteur d'intégration continue\convention{choix-conteneurs} \\
+Docker Compose\cite{s43} & outil de composition de conteneurs & démarre la base, l'orchestrateur et le tableau de bord & la même base sur le poste et en intégration continue\convention{choix-conteneurs} \\
 \bottomrule
 \end{longtable}
 }
 
-Le motif d'un choix n'est presque jamais la performance. Le serveur relationnel en est l'exemple le
-plus net : un moteur embarqué aurait produit les mêmes tables plus vite, et le choix tient aux
-propriétés que la chaîne exerce réellement, que la section~\ref{sec:choix-serveur} détaille.
+Le serveur relationnel montre le genre de motif retenu. Un moteur embarqué aurait produit les mêmes
+tables plus vite, mais la chaîne a besoin que plusieurs services partagent la base par le réseau
+(section~\ref{sec:choix-serveur}).
 
 \section{Les outils de qualité et de composition}
 
-Trois autres familles d'outils ne transforment aucune donnée : elles vérifient la chaîne et
-composent ce document (cf. tableau~\ref{tab:outils-qualite}).
+D'autres outils contrôlent la chaîne et composent les documents (cf.
+tableau~\ref{tab:outils-qualite}).
 
 {\footnotesize
 \begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.6cm}p{3.4cm}p{4.0cm}p{4.6cm}@{}}
@@ -86,14 +84,17 @@ Outils & Ce qu'ils sont & Ce que le projet en fait & Motif du choix \\
 Outils & Ce qu'ils sont & Ce que le projet en fait & Motif du choix \\
 \midrule
 \endhead
-pytest, Ruff et SQLFluff\cite{s44, s45, s46} & cadre de contrôles automatisés, et analyseurs statiques du code Python et du SQL & exécutent les contrôles du dépôt et bloquent tout écart de forme du code & un défaut qui fait échouer un contrôle avant la publication plutôt qu'après\convention{choix-controles} \\
+pytest, Ruff et SQLFluff\cite{s44, s45, s46} & cadre de contrôles, analyseurs du code Python et du SQL & exécutent les contrôles et bloquent les écarts de forme & un défaut arrêté avant la publication\convention{choix-controles} \\
 \addlinespace
-GitHub Actions\cite{s47} & service d'intégration continue & rejoue les contrôles à chaque publication et compose le rapport et la présentation & une vérification sur un clone frais, hors du poste de travail\convention{choix-integration-continue} \\
+GitHub Actions\cite{s47} & service d'intégration continue & rejoue les contrôles et compose le rapport & une vérification hors du poste de travail\convention{choix-integration-continue} \\
 \addlinespace
-LaTeX, biblatex et pgfplots\cite{s48, s49, s50} & système de composition, gestion bibliographique et graphiques composés & composent ce rapport, sa bibliographie et ses graphiques depuis les fichiers de données du registre des chiffres & un document recomposé à l'identique depuis ses sources\convention{choix-composition} \\
+LaTeX, biblatex et pgfplots\cite{s48, s49, s50} & composition, bibliographie et graphiques & composent le rapport et ses graphiques depuis les données du registre & un document recomposé à l'identique\convention{choix-composition} \\
 \bottomrule
 \end{longtable}
 }
 
-Chaque choix est consigné avec ce qui l'aurait invalidé. Un choix qu'on ne sait pas décrire comme
-réfutable n'est pas un choix, c'est une préférence.
+\section*{Synthèse}
+
+La chaîne tient en un langage, une base relationnelle et quelques outils libres, installés à
+l'identique partout. Chaque outil a été retenu pour une propriété que la chaîne exerce, et son
+motif est consigné. Le chapitre~\ref{chap:activite} analyse l'activité que cette chaîne mesure.
