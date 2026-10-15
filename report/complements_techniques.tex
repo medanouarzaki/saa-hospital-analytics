@@ -9,190 +9,43 @@
 %
 % Ce fichier repose sur :
 %   DOC: s22, s27, s30
-%   OBS: REL-PAT.A01, REL-PAT.A03, REL-PAT.D01, REL-PAT.D02, REL-PAT.D03, REL-PAT.D05,
-%   OBS: REL-PAT.D06, REL-PAT.D09, REL-PAT.D10, REL-PAT.D11, REL-PAT.H05, REL-PAT.H07,
-%   OBS: REL-PAT.H12, REL-RDV.C01, REL-RDV.C02, REL-RDV.C05, REL-RDV.C07, REL-RDV.C08,
-%   OBS: REL-RDV.R01, REL-RDV.R02, REL-RDV.R03, REL-RDV.R08, REL-RDV.R10, REL-RDV.R11,
-%   OBS: REL-RDV.R12
+%   OBS: (aucun)
 %   HYP: (aucun)
-%   CHI: artefact-part, blocage-nom-adresse, blocage-nom-telephone, blocage-parents-naissance, blocage-piece-identite, blocage-reduction-nom-adresse
-%   CHI: blocage-reduction-nom-telephone, blocage-reduction-parents-naissance, blocage-reduction-piece-identite, blocage-reduction-union, colonnes-aval-decrites, colonnes-aval-total
-%   CHI: colonnes-intermediate, colonnes-marts, colonnes-source-catalogue, colonnes-source-catalogue-doc, colonnes-source-catalogue-hyp, colonnes-source-catalogue-obs
-%   CHI: colonnes-source-doc, colonnes-source-hyp, colonnes-source-obs, colonnes-source-registre, comparaisons-modele, creances-part-au-dela-un-an
-%   CHI: doublons-part-mesuree, facturation-part-organisme, facturation-part-patient, feries-urgences-hors-moyenne, feries-urgences-moyenne, flux-lundi-moyenne
-%   CHI: flux-programme-moyenne, flux-samedi-moyenne, hebdo-rapport-mesure, injecte-correlation-parametres, instantane-duree-rafraichissement, instantane-erreurs-completude
-%   CHI: instantane-erreurs-dimension, instantane-fenetre-completude, instantane-fenetre-dimension, instantane-lectures-temoin, instantane-lignes, instantane-objets-copies
-%   CHI: instantane-rapport-cout-lecture, instantane-rapport-hors-completude, instantane-tables, instantane-volume, jour-meme-part-marge-nulle, niveaux-tri
-%   CHI: paires-candidates, paires-possibles, part-couverture-principale, part-jour-meme, part-sans-couverture, part-sejours-depuis-urgences
-%   CHI: part-sexe-masculin, part-tri-niveau-4, part-tri-niveau-5, part-urbain, qualite-taux-quarantaine-maximal, ramadan-baisse
-%   CHI: ramadan-hors-moyenne, ramadan-programme-moyenne, rapport-accord-etat, rapport-accord-etat-naissance, rapport-accord-pays-naissance, recouvrement-taux-aboutissement
-%   CHI: recouvrement-taux-global, recouvrement-taux-maximal, recouvrement-taux-minimal, relation-brute-complement, relation-brute-ensemble, relation-inter-complement
-%   CHI: relation-inter-ensemble, relation-intra-complement, relation-intra-ensemble, source-part-non-appropriees, taches-graphe, taux-absenteisme-global
-%   CHI: taux-annulation-global, taux-encaissement, tdb-erreurs-lecture-tolerees, tranches-age, urgences-part-consultation-ordinaire, urgences-part-hospitalisation
-%   CHI: urgences-part-mode-principal, urgences-part-retour-domicile, urgences-part-transfert, urgences-rapport-pointe-creux
-%   SER: facturation-par-type, instantane-objets, qualite-par-table
+%   CHI: artefact-part, creances-part-au-dela-un-an, doublons-part-mesuree, facturation-part-organisme, facturation-part-patient, feries-urgences-hors-moyenne
+%   CHI: feries-urgences-moyenne, flux-lundi-moyenne, flux-programme-moyenne, flux-samedi-moyenne, hebdo-rapport-mesure, injecte-correlation-parametres
+%   CHI: jour-meme-part-marge-nulle, part-jour-meme, qualite-taux-quarantaine-maximal, ramadan-baisse, ramadan-hors-moyenne, ramadan-programme-moyenne
+%   CHI: recouvrement-taux-aboutissement, recouvrement-taux-global, recouvrement-taux-maximal, recouvrement-taux-minimal, relation-brute-complement, relation-brute-ensemble
+%   CHI: relation-inter-complement, relation-inter-ensemble, relation-intra-complement, relation-intra-ensemble, source-part-non-appropriees, taches-graphe
+%   CHI: taux-absenteisme-global, taux-annulation-global, taux-encaissement, urgences-part-consultation-ordinaire, urgences-part-hospitalisation, urgences-part-mode-principal
+%   CHI: urgences-part-retour-domicile, urgences-part-transfert, urgences-rapport-pointe-creux
+%   SER: facturation-par-type, qualite-par-table
 %   SECTIONS: 9
 
 \chapitreDAnnexe{Compléments techniques}\label{annexe:complements}
 
 \section{La provenance des colonnes}\label{sec:complements-provenance}
 
-Chaque colonne de la couche source est rattachée à ce qui l'établit. Le
-tableau~\ref{tab:correspondance-champs} donne sa correspondance avec les écrans pour deux tables. Le
-dictionnaire complet la porte pour toutes les tables, et l'annexe~\ref{annexe:dictionnaire} en donne
-la synthèse. La colonne « Preuve » porte l'identifiant du relevé, celui que le registre des champs
-référence.
-
-% SÉCABLE : en `tabular`, le tableau partait d'un seul bloc à la page suivante dès qu'il ne tenait
-% pas sur la fin de la page courante, et laissait une page presque blanche. En `longtable`, il
-% commence où il se trouve et répète sa ligne d'intitulés en tête de chaque page qu'il occupe.
-%
-% Les largeurs sont MESURÉES sur le rendu, non estimées : `type_piece_identite` occupe 4,18 cm en
-% chasse fixe et surimprimait la colonne suivante, et l'intitulé « Provenance » en occupe 2,06. La
-% somme des cinq colonnes vaut 12,9 cm.
-\begin{longtable}{@{}p{2.6cm}p{4.3cm}p{1.0cm}p{2.1cm}p{2.9cm}@{}}
-\caption[Correspondance entre libellé d'écran, colonne et preuve d'observation]{Correspondance entre libellé d'écran, colonne et preuve d'observation, pour deux tables}\label{tab:correspondance-champs}\\
-\toprule
-Libellé relevé & Colonne & Type & Provenance & Preuve \\
-\midrule
-\endfirsthead
-\toprule
-Libellé relevé & Colonne & Type & Provenance & Preuve \\
-\midrule
-\endhead
-\multicolumn{5}{@{}l}{\textbf{\texttt{patients}} — extraits}\\
-N° IPP & \texttt{n\_ipp} & texte & \texttt{OBS} & \texttt{REL-PAT.D01} \\
-Nom & \texttt{nom} & texte & \texttt{OBS} & \texttt{REL-PAT.D02} \\
-Nom de famille 1 & \texttt{nom\_famille\_1} & texte & \texttt{OBS} & \texttt{REL-PAT.D03} \\
-Sexe & \texttt{sexe} & texte & \texttt{OBS} & \texttt{REL-PAT.D05} \\
-D. Nai & \texttt{date\_naissance} & texte & \texttt{OBS} & \texttt{REL-PAT.D06} \\
-Type pièce d'identité & \texttt{type\_piece\_identite} & texte & \texttt{OBS} & \texttt{REL-PAT.D09} \\
-N° pièce d'identité & \texttt{n\_piece\_identite} & texte & \texttt{OBS} & \texttt{REL-PAT.D10} \\
-E. Civil & \texttt{etat\_civil} & texte & \texttt{OBS} & \texttt{REL-PAT.D11} \\
-Compagnie d'assur. & \texttt{compagnie\_assurance} & texte & \texttt{OBS} & \texttt{REL-PAT.A01} \\
-N° Assu & \texttt{n\_assure} & texte & \texttt{OBS} & \texttt{REL-PAT.A03} \\
-Ville & \texttt{ville} & texte & \texttt{OBS} & \texttt{REL-PAT.H05} \\
-Nationalité & \texttt{nationalite} & texte & \texttt{OBS} & \texttt{REL-PAT.H07} \\
-Avertissements SMS & \texttt{avertissements\_sms} & texte & \texttt{OBS} & \texttt{REL-PAT.H12} \\
-\addlinespace
-\multicolumn{5}{@{}l}{\textbf{\texttt{rendez\_vous}} — extraits}\\
-Agenda & \texttt{agenda} & texte & \texttt{OBS} & \texttt{REL-RDV.R01} \\
-Activité & \texttt{activite} & texte & \texttt{OBS} & \texttt{REL-RDV.R02} \\
-Origine & \texttt{origine} & texte & \texttt{OBS} & \texttt{REL-RDV.R03} \\
-Date rendez-vous & \texttt{date\_heure\_rdv} & texte & \texttt{OBS} & \texttt{REL-RDV.R08} \\
-Type d'attention & \texttt{type\_attention} & texte & \texttt{OBS} & \texttt{REL-RDV.R10} \\
-État & \texttt{etat} & texte & \texttt{OBS} & \texttt{REL-RDV.R11} \\
-Durée & \texttt{duree} & texte & \texttt{OBS} & \texttt{REL-RDV.R12} \\
-Créé par & \texttt{cree\_par} & texte & \texttt{OBS} & \texttt{REL-RDV.C01} \\
-Date création & \texttt{date\_creation} & texte & \texttt{OBS} & \texttt{REL-RDV.C02} \\
-Confirmé par & \texttt{confirme\_par} & texte & \texttt{OBS} & \texttt{REL-RDV.C05} \\
-Annulé par & \texttt{annule\_par} & texte & \texttt{OBS} & \texttt{REL-RDV.C07} \\
-Date annul. & \texttt{date\_annulation} & texte & \texttt{OBS} & \texttt{REL-RDV.C08} \\
-\bottomrule
-\end{longtable}
-
-Le registre des champs porte \chiffre{colonnes-source-registre} entrées, et le catalogue de la base
-compte exactement \chiffre{colonnes-source-catalogue} colonnes au schéma source. Un contrôle bloquant
-vérifie la correspondance dans les deux sens, et le décompte par étiquette se lit des deux côtés
-(voir tableau~\ref{tab:provenance-colonnes}). Les couches intermédiaire et analytique comptent ensemble \chiffre{colonnes-aval-total} colonnes,
-\chiffre{colonnes-intermediate} et \chiffre{colonnes-marts}, et aucune ne porte d'étiquette de
-provenance. Une colonne calculée a pour provenance sa formule, écrite dans le modèle qui la produit.
-Ces \chiffre{colonnes-aval-decrites} colonnes sont toutes décrites dans les fichiers de propriétés de
-l'outil de transformation.
-
-\begin{table}[htbp]
-\centering
-\caption{Provenance des colonnes de la couche source, comptée au registre et au catalogue de la base}\label{tab:provenance-colonnes}
-\begin{tabular}{@{}p{2.2cm}rrp{6.4cm}@{}}
-\toprule
-Étiquette & Registre & Catalogue & Ce qu'elle signifie \\
-\midrule
-\texttt{OBS} & \chiffre{colonnes-source-obs} & \chiffre{colonnes-source-catalogue-obs} & le champ a été vu à l'écran, et son libellé est reproduit \\
-\texttt{DOC} & \chiffre{colonnes-source-doc} & \chiffre{colonnes-source-catalogue-doc} & le champ est déduit d'une source documentaire \\
-\texttt{HYP} & \chiffre{colonnes-source-hyp} & \chiffre{colonnes-source-catalogue-hyp} & le champ est posé, et l'absence de preuve est écrite \\
-\midrule
-\textbf{Total} & \textbf{\chiffre{colonnes-source-registre}} & \textbf{\chiffre{colonnes-source-catalogue}} & \\
-\bottomrule
-\end{tabular}
-\end{table}
+Chaque colonne de la couche source est rattachée à ce qui l'établit : un écran observé, une source
+documentaire ou une convention posée. Le dictionnaire de données donne cette correspondance
+colonne par colonne, avec la preuve de chacune, sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/main/docs/champs/dictionnaire_donnees.md}.
 
 \section{Les distributions du générateur}\label{sec:complements-distributions}
 
-Le tableau~\ref{tab:distributions} donne chaque distribution du générateur, sa valeur ou sa forme,
-son étiquette et ce qui l'étaye. La structure par âge et la répartition par sexe sont des
-conventions posées : une conclusion tirée de la pyramide des âges ne dirait rien de la population
-réelle.
-
-% SÉCABLE POUR LA MÊME RAISON QUE LE TABLEAU DE CORRESPONDANCE : rendu insécable, il partait d'un
-% bloc et laissait une demi-page blanche.
-\begin{longtable}{@{}p{4.6cm}p{4.4cm}p{1.7cm}p{2.6cm}@{}}
-\caption[Les distributions du générateur]{Les distributions du générateur et l'étiquette de provenance de chacune}\label{tab:distributions}\\
-\toprule
-Distribution & Valeur ou forme & Étiquette & Ce qui l'étaye \\
-\midrule
-\endfirsthead
-\toprule
-Distribution & Valeur ou forme & Étiquette & Ce qui l'étaye \\
-\midrule
-\endhead
-Structure par âge & \chiffre{tranches-age} tranches & \texttt{HYP} & convention posée \\
-Répartition par sexe & \chiffre{part-sexe-masculin} d'hommes & \texttt{HYP} & convention posée \\
-Environnement de résidence & \chiffre{part-urbain} en milieu urbain & \texttt{HYP} & mesure régionale \cite{s30} \\
-Couverture principale & \chiffre{part-couverture-principale} & \texttt{HYP} & répartition nationale des régimes \\
-Absence de couverture & \chiffre{part-sans-couverture} & \texttt{HYP} & convention posée \\
-Niveaux de tri aux urgences & \chiffre{niveaux-tri} niveaux & \texttt{DOC} & échelle de tri publiée \\
-Part du niveau de tri 4 & \chiffre{part-tri-niveau-4} & \texttt{DOC} & échelle de tri publiée \\
-Part du niveau de tri 5 & \chiffre{part-tri-niveau-5} & \texttt{DOC} & échelle de tri publiée \\
-Séjours provenant des urgences & \chiffre{part-sejours-depuis-urgences} & \texttt{HYP} & convention posée \\
-\bottomrule
-\end{longtable}
+Chaque distribution du générateur porte sa valeur, son étiquette de provenance et ce qui l'étaye.
+Les distributions de la population sont posées sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/main/generator/config/demographie.yml}, celles
+des urgences sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/main/generator/config/urgences.yml}.
 
 \section{L'absence d'activité chirurgicale}\label{sec:complements-chirurgie}
 
-Trois vérifications fondent la lecture du recueil statistique \cite{s30}. Le nom de
-l'établissement, cherché sans égard à la casse dans le texte intégral des deux éditions, ne figure
-nulle part dans l'emprise du tableau des interventions. La somme des lignes visibles de la section
-provinciale égale exactement le total imprimé, ce qui exclut un établissement non listé. Ces
-tableaux recensent enfin une activité, et non un parc d'établissements : y être absent signifie ne
-pas l'exercer.
+Le recueil statistique ne porte aucune intervention chirurgicale pour l'établissement, et trois
+vérifications excluent une absence due à la recherche ou à l'agrégation \cite{s30}. Elles sont
+consignées sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/main/docs/decisions/0003-volumetrie.md}.
 
 \section{Les outils de la chaîne}\label{sec:complements-pile}
 
-La figure~\ref{fig:pile-technique} donne chaque brique de la pile, son rôle et la couche à laquelle
-elle appartient.
-
-\begin{figure}[htbp]
-\centering
-\begin{tikzpicture}[x=1mm, y=1mm]
-
-\node[coucheUML, anchor=east] at (-4,0)   {restitution};
-\node[coucheUML, anchor=east] at (-4,-20) {ordonnancement};
-\node[coucheUML, anchor=east] at (-4,-40) {identités};
-\node[coucheUML, anchor=east] at (-4,-60) {modélisation};
-\node[coucheUML, anchor=east] at (-4,-80) {persistance};
-
-\node[briqueUML, text width=52mm] (res) at (26,0)   {Bibliothèque d'application web analytique\\[1pt]\emph{lire, filtrer, afficher}};
-\node[briqueUML, text width=52mm] (ord) at (26,-20) {Orchestrateur de graphes de tâches\\[1pt]\emph{déclencher dans l'ordre}};
-\node[briqueUML, text width=52mm] (rap) at (26,-40) {Bibliothèque de rapprochement probabiliste\\[1pt]\emph{estimer, apparier, regrouper}};
-\node[briqueUML, text width=52mm] (mod) at (26,-60) {Outil de transformation déclaratif\\[1pt]\emph{typer, modéliser, tester}};
-\node[briqueUML, text width=52mm] (per) at (26,-80) {Serveur de base de données relationnelle\\[1pt]\emph{stocker, servir, transiger}};
-
-\node[briqueOptUML, text width=44mm] (sch) at (96,-60) {Schéma en étoile\\[1pt]\emph{faits, dimensions, agrégats}};
-\node[briqueOptUML, text width=44mm] (mem) at (96,-40) {Moteur en mémoire\\[1pt]\emph{calculer hors du serveur}};
-
-\draw[fluxUML] (per) -- (mod);
-\draw[fluxUML] (mod) -- (rap);
-\draw[fluxUML] (rap) -- (ord);
-\draw[fluxUML] (ord) -- (res);
-\draw[fluxUML] (sch.west) -- (mod.east);
-\draw[fluxUML] (mem.west) -- (rap.east);
-\end{tikzpicture}
-\caption{La pile technique, couche par couche}\label{fig:pile-technique}
-\end{figure}
-
-Chaque brique porte sa désignation fonctionnelle et son rôle en trois verbes, et le
-chapitre~\ref{chap:outils} nomme l'outil qui l'incarne. Les flèches pleines montent d'une couche à
-la suivante. Les deux briques en pointillé sont des choix internes à la couche qu'elles rejoignent.
+La chaîne empile cinq couches, de la persistance à la restitution, et chaque couche a sa brique.
+La désignation de chaque brique et l'outil qui l'incarne sont consignés sous
+\url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/main/docs/decisions/0099-trois-parties-et-les-outils-nommes.md}.
 
 \section{La couche analytique et l'orchestration}\label{sec:complements-analytique}
 
@@ -266,56 +119,10 @@ suivants, dans l'ordre de la figure~\ref{fig:sequence-quotidienne} :
 
 \section{Le modèle de rapprochement}\label{sec:complements-modele}
 
-Deux probabilités donnent son poids à chaque champ, et leur rapport fait le poids selon la formule
-de la littérature \cite{s22}. La première est celle d'observer un accord quand les deux fiches
-désignent la même personne. Elle mesure la fiabilité du champ : un téléphone change, une date de
-naissance est stable. La seconde est celle d'observer un accord entre deux personnes différentes,
-et elle mesure le hasard : deux personnes partagent souvent une ville, rarement une date de
-naissance.
-
-Un désaccord porte aussi de l'information. Sur un champ stable, il retire beaucoup de poids, et sur
-un champ instable il en retire peu. L'addition des poids suppose les champs indépendants une fois
-l'état de la paire connu.
-
-Ils ne le sont pas, car une adresse et une ville sont liées, comme un nom
-de père et un nom de famille. Les poids extrêmes sont donc surestimés, et les probabilités
-affichées plus tranchées que la réalité. Le classement des paires n'en souffre pas, et c'est ce dont
-le seuil a besoin, mais une probabilité isolée ne se lit pas comme une chance.
-
-Le tableau~\ref{tab:regles-blocage} donne les quatre règles de blocage et les paires que chacune
-produit. La réduction y est rapportée aux \chiffre{paires-possibles} paires possibles.
-
-\begin{table}[htbp]
-\centering
-\caption{Les règles de blocage, les paires que chacune produit et la réduction qu'elle opère}\label{tab:regles-blocage}
-\begin{tabular}{@{}p{6.6cm}rr@{}}
-\toprule
-Règle de blocage & Paires & Réduction \\
-\midrule
-premier nom de famille \emph{et} adresse & \chiffre{blocage-nom-adresse} & \chiffre{blocage-reduction-nom-adresse}~\% \\
-premier nom de famille \emph{et} téléphone & \chiffre{blocage-nom-telephone} & \chiffre{blocage-reduction-nom-telephone}~\% \\
-type \emph{et} numéro de pièce d'identité & \chiffre{blocage-piece-identite} & \chiffre{blocage-reduction-piece-identite}~\% \\
-nom du père \emph{et} nom de la mère \emph{et} date de naissance & \chiffre{blocage-parents-naissance} & \chiffre{blocage-reduction-parents-naissance}~\% \\
-\midrule
-\textbf{Union des quatre} & \textbf{\chiffre{paires-candidates}} & \textbf{\chiffre{blocage-reduction-union}~\%} \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Treize colonnes sont comparées sous \chiffre{comparaisons-modele} comparaisons, car les deux
-colonnes de nom de famille se traitent ensemble. Les champs de texte utilisent une distance de
-Jaro-Winkler à deux seuils successifs. La date de naissance passe par l'égalité exacte, puis par un
-écart en nombre de jours, puis par une distance de chaîne, puis par le niveau par défaut. L'ordre
-des deux niveaux intermédiaires a été fixé par la mesure : un écart en jours sépare nettement mieux
-les paires qu'une distance de chaîne.
-
-Neuf colonnes sont écartées, chacune pour un motif mesuré. Pour certaines, un accord n'apprend
-presque rien, car le rapport entre la probabilité d'accord chez les vrais couples et chez les faux vaut
-\chiffre{rapport-accord-etat} pour l'état, \chiffre{rapport-accord-pays-naissance} pour le pays de
-naissance et \chiffre{rapport-accord-etat-naissance} pour l'état de naissance. D'autres colonnes sont des
-copies d'une autre colonne faites par le programme, égales ligne à ligne sur toute la population.
-L'état de naissance copie ainsi l'état, et la ville de naissance copie la ville. Les comparer compterait
-deux fois le même accord.
+Le modèle de rapprochement pèse chaque champ par le rapport de deux probabilités d'accord
+\cite{s22}, et quatre règles de blocage limitent les paires comparées. Les règles sont écrites
+sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/main/linkage/blocage.py}, les comparaisons et les colonnes écartées
+sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/main/linkage/champs.py}.
 
 \section{Deux tableaux de l'analyse de l'activité}\label{sec:complements-analyse}
 
@@ -444,52 +251,6 @@ Consultations non appropriées dans l'étude provinciale, en proportion & \chiff
 
 \section{Le motif de l'instantané du tableau de bord}\label{sec:complements-instantane}
 
-Le tableau de bord lit un schéma de tables figées parce qu'un lecteur voyait une erreur pendant la
-reconstruction, et non pour le coût des lectures. Ce coût a été mesuré : lire les indicateurs de
-toutes les pages contre les vues coûte \chiffre{instantane-rapport-cout-lecture} fois ce qu'il coûte
-contre des tables copiées. Ce rapport moyen est porté par une minorité d'indicateurs. Sans la page
-la plus coûteuse, il tombe à \chiffre{instantane-rapport-hors-completude}, un gain trop inégal pour
-justifier un schéma de plus à maintenir.
-
-Un lecteur concurrent a lu en boucle pendant une reconstruction complète. Il a compté
-\chiffre{instantane-erreurs-dimension} lectures en erreur sur \chiffre{instantane-lectures-temoin}
-tentatives contre une dimension simple, et \chiffre{instantane-erreurs-completude} contre la vue la
-plus coûteuse à produire. Le message disait que l'objet n'existait plus, pendant
-\chiffre{instantane-fenetre-dimension} seconde dans le premier cas et
-\chiffre{instantane-fenetre-completude} dans le second.
-
-Le critère retenu traite différemment les deux échecs. Le nombre d'échecs de lecture tolérés est de
-\chiffre{tdb-erreurs-lecture-tolerees}, sous toute charge, parce qu'un utilisateur les subit sans
-recours. Un échec de remplacement est journalisé et relançable. La transaction qui l'enveloppe
-laisse alors l'instantané dans sa génération précédente, complète.
-
-Les objets que les pages lisent se rangent par effectif (voir figure~\ref{fig:objets-instantane}).
-
-\begin{figure}[htbp]
-\centering
-\begin{tikzpicture}
-\begin{axis}[
-  width=11cm, height=4.6cm, ymode=log,
-  xlabel={objets copiés, rangés par effectif décroissant},
-  ylabel={lignes copiées},
-  xmin=0, xmax=25,
-  grid=major, grid style={gray!25},
-  every axis plot/.append style={thick},
-]
-\addplot[color=black, mark=*, mark size=1.2pt] table[x=rang, y=lignes, col sep=comma]
-  {\serie{instantane-objets}};
-\end{axis}
-\end{tikzpicture}
-\caption{Les objets que le tableau de bord lit, par effectif}\label{fig:objets-instantane}
-\end{figure}
-
-La figure range les \chiffre{instantane-objets-copies} objets par effectif, et son abscisse est un
-rang. L'instantané tient en \chiffre{instantane-tables} tables : ces copies, et deux tables de
-service qui portent l'état et les paramètres. Il pèse \chiffre{instantane-volume} octets pour
-\chiffre{instantane-lignes} lignes, et se reconstruit en \chiffre{instantane-duree-rafraichissement}
-secondes. Les effectifs s'étalent sur quatre ordres de grandeur, du fait de passage à l'agrégat de
-doublons. Cet écart explique que le gain de lecture varie autant d'un indicateur à l'autre.
-
-Le registre des indicateurs déclare des objets de la couche analytique, quand les pages lisent le
-schéma figé. Le registre nomme la couche où un modèle produit l'objet, et le nom de table, privé de
-son schéma, relie les deux.
+Le tableau de bord lit un schéma de tables figées parce qu'un lecteur concurrent voyait des
+erreurs de lecture pendant la reconstruction, et non pour le coût des lectures. La mesure et le
+critère retenu sont consignés sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/main/docs/decisions/0043-instantane-schema-dedie-du-tableau-de-bord.md}.

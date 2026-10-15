@@ -118,3 +118,4 @@ chaque exécution.
 | [0102](0102-partie-i-allegee.md) | Une première partie allégée, tenue par un budget et une charte |
 | [0103](0103-partie-ii-allegee.md) | Une deuxième partie allégée, et une annexe pour son détail technique |
 | [0104](0104-partie-iii-allegee.md) | Une troisième partie allégée, une conclusion en deux temps et des nombres arrondis à l'affichage |
+| [0105](0105-annexe-d-condensee-et-listes-enchainees.md) | Une annexe des compléments techniques condensée, et les listes préliminaires enchaînées |

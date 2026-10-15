@@ -229,16 +229,24 @@
 \setcounter{tocdepth}{1}
 \tableofcontents
 % Les trois listes entrent à la table des matières, comme les remerciements, le résumé et
-% l'abstract. L'entrée est posée après le saut de page qui ouvre la liste, pour porter sa page.
+% l'abstract. La liste des figures ouvre une page ; les deux suivantes s'enchaînent à sa suite.
+% Dans le groupe, `\clearpage` est sans effet : le `\chapter*` de chaque liste garde son titre et
+% perd seulement son saut de page. L'entrée de table des matières est suivie de `\nopagebreak`,
+% sans quoi une coupure pourrait tomber entre l'entrée et le titre, qui commence par un espace
+% vertical, et l'entrée porterait la page précédente.
 \clearpage
 \phantomsection
 \addcontentsline{toc}{chapter}{\listfigurename}
+\markboth{\MakeUppercase{\listfigurename}}{\MakeUppercase{\listfigurename}}
 \listoffigures
-\clearpage
+\begingroup
+\let\clearpage\relax
 \phantomsection
-\addcontentsline{toc}{chapter}{\listtablename}
+\addcontentsline{toc}{chapter}{\listtablename}\nopagebreak
+\markboth{\MakeUppercase{\listtablename}}{\MakeUppercase{\listtablename}}\nopagebreak
 \listoftables
 \input{liminaires/abreviations}
+\endgroup
 
 \cleardoublepage
 \pagenumbering{arabic}
