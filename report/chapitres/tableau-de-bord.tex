@@ -3,10 +3,11 @@
 %   OBS: REL-DEM.P05
 %   HYP: (aucun)
 %   CHI: dms-affichee, dms-publie, exigences-calculables, exigences-champs-manquants, exigences-classement-mixte, exigences-ecart-maximal
-%   CHI: exigences-non-calculables, exigences-rubriques, exigences-sans-objet, facteur-annualisation, irot-affiche, irot-publie
-%   CHI: rotation-affichee, rotation-affichee-avant, tdb-filtrabilite-non, tdb-filtrabilite-oui, tdb-filtrabilite-sous-reserve, tdb-graphiques
-%   CHI: tdb-indicateurs, tdb-indicateurs-methode, tdb-indicateurs-pilotage, tdb-page-plus-chargee, tdb-pages, tdb-pages-methode
-%   CHI: tdb-pages-pilotage, tdb-recalcules-depuis-faits, tolerance-indicateurs-sejour, tom-affiche, tom-publie, trot-publie
+%   CHI: exigences-non-calculables, exigences-rubriques, exigences-sans-objet, facteur-annualisation, filtres-donnees, irot-affiche
+%   CHI: irot-publie, rotation-affichee, rotation-affichee-avant, sejour-indicateurs-reglementaires, tableaux-etablissement, tdb-filtrabilite-non
+%   CHI: tdb-filtrabilite-oui, tdb-filtrabilite-sous-reserve, tdb-graphiques, tdb-indicateurs, tdb-indicateurs-methode, tdb-indicateurs-pilotage
+%   CHI: tdb-page-plus-chargee, tdb-pages, tdb-pages-methode, tdb-pages-pilotage, tdb-recalcules-depuis-faits, tolerance-indicateurs-sejour
+%   CHI: tom-affiche, tom-publie, trot-publie
 %   SER: exigences-restitution, tableau-de-bord-par-page
 %   SECTIONS: 3
 
@@ -103,7 +104,7 @@ universel avec marque d'ordre d'octets. Un tableur l'ouvre par double-clic sans 
 \begin{figure}[htbp]
 \centering
 \captureTdb{page-donnees}{0.92\linewidth}
-\caption[La page Données du tableau de bord]{La page \emph{Données} : les trois filtres, le sélecteur de table, le décompte des lignes retenues et le bouton de téléchargement}\label{fig:tdb-donnees}
+\caption[La page Données du tableau de bord]{La page \emph{Données} : les \chiffre{filtres-donnees} filtres, le sélecteur de table, le décompte des lignes retenues et le bouton de téléchargement}\label{fig:tdb-donnees}
 \end{figure}
 
 \section{Les exigences de la statistique nationale}
@@ -111,8 +112,7 @@ universel avec marque d'ordre d'octets. Un tableur l'ouvre par double-clic sans 
 Le tableau de bord couvre la plupart des rubriques que la statistique nationale attend, et nomme le
 champ qui bloque les autres. Le logiciel observé porte un profil dédié aux rapports et aux
 statistiques\releve{REL-DEM.P05}. Ce que ce profil doit produire se lit dans la nomenclature
-nationale \cite{s30}, dont quatre tableaux seulement descendent à l'établissement nommé. Ces quatre
-tableaux donnent la liste des rubriques attendues (cf. tableau~\ref{tab:exigences-restitution}).
+nationale \cite{s30}, dont \chiffre{tableaux-etablissement} tableaux seulement descendent à l'établissement nommé. Ces \chiffre{tableaux-etablissement} tableaux donnent la liste des rubriques attendues (cf. tableau~\ref{tab:exigences-restitution}).
 
 \begin{table}[htbp]
 \centering
@@ -142,7 +142,7 @@ seule rubrique. Le référentiel des médecins vient en tête : son absence prod
 \chiffre{exigences-ecart-maximal}~\% sur un indicateur dont le numérateur se calcule. Les deux
 autres champs rendent leur rubrique simplement absente.
 
-La page \emph{Séjours} affiche les quatre indicateurs réglementaires annualisés, chacun avec la
+La page \emph{Séjours} affiche les \chiffre{sejour-indicateurs-reglementaires} indicateurs réglementaires annualisés, chacun avec la
 source de sa valeur (voir figure~\ref{fig:tdb-sejours}).
 
 \begin{figure}[htbp]
@@ -163,7 +163,7 @@ implémentation écrite séparément dans un autre langage. Les quatre valeurs a
 aujourd'hui \chiffre{tom-affiche}~\% d'occupation contre \chiffre{tom-publie}~\% publiés,
 \chiffre{dms-affichee} jours de durée moyenne de séjour contre \chiffre{dms-publie},
 \chiffre{rotation-affichee} de rotation contre \chiffre{trot-publie}, et \chiffre{irot-affiche} jours
-d'intervalle contre \chiffre{irot-publie}. Les quatre restent sous la tolérance relative de
+d'intervalle contre \chiffre{irot-publie}. Les \chiffre{sejour-indicateurs-reglementaires} restent sous la tolérance relative de
 \chiffre{tolerance-indicateurs-sejour} que le contrôle porte.
 
 \section*{Synthèse}

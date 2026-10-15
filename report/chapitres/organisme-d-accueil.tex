@@ -3,7 +3,7 @@
 %   DOC: s28, s29, s30
 %   OBS: REL-DEM.P02, REL-DEM.P03
 %   HYP: (aucun)
-%   CHI: capacite-annoncee, capacite-fonctionnelle
+%   CHI: capacite-annoncee, capacite-fonctionnelle, missions-service, profils-applicatifs, profils-non-observes
 %   SER: (aucune)
 %   SECTIONS: 2
 
@@ -103,9 +103,9 @@ service sert donc l'une de ses attributions.
 \medskip
 
 Ce que le service fait au quotidien se lit aussi dans l'outil qu'il emploie. L'écran de connexion
-du système d'information propose cinq profils applicatifs, et chacun ouvre un jeu de modules
-distinct\releve{REL-DEM.P02}. Les profils ne sont donc pas cinq vues d'un même écran : ils
-découpent l'activité du service en cinq processus.
+du système d'information propose \chiffre{profils-applicatifs} profils applicatifs, et chacun ouvre un jeu de modules
+distinct\releve{REL-DEM.P02}. Les profils ne sont donc pas \chiffre{profils-applicatifs} vues d'un même écran : ils
+découpent l'activité du service en \chiffre{profils-applicatifs} processus.
 
 \textbf{Un profil du logiciel sert une mission que le règlement place ailleurs.} Le profil
 \texttt{MSM - RECOUVREMENT}\releve{REL-DEM.P03} porte le suivi des créances et des relances, et le
@@ -115,12 +115,12 @@ pôle des affaires administratives de veiller au recouvrement des créances de l
 peut porter à l'écran une activité que le texte attribue à un autre. Ce travail observe le
 logiciel tel qu'il est, et cite le règlement tel qu'il est écrit.
 
-L'observation conduite pour ce travail a porté sur un poste et sur un seul de ces cinq profils,
-celui des rendez-vous : les quatre autres exigent des habilitations qu'un stagiaire ne reçoit
+L'observation conduite pour ce travail a porté sur un poste et sur un seul de ces \chiffre{profils-applicatifs} profils,
+celui des rendez-vous : les \chiffre{profils-non-observes} autres exigent des habilitations qu'un stagiaire ne reçoit
 pas.
 
 Missions et profils disent ce que le service doit faire et par quel outil. Le chemin d'un patient
-relie les cinq processus entre eux (voir figure~\ref{fig:parcours-patient}).
+relie les \chiffre{profils-applicatifs} processus entre eux (voir figure~\ref{fig:parcours-patient}).
 
 \begin{figure}[htbp]
 \centering
@@ -158,7 +158,7 @@ relie les cinq processus entre eux (voir figure~\ref{fig:parcours-patient}).
 \draw[fluxUML] (fac) -- (cre);
 \draw[fluxUML] (cre) -- (rel);
 \end{tikzpicture}
-\caption{Le parcours d'un patient à travers les cinq processus du service}\label{fig:parcours-patient}
+\caption{Le parcours d'un patient à travers les \chiffre{profils-applicatifs} processus du service}\label{fig:parcours-patient}
 \end{figure}
 
 Le parcours va de l'arrivée du patient à la relance d'une créance. La voie programmée commence par
@@ -172,7 +172,7 @@ italique nomment le processus, non le profil applicatif.
 L'hôpital Sidi Saïd est un hôpital provincial, rattaché au centre hospitalier préfectoral
 Mohammed~V et sans activité chirurgicale. Deux capacités litières lui sont attribuées, l'une
 annoncée par la presse, l'autre fonctionnelle et relevée par le ministère. Le règlement confie à son
-service d'accueil et d'admission neuf missions, dont la facturation et la production des
-statistiques. Le logiciel du service découpe ce travail en cinq profils, selon un découpage qui
+service d'accueil et d'admission \chiffre{missions-service} missions, dont la facturation et la production des
+statistiques. Le logiciel du service découpe ce travail en \chiffre{profils-applicatifs} profils, selon un découpage qui
 n'est pas celui du règlement. Le chapitre~\ref{chap:systeme} décrit ce logiciel et ce que son
 observation au poste a permis de relever.

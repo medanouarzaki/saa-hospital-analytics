@@ -5,14 +5,14 @@
 %   CHI: admissions-2024, capacite-annoncee, capacite-fonctionnelle, colonnes-part-doc, colonnes-part-hyp, colonnes-part-obs
 %   CHI: colonnes-source-doc, colonnes-source-hyp, colonnes-source-obs, colonnes-source-registre, consultations-2024, consultations-produites
 %   CHI: defaut-ages-incoherents, defaut-dates-aberrantes, defaut-factures-sans-pec, defaut-familles, defaut-rdv-doublon-creneau, defaut-taux-doublons
-%   CHI: dim-patient-fiches-plusieurs-versions, dms-publie, examens-2024, factures-avec-creance, grappes-multiples, identifiants-distincts
-%   CHI: interventions-2024, journees-2024, mouvements-lits-distincts, parametres-doc, parametres-fichiers, parametres-hyp
-%   CHI: parametres-obs, parametres-part-doc, parametres-part-hyp, parametres-part-obs, parametres-total, part-sejours-depuis-urgences
-%   CHI: passages-urgences-produits, patients-produits, periode-debut, periode-fin, periode-jours, personnes-estimees
-%   CHI: prelevements-2024, sejours-produits, source-creances-lignes, source-encaissements-lignes, source-factures-lignes, source-lignes-facture-lignes
-%   CHI: source-lignes-total, source-mouvements-lignes, source-passages-lignes, source-passages-urgences-lignes, source-patients-lignes, source-prises-en-charge-lignes
-%   CHI: source-relances-lignes, source-rendez-vous-lignes, source-tables, tom-publie, urgences-borne-basse, urgences-borne-haute
-%   CHI: urgences-milieu-fourchette, urgences-scenario-retenu
+%   CHI: dim-patient-fiches-plusieurs-versions, dms-publie, ecart-annees-sources, examens-2024, facteur-cadrage-max, facteur-cadrage-min
+%   CHI: factures-avec-creance, grappes-multiples, identifiants-distincts, interventions-2024, journees-2024, mouvements-lits-distincts
+%   CHI: parametres-doc, parametres-fichiers, parametres-hyp, parametres-obs, parametres-part-doc, parametres-part-hyp
+%   CHI: parametres-part-obs, parametres-total, part-sejours-depuis-urgences, passages-urgences-produits, patients-produits, periode-debut
+%   CHI: periode-fin, periode-jours, personnes-estimees, prelevements-2024, sejours-produits, source-creances-lignes
+%   CHI: source-encaissements-lignes, source-factures-lignes, source-lignes-facture-lignes, source-lignes-total, source-mouvements-lignes, source-passages-lignes
+%   CHI: source-passages-urgences-lignes, source-patients-lignes, source-prises-en-charge-lignes, source-relances-lignes, source-rendez-vous-lignes, source-tables
+%   CHI: tom-publie, urgences-borne-basse, urgences-borne-haute, urgences-milieu-fourchette, urgences-scenario-retenu, verifications-recueil
 %   SER: (aucune)
 %   SECTIONS: 6
 \chapter{Conception du jeu de données}\label{chap:jeu-de-donnees}
@@ -172,7 +172,7 @@ prélèvements et \chiffre{examens-2024} examens de laboratoire. La couche produ
 \chiffre{passages-urgences-produits} passages aux urgences.
 
 Le cadrage initial avait dérivé la volumétrie d'une capacité annoncée et d'indicateurs nationaux,
-et se trompait d'un facteur cinq à sept. Il confondait la capacité annoncée par la presse,
+et se trompait d'un facteur \chiffre{facteur-cadrage-min} à \chiffre{facteur-cadrage-max}. Il confondait la capacité annoncée par la presse,
 \chiffre{capacite-annoncee} lits \cite{s29}, avec la capacité fonctionnelle, seule publiée par
 établissement. Il appliquait aussi des valeurs nationales à un hôpital qui publie les siennes : un
 taux d'occupation de \chiffre{tom-publie}~\% et une durée moyenne de séjour de \chiffre{dms-publie}
@@ -182,8 +182,8 @@ un plancher, et non une capacité.
 
 Le recueil porte \chiffre{interventions-2024} intervention chirurgicale pour l'hôpital \cite{s30},
 et ce zéro vient d'une absence de ligne plutôt que d'un zéro imprimé. La Cour des comptes décrit de
-même, à huit ans d'écart, une gynéco-obstétrique qui fonctionne comme maison d'accouchement, sans
-activité chirurgicale, malgré un bloc opératoire équipé \cite{s20}. Les trois vérifications qui fondent cette lecture du
+même, à \chiffre{ecart-annees-sources} ans d'écart, une gynéco-obstétrique qui fonctionne comme maison d'accouchement, sans
+activité chirurgicale, malgré un bloc opératoire équipé \cite{s20}. Les \chiffre{verifications-recueil} vérifications qui fondent cette lecture du
 recueil sont données en section~\ref{sec:complements-chirurgie}.
 
 \section{La sensibilité aux passages aux urgences}\label{sec:sensibilite}

@@ -240,12 +240,18 @@
 \markboth{\MakeUppercase{\listfigurename}}{\MakeUppercase{\listfigurename}}
 \listoffigures
 \begingroup
+\let\sautdepage\clearpage
 \let\clearpage\relax
+% En-tête des pages de liste : la marque en vigueur en haut de la page, et non la dernière posée.
+% Une page qui finit une liste et en commence une autre porte ainsi le titre de la première. Le
+% saut de page de fin de groupe compose la dernière page de liste avec ce réglage.
+\fancyhead[L]{\TopMark{2e-left}}
 \phantomsection
 \addcontentsline{toc}{chapter}{\listtablename}\nopagebreak
 \markboth{\MakeUppercase{\listtablename}}{\MakeUppercase{\listtablename}}\nopagebreak
 \listoftables
 \input{liminaires/abreviations}
+\sautdepage
 \endgroup
 
 \cleardoublepage

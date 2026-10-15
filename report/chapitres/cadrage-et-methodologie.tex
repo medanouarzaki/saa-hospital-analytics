@@ -2,8 +2,8 @@
 %   DOC: s06, s27, s30, s52
 %   OBS: organisation-en-phases, rattachement-du-travail
 %   HYP: (aucun)
-%   CHI: colonnes-source-doc, colonnes-source-hyp, colonnes-source-obs, colonnes-source-registre
-%   CHI: releve-champs-total
+%   CHI: colonnes-source-doc, colonnes-source-hyp, colonnes-source-obs, colonnes-source-registre, dimensions, dimensions-sans-libelle
+%   CHI: ecrans-releves, indicateurs-ecarts-faits, indicateurs-sans-fait, profils-non-observes, releve-champs-total, sejour-indicateurs-reglementaires
 %   SER: (aucune)
 %   SECTIONS: 5
 
@@ -18,7 +18,7 @@ vérifiables ?
 
 Le travail répond à un cahier de charges portant sur l'activité du service d'accueil et d'admission
 dans son ensemble, et non sur le seul processus observable depuis un poste. Ce périmètre oblige à
-documenter quatre processus que l'observation directe n'a pas atteints, et il explique la place de
+documenter \chiffre{profils-non-observes} processus que l'observation directe n'a pas atteints, et il explique la place de
 la reconstruction documentaire dans le projet.
 
 Le document lui-même ne figure pas au dépôt, mais trois de ses exigences y sont consignées. Tout
@@ -27,12 +27,10 @@ indicateur affiché doit être recalculé depuis les tables de faits, dont chaqu
 bord ne doit lire que la base. Les valeurs affichées doivent rester lisibles par un lecteur qui ne
 connaît pas les codes du système d'origine.
 
-Ces exigences sont tenues en partie. Six indicateurs ne sont pas recalculés depuis les faits. Pour
-cinq d'entre eux, aucune table de faits ne porte la matière, puisqu'il n'existe ni fait des
+Ces exigences sont tenues en partie. En tout, \chiffre{indicateurs-ecarts-faits} indicateurs ne sont pas recalculés depuis les faits. Pour \chiffre{indicateurs-sans-fait} d'entre eux, aucune table de faits ne porte la matière, puisqu'il n'existe ni fait des
 créances ni fait des relances. Le sixième changerait de valeur en changeant de population. La
-capacité litière, dont dépendent quatre indicateurs de séjour, est absente de la base et transite
-par une table de paramètres qui porte sa provenance. Quatre dimensions sur six affichent enfin leur
-code nu, faute de libellé qu'une source établisse.
+capacité litière, dont dépendent \chiffre{sejour-indicateurs-reglementaires} indicateurs de séjour, est absente de la base et transite
+par une table de paramètres qui porte sa provenance. Enfin, \chiffre{dimensions-sans-libelle} dimensions sur \chiffre{dimensions} affichent leur code nu, faute de libellé qu'une source établisse.
 
 Le besoin est arrivé par ce document, remis en début de stage.
 
@@ -48,8 +46,7 @@ Le besoin n'a pas changé en cours de stage.
 
 \section{Périmètre d'observation}
 
-Faute d'accès aux quatre autres profils applicatifs, un processus a été observé au poste et quatre
-ont été reconstruits à partir de documents. Une observation et une reconstruction n'ont pas la même
+Faute d'accès aux \chiffre{profils-non-observes} autres profils applicatifs, un processus a été observé au poste et \chiffre{profils-non-observes} ont été reconstruits à partir de documents. Une observation et une reconstruction n'ont pas la même
 valeur, et les confondre présenterait comme vu ce qui a été déduit.
 
 Chaque colonne du modèle de données porte donc une \textbf{étiquette de provenance}, c'est-à-dire
@@ -83,8 +80,7 @@ Les écrans du système observé ne sont pas reproduits : ils sont décrits par 
 patient en production affichent des identifiants de session, des libellés de compte et la structure
 des dossiers d'un établissement réel, et le dépôt du projet est public. Le tableau de bord, bâti sur
 des données générées, se montre en revanche, et le chapitre~\ref{chap:tableau-de-bord} en compose
-des captures. Le relevé de champs porte ce que les images auraient montré : quatre écrans et
-\chiffre{releve-champs-total} éléments, chacun avec son identifiant, son libellé exact, son type
+des captures. Le relevé de champs porte ce que les images auraient montré : \chiffre{ecrans-releves} écrans et \chiffre{releve-champs-total} éléments, chacun avec son identifiant, son libellé exact, son type
 apparent et sa valeur observée le cas échéant.
 
 \section{La contrainte de confidentialité et la décision de générer}
@@ -128,7 +124,7 @@ L'observation a été courte et bornée à un poste ; l'essentiel du temps est a
 et à la rédaction. \textbf{La rédaction a été menée en fin de projet alors qu'elle devait être
 répartie sur toute sa durée}, et c'est une erreur de méthode.
 
-La reconstruction documentaire couvre les quatre processus que l'observation n'a pas atteints. Elle
+La reconstruction documentaire couvre les \chiffre{profils-non-observes} processus que l'observation n'a pas atteints. Elle
 s'appuie sur la documentation de l'éditeur \cite{s06}, sur le règlement intérieur des hôpitaux
 \cite{s27} et sur le recueil statistique national \cite{s30}. La génération produit ensuite le jeu
 de données à partir des champs relevés et des valeurs sourcées. La chaîne de traitement charge ce
@@ -152,7 +148,7 @@ Le projet se découpe en sept phases, nommées par ce qu'elles font\releve{organ
 \toprule
 Phase & Objectif & Ce qu'elle produit \\
 \midrule
-Comprendre le service et relever les écrans & savoir ce que le service fait et quels champs le système porte & le relevé des quatre écrans, élément par élément \\
+Comprendre le service et relever les écrans & savoir ce que le service fait et quels champs le système porte & le relevé des \chiffre{ecrans-releves} écrans, élément par élément \\
 \addlinespace
 Établir les sources et les chiffres de référence & fonder chaque valeur sur un document vérifiable & le registre des sources et les volumes de référence \\
 \addlinespace
@@ -227,8 +223,7 @@ dans un rapport déjà remis. C'est un fait, pas une excuse.
 
 \section*{Synthèse}
 
-Le besoin porte sur tout le service, alors qu'un seul processus a pu être observé. Les quatre autres
-ont été reconstruits à partir de documents, et chaque colonne du modèle indique d'où elle vient.
+Le besoin porte sur tout le service, alors qu'un seul processus a pu être observé. Les \chiffre{profils-non-observes} autres ont été reconstruits à partir de documents, et chaque colonne du modèle indique d'où elle vient.
 Faute de données réelles, le projet génère un jeu de données dont les défauts sont connus, ce qui
 rend les traitements mesurables. Le travail s'organise en sept phases, de l'observation au poste
 jusqu'à la rédaction. Le chapitre~\ref{chap:jeu-de-donnees} décrit la conception de ce jeu de

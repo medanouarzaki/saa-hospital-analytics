@@ -13,15 +13,15 @@
 %   CHI: flux-passages-heure-pointe, flux-passages-total, flux-programme-moyenne-arrondi, flux-programme-total, flux-samedi-moyenne-arrondi, flux-urgences-moyenne
 %   CHI: grappes-multiples, grappes-taille-maximale, hebdo-rapport-mesure-arrondi, honores-avec-fiche, honores-sans-fiche, honores-sans-fiche-en-quarantaine
 %   CHI: honores-total, identifiants-distincts, injecte-correlation-parametres-arrondi, injecte-part-jour-meme, injecte-taux-annulation, jour-meme-marge-nulle
-%   CHI: jour-meme-part-marge-nulle-arrondi, part-jour-meme-arrondi, passages-urgences-produits, periode-debut, periode-fin, periode-jours
-%   CHI: personnes-estimees, qualite-colonne-vide, qualite-colonnes, qualite-colonnes-incompletes, qualite-lignes-examinees, qualite-tables
-%   CHI: qualite-tables-sans-quarantaine, qualite-taux-quarantaine-maximal-arrondi, quarantaine-lignes-total-analyse, ramadan-baisse-arrondi, ramadan-jours, ramadan-jours-ouverts
-%   CHI: rdv-en-instance, recouvrement-creances, recouvrement-montant-du, recouvrement-montant-restant, recouvrement-relances, recouvrement-taux-aboutissement-arrondi
-%   CHI: recouvrement-taux-global-arrondi, recouvrement-taux-maximal-arrondi, recouvrement-taux-minimal-arrondi, relation-brute-complement-arrondi, relation-brute-ensemble-arrondi, relation-effectif-complement
-%   CHI: relation-effectif-ensemble, relation-inter-complement-arrondi, relation-inter-ensemble-arrondi, relation-intra-complement-arrondi, relation-intra-ensemble-arrondi, source-part-non-appropriees-arrondi
-%   CHI: source-part-non-urgentes, source-rendez-vous-lignes, taux-absenteisme-global-arrondi, taux-annulation-global-arrondi, taux-encaissement-arrondi, urgences-heure-creux
-%   CHI: urgences-heure-pointe, urgences-part-consultation-ordinaire-arrondi, urgences-part-hospitalisation-arrondi, urgences-part-mode-principal-arrondi, urgences-part-retour-domicile-arrondi, urgences-part-transfert-arrondi
-%   CHI: urgences-rapport-pointe-creux-arrondi
+%   CHI: jour-meme-part-marge-nulle-arrondi, niveaux-tri, part-jour-meme-arrondi, passages-urgences-produits, periode-debut, periode-fin
+%   CHI: periode-jours, periode-mois, personnes-estimees, qualite-colonne-vide, qualite-colonnes, qualite-colonnes-incompletes
+%   CHI: qualite-lignes-examinees, qualite-tables, qualite-tables-sans-quarantaine, qualite-taux-quarantaine-maximal-arrondi, quarantaine-lignes-total-analyse, ramadan-baisse-arrondi
+%   CHI: ramadan-jours, ramadan-jours-ouverts, rdv-en-instance, rdv-etats, rdv-etats-signification, recouvrement-creances
+%   CHI: recouvrement-montant-du, recouvrement-montant-restant, recouvrement-relances, recouvrement-taux-aboutissement-arrondi, recouvrement-taux-global-arrondi, recouvrement-taux-maximal-arrondi
+%   CHI: recouvrement-taux-minimal-arrondi, relation-brute-complement-arrondi, relation-brute-ensemble-arrondi, relation-effectif-complement, relation-effectif-ensemble, relation-inter-complement-arrondi
+%   CHI: relation-inter-ensemble-arrondi, relation-intra-complement-arrondi, relation-intra-ensemble-arrondi, source-part-non-appropriees-arrondi, source-part-non-urgentes, source-rendez-vous-lignes
+%   CHI: taux-absenteisme-global-arrondi, taux-annulation-global-arrondi, taux-encaissement-arrondi, urgences-heure-creux, urgences-heure-pointe, urgences-part-consultation-ordinaire-arrondi
+%   CHI: urgences-part-hospitalisation-arrondi, urgences-part-mode-principal-arrondi, urgences-part-retour-domicile-arrondi, urgences-part-transfert-arrondi, urgences-rapport-pointe-creux-arrondi
 %   SER: absenteisme-par-activite, anciennete-creances, completude-champs, delais-par-activite, delais-repartition, flux-horaire
 %   SER: flux-mensuel, urgences-par-niveau
 %   SECTIONS: 6
@@ -73,7 +73,7 @@ libellé (voir figure~\ref{fig:passages-mois}).
 \addlegendentry{activité programmée}
 \end{axis}
 \end{tikzpicture}
-\caption{Passages par mois, sur les trente mois de la période}\label{fig:passages-mois}
+\caption{Passages par mois, sur les \chiffre{periode-mois} mois de la période}\label{fig:passages-mois}
 \end{figure}
 
 \conclusion{C-01}\textbf{Le flux des urgences reste plat sur toute la période, quand l'activité
@@ -235,11 +235,11 @@ L'absence et l'annulation se distinguent nettement, et la relation entre délai 
 selon la façon de la mesurer. Le fait de rendez-vous porte \chiffre{source-rendez-vous-lignes} lignes
 en quatre états\releve{REL-RDV.R11} : \chiffre{honores-total} honorés, \chiffre{absences-total}
 absences, \chiffre{annulations-total} annulations et \chiffre{rdv-en-instance} encore ouverts. Ce
-dernier état ne correspond à aucune des trois significations établies, et il ne reçoit aucun drapeau.
+dernier état ne correspond à aucune des \chiffre{rdv-etats-signification} significations établies, et il ne reçoit aucun drapeau.
 
 \conclusion{C-09}\textbf{Le taux d'absentéisme vaut \chiffre{taux-absenteisme-global-arrondi}~\% et le
 taux d'annulation \chiffre{taux-annulation-global-arrondi}~\%.} Les deux se rapportent à l'ensemble
-des rendez-vous, quatre états compris. Le taux d'annulation retrouve son paramètre,
+des rendez-vous, \chiffre{rdv-etats} états compris. Le taux d'annulation retrouve son paramètre,
 \chiffre{injecte-taux-annulation}. Le classement des activités par absentéisme est fixé de la même
 manière.
 
@@ -333,8 +333,8 @@ tableau~\ref{tab:urgences-tri}).
 ]{\serie{urgences-par-niveau}}
 \end{table}
 
-Les cinq codes de niveau s'y affichent sans libellé. La source qui décrit la nomenclature distingue
-trois groupes de gravité \cite{s12}, et les données en portent cinq.
+Les \chiffre{niveaux-tri} codes de niveau s'y affichent sans libellé. La source qui décrit la nomenclature distingue
+trois groupes de gravité \cite{s12}, et les données en portent \chiffre{niveaux-tri}.
 
 \conclusion{C-14}\textbf{Le délai avant prise en charge croît avec le numéro du niveau de tri.} Les
 cibles de délai, adossées à l'échelle de tri publiée \cite{s14}, valent

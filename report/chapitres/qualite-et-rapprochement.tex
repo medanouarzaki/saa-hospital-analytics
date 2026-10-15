@@ -3,13 +3,14 @@
 %   OBS: REL-IPP.O03, REL-IPP.R12
 %   HYP: (aucun)
 %   CHI: ablation-comparaisons-variante-a, ablation-ecart-complet, ablation-ecart-variante-a, ablation-ecart-variante-c, ablation-f-variante-a, ablation-f-variante-c
-%   CHI: balayage-points, balayage-points-f-parfaite, baseline-f-mesure, collision-adresse-paires, collision-adresse-rappel, collision-adresse-retrouvees
-%   CHI: collision-date-naissance-paires, collision-date-naissance-rappel, collision-date-naissance-retrouvees, collision-groupes-nom, collision-groupes-piece, collision-piece-absente-paires
-%   CHI: collision-piece-absente-rappel, collision-piece-absente-retrouvees, collision-prenom-compose-paires, collision-prenom-compose-rappel, collision-prenom-compose-retrouvees, collision-telephone-paires
-%   CHI: collision-telephone-rappel, collision-telephone-retrouvees, collision-translitteration-paires, collision-translitteration-rappel, collision-translitteration-retrouvees, collision-vides-piece
-%   CHI: comparaisons-modele, f-mesure-seuil-retenu, grappes-exactes-global, grappes-exactes-restreint, identifiants-distincts, paires-candidates
-%   CHI: paires-possibles, precision-seuil-retenu, qualite-colonne-vide, qualite-colonnes, qualite-colonnes-incompletes, rappel-seuil-retenu
-%   CHI: seuil-retenu, sur-fusionnes-global, vt-paires-injectees, vt-paires-presentes
+%   CHI: balayage-points, balayage-points-f-parfaite, baseline-f-mesure, blocage-rapport-substitution, collision-adresse-paires, collision-adresse-rappel
+%   CHI: collision-adresse-retrouvees, collision-date-naissance-paires, collision-date-naissance-rappel, collision-date-naissance-retrouvees, collision-groupes-nom, collision-groupes-piece
+%   CHI: collision-piece-absente-paires, collision-piece-absente-rappel, collision-piece-absente-retrouvees, collision-prenom-compose-paires, collision-prenom-compose-rappel, collision-prenom-compose-retrouvees
+%   CHI: collision-telephone-paires, collision-telephone-rappel, collision-telephone-retrouvees, collision-translitteration-paires, collision-translitteration-rappel, collision-translitteration-retrouvees
+%   CHI: collision-vides-piece, comparaisons-modele, f-mesure-seuil-retenu, grappes-exactes-global, grappes-exactes-restreint, identifiants-distincts
+%   CHI: onglets-recherche, paires-candidates, paires-possibles, precision-seuil-retenu, qualite-colonne-vide, qualite-colonnes
+%   CHI: qualite-colonnes-incompletes, rappel-seuil-retenu, regles-blocage, regles-blocage-prevues, regles-blocage-union-reduite, seuil-retenu
+%   CHI: sur-fusionnes-global, vt-paires-injectees, vt-paires-presentes
 %   SER: (aucune)
 %   SECTIONS: 5
 \chapter{Qualité des données et rapprochement d'identités}\label{chap:qualite}
@@ -49,8 +50,7 @@ hospitaliers, et il coûte des deux côtés. Un antécédent saisi sous le premi
 invisible au praticien qui ouvre le second. Deux dossiers se facturent à part, deux créances
 naissent, et le recouvrement se dégrade sans qu'aucune ligne soit fausse.
 
-Le logiciel du service reconnaît lui-même le problème. Son écran de recherche d'identifiant porte
-quatre onglets, dont deux interrogent un index maître des patients, et l'un d'eux propose une
+Le logiciel du service reconnaît lui-même le problème. Son écran de recherche d'identifiant porte \chiffre{onglets-recherche} onglets, dont deux interrogent un index maître des patients, et l'un d'eux propose une
 recherche pondérée\releve{REL-IPP.O03}. Les résultats portent en dernière colonne une
 probabilité\releve{REL-IPP.R12}. Le produit admet ainsi qu'une même personne peut y figurer
 plusieurs fois, et que l'égalité exacte des champs ne suffit pas à la retrouver. La Cour des
@@ -87,13 +87,13 @@ l'inversion d'un prénom composé. Une valeur vide reste vide.
 Comparer toutes les paires est impossible, car les \chiffre{identifiants-distincts} fiches de version
 courante en forment \chiffre{paires-possibles}. Le blocage ne compare donc que les paires qui
 s'accordent déjà sur un critère simple, par exemple le même nom de famille et le même téléphone.
-Quatre règles de blocage retiennent ainsi \chiffre{paires-candidates} paires candidates, et leur
+Les \chiffre{regles-blocage} règles de blocage retiennent ainsi \chiffre{paires-candidates} paires candidates, et leur
 détail est donné en section~\ref{sec:complements-modele}.
 
 Le rappel est la part des doublons de la vérité terrain qu'une étape retrouve \cite{s51}. Une
-quatrième règle a été ajoutée aux trois prévues, parce que l'union des quatre donne au blocage son
-rappel maximal pour \chiffre{paires-candidates} paires. La meilleure union de trois règles qui
-atteignait ce rappel produisait quatre-vingts fois plus de paires. Le modèle estimé porte
+quatrième règle a été ajoutée aux \chiffre{regles-blocage-prevues} prévues, parce que l'union des \chiffre{regles-blocage} donne au blocage son
+rappel maximal pour \chiffre{paires-candidates} paires. La meilleure union de \chiffre{regles-blocage-union-reduite} règles qui
+atteignait ce rappel produisait \chiffre{blocage-rapport-substitution} fois plus de paires. Le modèle estimé porte
 \chiffre{comparaisons-modele} comparaisons de champs, chacune en niveaux du plus strict au plus
 permissif.
 
