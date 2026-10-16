@@ -120,3 +120,4 @@ chaque exécution.
 | [0104](0104-partie-iii-allegee.md) | Une troisième partie allégée, une conclusion en deux temps et des nombres arrondis à l'affichage |
 | [0105](0105-annexe-d-condensee-et-listes-enchainees.md) | Une annexe des compléments techniques condensée, et les listes préliminaires enchaînées |
 | [0106](0106-controle-de-langue-et-nombres-en-lettres.md) | Un contrôle de langue, et les nombres écrits en lettres passés par le registre |
+| [0107](0107-partie-i-en-langue-simple-et-trois-comptes-recalcules.md) | La première partie en langue simple, et trois comptes recalculés depuis l'objet compté |
