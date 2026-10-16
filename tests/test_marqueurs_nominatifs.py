@@ -191,7 +191,7 @@ def test_le_fichier_des_marqueurs_existe_et_les_declare_tous() -> None:
 
 
 def test_les_marqueurs_retires_ne_reviennent_pas() -> None:
-    """Ils sont RETIRÉS, pas laissés vides : une déclaration, même vide, est rouge.
+    r"""Ils sont RETIRÉS, pas laissés vides : une déclaration, même vide, est rouge.
 
     Le motif est celui du retrait lui-même. Un `\marqueurPresidentJury` déclaré vide fait
     composer à la page de garde une ligne « Président du jury » sans valeur, et une ligne vide

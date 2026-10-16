@@ -377,12 +377,6 @@ EXEMPTIONS_LETTRES = (
     ),
     (
         "cadrage-et-methodologie.tex",
-        "réelle. Trois questions en découlent. Que demande le besoin ? Que permet l'accès au poste, et comment",  # noqa: E501
-        "STRUCTURE",
-        "« Trois » : les trois questions du chapitre, posées ensuite",
-    ),
-    (
-        "cadrage-et-methodologie.tex",
         "Le document lui-même ne figure pas au dépôt, mais trois de ses exigences y sont consignées. Tout",  # noqa: E501
         "ÉNUMÉRATION",
         "« trois » : les trois exigences énoncées dans les phrases qui suivent",
@@ -395,7 +389,7 @@ EXEMPTIONS_LETTRES = (
     ),
     (
         "cadrage-et-methodologie.tex",
-        "rend les traitements mesurables. Le travail s'organise en sept phases, de l'observation au poste",  # noqa: E501
+        "aux défauts connus, en sept phases de l'observation au poste jusqu'à la rédaction. Le",  # noqa: E501
         "STRUCTURE",
         "« sept » : les phases du projet, méthode fixe",
     ),
@@ -461,7 +455,7 @@ EXEMPTIONS_LETTRES = (
     ),
     (
         "organisme-d-accueil.tex",
-        "l'une des cinq structures . Ce rattachement fixe le niveau auquel les grandeurs sont",  # noqa: E501
+        "Il dépend du centre hospitalier préfectoral Mohammed~V, dont il est l'une des cinq structures",  # noqa: E501
         "SOURCE",
         "« cinq » : \\cite{s20, s29} dans la phrase",
     ),
@@ -473,7 +467,7 @@ EXEMPTIONS_LETTRES = (
     ),
     (
         "organisme-d-accueil.tex",
-        "structure interne du service d'accueil et d'admission. L' fixe les neuf missions du",  # noqa: E501
+        "L' fixe les neuf missions du service , que le tableau~",  # noqa: E501
         "SOURCE",
         "« neuf » : \\cite{s27} dans la phrase",
     ),
@@ -488,6 +482,36 @@ EXEMPTIONS_LETTRES = (
         "orientation de sortie ou une sortie d'hospitalisation aboutissent toutes trois à une facture. Une",  # noqa: E501
         "ÉNUMÉRATION",
         "« trois » : consultation, orientation de sortie, sortie d'hospitalisation, dans la phrase",
+    ),
+    (
+        "organisme-d-accueil.tex",
+        "du système d'information propose cinq profils applicatifs, et chacun ouvre un jeu de modules",  # noqa: E501
+        "PERSONNEL",
+        "« cinq » : passage d'écriture personnelle sur les profils du service, forme de l'auteur",
+    ),
+    (
+        "organisme-d-accueil.tex",
+        "distinct . Les profils ne sont donc pas cinq vues d'un même écran : ils",  # noqa: E501
+        "PERSONNEL",
+        "« cinq » : passage d'écriture personnelle sur les profils du service, forme de l'auteur",
+    ),
+    (
+        "organisme-d-accueil.tex",
+        "découpent l'activité du service en cinq processus.",  # noqa: E501
+        "PERSONNEL",
+        "« cinq » : passage d'écriture personnelle sur les profils du service, forme de l'auteur",
+    ),
+    (
+        "organisme-d-accueil.tex",
+        "L'observation conduite pour ce travail a porté sur un poste et sur un seul de ces cinq profils,",  # noqa: E501
+        "PERSONNEL",
+        "« cinq » : passage d'écriture personnelle sur les profils du service, forme de l'auteur",
+    ),
+    (
+        "organisme-d-accueil.tex",
+        "celui des rendez-vous : les quatre autres exigent des habilitations qu'un stagiaire ne reçoit",  # noqa: E501
+        "PERSONNEL",
+        "« quatre » : passage d'écriture personnelle sur les profils du service, forme de l'auteur",
     ),
     (
         "qualite-et-rapprochement.tex",
