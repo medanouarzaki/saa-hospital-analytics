@@ -1,0 +1,47 @@
+# Planification du projet : la période du stage, les sept phases du tableau du chapitre de cadrage
+# dans leur ordre et sous leur nom exact, les répertoires qui portent la trace de chacune, et le
+# jalon de l'observation. Convention de l'auteur, consignée par l'enregistrement de décision 0108.
+#
+# La série « planification » du registre des chiffres lit ce fichier et l'historique du dépôt ;
+# docs/planification/to_tex.py rend la figure depuis la série.
+
+stage:
+  debut: 2026-07-20
+  fin: 2026-08-31
+
+# Exclu de l'historique lu : il crée un fichier vide par répertoire et ne témoigne d'aucun travail.
+commit_initialisation:
+  identifiant: e3948bf
+  motif: crée la structure du dépôt, un fichier vide par répertoire, et ne témoigne d'aucun travail
+
+jalon:
+  libelle: Observation au poste
+  date: 2026-07-28
+  phase: Comprendre le service et relever les écrans
+
+# Les répertoires suivent la colonne « Ce qu'elle produit » du tableau des phases.
+phases:
+  - nom: Comprendre le service et relever les écrans
+    produit: le relevé des écrans, élément par élément
+    repertoires: [docs/observation, docs/champs]
+    ancrage: debut-du-stage
+    motif_ancrage: « Le travail a commencé par le service, et non par la technique »
+  - nom: Établir les sources et les chiffres de référence
+    produit: le registre des sources et les volumes de référence
+    repertoires: [docs/sources]
+  - nom: Concevoir et générer le jeu de données
+    produit: le jeu de données et le registre des relations injectées
+    repertoires: [generator]
+  - nom: Construire la chaîne de traitement
+    produit: les couches d'ingestion, de quarantaine et de modélisation
+    repertoires: [ingestion, dbt, airflow]
+  - nom: Rapprocher les identités et mesurer la qualité
+    produit: le modèle de rapprochement et son évaluation
+    repertoires: [linkage]
+  - nom: Restituer
+    produit: le tableau de bord et le livrable quotidien
+    repertoires: [dashboard, livraison, instantane]
+  - nom: Rédiger
+    produit: le présent rapport
+    repertoires: [report]
+    jusqu_a_la_fin_du_stage: true

@@ -137,6 +137,11 @@ jobs:
       # sources du rapport et n'ouvre aucune base.
       - run: uv run pytest tests/test_langue.py -v
 
+      # La planification : la figure est le rendu de son générateur, ses phases sont celles du
+      # chapitre de cadrage, et ses semaines tiennent dans la période du stage. Le contrôle lit la
+      # série, la configuration et le chapitre, et n'ouvre aucune base.
+      - run: uv run pytest tests/test_planification.py -v
+
   tests-matrice:
     runs-on: ubuntu-latest
     strategy:

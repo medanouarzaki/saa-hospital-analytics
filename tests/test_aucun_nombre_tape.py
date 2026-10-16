@@ -43,6 +43,7 @@ ANNEXES_PRODUITES = (
     "dictionnaire_synthese.tex",
     "releve_des_ecrans.tex",
     "correspondance_relations.tex",
+    "planification.tex",
 )
 
 # Les commandes dont l'argument porte légitimement des chiffres : un identifiant, une clé, une

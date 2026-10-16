@@ -665,7 +665,7 @@ chiffres:
   commande: (R/'airflow/saa_daily.py').read_text(encoding='utf-8').count('task_id=')
   portee: independant-des-donnees
 - id: fichiers-de-controle
-  valeur: 79
+  valeur: 80
   unite: fichiers
   type: python
   commande: len(list((R/'tests').glob('test_*.py')))
@@ -3832,3 +3832,24 @@ series:
     et jamais recopié : indicateur, classement, tables mobilisées, champ manquant. Le séparateur
     est la tabulation, les cellules portant virgules et points-virgules. Les marques de mise en
     forme du document sont retirées, son texte ne l'est pas.
+- id: planification
+  fichier: figures/planification.csv
+  colonnes: [phase, debut, fin, origine]
+  lignes: 8
+  empreinte: 509a64bae91357c9df584350fa3345c55ee090ea9e7f8b4eaaf8846d4a8de2dd
+  type: python
+  commande: >-
+    (lambda p, g, w: [(f['nom'], min([w(d) for d in g(f['repertoires'], p)] + ([w(p['stage']['debut'])] if f.get('ancrage') == 'debut-du-stage' else []), default=None), w(p['stage']['fin']) if f.get('jusqu_a_la_fin_du_stage') else max([w(d) for d in g(f['repertoires'], p)], default=None), 'historique et ancrage' if f.get('ancrage') else 'historique') for f in p['phases']] + [(p['jalon']['libelle'], w(p['jalon']['date']), w(p['jalon']['date']), 'jalon')])(yaml.safe_load((R/'docs/planification/planification.yml').read_text(encoding='utf-8')), lambda reps, p: [d for d in (__import__('datetime').date.fromisoformat(l.split()[1]) for l in __import__('subprocess').run(['git', '-C', str(R), 'log', '--format=%H %ad', '--date=short', '--', *reps], capture_output=True, text=True, check=True).stdout.splitlines() if l and not l.startswith(p['commit_initialisation']['identifiant'])) if p['stage']['debut'] <= d <= p['stage']['fin']], lambda d: d.isocalendar()[1])
+  portee: independant-des-donnees
+  note: >-
+    Une ligne par phase du tableau des phases du chapitre de cadrage, dans son ordre : semaine ISO
+    de début et de fin, tirées de l'historique du dépôt (dates d'auteur des commits qui touchent
+    les répertoires que docs/planification/planification.yml associe à la phase, commit
+    d'initialisation exclu, bornées à la période du stage) ; la première phase commence au plus
+    tard avec le stage (ancrage), la rédaction court jusqu'à la semaine de la fin du stage. Une
+    dernière ligne porte le jalon de l'observation. Dans un clone superficiel, l'historique manque
+    et les semaines non ancrées valent None : seul --verifier, sur le dépôt complet, juge les
+    valeurs.
+  motif_non_emploi: >-
+    Aucun chapitre ne l'appelle par \serie : docs/planification/to_tex.py la lit et en produit
+    report/figures/planification.tex, la figure que le chapitre de cadrage inclut.
