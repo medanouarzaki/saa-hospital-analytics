@@ -3,31 +3,29 @@
 %   DOC: s28, s29, s30
 %   OBS: REL-DEM.P02, REL-DEM.P03
 %   HYP: (aucun)
-%   CHI: capacite-annoncee, capacite-fonctionnelle, missions-service, profils-applicatifs, profils-non-observes
+%   CHI: capacite-annoncee, capacite-fonctionnelle, missions-service, profils-applicatifs
 %   SER: (aucune)
 %   SECTIONS: 2
 
 \chapter{L'organisme d'accueil}\label{chap:organisme}
 
-Le stage s'est déroulé à l'hôpital provincial Sidi Saïd de Meknès, au service d'accueil et
-d'admission. Deux questions orientent sa présentation. Quelle place l'hôpital occupe-t-il dans
-l'offre de soins publique ? Quelles missions le règlement confie-t-il au service où le travail a eu
-lieu ?
+L'hôpital provincial Sidi Saïd de Meknès a accueilli le stage, dans son service d'accueil et
+d'admission. Quelle place l'hôpital occupe-t-il dans l'offre de soins publique, et quelles missions
+le règlement confie-t-il à ce service ?
 
 \section{L'hôpital Sidi Saïd}
 
 L'hôpital appartient à la catégorie des hôpitaux provinciaux ou préfectoraux, la plus nombreuse du
 réseau hospitalier public \cite[tableau~32, p.~46]{s30}. À ce niveau, la fonction d'urgence est
-assurée sous sa forme de base, et non sous sa forme spécialisée \cite{s12}. L'hôpital se situe dans
-la région Fès-Meknès \cite{s05} et dépend du centre hospitalier préfectoral Mohammed~V, dont il est
-l'une des cinq structures \cite{s20, s29}. Ce rattachement fixe le niveau auquel les grandeurs sont
-publiées. Certaines statistiques nationales descendent jusqu'à l'hôpital nommé, d'autres
-s'arrêtent au centre hospitalier ou à la préfecture, et la construction du jeu de données en
-dépend (chapitre~\ref{chap:jeu-de-donnees}).
+assurée sous sa forme de base \cite{s12}. L'hôpital se situe dans la région Fès-Meknès \cite{s05}.
+Il dépend du centre hospitalier préfectoral Mohammed~V, dont il est l'une des cinq structures
+\cite{s20, s29}. Ce rattachement fixe le niveau auquel les grandeurs sont publiées. Certaines
+statistiques nationales descendent jusqu'à l'hôpital nommé, d'autres s'arrêtent au centre
+hospitalier ou à la préfecture, et le jeu de données en dépend (chapitre~\ref{chap:jeu-de-donnees}).
 
 L'hôpital a été rénové en 2019, avec la création d'un pôle Mère-Enfant \cite{s29}. La
-figure~\ref{fig:organisation-etablissement} montre ses départements et ses services, et situe le
-service d'accueil et d'admission dans cette organisation.
+figure~\ref{fig:organisation-etablissement} montre ses départements et ses services, dont le service
+d'accueil et d'admission.
 
 \begin{figure}[htbp]
 \centering
@@ -50,29 +48,27 @@ $\downarrow$\\[4pt]
 \caption[Organisation de l'établissement]{Organisation de l'établissement, telle que la source la décrit \cite{s29}}\label{fig:organisation-etablissement}
 \end{figure}
 
-Deux capacités litières sont attribuées à l'hôpital, et elles ne mesurent pas la même chose. Une
-dépêche d'agence de février~2020 annonce une capacité de \chiffre{capacite-annoncee} lits
-\cite{s29}. Le recueil statistique du ministère relève, pour l'exercice~2024, une capacité litière
-\emph{fonctionnelle} de \chiffre{capacite-fonctionnelle} lits \cite{s30}. La première est une
-capacité annoncée par voie de presse, la seconde la capacité effectivement armée, et aucun rapport
-n'est calculé entre elles. Plusieurs titres de presse ont repris la dépêche mot pour mot \cite{s01}.
-La valeur annoncée ne repose donc que sur une source, la dépêche elle-même \cite{s29}.
+Deux capacités litières sont attribuées à l'hôpital, et elles ne comptent pas les mêmes lits. Une dépêche
+d'agence de février~2020 annonce \chiffre{capacite-annoncee} lits \cite{s29}. Le recueil
+statistique du ministère relève, pour l'exercice~2024, une capacité litière \emph{fonctionnelle} de
+\chiffre{capacite-fonctionnelle} lits \cite{s30}, celle des lits effectivement armés. Plusieurs
+titres de presse ont repris la dépêche mot pour mot \cite{s01}, et la valeur annoncée ne repose que
+sur elle \cite{s29}.
 
 L'hôpital n'exerce aucune activité chirurgicale. Le recueil statistique ne lui attribue aucune
-intervention chirurgicale sur les deux exercices publiés \cite{s30}, et la Cour des comptes décrit
-sa gynéco-obstétrique comme une maison d'accouchement, sans activité chirurgicale \cite{s20}. Le
+intervention chirurgicale sur les deux exercices publiés \cite{s30}. La Cour des comptes décrit sa
+gynéco-obstétrique comme une maison d'accouchement \cite{s20}. Le
 chapitre~\ref{chap:jeu-de-donnees} démontre ce constat et en tire une décision de modélisation.
 
 \section{Le Service d'Accueil et d'Admission}
 
-Le fonctionnement du service est régi par l'arrêté du ministre de la santé
-n\textsuperscript{o}~456-11 du 6~juillet 2010 portant règlement intérieur des hôpitaux \cite{s03},
-publié au Bulletin Officiel n\textsuperscript{o}~5926 du 17~mars 2011 \cite{s28}.
-
-L'article~27 de ce règlement organise l'hôpital en départements et en services selon sa tranche de
-capacité litière, sans nommer les services qu'elle comporte \cite{s27}. Il ne dit rien de la
-structure interne du service d'accueil et d'admission. L'article~35 fixe les neuf missions du
-service \cite{s27}, que le tableau~\ref{tab:missions-service} reproduit dans les termes du texte.
+Le règlement intérieur des hôpitaux régit le fonctionnement du service. Il est fixé par l'arrêté
+du ministre de la santé n\textsuperscript{o}~456-11 du 6~juillet 2010 \cite{s03}, publié au
+Bulletin Officiel n\textsuperscript{o}~5926 du 17~mars 2011 \cite{s28}. Son article~27 organise
+l'hôpital en départements et en services selon sa tranche de capacité litière, sans nommer ces
+services \cite{s27}. Il ne décrit pas l'organisation interne du service d'accueil et d'admission.
+L'article~35 fixe les neuf missions du service \cite{s27}, que le tableau~\ref{tab:missions-service}
+reproduit dans les termes du texte.
 
 \begin{table}[htbp]
 \centering
@@ -95,17 +91,16 @@ la classification des maladies, des nomenclatures des actes et des tarifs en vig
 \end{tabular}
 \end{table}
 
-Deux de ces missions gouvernent directement l'objet de ce travail, et le tableau les porte en gras.
-La sixième fait du service le lieu où naît la donnée de facturation. La cinquième est une mission
-propre du service, et non une fonction déléguée à une cellule tierce. Un tableau de bord alimenté par les données du
-service sert donc l'une de ses attributions.
+Le tableau porte en gras les deux missions qui gouvernent ce travail. La sixième fait du service le
+lieu où naît la donnée de facturation. La cinquième confie au service lui-même la production des
+statistiques. Un tableau de bord alimenté par ses données sert donc l'une de ses attributions.
 
 \medskip
 
 Ce que le service fait au quotidien se lit aussi dans l'outil qu'il emploie. L'écran de connexion
-du système d'information propose \chiffre{profils-applicatifs} profils applicatifs, et chacun ouvre un jeu de modules
-distinct\releve{REL-DEM.P02}. Les profils ne sont donc pas \chiffre{profils-applicatifs} vues d'un même écran : ils
-découpent l'activité du service en \chiffre{profils-applicatifs} processus.
+du système d'information propose cinq profils applicatifs, et chacun ouvre un jeu de modules
+distinct\releve{REL-DEM.P02}. Les profils ne sont donc pas cinq vues d'un même écran : ils
+découpent l'activité du service en cinq processus.
 
 \textbf{Un profil du logiciel sert une mission que le règlement place ailleurs.} Le profil
 \texttt{MSM - RECOUVREMENT}\releve{REL-DEM.P03} porte le suivi des créances et des relances, et le
@@ -115,12 +110,11 @@ pôle des affaires administratives de veiller au recouvrement des créances de l
 peut porter à l'écran une activité que le texte attribue à un autre. Ce travail observe le
 logiciel tel qu'il est, et cite le règlement tel qu'il est écrit.
 
-L'observation conduite pour ce travail a porté sur un poste et sur un seul de ces \chiffre{profils-applicatifs} profils,
-celui des rendez-vous : les \chiffre{profils-non-observes} autres exigent des habilitations qu'un stagiaire ne reçoit
+L'observation conduite pour ce travail a porté sur un poste et sur un seul de ces cinq profils,
+celui des rendez-vous : les quatre autres exigent des habilitations qu'un stagiaire ne reçoit
 pas.
 
-Missions et profils disent ce que le service doit faire et par quel outil. Le chemin d'un patient
-relie les \chiffre{profils-applicatifs} processus entre eux (voir figure~\ref{fig:parcours-patient}).
+Le chemin d'un patient relie ces processus entre eux (figure~\ref{fig:parcours-patient}).
 
 \begin{figure}[htbp]
 \centering
@@ -169,10 +163,8 @@ italique nomment le processus, non le profil applicatif.
 
 \section*{Synthèse}
 
-L'hôpital Sidi Saïd est un hôpital provincial, rattaché au centre hospitalier préfectoral
-Mohammed~V et sans activité chirurgicale. Deux capacités litières lui sont attribuées, l'une
-annoncée par la presse, l'autre fonctionnelle et relevée par le ministère. Le règlement confie à son
-service d'accueil et d'admission \chiffre{missions-service} missions, dont la facturation et la production des
-statistiques. Le logiciel du service découpe ce travail en \chiffre{profils-applicatifs} profils, selon un découpage qui
-n'est pas celui du règlement. Le chapitre~\ref{chap:systeme} décrit ce logiciel et ce que son
-observation au poste a permis de relever.
+L'hôpital Sidi Saïd est un hôpital provincial sans activité chirurgicale, rattaché au centre
+hospitalier préfectoral Mohammed~V. Le règlement confie à son service d'accueil et d'admission
+\chiffre{missions-service} missions, dont la facturation et la production des statistiques. Le
+logiciel découpe ce travail en \chiffre{profils-applicatifs} profils, selon un autre découpage. Le
+chapitre~\ref{chap:systeme} décrit ce logiciel et ce que l'observation au poste en a relevé.

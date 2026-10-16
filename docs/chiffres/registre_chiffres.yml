@@ -665,7 +665,7 @@ chiffres:
   commande: (R/'airflow/saa_daily.py').read_text(encoding='utf-8').count('task_id=')
   portee: independant-des-donnees
 - id: fichiers-de-controle
-  valeur: 78
+  valeur: 79
   unite: fichiers
   type: python
   commande: len(list((R/'tests').glob('test_*.py')))
@@ -3373,30 +3373,54 @@ chiffres:
   portee: independant-des-donnees
   note: >-
     Écrans parcourus au poste, comptés par leur préfixe d'identifiant au relevé.
-- id: facteur-cadrage-min
-  valeur: 5
+- id: facteur-cadrage-capacite
+  valeur: 3.5
   unite: proportion
   type: python
   commande: >-
-    ['zéro', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf',
-    'dix'].index(__import__('re').search(r'facteur (\w+) à (\w+)',
-    (R/'docs/decisions/0003-volumetrie.md').read_text(encoding='utf-8')).group(1))
+    round((lambda c: c['capacite-annoncee'] / c['capacite-fonctionnelle'])({e['id']: e['valeur'] for e in yaml.safe_load((R/'docs/chiffres/registre_chiffres.yml').read_text(encoding='utf-8'))['chiffres']}), 4)
   portee: independant-des-donnees
   note: >-
-    Borne basse du facteur d'erreur de la dérivation initiale, telle que l'enregistrement de
-    décision 0003 la donne.
-- id: facteur-cadrage-max
-  valeur: 7
+    Rapport de la capacité annoncée par la presse à la capacité fonctionnelle relevée, lues au
+    registre (capacite-annoncee, capacite-fonctionnelle) : l'écart du cadrage initial sur la capacité.
+  motif_non_emploi: >-
+    Valeur en précision complète ; le rapport compose facteur-cadrage-capacite-arrondi, dont la
+    commande est celle-ci, arrondie à une décimale.
+- id: facteur-cadrage-capacite-arrondi
+  valeur: 3.5
   unite: proportion
   type: python
   commande: >-
-    ['zéro', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf',
-    'dix'].index(__import__('re').search(r'facteur (\w+) à (\w+)',
-    (R/'docs/decisions/0003-volumetrie.md').read_text(encoding='utf-8')).group(2))
+    round(round((lambda c: c['capacite-annoncee'] / c['capacite-fonctionnelle'])({e['id']: e['valeur'] for e in yaml.safe_load((R/'docs/chiffres/registre_chiffres.yml').read_text(encoding='utf-8'))['chiffres']}), 4), 1)
   portee: independant-des-donnees
   note: >-
-    Borne haute du facteur d'erreur de la dérivation initiale, telle que l'enregistrement de
-    décision 0003 la donne.
+    Valeur de facteur-cadrage-capacite arrondie à une décimale, pour l'affichage dans la prose du
+    chapitre de conception. La commande est celle de facteur-cadrage-capacite, arrondie.
+- id: facteur-cadrage-sejours
+  valeur: 7.284
+  unite: proportion
+  type: python
+  commande: >-
+    round((lambda c, u, a: c['capacite-annoncee'] * 365 * float(u.split("taux d'occupation moyen ")[1].split(' %')[0].replace(',', '.')) / 100 / float(u.split('durée moyenne de séjour ')[1].split(' jours')[0].replace(',', '.')) / a)({e['id']: e['valeur'] for e in yaml.safe_load((R/'docs/chiffres/registre_chiffres.yml').read_text(encoding='utf-8'))['chiffres']}, [s for s in yaml.safe_load((R/'docs/sources/sources.yml').read_text(encoding='utf-8')) if s['id']=='S-30'][0]['utilise_pour'], [p['valeur'] for p in yaml.safe_load((R/'generator/config/volumetrie.yml').read_text(encoding='utf-8'))['parametres'] if p['nom']=='admissions_annuelles'][0]), 4)
+  portee: independant-des-donnees
+  note: >-
+    Rapport des séjours que le cadrage initial dérivait (capacité annoncée × 365 × taux
+    d'occupation moyen national ÷ durée moyenne de séjour nationale) aux séjours relevés. Les
+    valeurs nationales sont lues dans utilise_pour de S-30 (tableau 76, ligne Total), la capacité
+    au registre, les admissions relevées dans generator/config/volumetrie.yml.
+  motif_non_emploi: >-
+    Valeur en précision complète ; le rapport compose facteur-cadrage-sejours-arrondi, dont la
+    commande est celle-ci, arrondie à une décimale.
+- id: facteur-cadrage-sejours-arrondi
+  valeur: 7.3
+  unite: proportion
+  type: python
+  commande: >-
+    round(round((lambda c, u, a: c['capacite-annoncee'] * 365 * float(u.split("taux d'occupation moyen ")[1].split(' %')[0].replace(',', '.')) / 100 / float(u.split('durée moyenne de séjour ')[1].split(' jours')[0].replace(',', '.')) / a)({e['id']: e['valeur'] for e in yaml.safe_load((R/'docs/chiffres/registre_chiffres.yml').read_text(encoding='utf-8'))['chiffres']}, [s for s in yaml.safe_load((R/'docs/sources/sources.yml').read_text(encoding='utf-8')) if s['id']=='S-30'][0]['utilise_pour'], [p['valeur'] for p in yaml.safe_load((R/'generator/config/volumetrie.yml').read_text(encoding='utf-8'))['parametres'] if p['nom']=='admissions_annuelles'][0]), 4), 1)
+  portee: independant-des-donnees
+  note: >-
+    Valeur de facteur-cadrage-sejours arrondie à une décimale, pour l'affichage dans la prose du
+    chapitre de conception. La commande est celle de facteur-cadrage-sejours, arrondie.
 - id: ecart-annees-sources
   valeur: 8
   unite: points
@@ -3488,18 +3512,6 @@ chiffres:
   portee: independant-des-donnees
   note: >-
     Règles de blocage du rapprochement, définies dans linkage/blocage.py.
-- id: regles-blocage-prevues
-  valeur: 3
-  unite: familles
-  type: python
-  commande: >-
-    ['zéro', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf',
-    'dix'].index(__import__('re').search(r'annonçait (\w+) règles',
-    (R/'docs/decisions/0030-quatre-regles-de-blocage.md').read_text(encoding='utf-8')).group(1))
-  portee: independant-des-donnees
-  note: >-
-    Règles de blocage que le périmètre initial annonçait, telles que l'enregistrement de
-    décision 0030 le rapporte.
 - id: regles-blocage-union-reduite
   valeur: 3
   unite: familles
@@ -3558,16 +3570,15 @@ chiffres:
     Filtres de la page des données : la période, puis chaque filtre à choix multiple compté une
     fois par libellé.
 - id: pile-couches
-  valeur: 5
+  valeur: 7
   unite: familles
   type: python
   commande: >-
-    ['zéro', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf',
-    'dix'].index(__import__('re').search(r'pile technique\*\*[^:]*: (\w+) couches',
-    (R/'docs/decisions/0088-la-correction-de-l-article-35-et-la-passe-de-conversion.md').read_text(encoding='utf-8')).group(1))
+    len(set(__import__('re').findall(r'create schema if not exists (\w+)', ''.join(f.read_text(encoding='utf-8') for f in sorted((R/'ingestion/ddl').glob('*.sql')) + sorted((R/'linkage/ddl').glob('*.sql'))))) | set(__import__('re').findall(r'\+schema: (\w+)', (R/'dbt/dbt_project.yml').read_text(encoding='utf-8'))) | set(__import__('re').findall(r'^SCHEMA = "(\w+)"', (R/'instantane/rafraichir.py').read_text(encoding='utf-8'), __import__('re').M)))
   portee: independant-des-donnees
   note: >-
-    Couches de la pile technique, telles que l'enregistrement de décision 0088 les compte.
+    Schémas que la chaîne déclare, sans doublon : les DDL d'ingestion et de rapprochement
+    (create schema), la configuration dbt (+schema) et le module de l'instantané (SCHEMA).
 - id: types-episode
   valeur: 3
   unite: familles

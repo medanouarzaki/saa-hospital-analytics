@@ -1,7 +1,7 @@
 % Ce chapitre repose sur :
 %   DOC: s20, s22, s23, s51
 %   OBS: REL-IPP.O03, REL-IPP.R12
-%   HYP: (aucun)
+%   HYP: decision-quatre-regles-de-blocage
 %   CHI: ablation-comparaisons-variante-a, ablation-ecart-complet, ablation-ecart-variante-a, ablation-ecart-variante-c, ablation-f-variante-a, ablation-f-variante-c
 %   CHI: balayage-points, balayage-points-f-parfaite, baseline-f-mesure, blocage-rapport-substitution, collision-adresse-paires, collision-adresse-rappel
 %   CHI: collision-adresse-retrouvees, collision-date-naissance-paires, collision-date-naissance-rappel, collision-date-naissance-retrouvees, collision-groupes-nom, collision-groupes-piece
@@ -9,8 +9,8 @@
 %   CHI: collision-telephone-paires, collision-telephone-rappel, collision-telephone-retrouvees, collision-translitteration-paires, collision-translitteration-rappel, collision-translitteration-retrouvees
 %   CHI: collision-vides-piece, comparaisons-modele, f-mesure-seuil-retenu, grappes-exactes-global, grappes-exactes-restreint, identifiants-distincts
 %   CHI: onglets-recherche, paires-candidates, paires-possibles, precision-seuil-retenu, qualite-colonne-vide, qualite-colonnes
-%   CHI: qualite-colonnes-incompletes, rappel-seuil-retenu, regles-blocage, regles-blocage-prevues, regles-blocage-union-reduite, seuil-retenu
-%   CHI: sur-fusionnes-global, vt-paires-injectees, vt-paires-presentes
+%   CHI: qualite-colonnes-incompletes, rappel-seuil-retenu, regles-blocage, regles-blocage-union-reduite, seuil-retenu, sur-fusionnes-global
+%   CHI: vt-paires-injectees, vt-paires-presentes
 %   SER: (aucune)
 %   SECTIONS: 5
 \chapter{Qualité des données et rapprochement d'identités}\label{chap:qualite}
@@ -91,7 +91,7 @@ Les \chiffre{regles-blocage} règles de blocage retiennent ainsi \chiffre{paires
 détail est donné en section~\ref{sec:complements-modele}.
 
 Le rappel est la part des doublons de la vérité terrain qu'une étape retrouve \cite{s51}. Une
-quatrième règle a été ajoutée aux \chiffre{regles-blocage-prevues} prévues, parce que l'union des \chiffre{regles-blocage} donne au blocage son
+quatrième règle a été ajoutée au découpage d'abord annoncé\convention{decision-quatre-regles-de-blocage}. L'union des \chiffre{regles-blocage} règles donne au blocage son
 rappel maximal pour \chiffre{paires-candidates} paires. La meilleure union de \chiffre{regles-blocage-union-reduite} règles qui
 atteignait ce rappel produisait \chiffre{blocage-rapport-substitution} fois plus de paires. Le modèle estimé porte
 \chiffre{comparaisons-modele} comparaisons de champs, chacune en niveaux du plus strict au plus
