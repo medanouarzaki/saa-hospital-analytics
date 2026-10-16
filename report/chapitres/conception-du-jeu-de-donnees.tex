@@ -5,7 +5,7 @@
 %   CHI: admissions-2024, capacite-annoncee, capacite-fonctionnelle, colonnes-part-doc, colonnes-part-hyp, colonnes-part-obs
 %   CHI: colonnes-source-doc, colonnes-source-hyp, colonnes-source-obs, colonnes-source-registre, consultations-2024, consultations-produites
 %   CHI: defaut-ages-incoherents, defaut-dates-aberrantes, defaut-factures-sans-pec, defaut-familles, defaut-rdv-doublon-creneau, defaut-taux-doublons
-%   CHI: dim-patient-fiches-plusieurs-versions, dms-publie, ecart-annees-sources, examens-2024, facteur-cadrage-max, facteur-cadrage-min
+%   CHI: dim-patient-fiches-plusieurs-versions, dms-publie, ecart-annees-sources, examens-2024, facteur-cadrage-capacite-arrondi, facteur-cadrage-sejours-arrondi
 %   CHI: factures-avec-creance, grappes-multiples, identifiants-distincts, interventions-2024, journees-2024, mouvements-lits-distincts
 %   CHI: parametres-doc, parametres-fichiers, parametres-hyp, parametres-obs, parametres-part-doc, parametres-part-hyp
 %   CHI: parametres-part-obs, parametres-total, part-sejours-depuis-urgences, passages-urgences-produits, patients-produits, periode-debut
@@ -172,7 +172,7 @@ prélèvements et \chiffre{examens-2024} examens de laboratoire. La couche produ
 \chiffre{passages-urgences-produits} passages aux urgences.
 
 Le cadrage initial avait dérivé la volumétrie d'une capacité annoncée et d'indicateurs nationaux,
-et se trompait d'un facteur \chiffre{facteur-cadrage-min} à \chiffre{facteur-cadrage-max}. Il confondait la capacité annoncée par la presse,
+et se trompait d'un facteur \chiffre{facteur-cadrage-capacite-arrondi} sur la capacité et \chiffre{facteur-cadrage-sejours-arrondi} sur les séjours \cite{s30}. Il confondait la capacité annoncée par la presse,
 \chiffre{capacite-annoncee} lits \cite{s29}, avec la capacité fonctionnelle, seule publiée par
 établissement. Il appliquait aussi des valeurs nationales à un hôpital qui publie les siennes : un
 taux d'occupation de \chiffre{tom-publie}~\% et une durée moyenne de séjour de \chiffre{dms-publie}

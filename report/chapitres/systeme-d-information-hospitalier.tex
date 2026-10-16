@@ -10,9 +10,9 @@
 
 \chapter{Le système d'information hospitalier}\label{chap:systeme}
 
-Le service d'accueil et d'admission enregistre son activité dans un progiciel, Hosix.NET. Deux
-questions se posent à son sujet. Que contient ce logiciel, d'après les documents de son éditeur ?
-Que montre-t-il réellement au poste observé, et qu'en tirer pour construire un modèle de données ?
+Le service d'accueil et d'admission enregistre son activité dans un progiciel, Hosix.NET. Que
+contient ce logiciel d'après son éditeur, et que montre-t-il au poste observé pour construire un
+modèle de données ?
 
 \section{Hosix.NET, origine et architecture}
 
@@ -21,17 +21,17 @@ Le système d'information en place est Hosix.NET, édité par SIVSA Soluciones I
 l'établissement. Sa conception remonte aux années 1980, et l'éditeur en revendique le déploiement
 dans plus de trente hôpitaux répartis sur six pays \cite{s07}.
 
-La raison sociale de l'éditeur est espagnole, et les modules portent des noms espagnols que la
-documentation reprend sans les traduire : \emph{Consultas} pour les agendas et les rendez-vous
-\cite{s08}, \emph{Facturación} pour l'émission des factures \cite{s09}, ainsi que \emph{Médicos},
+La raison sociale de l'éditeur est espagnole. Les modules portent des noms espagnols, que la
+documentation garde : \emph{Consultas} pour les agendas et les rendez-vous \cite{s08},
+\emph{Facturación} pour l'émission des factures \cite{s09}, ainsi que \emph{Médicos},
 \emph{Urgencias} et \emph{admisión}.
 
 Vingt-six modules se regroupent en trois paquets, Core, Clinic et Extension Packs \cite{s06}. Le
 Core porte les fonctions administratives du dossier, le Clinic les fonctions médicales, et les
-Extension Packs des compléments contractables séparément. Un établissement peut donc exploiter la
-gestion administrative des patients sans la couche clinique. La documentation décrit ce qui est
-contractable, et le périmètre installé à l'hôpital reste inconnu. Elle énonce des fonctions et ne
-publie aucun schéma de données. Tout ce qui touche aux champs vient donc du relevé conduit au poste.
+Extension Packs des compléments vendus à part. Un établissement peut donc exploiter la gestion
+administrative des patients sans la couche clinique. La documentation décrit l'offre de l'éditeur,
+sans le périmètre installé à l'hôpital ni aucun schéma de données. Les champs du modèle viennent donc
+du relevé conduit au poste.
 
 \section{Les \chiffre{profils-applicatifs} profils applicatifs et les processus qu'ils portent}
 
@@ -62,14 +62,15 @@ Profil & Processus porté & Module & Établi par \\
 
 \medskip
 
-L'éditeur ne publie aucune fiche distincte pour le recouvrement. La fonction est intégrée au module
-de facturation, et deux profils s'y rattachent donc. Le contenu du cinquième profil se déduit d'une
-source extérieure à l'éditeur, la nomenclature des indicateurs qu'un hôpital nommé remonte à la
-statistique nationale \cite{s10}.
+Le recouvrement n'a pas de fiche propre chez l'éditeur. Il est intégré au module de facturation,
+auquel deux profils se rattachent. Le contenu du cinquième profil se déduit d'une source extérieure
+à l'éditeur, la nomenclature des indicateurs qu'un hôpital remonte à la statistique nationale
+\cite{s10}.
 
-Les profils et les missions du règlement ne se recouvrent pas terme à terme (voir
-figure~\ref{fig:cas-utilisation}). Sur les \chiffre{missions-service} missions, \chiffre{missions-avec-profil} reçoivent un profil, \chiffre{missions-sans-profil} n'en reçoivent
-aucun, et un profil ne répond à aucune mission de l'article~35.
+Les profils et les missions du règlement ne se recouvrent pas terme à terme
+(figure~\ref{fig:cas-utilisation}). Sur les \chiffre{missions-service} missions,
+\chiffre{missions-avec-profil} reçoivent un profil et \chiffre{missions-sans-profil} n'en reçoivent
+aucun. Un profil, lui, ne répond à aucune mission de l'article~35.
 
 \begin{figure}[htbp]
 \centering
@@ -126,19 +127,18 @@ L'observation a été active. Des patients de test ont été saisis dans le syst
 qui distingue les cas. Les cas rencontrés étaient variés, patient déjà présent dans la base ou
 patient à créer, types de couverture différents\releve{saisie-de-patients-de-test}.
 
-Chaque élément est consigné avec un identifiant stable, le bloc de l'écran auquel il appartient, son
-libellé reproduit à l'identique, son type apparent et la valeur affichée lorsqu'une valeur l'était.
-Cet identifiant relie ensuite chaque colonne du modèle de données à l'élément observé. Le caractère
-obligatoire ou facultatif d'un champ n'a été relevé sur aucun écran. Les boutons et l'agencement des
-blocs ne portent aucune donnée, et l'annexe~\ref{annexe:releve} reproduit le relevé intégral,
-élément par élément.
+Chaque élément est consigné avec un identifiant stable, le bloc de l'écran qui le porte, son libellé
+exact, son type apparent et la valeur affichée. Cet identifiant relie ensuite chaque colonne du
+modèle de données à l'élément observé. Le caractère obligatoire d'un champ n'a été relevé sur aucun
+écran. L'annexe~\ref{annexe:releve} reproduit le relevé intégral, élément par élément, hors boutons
+et agencement des blocs, qui ne portent aucune donnée.
 
 \section{Ce que le service saisit}
 
 L'écran de démarrage ne porte aucune donnée de dossier. Il affiche le ministère de tutelle et
 l'identification du site, où le code de région précède le nom de l'établissement\releve{REL-DEM.I01}.
-Ce premier écran montre une pratique que les suivants confirment, car le système affiche chaque code
-avec son libellé.
+Dès ce premier écran, le système affiche chaque code avec son libellé, et les écrans suivants le
+confirment.
 
 L'écran de recherche d'identifiant patient sert à retrouver un dossier avant toute opération. Il
 nomme l'identifiant patient permanent (IPP), numéro unique qu'un établissement attribue à une
@@ -154,11 +154,12 @@ mois et année seuls, âge et approximation en années. Un écran qui permet de 
 est conçu pour des dossiers dont la date de naissance est incertaine ou absente.
 
 La fiche patient est l'écran le plus dense, et la plus grande part des colonnes du modèle en vient.
-Elle porte le numéro IPP\releve{REL-PAT.D01}, plusieurs champs de nom, dont les noms du père et de la
-mère, la pièce d'identité, l'état civil, la compagnie d'assurance, le quartier et \chiffre{lignes-telephone} lignes de téléphone. La compagnie d'assurance et la nationalité y sont des couples code-libellé. Le type de
-pièce d'identité et l'état civil s'écrivent par une lettre suivie de son libellé
-développé\releve{REL-PAT.D09}. Ces couples permettent de reconstituer plus loin des dimensions sans
-inventer de libellés.
+Elle porte le numéro IPP\releve{REL-PAT.D01} et plusieurs champs de nom, dont ceux du père et de la
+mère. Elle porte aussi la pièce d'identité, l'état civil, la compagnie d'assurance, le quartier et
+\chiffre{lignes-telephone} lignes de téléphone. La compagnie d'assurance et la nationalité y sont des
+couples code-libellé. Le type de pièce d'identité et l'état civil s'écrivent par une lettre suivie
+de son libellé développé\releve{REL-PAT.D09}, ce qui permet de reconstituer plus loin des dimensions
+sans inventer de libellés.
 
 La fiche porte aussi deux cases d'avertissement, l'une par service de messages courts, ou SMS,
 l'autre par courrier électronique\releve{REL-PAT.H12}. Les canaux de rappel existent donc déjà dans
@@ -173,8 +174,8 @@ l'annulation.
 
 \section{Les observations exploitables}
 
-Certaines observations vont au-delà de la description. Elles fondent une grandeur, une distinction,
-un diagnostic ou une contrainte que la chaîne reprend.
+Les observations qui suivent fondent chacune une grandeur, une distinction, un diagnostic ou une
+contrainte que la chaîne reprend.
 
 \paragraph{Le délai d'obtention.} Le bloc de contrôle horodate la création du
 rendez-vous\releve{REL-RDV.C02}, et le bloc du rendez-vous porte la date convenue. Leur différence
@@ -190,8 +191,7 @@ prévenue, qui le perd. Les deux taux appellent des remèdes différents, et le
 chapitre~\ref{chap:activite} les mesure séparément.
 
 \paragraph{La recherche pondérée.} Un système qui cherche un patient par similarité et affiche une
-probabilité admet que la recherche exacte ne suffit pas\releve{REL-IPP.O03}. Elle ne suffit pas
-parce qu'une même personne y possède plusieurs dossiers. Le relevé ne dit pas si le service emploie
+probabilité admet qu'une même personne y possède plusieurs dossiers\releve{REL-IPP.O03}. Le relevé ne dit pas si le service emploie
 la fonction, ni combien de dossiers sont concernés. Aucune recherche conduite au poste n'a rendu
 plusieurs résultats proches d'un même patient\releve{aucune-collision-observee}. Le problème est
 établi par l'existence de la fonction dans l'outil et par le rapport d'audit consacré à
