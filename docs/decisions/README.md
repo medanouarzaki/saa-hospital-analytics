@@ -121,3 +121,4 @@ chaque exécution.
 | [0105](0105-annexe-d-condensee-et-listes-enchainees.md) | Une annexe des compléments techniques condensée, et les listes préliminaires enchaînées |
 | [0106](0106-controle-de-langue-et-nombres-en-lettres.md) | Un contrôle de langue, et les nombres écrits en lettres passés par le registre |
 | [0107](0107-partie-i-en-langue-simple-et-trois-comptes-recalcules.md) | La première partie en langue simple, et trois comptes recalculés depuis l'objet compté |
+| [0108](0108-planification-du-projet.md) | La planification du projet, tirée de l'historique du dépôt |
