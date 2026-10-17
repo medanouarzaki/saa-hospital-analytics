@@ -47,6 +47,16 @@
 \setstretch{1.15}
 \setlength{\parskip}{0.6em}
 \setlength{\parindent}{0pt}
+
+% Aucune fin de paragraphe seule en haut de page. La pénalité du noyau (150) en laissait une en tête
+% de page ; à 10000 la coupure est interdite, et TeX reporte une ligne de plus. La pénalité de la
+% ligne seule en bas de page reste celle du noyau : portée à 10000, elle repoussait la fin d'une
+% synthèse de chapitre sur une page sinon vide. Le bas de page reste irrégulier (`\raggedbottom`,
+% que la classe emploie en recto seul) : une page plus courte d'une ligne vaut mieux que des blancs
+% étirés entre les paragraphes, que `\flushbottom` produirait avec l'espacement de ce document.
+\widowpenalty=10000
+\clubpenalty=150
+\raggedbottom
 \usepackage{longtable}
 \usepackage{booktabs}
 
@@ -286,6 +296,16 @@
 %
 % Les entrées du registre des sources qu'aucun chapitre ne cite restent au registre avec leur
 % motif de non-emploi. Elles n'ont pas disparu ; elles ne s'impriment plus.
+% Sources du registre que le rapport ne cite pas, chacune avec son motif. Le contrôle de provenance
+% les lit ici, en état de remise.
+% NON-EMPLOYEE : s11 — source consultée pour le contexte national ou régional ; le rapport, centré sur le service, ne la cite plus
+% NON-EMPLOYEE : s15 — source consultée pour le contexte national ou régional ; le rapport, centré sur le service, ne la cite plus
+% NON-EMPLOYEE : s16 — source consultée pour le contexte national ou régional ; le rapport, centré sur le service, ne la cite plus
+% NON-EMPLOYEE : s17 — barème national des actes, employé par la configuration de tarification du générateur ; le rapport ne le cite plus
+% NON-EMPLOYEE : s18 — règles de prise en charge employées par la configuration du générateur ; le rapport ne les cite plus
+% NON-EMPLOYEE : s19 — règles de prise en charge employées par la configuration du générateur ; le rapport ne les cite plus
+% NON-EMPLOYEE : s21 — aucun usage : la recommandation qu'elle porte figure dans la source de la Cour des comptes, que le rapport cite
+% NON-EMPLOYEE : s31 — justifie, dans la configuration du générateur, le maintien de l'organisme public distinct ; le rapport ne la cite plus
 \printbibliography[heading=bibintoc,title={Bibliographie}]
 
 \input{annexes}
