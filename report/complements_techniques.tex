@@ -28,24 +28,24 @@
 
 Chaque colonne de la couche source est rattachée à ce qui l'établit : un écran observé, une source
 documentaire ou une convention posée. Le dictionnaire de données donne cette correspondance
-colonne par colonne, avec la preuve de chacune, sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/main/docs/champs/dictionnaire_donnees.md}.
+colonne par colonne, avec la preuve de chacune, sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/rapport-de-stage-v1/docs/champs/dictionnaire_donnees.md}.
 
 \section{Les distributions du générateur}\label{sec:complements-distributions}
 
 Chaque distribution du générateur porte sa valeur, son étiquette de provenance et ce qui l'étaye.
-Les distributions de la population sont posées sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/main/generator/config/demographie.yml}, celles
-des urgences sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/main/generator/config/urgences.yml}.
+Les distributions de la population sont posées sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/rapport-de-stage-v1/generator/config/demographie.yml}, celles
+des urgences sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/rapport-de-stage-v1/generator/config/urgences.yml}.
 
 \section{L'absence d'activité chirurgicale}\label{sec:complements-chirurgie}
 
 Le recueil statistique ne porte aucune intervention chirurgicale pour l'établissement, et \chiffre{verifications-recueil} vérifications excluent une absence due à la recherche ou à l'agrégation \cite{s30}. Elles sont
-consignées sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/main/docs/decisions/0003-volumetrie.md}.
+consignées sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/rapport-de-stage-v1/docs/decisions/0003-volumetrie.md}.
 
 \section{Les outils de la chaîne}\label{sec:complements-pile}
 
 La chaîne range ses données dans \chiffre{pile-couches} schémas : \texttt{source}, \texttt{quarantaine}, \texttt{intermediate},
 \texttt{referentiels}, \texttt{marts}, \texttt{linkage} et \texttt{instantane}. Les outils de la chaîne et le motif de leur choix sont consignés sous
-\url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/main/docs/decisions/0099-trois-parties-et-les-outils-nommes.md}.
+\url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/rapport-de-stage-v1/docs/decisions/0099-trois-parties-et-les-outils-nommes.md}.
 
 \section{La couche analytique et l'orchestration}\label{sec:complements-analytique}
 
@@ -121,8 +121,8 @@ suivants, dans l'ordre de la figure~\ref{fig:sequence-quotidienne} :
 
 Le modèle de rapprochement pèse chaque champ par le rapport de deux probabilités d'accord
 \cite{s22}, et \chiffre{regles-blocage} règles de blocage limitent les paires comparées. Les règles sont écrites
-sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/main/linkage/blocage.py}, les comparaisons et les colonnes écartées
-sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/main/linkage/champs.py}.
+sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/rapport-de-stage-v1/linkage/blocage.py}, les comparaisons et les colonnes écartées
+sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/rapport-de-stage-v1/linkage/champs.py}.
 
 \section{Deux tableaux de l'analyse de l'activité}\label{sec:complements-analyse}
 
@@ -253,4 +253,4 @@ Consultations non appropriées dans l'étude provinciale, en proportion & \chiff
 
 Le tableau de bord lit un schéma de tables figées parce qu'un lecteur concurrent voyait des
 erreurs de lecture pendant la reconstruction, et non pour le coût des lectures. La mesure et le
-critère retenu sont consignés sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/main/docs/decisions/0043-instantane-schema-dedie-du-tableau-de-bord.md}.
+critère retenu sont consignés sous \url{https://github.com/medanouarzaki/saa-hospital-analytics/blob/rapport-de-stage-v1/docs/decisions/0043-instantane-schema-dedie-du-tableau-de-bord.md}.
