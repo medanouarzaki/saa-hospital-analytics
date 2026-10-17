@@ -247,7 +247,7 @@ qu'aucune donnée réelle n'existera pour la confronter.
 **Relevé du 2026-10-16.** Chaque consigne du référentiel est citée par son texte, dans l'ordre du
 référentiel, avec la commande qui l'établit, la ligne utile de sa sortie et un verdict : respectée,
 partiellement respectée (avec ce qui manque), ou sans objet (avec le motif). Le document mesuré est
-le rapport composé en état de remise (88 pages), et ses sources au dépôt.
+le rapport composé en état de remise (90 pages), et ses sources au dépôt.
 
 **La limite de ce relevé.** Trois consignes sont des consignes de jugement : « éviter les
 généralités », « éviter de parler des concepts suivis en cours », « chapitres équilibrés en pages ».
@@ -270,10 +270,10 @@ le verdict ne vaut que pour cette mesure.
 
 | consigne | commande | sortie | verdict |
 |---|---|---|---|
-| « introduction ; première, deuxième et troisième parties avec leurs chapitres ; conclusion ; puis bibliographie, puis annexes » | entrées de premier niveau de la table des matières | Introduction générale 1 ; I Contexte et cadrage 4 ; II Analyse et conception 19 ; III Réalisation 36 ; Conclusion générale 55 ; Bibliographie 58 ; annexes A à D 62–73 | respectée |
+| « introduction ; première, deuxième et troisième parties avec leurs chapitres ; conclusion ; puis bibliographie, puis annexes » | entrées de premier niveau de la table des matières | Introduction générale 1 ; I Contexte et cadrage 4 ; II Analyse et conception 20 ; III Réalisation 37 ; Conclusion générale 57 ; Bibliographie 60 ; annexes A à D 64–75 | respectée |
 | « introduction : contexte général, problématique abordée, solution envisagée, plan du rapport par parties et chapitres » | `grep -n "section\*" report/chapitres/introduction.tex` | Contexte général ; Problématique ; Solution envisagée (Les données) ; Plan du rapport — le plan annonce chaque partie et chaque chapitre (`tests/test_annonce_du_plan.py` vert) | respectée |
 | « éviter les généralités » | mesure approchante : longueur de l'introduction et objet de sa première phrase | 2,1 pages ; la première phrase nomme le service et l'établissement | respectée, pour cette mesure |
-| « contexte général et organisme d'accueil : organisme réduit au maximum, domaine d'activité » | pages du chapitre 1 ; ses sections | 3 pages sur 88 ; « L'hôpital Sidi Saïd », « Le Service d'Accueil et d'Admission » (missions du service) | respectée |
+| « contexte général et organisme d'accueil : organisme réduit au maximum, domaine d'activité » | pages du chapitre 1 ; ses sections | 3 pages sur 90 ; « L'hôpital Sidi Saïd », « Le Service d'Accueil et d'Admission » (missions du service) | respectée |
 | « description du projet (contexte, problématique, objectif) ; méthodologie adoptée et planification » | sections du chapitre 3 | Le besoin exprimé ; Périmètre d'observation ; La contrainte de confidentialité ; La méthode du projet ; Organisation du projet en phases, avec la figure de planification | respectée |
 | « analyse et conception : identification des indicateurs, conception des magasins de données » | sections des chapitres 5 et 9 | « Modélisation dimensionnelle » (schéma en étoile, figure en annexe D) ; « Les exigences de la statistique nationale » (tableau des rubriques attendues) | respectée |
 | « éviter de parler des concepts suivis en cours » | mesure approchante : phrases de définition générique (« un entrepôt / un schéma en étoile / une table de faits / une dimension est… ») dans les chapitres 4 à 6 | 0 ; 0 ; 0 — une seule notion est définie, la table de faits, en une proposition, avec sa source | respectée, pour cette mesure |
@@ -291,10 +291,10 @@ le verdict ne vaut que pour cette mesure.
 | « introduction pour chaque chapitre » | lignes de texte entre `\chapter` et la première section, par chapitre | de 3 à 8 lignes dans chacun des dix chapitres | respectée |
 | « synthèse et transition à la fin de chaque chapitre » | `grep -c "section\*{Synthèse}"` par chapitre ; `pytest tests/test_langue.py` (renvoi au chapitre suivant) | 1 dans chacun des dix ; 38 passed | respectée |
 | « pas de mélange entre « on », « je » et « nous » » | `pytest tests/test_langue.py` | 38 passed — aucun « on » ni « nous » ; la première personne réservée aux remerciements et au volet professionnel | respectée |
-| « en-tête portant le titre du chapitre et pied de page portant le numéro de page » | lecture en image des 88 pages | titre du chapitre en tête de chaque page courante, numéro en pied | respectée |
+| « en-tête portant le titre du chapitre et pied de page portant le numéro de page » | lecture en image des 90 pages | titre du chapitre en tête de chaque page courante, numéro en pied | respectée |
 | « titres aux figures et aux tableaux » | `tests/test_structure_du_rapport.py::test_chaque_figure_et_chaque_tableau_porte_un_titre_et_une_etiquette` | vert (11 passed pour le fichier) | respectée |
 | « planification en diagramme de Gantt » | figure 3.2 | « Planification du projet », semaines du stage, sept phases, jalon de l'observation | respectée |
-| « chapitres équilibrés en pages » | mesure approchante : pages par chapitre, d'après la table des matières | 3, 6, 5, 6, 5, 5, 2, 7, 5, 4 pages (chapitres 1 à 10) | partiellement respectée : le chapitre 7 tient en 2 pages et le chapitre 8 en 7 |
+| « chapitres équilibrés en pages » | mesure approchante : pages par chapitre, d'après la table des matières | 3, 6, 6, 6, 5, 5, 2, 8, 5, 4 pages (chapitres 1 à 10) | partiellement respectée : le chapitre 7 tient en 2 pages et le chapitre 8 en 8 |
 | « références aux figures qui ne relèvent pas du travail de l'auteur » | légendes qui citent une source | 3 légendes citent leur source (organisation de l'établissement, missions du service) ; les autres figures sont produites par le projet | respectée |
 | « police et interligne unifiés » | `grep` du préambule ; réglages dans les sources rédigées | Latin Modern 12 pt, interligne 1,15, déclarés une fois ; 0 autre réglage | respectée |
 

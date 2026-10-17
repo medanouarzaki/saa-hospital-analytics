@@ -38,8 +38,10 @@ Le texte n'a pas changé. Trois moyens, dans cet ordre :
 2. **Réglage local d'un tableau.** Le tableau des étiquettes de provenance compose ses deux colonnes
    de texte en fer à gauche, et sa première colonne s'élargit : ses cellules n'ont plus d'espaces
    béants, et la seule boîte trop pleine du document disparaît.
-3. **Dernier recours.** Deux synthèses de chapitre débordaient de deux et de trois lignes sur une page
-   sinon vide ; la page qui les commence reçoit autant de lignes (`\enlargethispage`).
+3. **Dernier recours, écarté.** Deux synthèses de chapitre débordent de deux et de trois lignes sur
+   une page sinon vide. Agrandir la page qui les commence (`\enlargethispage`) les y faisait tenir,
+   mais leur dernière ligne recouvrait alors le numéro de page : le réglage est retiré, et les deux
+   courtes pages restent.
 
 Ce qui reste, et pourquoi : la dernière entrée de la liste des figures et celle de la liste des
 tableaux passent chacune en tête de la page suivante, parce que les listes s'enchaînent sur les mêmes
