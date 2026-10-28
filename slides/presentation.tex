@@ -1,39 +1,35 @@
-% Support de présentation de la soutenance.
+% Support de présentation de la soutenance : quatorze planches, quinze minutes.
 %
-% Même moteur que le rapport — pdflatex par latexmk — et pour le même motif : la
-% classe beamer et les polices Latin Modern sont présentes dans toute distribution
-% complète, sans dépendre d'une police du système.
+% Même moteur que le rapport — pdflatex par latexmk — et pour le même motif : la classe beamer et
+% les polices Latin Modern sont présentes dans toute distribution complète.
 %
-% Les marqueurs sont ceux du rapport, lus dans son fichier unique. Le seul nom de
-% personne — celui de l'auteur — n'y est pas écrit : il vient de
-% `../report/noms.tex`, que le fichier des marqueurs charge s'il existe et qui
-% n'est jamais commis. Sans lui, la planche de titre compose sans nom.
+% UNE IDÉE PAR PLANCHE, ET PEU DE TEXTE. Le propos est porté par l'oral ; la planche ne garde que
+% les mots-clés et les chiffres. Trois schémas en tout : la planification, l'architecture, et le
+% principe du paradoxe de composition. La planification n'est pas redessinée : c'est la figure que
+% le rapport compose, produite par son générateur, incluse telle quelle.
 %
-% Aucun texte fixe n'entoure un marqueur qui peut être vide : une ligne qui en
-% porte un passe par `\siRenseigne` et disparaît avec sa valeur, comme sur la
-% page de garde du rapport.
+% DEUX FAMILLES D'IMAGE SEULEMENT, celles que `tests/test_aucune_image.py` tolère : le logotype de
+% l'établissement de formation, et les captures du tableau de bord produit par ce projet. Aucune
+% image du système d'information observé, sous aucune forme — c'est la décision `0010`.
 %
-% AUCUN NOMBRE N'EST TAPÉ ICI. Chaque valeur vient du registre des chiffres, par son
-% identifiant, exactement comme dans le rapport : `../report/chiffres.tex` est le
-% fichier que le registre produit, et il porte `\chiffre` comme les valeurs. Sans
-% cette règle, la présentation serait le seul document du projet où un chiffre est
-% écrit à la main — et c'est par cette voie que cinq valeurs du projet sont devenues
-% fausses. Le contrôle du registre a vu sa portée étendue à ce répertoire pour que
-% la règle soit tenue et non seulement écrite.
+% UN SEUL NOM DE PERSONNE, celui de l'auteur, et il n'est pas écrit ici : il vient de
+% `../report/noms.tex`, que le fichier des marqueurs charge s'il existe et qui n'est jamais commis.
+%
+% AUCUN NOMBRE N'EST TAPÉ ICI. Chaque valeur vient du registre des chiffres, par son identifiant,
+% exactement comme dans le rapport. Le contrôle du registre examine ce fichier.
 %
 % Ce chapitre repose sur :
-%   CHI: ablation-comparaisons-variante-a, ablation-comparaisons-variante-c, ablation-ecart-complet, ablation-ecart-variante-a, ablation-ecart-variante-c, ablation-f-variante-c, admissions-2024
-%   CHI: baseline-f-mesure, capacite-fonctionnelle, collision-groupes-nom, collision-groupes-piece, collision-vides-piece, colonnes-source-obs
-%   CHI: colonnes-source-registre, comparaisons-modele, consultations-2024, defaut-taux-doublons, dim-patient-fiches-plusieurs-versions, dim-patient-lignes
-%   CHI: dimensions, examens-2024, facteur-annualisation, faits, fichiers-de-controle, grappes-exactes-global
-%   CHI: grappes-exactes-restreint, identifiants-distincts, interventions-2024, journees-2024, modeles-total, paires-candidates
-%   CHI: paires-possibles, parametres-obs, parametres-total, periode-jours, personnes-estimees, relation-brute-ensemble
-%   CHI: relation-inter-ensemble, relation-intra-ensemble, relations-injectees, relations-non-reprises, rotation-affichee, rotation-affichee-avant
-%   CHI: seuil-retenu, source-lignes-total, source-tables, sur-fusionnes-global, taches-graphe, tdb-graphiques
-%   CHI: tdb-indicateurs, tdb-pages, tdb-pages-methode, tdb-pages-pilotage, trot-publie, vt-paires-injectees
+%   CHI: ablation-comparaisons-variante-a, ablation-comparaisons-variante-c, ablation-ecart-complet, ablation-ecart-variante-a, ablation-ecart-variante-c, ablation-f-variante-a
+%   CHI: ablation-f-variante-c, activites-distinctes, baseline-f-mesure, colonnes-part-doc, colonnes-part-hyp, colonnes-part-obs
+%   CHI: colonnes-source-registre, comparaisons-modele, conclusions-avec-relation, exigences-calculables, exigences-champs-manquants, exigences-non-calculables
+%   CHI: exigences-rubriques, f-mesure-seuil-retenu, fichiers-de-controle, missions-service, modeles-total, parametres-part-doc
+%   CHI: parametres-part-hyp, parametres-part-obs, parametres-total, periode-jours, precision-seuil-retenu, profils-applicatifs
+%   CHI: profils-non-observes, rappel-seuil-retenu, relation-brute-ensemble-arrondi, relation-effectif-ensemble, relation-inter-ensemble-arrondi, relation-intra-ensemble-arrondi
+%   CHI: relations-injectees, relations-non-reprises, seuil-retenu, source-lignes-total, source-tables, tableaux-etablissement
+%   CHI: taches-graphe, tdb-indicateurs, tdb-pages, tdb-pages-methode, tdb-pages-pilotage, vt-paires-presentes
 %   SER: (aucune)
 
-\documentclass[aspectratio=169]{beamer}
+\documentclass[aspectratio=169,11pt]{beamer}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -42,759 +38,448 @@
 \usepackage{csquotes}
 \usepackage{xcolor}
 \usepackage{tikz}
+\usepackage{booktabs}
+\usepackage{amssymb}
 
 \usetheme{default}
-\usecolortheme{default}
-\setbeamertemplate{navigation symbols}{}
-\setbeamertemplate{footline}[frame number]
-
 \input{styles}
 \input{../report/marqueurs}
 \input{../report/chiffres}
 
-% LES DEUX LOGOTYPES VIENNENT DE LA COMMANDE DU RAPPORT, RÉEMPLOYÉE ET NON RÉÉCRITE. Elle
-% porte l'égalisation sur l'encre composée, l'alignement des médianes et le cadre d'attente
-% qui prend la place d'un fichier manquant ; en écrire une seconde ici, c'est se donner deux
-% vérités qui divergeront.
-%
-% ELLE N'ÉTAIT PAS ATTEIGNABLE, ET C'EST MESURÉ. `\IfFileExists` cherche depuis le répertoire
-% de composition et n'honore pas `\graphicspath` : un document d'essai composé depuis ce
-% répertoire, portant `\graphicspath{{../report/}}`, compose les deux CADRES D'ATTENTE et non
-% les logotypes. Le rapport déclare donc une racine de figures, vide chez lui ; il suffit de
-% la redéfinir ici.
-\input{../report/images}
-\renewcommand{\racineFigures}{../report/}
-
-% LE FIL. Chaque planche dit à laquelle des quatre étapes elle appartient, en sous-titre gris
-% et petit : le jury sait toujours où il en est, sans qu'une planche s'interrompe pour le lui
-% rappeler. Les planches d'ouverture n'en portent pas — elles précèdent le fil.
-\newcommand{\filDuPropos}[1]{\framesubtitle{\color{griscartouche}\scriptsize #1}}
-
-\title{Chaîne de données et tableau de bord\\pour un établissement hospitalier}
+\title{Conception et mise en œuvre d'une chaîne de données décisionnelle pour le Service
+d'Accueil et d'Admission}
+\subtitle{De la modélisation à la restitution}
 \author{\marqueurAuteur}
-% Le seul texte fixe de la planche de titre est le saut de ligne qui sépare
-% l'établissement de la filière, et il ne compose que si les DEUX portent une
-% valeur : un séparateur seul en tête ou en queue serait une ligne blanche
-% inexpliquée. Les trois appels disent exactement cela, sans commande de plus.
-\institute{%
-  \siRenseigne{\marqueurEtablissementFormation}{\marqueurEtablissementFormation}%
-  \siRenseigne{\marqueurEtablissementFormation}{\siRenseigne{\marqueurFiliere}{\\}}%
-  \siRenseigne{\marqueurFiliere}{\marqueurFiliere}%
-}
-\date{\marqueurDateSoutenance}
+\date{}
 
 \begin{document}
 
 % ---------------------------------------------------------------- 1. Titre
 \begin{frame}[plain]
-  \siBrouillon{\begin{center}\fbox{\mentionVersionDeTravail}\end{center}}
-  \begin{center}\logosInstitutionnels\end{center}
-  \vspace{-2mm}
-  \titlepage
+  \centering
+  \siBrouillon{{\footnotesize\color{griscartouche}\mentionVersionDeTravail}\par}
+  \vspace{4mm}
+  \includegraphics[height=17mm]{../report/figures/logos/INSEA-logo.png}\par
+  \vspace{5mm}
+  {\small\scshape\color{griscartouche}Rapport de stage d'application\par}
+  \vspace{3mm}
+  {\Large\bfseries\color{accentgarde}\inserttitle\par}
+  \vspace{2mm}
+  {\normalsize\insertsubtitle\par}
+  \vspace{6mm}
+  \siRenseigne{\marqueurAuteur}{{\large\marqueurAuteur\par}\vspace{3mm}}
+  {\small \marqueurOrganismeAccueil\par}
+  \vspace{1mm}
+  {\small\color{griscartouche}\marqueurFiliere\ — \marqueurAnneeUniversitaire\par}
+\end{frame}
+
+% ---------------------------------------------------------------- 2. Le contexte
+\begin{frame}{Le contexte}
+  \vspace{2mm}
+  \begin{columns}[T]
+    \begin{column}{0.31\textwidth}
+      {\large\bfseries\color{accentgarde}Le service\par}
+      \medskip
+      Accueil et admission\par
+      \secondaire{\marqueurOrganismeAccueil}
+      \bigskip
+
+      \grandChiffre{\chiffre{missions-service}} missions\par
+      \secondaire{article~35 du règlement}
+      \bigskip
+
+      dont : \textbf{établir les statistiques}
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      {\large\bfseries\color{accentgarde}Le système\par}
+      \medskip
+      Hosix.NET\par
+      \secondaire{progiciel du commerce}
+      \bigskip
+
+      \grandChiffre{\chiffre{profils-applicatifs}} profils applicatifs
+      \bigskip
+
+      aucun schéma de données publié
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      {\large\bfseries\color{accentgarde}Le besoin\par}
+      \medskip
+      un cahier de charges\par
+      \secondaire{toute l'activité du service}
+      \bigskip
+
+      indicateurs \textbf{recalculés depuis les faits}
+      \bigskip
+
+      lisibles sans connaître les codes
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------- 3. La problématique
+\begin{frame}{La problématique}
+  \vspace{8mm}
   \begin{center}
-    \small
-    \begin{tabular}{rl}
-      Organisme d'accueil & \marqueurOrganismeAccueil \\
-    \end{tabular}
-  \end{center}
-\end{frame}
-
-\section{Contexte et problème}
-
-% ---------------------------------------------------------------- A. Où j'étais
-\begin{frame}{Où j'étais}
-  \small
-  Un hôpital provincial, et l'un de ses services : \textbf{l'accueil et l'admission}. C'est par lui
-  qu'un patient entre, et c'est lui qui tient le dossier.
-  \medskip
-
-  \begin{itemize}
-    \item Il \textbf{ouvre un dossier} et lui attribue un identifiant qui suivra la personne d'un
-      séjour à l'autre.
-    \item Il \textbf{donne, déplace et annule des rendez-vous}.
-    \item Il \textbf{admet} un patient et enregistre ses mouvements d'un service à l'autre.
-    \item Il \textbf{oriente} ceux qui arrivent aux urgences.
-    \item Il \textbf{facture} les prestations, et relance ce qui reste dû.
-  \end{itemize}
-  \medskip
-
-  J'y ai passé mon stage, à un poste, sur l'écran des rendez-vous.
-\end{frame}
-
-% ---------------------------------------------------------------- B. Ce que le service produit
-\begin{frame}{Ce que ce service produit sans le savoir}
-  \small
-  Chacun de ces gestes laisse une trace dans le logiciel : une ligne, une date, un code, un montant.
-  \medskip
-
-  \textbf{Ces traces s'accumulent depuis des années.} Elles ne sont pas là pour être analysées :
-  elles sont là parce qu'il fallait bien enregistrer le dossier.
-  \medskip
-
-  Et pourtant, sur les neuf missions que le règlement intérieur prescrit au service, la cinquième
-  est d'\textbf{établir les statistiques et de gérer l'information hospitalière}. Ce n'est pas une
-  fonction déléguée à une cellule tierce : c'est une mission propre du service.
-\end{frame}
-
-% ---------------------------------------------------------------- C. Le problème
-\begin{frame}{Le problème, en une phrase}
-  \vspace{1.2cm}
-  \begin{center}
-    \begin{minipage}{0.86\textwidth}
+    \begin{minipage}{0.84\textwidth}
       \centering
-      {\large\color{accentgarde}\textbf{Entre les données que le service saisit chaque jour et les
-      indicateurs que le règlement lui demande, il manque un chemin.}}
+      {\Large\color{accentgarde}\textbf{Le service saisit tout,\\[1mm] et n'exploite presque rien.}\par}
     \end{minipage}
   \end{center}
-  \vspace{1.0cm}
-
-  \small
-  \begin{center}
-    Ce chemin est ce que ce travail construit — et ce qu'il mesure.
-  \end{center}
-\end{frame}
-
-% ---------------------------------------------------------------- D. Le fil
-\begin{frame}{Ce que je vais montrer}
-  \small
-  \begin{center}
-    \begin{tikzpicture}[x=1mm,y=1mm]
-      \node[briqueLargePres, text width=27mm] (a) at (0,0)   {\textbf{1.} Comprendre ce que le service saisit};
-      \node[briqueLargePres, text width=27mm] (b) at (34,0)  {\textbf{2.} Construire des données qui lui ressemblent};
-      \node[briqueLargePres, text width=27mm] (c) at (68,0)  {\textbf{3.} Bâtir la chaîne qui les traite};
-      \node[briqueLargePres, text width=27mm] (d) at (102,0) {\textbf{4.} Restituer, et dire ce que cela vaut};
-      \draw[fluxPres] (a) -- (b);
-      \draw[fluxPres] (b) -- (c);
-      \draw[fluxPres] (c) -- (d);
-    \end{tikzpicture}
-  \end{center}
-  \medskip
-
-  \begin{itemize}
-    \item La première étape est une \textbf{observation}, au poste, écran par écran.
-    \item La deuxième existe parce qu'\textbf{aucune donnée réelle ne sort du service}.
-    \item La troisième est le travail d'ingénierie proprement dit.
-    \item La quatrième dit ce que la chaîne démontre — et surtout ce qu'elle n'établit pas.
-  \end{itemize}
-  \medskip
-
-  Chaque planche qui suit porte, sous son titre, l'étape à laquelle elle appartient.
-\end{frame}
-
-
-% ---------------------------------------------------------------- 2. Le service
-\begin{frame}{Un profil du logiciel sert une mission que le règlement place ailleurs}
-  \filDuPropos{1. Comprendre ce que le service saisit}
+  \vspace{8mm}
   \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \small
-      Le règlement intérieur des hôpitaux prescrit \textbf{neuf} missions au service d'accueil
-      et d'admission. Le logiciel en propose \textbf{cinq} profils.
-      \medskip
-
-      Quatre missions reçoivent un profil. \textbf{Cinq n'en reçoivent aucun.}
-      \medskip
-
-      Et le profil de recouvrement ne répond à aucune mission de l'article~35 : le recouvrement
-      relève de l'article~9, qui en charge un autre pôle.
+    \begin{column}{0.44\textwidth}
+      \centering
+      \textbf{Ce qui existe}\par\medskip
+      rendez-vous, passages, mouvements,\\ factures, créances
     \end{column}
     \begin{column}{0.44\textwidth}
+      \centering
+      \textbf{Ce qui est attendu}\par\medskip
+      la nomenclature nationale :\\
+      \chiffre{tableaux-etablissement} tableaux par établissement nommé
+    \end{column}
+  \end{columns}
+  \vspace{8mm}
+  \begin{center}
+    \secondaire{Une chaîne peut-elle produire ces indicateurs à partir des seules données saisies ?}
+  \end{center}
+\end{frame}
+
+% ---------------------------------------------------------------- 4. Les deux contraintes
+\begin{frame}{Deux contraintes fondatrices}
+  \vspace{2mm}
+  \begin{columns}[T]
+    \begin{column}{0.46\textwidth}
+      {\large\bfseries\color{accentgarde}Aucune donnée réelle ne sort\par}
+      \medskip
+      confidentialité des données de santé
+      \bigskip
+
+      $\rightarrow$ un \textbf{jeu de données généré}, calibré sur le recueil national
+      \bigskip
+
+      \grandChiffre{\chiffre{source-lignes-total}} lignes\par
+      \secondaire{\chiffre{source-tables} tables, \chiffre{periode-jours} jours}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      {\large\bfseries\color{accentgarde}Un profil observé sur \chiffre{profils-applicatifs}\par}
+      \medskip
+      les autres exigent des habilitations
+      \bigskip
+
+      $\rightarrow$ \chiffre{profils-non-observes} processus \textbf{reconstruits par les documents}
+      \bigskip
+
+      \grandChiffre{OBS · DOC · HYP}\par
+      \secondaire{la provenance de chaque colonne}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------- 5. La démarche
+\begin{frame}{La démarche : sept phases, du service au rapport}
+  \vspace{1mm}
+  \begin{center}
+    \resizebox{\textwidth}{!}{\input{../report/figures/planification.tex}}
+  \end{center}
+  \vspace{2mm}
+  \begin{center}
+    du 20~juillet au 31~août 2026
+    \quad\secondaire{|}\quad
+    {\color{accentgarde}$\blacklozenge$} observation au poste\\[1.5mm]
+    \secondaire{une huitième phase, imprévue : la relecture critique}
+  \end{center}
+\end{frame}
+
+% ---------------------------------------------------------------- 6. L'architecture
+\begin{frame}{L'architecture de la chaîne}
+  \vspace{4mm}
+  \begin{center}
+    \begin{tikzpicture}[x=1mm,y=1mm]
+      \node[briquePres] (zone) at (0,0)   {Zone\\d'atterrissage};
+      \node[briquePres] (src)  at (23.5,0)  {source};
+      \node[briquePres] (int)  at (47,0)  {intermediate};
+      \node[briquePres] (mar)  at (70.5,0)  {marts};
+      \node[briquePres] (ins)  at (94,0)  {instantane};
+      \node[briqueFinPres] (tdb) at (117.5,0) {Tableau\\de bord};
+      \node[briqueOptPres] (qua) at (23.5,-20) {quarantaine};
+      \node[briqueOptPres] (lin) at (70.5,-20) {linkage};
+
+      \draw[fluxPres] (zone) -- (src);
+      \draw[fluxPres] (src) -- (int);
+      \draw[fluxPres] (int) -- (mar);
+      \draw[fluxPres] (mar) -- (ins);
+      \draw[fluxPres] (ins) -- (tdb);
+      \draw[fluxPres] (src) -- (qua);
+      \draw[fluxPres] (mar) -- (lin);
+
+      \node[notePres, anchor=south] at (23.5,6)  {copie fidèle};
+      \node[notePres, anchor=south] at (47,6)  {typage};
+      \node[notePres, anchor=south] at (70.5,6)  {étoile};
+      \node[notePres, anchor=south] at (94,6)  {tables figées};
+      \node[notePres, anchor=west] at (35,-20) {lignes rejetées,\\avec leur motif};
+      \node[notePres, anchor=west] at (82,-20) {rapprochement\\d'identités};
+    \end{tikzpicture}
+  \end{center}
+  \vspace{5mm}
+  \begin{columns}[T]
+    \begin{column}{0.3\textwidth}\centering
+      \textbf{Aucune couche}\\ ne modifie la précédente
+    \end{column}
+    \begin{column}{0.3\textwidth}\centering
+      \textbf{\chiffre{modeles-total}} modèles\\
+      \textbf{\chiffre{taches-graphe}} tâches par jour
+    \end{column}
+    \begin{column}{0.3\textwidth}\centering
+      une journée rejouée :\\ \textbf{remplacée, jamais dédoublée}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------- 7. Le jeu de données
+\begin{frame}{Le jeu de données : la structure observée, les valeurs posées}
+  \vspace{3mm}
+  \begin{center}
+    \renewcommand{\arraystretch}{1.35}
+    \large
+    \begin{tabular}{@{}l@{\hspace{14mm}}c@{\hspace{14mm}}c@{}}
+      & \textbf{Structure} & \textbf{Valeurs} \\
+      & \secondaire{\normalsize\chiffre{colonnes-source-registre} colonnes}
+      & \secondaire{\normalsize\chiffre{parametres-total} paramètres} \\
+      \midrule
+      Observé à l'écran   & \textbf{\color{accentgarde}\chiffre{colonnes-part-obs}~\%} & \chiffre{parametres-part-obs}~\% \\
+      Tiré d'un document  & \chiffre{colonnes-part-doc}~\% & \chiffre{parametres-part-doc}~\% \\
+      Posé par hypothèse  & \chiffre{colonnes-part-hyp}~\% & \textbf{\color{accentgarde}\chiffre{parametres-part-hyp}~\%} \\
+    \end{tabular}
+  \end{center}
+  \vspace{7mm}
+  \begin{center}
+    Le \textbf{modèle} ressemble au service.\quad Les \textbf{nombres} ne disent rien de lui.
+  \end{center}
+\end{frame}
+
+% ---------------------------------------------------------------- 8. Le rapprochement
+\begin{frame}{Le rapprochement d'identités : un score parfait qui ne prouve rien}
+  \vspace{2mm}
+  \begin{columns}[T]
+    \begin{column}{0.36\textwidth}
+      \textbf{Au seuil \chiffre{seuil-retenu}}\par
+      \secondaire{\chiffre{vt-paires-presentes} paires de doublons}
+      \medskip
+
+      précision \hfill \textbf{\chiffre{precision-seuil-retenu}}\par
+      rappel \hfill \textbf{\chiffre{rappel-seuil-retenu}}\par
+      F-mesure \hfill \textbf{\chiffre{f-mesure-seuil-retenu}}\par
+      \medskip
+      \secondaire{collision exacte : \chiffre{baseline-f-mesure}}
+    \end{column}
+    \begin{column}{0.58\textwidth}
+      \textbf{L'ablation des champs recopiés}\par
+      \medskip
+      \begin{tabular}{@{}lcr@{}}
+        & F-mesure & Marge \\
+        \midrule
+        modèle complet     & \chiffre{f-mesure-seuil-retenu} & \chiffre{ablation-ecart-complet} \\
+        sans champs recopiés & \chiffre{ablation-f-variante-a} & \textbf{\color{accentgarde}\chiffre{ablation-ecart-variante-a}} \\
+        deux retraits      & \chiffre{ablation-f-variante-c} & \textbf{\color{accentgarde}\chiffre{ablation-ecart-variante-c}} \\
+      \end{tabular}
+      \par\medskip
+      \secondaire{\small comparaisons : \chiffre{comparaisons-modele}, puis \chiffre{ablation-comparaisons-variante-a} et \chiffre{ablation-comparaisons-variante-c}}
+    \end{column}
+  \end{columns}
+  \vspace{7mm}
+  \begin{center}
+    La F-mesure tient. \textbf{La marge devient négative.}
+  \end{center}
+\end{frame}
+
+% ---------------------------------------------------------------- 9. Le tableau de bord
+\begin{frame}{Le tableau de bord}
+  \begin{center}
+    \small
+    \textbf{\chiffre{tdb-pages}} pages \quad\secondaire{|}\quad
+    \textbf{\chiffre{tdb-indicateurs}} indicateurs \quad\secondaire{|}\quad
+    pilotage du service \textbf{\chiffre{tdb-pages-pilotage}} \quad\secondaire{|}\quad
+    évaluation de la chaîne \textbf{\chiffre{tdb-pages-methode}}
+  \end{center}
+  \vspace{-1mm}
+  \begin{columns}[T]
+    \begin{column}{0.49\textwidth}\centering
+      \fbox{\includegraphics[width=0.96\linewidth]{../report/figures/tableau-de-bord/page-activite.png}}\par
+      \footnotesize\secondaire{Activité}
+    \end{column}
+    \begin{column}{0.49\textwidth}\centering
+      \fbox{\includegraphics[width=0.96\linewidth]{../report/figures/tableau-de-bord/page-donnees.png}}\par
+      \footnotesize\secondaire{Données}
+    \end{column}
+  \end{columns}
+  \vspace{3mm}
+  \begin{center}
+    \textbf{Faut-il ouvrir des créneaux ?}\quad
+    Activité $\rightarrow$ Rendez-vous $\rightarrow$ Données
+  \end{center}
+\end{frame}
+
+% ---------------------------------------------------------------- 10. Le paradoxe de composition
+\begin{frame}{Délai et absentéisme : un paradoxe de composition}
+  \vspace{2mm}
+  \begin{columns}[c]
+    \begin{column}{0.44\textwidth}
+      \renewcommand{\arraystretch}{1.4}
+      \begin{tabular}{@{}lr@{}}
+        Entre activités          & \grandChiffre{\chiffre{relation-inter-ensemble-arrondi}} \\
+        Dans chaque activité     & \grandChiffre{\chiffre{relation-intra-ensemble-arrondi}} \\
+        Tout mélangé             & \grandChiffre{\chiffre{relation-brute-ensemble-arrondi}} \\
+      \end{tabular}
+      \par\medskip
+      \secondaire{\small \chiffre{relation-effectif-ensemble} rendez-vous, \chiffre{activites-distinctes} activités}
+    \end{column}
+    \begin{column}{0.52\textwidth}
+      \centering
       \begin{tikzpicture}[x=1mm,y=1mm]
-        \node[briquePres, text width=30mm] (a) at (0,0) {Neuf missions\\prescrites};
-        \node[briquePres, text width=30mm] (b) at (0,-16) {Cinq profils\\applicatifs};
-        \draw[fluxPres] (a) -- node[notePres,right,inner sep=1.5pt] {quatre liens} (b);
-        \node[notePres, align=center, text width=34mm] at (0,-27)
-          {cinq missions sans profil\\un profil sans mission};
+        \draw[griscartouche, line width=0.5pt, -{Latex[length=1.6mm]}] (0,0) -- (62,0)
+          node[below left, font=\footnotesize, text=griscartouche] {délai};
+        \draw[griscartouche, line width=0.5pt, -{Latex[length=1.6mm]}] (0,0) -- (0,40)
+          node[above right, font=\footnotesize, text=griscartouche] {absence};
+        \draw[griscartouche, dashed, line width=0.6pt] (6,32) -- (58,8);
+        \foreach \cx/\cy in {12/28, 30/20, 48/12}{
+          \draw[accentgarde, line width=1.4pt] (\cx-7,\cy-4) -- (\cx+7,\cy+4);
+          \foreach \d in {-6,-2,2,6} \fill[accentgarde] (\cx+\d,\cy+\d*0.57) circle (0.8mm);
+        }
+        \node[notePres, anchor=north] at (31,-4) {schéma de principe : chaque trait est une activité};
       \end{tikzpicture}
     \end{column}
   \end{columns}
-\end{frame}
-
-% ---------------------------------------------------------------- 3. Au poste
-\begin{frame}{Un champ renseigné n'est pas un champ juste}
-  \filDuPropos{1. Comprendre ce que le service saisit}
-  \small
-  Au poste d'accueil, un agent saisit parfois un numéro de téléphone inventé, lorsque la personne
-  en face ne connaît pas le sien.
-  \medskip
-
-  Il ne fabrique pas une erreur : \textbf{il fait passer un dossier avec ce qu'il a.}
-  \medskip
-
-  Conséquence pour toute la chaîne :
-  \begin{itemize}
-    \item le taux de renseignement d'une colonne mesure ce qui a été \emph{saisi} ;
-    \item il ne mesure jamais ce qui est \emph{vrai} ;
-    \item un rappel envoyé sur un tel numéro part, et personne ne le reçoit.
-  \end{itemize}
-\end{frame}
-
-% ---------------------------------------------------------------- 4. Le problème
-\begin{frame}{Le service saisit tout, et n'exploite presque rien}
-  \filDuPropos{1. Comprendre ce que le service saisit}
-  \small
-  Le service enregistre chaque jour l'accueil, les rendez-vous, les passages, les mouvements et
-  la facturation. Cette matière existe.
-  \medskip
-
-  \textbf{Elle ne sert presque à rien tant qu'aucun chemin ne la mène jusqu'à un indicateur.}
-  \medskip
-
-  Établir les statistiques et gérer l'information hospitalière est pourtant une mission
-  \emph{propre} du service — la cinquième de l'article~35 —, et non une fonction déléguée à une
-  cellule tierce.
-\end{frame}
-
-% ---------------------------------------------------------------- 5. La contrainte
-\begin{frame}{Aucune donnée réelle ne sort du service}
-  \filDuPropos{2. Construire des données qui lui ressemblent}
-  \small
-  C'est la contrainte de cadrage, et elle est dite d'emblée parce qu'elle gouverne tout le reste.
-  \medskip
-
-  \begin{itemize}
-    \item Aucun extrait, aucun échantillon, aucune donnée anonymisée.
-    \item La chaîne est donc construite sur un \textbf{jeu de données généré}.
-    \item Elle lit des fichiers, non ce générateur : ce qui changerait en la branchant sur des
-      données réelles est écrit au rapport, chapitre par chapitre.
-  \end{itemize}
-  \medskip
-
-  \textbf{Ce que la chaîne démontre n'est donc jamais un constat sur le service.} La distinction
-  revient à chaque planche qui porte un résultat.
-\end{frame}
-
-\section{Le jeu de données}
-
-% ---------------------------------------------------------------- 6. Les volumes
-\begin{frame}{L'établissement est nommé dans le recueil statistique du ministère}
-  \filDuPropos{2. Construire des données qui lui ressemblent}
-  \small
-  Les volumes ne sont pas inventés : ils sont relevés dans une série annuelle, pour cet
-  établissement, sous son nom.
-  \medskip
-
+  \vspace{6mm}
   \begin{center}
-    \begin{tabular}{@{}lr@{}}
-      \hline
-      Capacité litière fonctionnelle & \chiffre{capacite-fonctionnelle} lits \\
-      Journées d'hospitalisation & \chiffre{journees-2024} \\
-      Admissions & \chiffre{admissions-2024} \\
-      Consultations & \chiffre{consultations-2024} \\
-      Examens & \chiffre{examens-2024} \\
-      Interventions chirurgicales & \chiffre{interventions-2024} \\
-      \hline
-    \end{tabular}
+    Lue seule, la mesure entre activités dirait : \textbf{attendre ne fait pas manquer.}
   \end{center}
-  \medskip
-
-  Le dernier chiffre n'est pas une donnée manquante : \textbf{l'établissement n'exerce aucune
-  activité chirurgicale}, et deux appuis indépendants l'établissent.
 \end{frame}
 
-% ---------------------------------------------------------------- 7. L'asymétrie
-\begin{frame}{La structure est observée, les valeurs ne le sont pas}
-  \filDuPropos{2. Construire des données qui lui ressemblent}
-  \small
+% ---------------------------------------------------------------- 11. Démontré, non établi
+\begin{frame}{Ce que l'analyse démontre, et ce qu'elle n'établit pas}
+  \vspace{2mm}
   \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
-      \textbf{Ce que l'écran a montré}
+    \begin{column}{0.46\textwidth}
+      {\large\bfseries\color{accentgarde}Démontré\par}
       \medskip
-
-      \chiffre{colonnes-source-obs} colonnes sur \chiffre{colonnes-source-registre} viennent
-      d'un relevé d'écran, chacune sous un identifiant que le lecteur retrouve en annexe.
+      \begin{itemize}\setlength{\itemsep}{2mm}
+        \item la chaîne \textbf{sait produire} chaque grandeur
+        \item \textbf{\chiffre{exigences-calculables}} rubriques sur \chiffre{exigences-rubriques} calculables
+        \item \chiffre{exigences-non-calculables} bloquées, chacune par \textbf{un champ absent}
+        \item absence $\neq$ annulation : tenu par le modèle de données
+      \end{itemize}
     \end{column}
-    \begin{column}{0.48\textwidth}
-      \textbf{Ce que l'écran n'a pas montré}
+    \begin{column}{0.46\textwidth}
+      {\large\bfseries\color{griscartouche}Non établi\par}
       \medskip
-
-      \chiffre{parametres-obs} paramètres de génération sur \chiffre{parametres-total} reposent
-      sur une observation. Les autres viennent d'une source publiée ou d'une hypothèse posée.
+      \begin{itemize}\setlength{\itemsep}{2mm}
+        \item \textbf{aucun fait} sur le service
+        \item \chiffre{conclusions-avec-relation} conclusions reproduisent une relation injectée
+        \item \chiffre{relations-non-reprises} relations injectées sur \chiffre{relations-injectees} reprises par aucune conclusion
+        \item un rappel parfait sur des données réelles
+      \end{itemize}
     \end{column}
   \end{columns}
-  \bigskip
-
-  \textbf{L'asymétrie est le fait central de ce travail.} Le \emph{modèle} est observé ; les
-  \emph{valeurs} qui le remplissent ne le sont pas, et aucune conclusion ne peut donc porter sur
-  le service.
 \end{frame}
 
-\section{La chaîne de données}
+% ---------------------------------------------------------------- 12. Trois recommandations
+\begin{frame}{Trois recommandations}
+  \vspace{2mm}
+  \begin{columns}[T]
+    \begin{column}{0.31\textwidth}
+      {\large\bfseries\color{accentgarde}Rendez-vous\par}
+      \medskip
+      \textbf{rappeler} les patients avant le rendez-vous
+      \bigskip
 
-% ---------------------------------------------------------------- 8. L'architecture (longue)
-\begin{frame}{L'architecture : aucune couche ne modifie la précédente}
-  \filDuPropos{3. Bâtir la chaîne qui les traite}
+      \secondaire{suppose}\par un numéro juste
+      \bigskip
+
+      \secondaire{mesure}\par l'absence par activité
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      {\large\bfseries\color{accentgarde}Urgences\par}
+      \medskip
+      une \textbf{filière courte} pour les deux niveaux les moins graves
+      \bigskip
+
+      \secondaire{suppose}\par un tri saisi à l'accueil
+      \bigskip
+
+      \secondaire{mesure}\par le délai des niveaux graves
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      {\large\bfseries\color{accentgarde}Champs manquants\par}
+      \medskip
+      \textbf{ajouter \chiffre{exigences-champs-manquants} champs}, le référentiel des médecins d'abord
+      \bigskip
+
+      \secondaire{suppose}\par le paramétrage, ou l'éditeur
+      \bigskip
+
+      \secondaire{mesure}\par \chiffre{exigences-non-calculables} rubriques débloquées
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------- 13. Limites et perspectives
+\begin{frame}{Limites et perspectives}
+  \vspace{2mm}
+  \begin{columns}[T]
+    \begin{column}{0.46\textwidth}
+      {\large\bfseries\color{griscartouche}Limites\par}
+      \medskip
+      \begin{itemize}\setlength{\itemsep}{2mm}
+        \item une vérité terrain \textbf{injectée}
+        \item un poste, un profil, une journée
+        \item le volume des urgences : une hypothèse
+        \item une rédaction menée trop tard
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      {\large\bfseries\color{accentgarde}Perspectives\par}
+      \medskip
+      \begin{itemize}\setlength{\itemsep}{2mm}
+        \item une \textbf{convention d'accès} et une extraction périodique
+        \item un échantillon annoté pour le rapprochement
+        \item des contrôles de forme, à écrire
+        \item un résultat qui devient \textbf{un constat}
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------- 14. Conclusion
+\begin{frame}{Conclusion}
+  \vspace{6mm}
   \begin{center}
-    \begin{tikzpicture}[x=0.95mm,y=0.95mm]
-      \node[briquePres, text width=22mm] (zone) at (0,0) {Zone\\d'atterrissage};
-      \node[briquePres, text width=22mm] (src)  at (28,0) {\texttt{source}};
-      \node[briqueOptPres, text width=22mm] (qua) at (28,-16) {\texttt{quarantaine}};
-      \node[briquePres, text width=22mm] (int)  at (56,0) {\texttt{intermediate}};
-      \node[briquePres, text width=22mm] (mar)  at (84,0) {\texttt{marts}};
-      \node[briqueOptPres, text width=22mm] (lin) at (84,-16) {\texttt{linkage}};
-      \node[briquePres, text width=22mm] (ins)  at (110,0) {\texttt{instantane}};
-
-      \draw[fluxPres] (zone) -- (src);
-      \draw[fluxPres] (src) -- (qua);
-      \draw[fluxPres] (src) -- (int);
-      \draw[fluxPres] (int) -- (mar);
-      \draw[fluxPres] (mar) -- (lin);
-      \draw[fluxPres] (mar) -- (ins);
-
-      \node[notePres, anchor=north, text width=26mm, align=center] at (0,-8)
-        {fichiers partitionnés};
-      \node[notePres, anchor=north, text width=26mm, align=center] at (28,-24)
-        {lignes rejetées,\\avec leur motif};
-      \node[notePres, anchor=north, text width=26mm, align=center] at (56,-8)
-        {typage,\\normalisation};
-      \node[notePres, anchor=north, text width=26mm, align=center] at (84,-24)
-        {rapprochement\\d'identités};
-      \node[notePres, anchor=north, text width=28mm, align=center] at (110,-8)
-        {tables figées\\que le tableau de bord lit};
-    \end{tikzpicture}
-  \end{center}
-  \small
-  \begin{itemize}
-    \item La couche source est une \textbf{copie fidèle} des fichiers, défauts compris ; corriger à
-      l'entrée aurait effacé ce qu'il fallait mesurer.
-    \item \chiffre{taches-graphe} tâches en chaîne, ordonnancées chaque jour, et les
-      \textbf{dimensions se construisent avant les faits}.
-    \item Le rafraîchissement de l'instantané n'est pas une reconstruction : les tables neuves sont
-      bâties à côté, puis \textbf{tous les noms sont échangés en une seule transaction}.
-  \end{itemize}
-\end{frame}
-
-% ---------------------------------------------------------------- E. La chaîne, couche par couche
-\begin{frame}{Ce que chaque couche reçoit, produit, et pourquoi elle existe}
-  \filDuPropos{3. Bâtir la chaîne qui les traite}
-  \scriptsize
-  \begin{center}
-    \begin{tabular}{@{}p{2.5cm}p{3.6cm}p{6.8cm}@{}}
-      \hline
-      Couche & Ce qu'elle produit & Pourquoi elle existe \\
-      \hline
-      Atterrissage & les fichiers tels qu'ils arrivent & une extraction ne se relit pas : on la dépose, datée, et on n'y touche plus \\
-      \texttt{source} & une copie fidèle, tout en texte & corriger à l'entrée effacerait ce qu'il faut mesurer \\
-      \texttt{quarantaine} & les lignes rejetées, avec leur motif & \emph{la quarantaine est le bac où l'on met de côté une ligne qu'on ne sait pas charger, plutôt que de la jeter} \\
-      \texttt{intermediate} & les mêmes tables, typées et normalisées & une date écrite « 07-28-2026 » n'est une date que si quelqu'un la convertit \\
-      \texttt{marts} & les tables d'analyse & c'est la forme dans laquelle une question se pose vite \\
-      \texttt{linkage} & les paires de fiches qui désignent la même personne & un même patient possède plusieurs dossiers \\
-      \texttt{instantane} & une copie figée et datée & \emph{l'instantané est une photographie de l'état construit, que le tableau de bord lit pendant qu'on reconstruit le reste} \\
-      \hline
-    \end{tabular}
-  \end{center}
-  \medskip
-
-  \textbf{Aucune couche ne modifie la précédente.} C'est la règle qui rend la chaîne rejouable : on
-  peut tout reconstruire depuis les fichiers déposés, et retrouver le même résultat.
-\end{frame}
-
-% ---------------------------------------------------------------- F. Le schéma en étoile
-\begin{frame}{Onze tables à l'entrée, un schéma en étoile à la sortie}
-  \filDuPropos{3. Bâtir la chaîne qui les traite}
-  \small
-  \emph{Un schéma en étoile, c'est une table d'événements — un passage, une facture — entourée des
-  tables qui la décrivent : qui, quand, où, quel acte.}
-
-  \begin{center}
-    \begin{tikzpicture}[x=1mm,y=1mm]
-      \node[briquePres, text width=26mm] (f) at (0,0) {\textbf{Passage}\\[1pt]\emph{un événement}};
-      \node[briqueOptPres, text width=22mm] (d1) at (-42,12) {Patient};
-      \node[briqueOptPres, text width=22mm] (d2) at (-42,-12) {Date};
-      \node[briqueOptPres, text width=22mm] (d3) at (42,12) {Service};
-      \node[briqueOptPres, text width=22mm] (d4) at (42,-12) {Activité};
-      \node[briqueOptPres, text width=22mm] (d5) at (0,-22) {Organisme};
-      \foreach \d in {d1,d2,d3,d4,d5} \draw[assocPres] (f) -- (\d);
-    \end{tikzpicture}
-  \end{center}
-  \medskip
-
-  \chiffre{source-tables} tables à l'entrée, \chiffre{modeles-total} modèles de transformation,
-  \chiffre{dimensions} dimensions et \chiffre{faits} tables de faits. On répond alors à « combien de
-  passages en mars, aux urgences » en joignant l'événement à ses descriptions.
-\end{frame}
-
-% ---------------------------------------------------------------- G. La dimension historisée
-\begin{frame}{Une fiche change, et la facture de l'an dernier ne doit pas changer avec elle}
-  \filDuPropos{3. Bâtir la chaîne qui les traite}
-  \small
-  \emph{Une dimension historisée garde chaque état successif d'une fiche, avec la période pendant
-  laquelle il a valu} — au lieu d'écraser l'ancien par le nouveau.
-  \medskip
-
-  \begin{center}
-    \begin{tikzpicture}[x=1mm,y=1mm]
-      \node[briqueLargePres, text width=44mm] (v1) at (0,0) {\textbf{version 1} — jusqu'en mars\\[1pt]\emph{couverture : sans}};
-      \node[briqueLargePres, text width=44mm] (v2) at (58,0) {\textbf{version 2} — depuis mars\\[1pt]\emph{couverture : assurance}};
-      \draw[fluxPres] (v1) -- (v2);
-      \node[notePres, align=center, text width=40mm] at (29,9) {le patient déclare\\sa couverture};
-      \node[briquePres, text width=30mm] (f) at (0,-22) {facture de février};
-      \draw[fluxPres] (f) -- (v1);
-    \end{tikzpicture}
-  \end{center}
-  \medskip
-
-  Sans historisation, la facture de février se lirait avec la couverture d'aujourd'hui, et la part
-  payée par l'organisme deviendrait fausse — rétroactivement, et sans que rien ne le signale.
-\end{frame}
-
-% ---------------------------------------------------------------- H. L'orchestration
-\begin{frame}{Rejouer une journée ne duplique rien, et l'ordre du rattrapage est indifférent}
-  \filDuPropos{3. Bâtir la chaîne qui les traite}
-  \small
-  \emph{L'orchestration, c'est le fait de déclencher les tâches dans un ordre imposé par leurs
-  dépendances.} \chiffre{taches-graphe} tâches s'enchaînent chaque jour, du dépôt des fichiers à
-  l'export.
-  \medskip
-
-  \textbf{Deux propriétés comptent, et elles se disent par l'exemple.}
-  \medskip
-
-  \begin{itemize}
-    \item \emph{L'idempotence} : le fichier d'un jour a été chargé, on s'aperçoit qu'il était
-      incomplet, on le corrige et on le recharge. Le chargement commence par supprimer tout ce qui
-      portait cette date, puis insère. \textbf{La journée est remplacée, jamais dédoublée.}
-    \item \emph{Le rattrapage} : trois journées manquent. On les charge. \textbf{L'ordre dans lequel
-      on le fait ne change pas l'état final} — chacune ne touche que sa propre date.
-  \end{itemize}
-  \medskip
-
-  Sans ces deux propriétés, une erreur d'extraction se répare en reconstruisant tout ; avec elles,
-  elle se répare en rechargeant un jour.
-\end{frame}
-
-% ---------------------------------------------------------------- I. La vérification
-\begin{frame}{Un contrôle vert ne prouve rien tant qu'on ne l'a pas mis en défaut}
-  \filDuPropos{3. Bâtir la chaîne qui les traite}
-  \small
-  \chiffre{fichiers-de-controle} fichiers de contrôle surveillent la chaîne, et s'exécutent à chaque
-  modification.
-  \medskip
-
-  \textbf{Mais le nombre ne dit rien de leur valeur.} La méthode retenue est celle-ci : on casse
-  délibérément ce qu'un contrôle surveille, on vérifie qu'il rougit, puis on restaure.
-  \medskip
-
-  \begin{center}
-    \begin{minipage}{0.88\textwidth}
+    \begin{minipage}{0.84\textwidth}
       \centering
-      {\color{accentgarde}\textbf{Une mutation restée verte révèle presque toujours un contrôle
-      défectueux, et non un code correct.}}
+      {\Large\color{accentgarde}\textbf{Un chemin, du fichier saisi jusqu'à l'indicateur.}\par}
+      \vspace{3mm}
+      {\large Et pour chaque grandeur : ce qu'elle vaut.\par}
     \end{minipage}
   \end{center}
-  \medskip
-
-  Le projet en donne le cas d'école : un indicateur réglementaire est resté faux d'un facteur
-  \chiffre{facteur-annualisation} pendant des mois, et son contrôle est resté vert tout ce temps —
-  il retranscrivait la formule de la page et se comparait à elle.
-\end{frame}
-
-
-% ---------------------------------------------------------------- 9. Étoile et historisation
-\begin{frame}{Une fiche modifiée fait une version, pas une personne}
-  \filDuPropos{3. Bâtir la chaîne qui les traite}
-  \small
-  \chiffre{dimensions} dimensions, \chiffre{faits} faits. La dimension patient est
-  \emph{historisée} : elle garde chaque état successif d'une fiche.
-  \medskip
-
-  \begin{center}
-    \begin{tikzpicture}[x=1mm,y=1mm]
-      \node[briquePres, text width=32mm] (v) at (0,0) {\chiffre{dim-patient-lignes} versions de fiche};
-      \node[briquePres, text width=32mm] (i) at (44,0) {\chiffre{identifiants-distincts} identifiants};
-      \node[briquePres, text width=32mm] (p) at (88,0) {\chiffre{personnes-estimees} personnes};
-      \draw[fluxPres] (v) -- (i);
-      \draw[fluxPres] (i) -- (p);
-      \node[notePres, anchor=north, text width=40mm, align=center] at (22,-7)
-        {\chiffre{dim-patient-fiches-plusieurs-versions} en portent plus d'une};
-      \node[notePres, anchor=north, text width=40mm, align=center] at (66,-7)
-        {des doublons d'identité les réunissent};
-    \end{tikzpicture}
-  \end{center}
-  \medskip
-
-  \textbf{Trois grandeurs, non deux.} Les confondre est l'erreur la plus facile à commettre sur ce
-  jeu de données, et elle a été commise trois fois dans les documents de travail de ce projet.
-\end{frame}
-
-\section{Qualité et rapprochement d'identités}
-
-% ---------------------------------------------------------------- 10. Pourquoi les doublons
-\begin{frame}{Les doublons sont établis par l'outil et par l'audit, jamais par une observation}
-  \filDuPropos{3. Bâtir la chaîne qui les traite}
-  \small
-  \begin{itemize}
-    \item \textbf{Par l'outil.} L'écran de recherche porte un onglet de recherche \emph{pondérée}
-      sur l'index maître des patients, et une colonne de \emph{probabilité} en regard de chaque
-      résultat. Une recherche qui rend des probabilités n'est pas une recherche exacte.
-    \item \textbf{Par l'audit.} Un rapport de contrôle consacré à l'établissement documente le
-      phénomène.
-  \end{itemize}
-  \medskip
-
-  \textbf{Et une réserve qui compte autant que le reste :} aucune recherche conduite au poste n'a
-  rendu plusieurs résultats proches d'un même patient. \emph{Le problème n'a pas été constaté sur
-  place.}
-  \medskip
-
-  Le jeu de données en injecte donc une part connue — \chiffre{defaut-taux-doublons} — et
-  \chiffre{vt-paires-injectees} paires forment la vérité terrain.
-\end{frame}
-
-% ---------------------------------------------------------------- 11. Comment on les retrouve
-\begin{frame}{Le blocage écarte, le modèle tranche}
-  \filDuPropos{3. Bâtir la chaîne qui les traite}
-  \small
-  \begin{center}
-    \begin{tikzpicture}[x=1mm,y=1mm]
-      \node[briquePres, text width=34mm] (t) at (0,0) {\chiffre{paires-possibles} paires possibles};
-      \node[briquePres, text width=34mm] (c) at (48,0) {\chiffre{paires-candidates} paires candidates};
-      \node[briquePres, text width=34mm] (m) at (96,0) {\chiffre{comparaisons-modele} comparaisons};
-      \draw[fluxPres] (t) -- node[notePres,above,inner sep=1.5pt] {blocage} (c);
-      \draw[fluxPres] (c) -- node[notePres,above,inner sep=1.5pt] {modèle} (m);
-    \end{tikzpicture}
-  \end{center}
-  \medskip
-
-  \emph{Un rapprochement probabiliste, c'est le fait d'estimer la probabilité que deux fiches
-  désignent la même personne, au lieu d'exiger qu'elles soient identiques à la lettre.}
-  \medskip
-
-  \begin{itemize}
-    \item \emph{Le blocage est le tri grossier qui écarte d'emblée les paires qui n'ont aucune
-      chance} : il réunit ici quatre règles — nom et adresse, nom et téléphone, pièce d'identité,
-      parents et naissance — et son rappel sur la vérité terrain est total.
-    \item \textbf{Le modèle} est probabiliste : il estime, pour chaque comparaison, la probabilité
-      d'accord chez les vrais couples et chez les faux.
-    \item \textbf{Le seuil retenu} est \chiffre{seuil-retenu}.
-  \end{itemize}
-\end{frame}
-
-% ---------------------------------------------------------------- 12. Ventilation (longue)
-\begin{frame}{Ce que la ligne de base retrouve, et ce qu'elle manque}
-  \filDuPropos{4. Restituer, et dire ce que cela vaut}
-  \small
-  La ligne de base est la collision exacte : deux fiches sont dites identiques si un champ le dit
-  à la lettre. Sa F-mesure vaut \chiffre{baseline-f-mesure}.
-  \medskip
-
-  \begin{center}
-    \begin{tabular}{@{}lrl@{}}
-      \hline
-      Groupes par nom exact & \chiffre{collision-groupes-nom} & retrouvés sans modèle \\
-      Groupes par pièce d'identité & \chiffre{collision-groupes-piece} & idem \\
-      Fiches sans pièce d'identité & \chiffre{collision-vides-piece} & \textbf{invisibles à la collision} \\
-      \hline
-      Grappes sur la population restreinte & \chiffre{grappes-exactes-restreint} & \\
-      Grappes sur la population entière & \chiffre{grappes-exactes-global} & \\
-      Fiches sur-fusionnées & \chiffre{sur-fusionnes-global} & \\
-      \hline
-    \end{tabular}
-  \end{center}
-  \medskip
-
-  \textbf{Le chiffre qui compte est le troisième.} Une fiche dont la pièce d'identité est vide ne
-  peut pas entrer dans une collision exacte : c'est exactement la population que le modèle
-  probabiliste existe pour retrouver, et c'est aussi celle que le service saisit le moins bien.
-\end{frame}
-
-% ---------------------------------------------------------------- 13. Ablation (longue)
-\begin{frame}{L'ablation : la F-mesure ne bouge pas, la marge s'effondre}
-  \filDuPropos{4. Restituer, et dire ce que cela vaut}
-  \small
-  \emph{L'ablation consiste à retirer une information au modèle et à regarder ce qu'il perd.} Et
-  \emph{le poids de correspondance est le score que le modèle donne à une paire} : plus il est
-  élevé, plus la paire a de chances d'être vraie.
-  \medskip
-
-  Regarder la F-mesure après un retrait ne dit rien. Il faut regarder \textbf{l'écart de poids}
-  entre la paire vraie la moins bien notée et la paire fausse la mieux notée.
-  \medskip
-
-  \begin{center}
-    \begin{tabular}{@{}lrr@{}}
-      \hline
-      Variante & Comparaisons & Écart de poids \\
-      \hline
-      Modèle complet & \chiffre{comparaisons-modele} & \chiffre{ablation-ecart-complet} \\
-      Variante A & \chiffre{ablation-comparaisons-variante-a} & \chiffre{ablation-ecart-variante-a} \\
-      Variante C & \chiffre{ablation-comparaisons-variante-c} & \chiffre{ablation-ecart-variante-c} \\
-      \hline
-    \end{tabular}
-  \end{center}
-  \medskip
-
-  La variante C garde une F-mesure de \chiffre{ablation-f-variante-c} — quasi parfaite — et son
-  écart de poids est pourtant \textbf{négatif}.
-  \medskip
-
-  \textbf{Un modèle qui classe encore juste peut avoir cessé de discriminer.} La F-mesure seule
-  l'aurait laissé passer.
-\end{frame}
-
-% ---------------------------------------------------------------- 14. Limites de l'évaluation
-\begin{frame}{Ce que cette évaluation ne prouve pas}
-  \filDuPropos{4. Restituer, et dire ce que cela vaut}
-  \small
-  \begin{itemize}
-    \item \textbf{La vérité terrain est connue parce qu'elle a été injectée.} Sur des données
-      réelles, cette connaissance n'existe pas : il faudrait un échantillon annoté à la main, avec
-      son coût et son incertitude propres.
-    \item \textbf{Précision et rappel cessent alors d'être mesurables tels quels.}
-    \item \textbf{Les défauts sont ceux que j'ai semés}, à un taux que j'ai choisi. Un fichier réel
-      en porte d'autres, dans d'autres proportions.
-  \end{itemize}
-  \medskip
-
-  Ce que l'évaluation établit est plus modeste et plus solide : \textbf{la chaîne sait produire
-  ces grandeurs, à la maille où une décision se prend.}
-\end{frame}
-
-\section{Analyse de l'activité}
-
-% ---------------------------------------------------------------- 15. Paradoxe de composition
-\begin{frame}{Trois corrélations, et une seule d'entre elles ment}
-  \filDuPropos{4. Restituer, et dire ce que cela vaut}
-  \small
-  Le lien entre le délai d'obtention d'un rendez-vous et l'absentéisme se mesure de trois façons,
-  et les trois ne disent pas la même chose.
-  \medskip
-
-  \begin{center}
-    \begin{tabular}{@{}lr@{}}
-      \hline
-      Entre activités & \chiffre{relation-inter-ensemble} \\
-      À l'intérieur de chaque activité & \chiffre{relation-intra-ensemble} \\
-      Sur les rendez-vous pris ensemble & \chiffre{relation-brute-ensemble} \\
-      \hline
-    \end{tabular}
-  \end{center}
-  \medskip
-
-  \textbf{La première est négative, la deuxième positive, la troisième presque nulle.} Publier
-  l'une des trois seule serait un artefact de composition : le tableau de bord porte les deux
-  premières côte à côte, et jamais l'une sans l'autre.
-\end{frame}
-
-\section{Le tableau de bord}
-
-% ---------------------------------------------------------------- 16. Deux sections
-\begin{frame}{Deux sections, et la seconde ne sert aucune décision}
-  \filDuPropos{4. Restituer, et dire ce que cela vaut}
-  \small
-  \chiffre{tdb-pages} pages, \chiffre{tdb-indicateurs} indicateurs, \chiffre{tdb-graphiques}
-  tracés, sur \chiffre{periode-jours} jours et \chiffre{source-lignes-total} lignes réparties sur
-  \chiffre{source-tables} tables.
-  \medskip
-
+  \vspace{8mm}
   \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
-      \textbf{Pilotage du service} — \chiffre{tdb-pages-pilotage} pages
-      \medskip
-
-      Chaque page sert une décision : ouvrir des créneaux, dimensionner le tri, répartir les lits,
-      prioriser le recouvrement.
+    \begin{column}{0.22\textwidth}\centering
+      \grandChiffre{\chiffre{modeles-total}}\par\small modèles
     \end{column}
-    \begin{column}{0.48\textwidth}
-      \textbf{Évaluation de la chaîne} — \chiffre{tdb-pages-methode} pages
-      \medskip
-
-      Aucune décision de service ne s'y adosse. Ces pages décrivent un modèle et une provenance,
-      non une file d'attente.
+    \begin{column}{0.22\textwidth}\centering
+      \grandChiffre{\chiffre{taches-graphe}}\par\small tâches orchestrées
+    \end{column}
+    \begin{column}{0.22\textwidth}\centering
+      \grandChiffre{\chiffre{tdb-indicateurs}}\par\small indicateurs
+    \end{column}
+    \begin{column}{0.22\textwidth}\centering
+      \grandChiffre{\chiffre{fichiers-de-controle}}\par\small fichiers de contrôle
     \end{column}
   \end{columns}
-  \medskip
-
-  \textbf{Aucun indicateur circulaire n'est classé en pilotage}, et un contrôle le vérifie.
-\end{frame}
-
-% ---------------------------------------------------------------- 17. L'indicateur faux
-\begin{frame}{Un indicateur réglementaire faux, qu'aucun contrôle ne pouvait voir}
-  \filDuPropos{4. Restituer, et dire ce que cela vaut}
-  \small
-  Le taux de rotation affichait \chiffre{rotation-affichee-avant} là où la statistique nationale
-  publie \chiffre{trot-publie} : faux d'un facteur \chiffre{facteur-annualisation}, soit exactement
-  le rapport de la durée de la période à l'année de référence. \textbf{La page n'annualisait pas.}
-  \medskip
-
-  \textbf{Le contrôle qui le surveillait était vert, et il l'est resté pendant toute la durée du
-  défaut.} Il retranscrivait la formule de la page et se comparait à elle : une comparaison vraie
-  par construction, incapable de départager une formule juste d'une formule fausse.
-  \medskip
-
-  Le contrôle qui l'a remplacé ne retranscrit rien : il appelle la page et confronte ses sorties à
-  deux références qui ne peuvent pas bouger avec elle. Le taux vaut désormais
-  \chiffre{rotation-affichee}.
-  \medskip
-
-  \textbf{Une seconde mesure n'a de valeur que si elle peut être fausse quand la première l'est.}
-\end{frame}
-
-\section{Limites et perspectives}
-
-% ---------------------------------------------------------------- 18. Recommandations
-\begin{frame}{Trois actions, et ce que chacune suppose}
-  \filDuPropos{4. Restituer, et dire ce que cela vaut}
-  \small
-  \begin{itemize}
-    \item \textbf{Rappeler les patients} dont le rendez-vous approche, en commençant par les
-      activités où le délai est le plus long. \emph{Suppose un numéro juste — et c'est là que la
-      difficulté se trouve.}
-    \item \textbf{Ouvrir une filière courte} pour les deux niveaux de tri les moins graves.
-      \emph{Suppose un tri formalisé dont le résultat est enregistré.}
-    \item \textbf{Prioriser le recouvrement} par ancienneté et par débiteur. \emph{Suppose que la
-      créance porte son débiteur, ce que le modèle observe.}
-  \end{itemize}
-  \medskip
-
-  Aucun effort n'est chiffré et aucun effet n'est quantifié. Ce qui établit le constat vient
-  toujours d'une source extérieure au jeu de données ; ce que l'indicateur démontre est seulement
-  que la chaîne sait produire le nombre.
-\end{frame}
-
-% ---------------------------------------------------------------- 19. Limites
-\begin{frame}{Les limites, énoncées et non concédées}
-  \filDuPropos{4. Restituer, et dire ce que cela vaut}
-  \small
-  \begin{itemize}
-    \item \textbf{Le jeu de données n'est pas la réalité.} \chiffre{relations-injectees} relations
-      y sont injectées, dont \chiffre{relations-non-reprises} qu'aucune conclusion ne reprend, et
-      chaque conclusion dit laquelle elle reproduit.
-    \item \textbf{L'observation a porté sur un poste et sur un profil}, une journée. Les quatre
-      autres profils exigent des habilitations qu'un stagiaire ne reçoit pas.
-    \item \textbf{La composition du service est inconnue} : aucune source consultée ne la donne, et
-      ce rapport ne la suppose pas.
-    \item \textbf{Aucun argument de performance} n'est tiré de la volumétrie : elle est celle d'un
-      établissement de cette taille, non celle d'une épreuve de charge.
-  \end{itemize}
-\end{frame}
-
-% ---------------------------------------------------------------- 20. Ensuite
-\begin{frame}{Ce que je ferais ensuite}
-  \filDuPropos{4. Restituer, et dire ce que cela vaut}
-  \small
-  \begin{itemize}
-    \item \textbf{Brancher la chaîne sur une extraction réelle}, sous convention d'accès — ce qui
-      change de nature est écrit : la vérité terrain disparaît, les distributions cessent d'être
-      posées, et un résultat cesse de démontrer pour se mettre à établir.
-    \item \textbf{Mesurer le taux d'aboutissement des rappels} avant d'en attendre un effet : c'est
-      lui qui dira quelle part du fichier de contact est utilisable.
-    \item \textbf{Écrire au fil de l'eau plutôt qu'à la fin.} J'ai découvert en rédigeant des
-      erreurs qu'aucun contrôle n'avait vues — écrire est aussi une manière de vérifier.
-  \end{itemize}
-\end{frame}
-
-% ---------------------------------------------------------------- 21. Merci
-\begin{frame}[plain]
+  \vspace{10mm}
   \begin{center}
-    \vspace{1.2cm}
-    {\Large\bfseries\color{accentgarde} Merci de votre attention}
-    \vspace{0.8cm}
-
-    \small
-    \begin{tabular}{rl}
-      Organisme d'accueil & \marqueurOrganismeAccueil \\
-    \end{tabular}
+    \secondaire{Merci de votre attention.}
   \end{center}
 \end{frame}
 

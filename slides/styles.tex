@@ -1,41 +1,52 @@
-% Les styles de tracé de la présentation.
+% Les styles de la présentation.
 %
 % Ils sont écrits ici plutôt qu'empruntés à `report/images.tex` : ce fichier-là porte l'apparat des
 % figures du rapport — emplacements réservés, logotypes, compteur de captures — dont une planche
-% n'a que faire, et il déclare ses couleurs par des noms que le document principal du rapport
-% définit. Une planche qui l'inclurait chargerait un apparat inutile et dépendrait d'un fichier
-% qu'elle ne compose pas.
+% n'a que faire.
 %
-% La couleur d'accent est celle de la page de garde du rapport, à l'identique : le support de
-% soutenance et le document remis se ressemblent, sans que l'un lise l'autre.
+% UNE SEULE COULEUR D'ACCENT, celle de la page de garde du rapport, à l'identique. Fond blanc, aucun
+% dégradé, aucune ombre, aucune barre de navigation : le seul apparat est le numéro de planche en
+% pied de page. Le gris ne porte que les mentions secondaires.
 
 \definecolor{accentgarde}{RGB}{23,54,93}
 \definecolor{griscartouche}{gray}{0.42}
 
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{normal text}{fg=black}
 \setbeamercolor{structure}{fg=accentgarde}
-\setbeamercolor{frametitle}{fg=accentgarde}
+\setbeamercolor{frametitle}{fg=accentgarde,bg=}
 \setbeamercolor{title}{fg=accentgarde}
-\setbeamerfont{frametitle}{series=\bfseries}
+\setbeamercolor{page number in head/foot}{fg=griscartouche}
+\setbeamerfont{frametitle}{series=\bfseries,size=\Large}
+\setbeamerfont{page number in head/foot}{size=\footnotesize}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}{%
+  \hfill\usebeamercolor[fg]{page number in head/foot}%
+  \usebeamerfont{page number in head/foot}\insertframenumber\hspace{6mm}\vspace{3mm}}
 \setbeamertemplate{itemize item}{\color{accentgarde}\textbullet}
 \setbeamertemplate{itemize subitem}{\color{griscartouche}--}
+\setbeamertemplate{enumerate item}{\color{accentgarde}\bfseries\insertenumlabel.}
+\setbeamersize{text margin left=10mm, text margin right=10mm}
 
-\usetikzlibrary{positioning, shapes.geometric, fit, calc, arrows.meta}
+\usetikzlibrary{positioning, calc, arrows.meta, shapes.geometric}
 
 \tikzset{
   % — une brique de couche, ou une étape.
   briquePres/.style={
-    rectangle, draw=accentgarde, line width=0.6pt, align=center,
-    font=\scriptsize, inner sep=2.5pt, minimum height=7mm, text width=24mm,
+    rectangle, draw=accentgarde, line width=0.7pt, align=center,
+    font=\small, inner sep=3pt, minimum height=9mm, text width=20mm,
   },
-  briqueLargePres/.style={briquePres, text width=54mm},
   % — un cadre secondaire : trait pointillé.
   briqueOptPres/.style={briquePres, dash pattern=on 1.6pt off 1.6pt},
-  % — l'intitulé d'une couche.
-  couchePres/.style={font=\scriptsize\scshape, text=griscartouche, align=right},
-  % — une association vers une table descriptive.
-  assocPres/.style={draw=accentgarde, line width=0.5pt},
+  % — la brique d'arrivée : pleine, en couleur d'accent.
+  briqueFinPres/.style={briquePres, fill=accentgarde, text=white},
   % — une flèche de flux.
-  fluxPres/.style={draw=accentgarde, line width=0.6pt, -{Latex[length=1.8mm,width=1.4mm]}},
-  % — une accolade de regroupement.
-  notePres/.style={font=\scriptsize\itshape, text=griscartouche},
+  fluxPres/.style={draw=accentgarde, line width=0.7pt, -{Latex[length=2mm,width=1.6mm]}},
+  % — une note grise.
+  notePres/.style={font=\footnotesize\itshape, text=griscartouche, align=center},
 }
+
+% Un chiffre mis en avant : grand, gras, en couleur d'accent.
+\newcommand{\grandChiffre}[1]{{\LARGE\bfseries\color{accentgarde}#1}}
+% Une mention secondaire.
+\newcommand{\secondaire}[1]{{\color{griscartouche}#1}}
